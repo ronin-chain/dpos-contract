@@ -43,6 +43,13 @@ contract MockPrecompile {
     _arrangeValidatorCandidates(_result, _trustedWeights, _newValidatorCount, _maxPrioritizedValidatorNumber);
   }
 
+  function validateProofOfPossession(
+    bytes calldata /*publicKey*/,
+    bytes calldata /*proofOfPossession*/
+  ) public pure returns (bool) {
+    return true;
+  }
+
   /**
    * @dev Arranges the sorted candidates to list of validators, by asserting prioritized and non-prioritized candidates
    *

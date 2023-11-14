@@ -14,6 +14,7 @@ import {
   RoninGovernanceAdmin,
   StakingVesting__factory,
   StakingVesting,
+  MockProfile__factory,
 } from '../../../src/types';
 import * as RoninValidatorSet from '../helpers/ronin-validator-set';
 import { generateSamplePubkey, mineBatchTxs } from '../helpers/utils';
@@ -85,7 +86,7 @@ describe('Emergency Exit test', () => {
       stakingVestingContractAddress,
       profileAddress,
       fastFinalityTrackingAddress,
-      roninTrustedOrganizationAddress
+      roninTrustedOrganizationAddress,
     } = await deployTestSuite('EmergencyExit')({
       slashIndicatorArguments: {
         doubleSignSlashing: {
@@ -139,6 +140,10 @@ describe('Emergency Exit test', () => {
       ...trustedOrgs.map((_) => _.governor)
     );
 
+    const mockProfileLogic = await new MockProfile__factory(deployer).deploy();
+    await mockProfileLogic.deployed();
+    await governanceAdminInterface.upgrade(profileAddress, mockProfileLogic.address);
+
     const mockValidatorLogic = await new MockRoninValidatorSetExtended__factory(deployer).deploy();
     await mockValidatorLogic.deployed();
     await governanceAdminInterface.upgrade(roninValidatorSet.address, mockValidatorLogic.address);
@@ -160,6 +165,7 @@ describe('Emergency Exit test', () => {
           validatorCandidates[i].treasuryAddr.address,
           2_00,
           generateSamplePubkey(),
+          '0x',
           {
             value: stakedAmount[i],
           }

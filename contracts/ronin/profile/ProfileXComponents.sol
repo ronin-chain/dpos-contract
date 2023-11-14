@@ -14,7 +14,8 @@ abstract contract ProfileXComponents is IProfile, ProfileHandler {
     address admin,
     address id,
     address treasury,
-    bytes calldata pubkey
+    bytes calldata pubkey,
+    bytes calldata proofOfPossession
   ) external override onlyContract(ContractType.STAKING) {
     // Check existent profile
     CandidateProfile storage _profile = _id2Profile[id];
@@ -27,9 +28,35 @@ abstract contract ProfileXComponents is IProfile, ProfileHandler {
       admin: admin,
       treasury: payable(treasury),
       __reservedGovernor: address(0),
-      pubkey: pubkey
+      pubkey: pubkey,
+      pubkeyLastChange: 0,
+      oldPubkey: ""
     });
     _requireNonDuplicatedInRegistry(profile);
+    _verifyPubkey(pubkey, proofOfPossession);
     _addNewProfile(_profile, profile);
+  }
+
+  /**
+   * @inheritdoc IProfile
+   */
+  function arePublicKeysRegistered(bytes[][2] calldata listOfPublicKey) external view returns (bool) {
+    for (uint256 i; i < listOfPublicKey.length; ) {
+      for (uint256 j; j < listOfPublicKey[i].length; ) {
+        if (!_isRegisteredPubkey(listOfPublicKey[i][j])) {
+          return false;
+        }
+
+        unchecked {
+          j++;
+        }
+      }
+
+      unchecked {
+        i++;
+      }
+    }
+
+    return true;
   }
 }

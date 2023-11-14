@@ -54,6 +54,8 @@ contract ChangeConsensusAddressForkTest is Test {
     MockPrecompile mockPrecompile = new MockPrecompile();
     vm.etch(address(0x68), address(mockPrecompile).code);
     vm.makePersistent(address(0x68));
+    vm.etch(address(0x6a), address(mockPrecompile).code);
+    vm.makePersistent(address(0x6a));
 
     vm.createSelectFork(RONIN_TEST_RPC, 21901973);
     // vm.createSelectFork(RONIN_MAIN_RPC, 29225255);
@@ -514,7 +516,8 @@ contract ChangeConsensusAddressForkTest is Test {
       TConsensus.wrap(makeAddr("new-consensus")),
       payable(admin),
       2500,
-      "new-consensus"
+      "new-consensus",
+      ""
     );
     // re-apply same consensus
     address newAdmin = makeAddr("new-admin");
@@ -526,7 +529,8 @@ contract ChangeConsensusAddressForkTest is Test {
       standardConsensus,
       payable(newAdmin),
       2500,
-      "new-admin"
+      "new-admin",
+      ""
     );
 
     console2.log("recipient", recipient);
@@ -992,7 +996,8 @@ contract ChangeConsensusAddressForkTest is Test {
       consensusAddr,
       payable(candidateAdmin),
       15_00,
-      pubKey
+      pubKey,
+      ""
     );
   }
 

@@ -30,6 +30,7 @@ import {
   bridgeManagerConf,
   bridgeRewardConf,
 } from '../../../src/configs/bridge-manager';
+import { MockProfile__factory } from '../../../src/types';
 
 export interface DeployTestSuiteOutput {
   roninGovernanceAdminAddress: Address;

@@ -37,6 +37,10 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     __migrationRenouncedCandidates();
   }
 
+  function initializeV3(uint256 cooldown) external reinitializer(3) {
+    _setPubkeyChangeCooldown(cooldown);
+  }
+
   /**
    * @dev Add addresses of renounced candidates into registry. Only called during {initializeV2}.
    */
@@ -198,10 +202,12 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
   /**
    * @inheritdoc IProfile
    */
-  function changePubkey(address id, bytes memory pubkey) external {
+  function changePubkey(address id, bytes calldata pubkey, bytes calldata proofOfPossession) external {
     CandidateProfile storage _profile = _getId2ProfileHelper(id);
     _requireCandidateAdmin(_profile);
     _requireNonDuplicatedPubkey(pubkey);
+    _checkPubkeyChangeCooldown(_profile);
+    _verifyPubkey(pubkey, proofOfPossession);
     _setPubkey(_profile, pubkey);
   }
 
@@ -210,5 +216,12 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
       msg.sender != sProfile.admin ||
       !IRoninValidatorSet(getContract(ContractType.VALIDATOR)).isCandidateAdmin(sProfile.consensus, msg.sender)
     ) revert ErrUnauthorized(msg.sig, RoleAccess.CANDIDATE_ADMIN);
+  }
+
+  /**
+   * @inheritdoc IProfile
+   */
+  function setPubkeyChangeCooldown(uint256 cooldown) external onlyAdmin {
+    _setPubkeyChangeCooldown(cooldown);
   }
 }

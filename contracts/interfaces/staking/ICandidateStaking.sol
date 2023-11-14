@@ -100,7 +100,8 @@ interface ICandidateStaking is IRewardPool {
     TConsensus consensusAddr,
     address payable treasuryAddr,
     uint256 commissionRate,
-    bytes calldata pubkey
+    bytes calldata pubkey,
+    bytes calldata proofOfPossession
   ) external payable;
 
   /**

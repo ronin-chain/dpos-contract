@@ -12,6 +12,7 @@ import {
   MockRoninValidatorSetExtended,
   RoninGovernanceAdmin,
   RoninGovernanceAdmin__factory,
+  MockProfile__factory,
 } from '../../../src/types';
 import { ContractType, generateSamplePubkey, mineBatchTxs } from '../helpers/utils';
 import { deployTestSuite } from '../helpers/fixture';
@@ -64,7 +65,7 @@ describe('[Integration] Submit Block Reward', () => {
       roninGovernanceAdminAddress,
       profileAddress,
       fastFinalityTrackingAddress,
-      roninTrustedOrganizationAddress
+      roninTrustedOrganizationAddress,
     } = await deployTestSuite('ActionSubmitReward')({
       slashIndicatorArguments: {
         unavailabilitySlashing: {
@@ -99,7 +100,7 @@ describe('[Integration] Submit Block Reward', () => {
       slashContractAddress,
       stakingContractAddress,
       validatorContractAddress,
-      roninTrustedOrganizationAddress
+      roninTrustedOrganizationAddress,
     });
 
     slashContract = SlashIndicator__factory.connect(slashContractAddress, deployer);
@@ -112,6 +113,10 @@ describe('[Integration] Submit Block Reward', () => {
       undefined,
       ...trustedOrgs.map((_) => _.governor)
     );
+
+    const mockProfileLogic = await new MockProfile__factory(deployer).deploy();
+    await mockProfileLogic.deployed();
+    await governanceAdminInterface.upgrade(profileAddress, mockProfileLogic.address);
 
     const mockValidatorLogic = await new MockRoninValidatorSetExtended__factory(deployer).deploy();
     await mockValidatorLogic.deployed();
@@ -155,6 +160,7 @@ describe('[Integration] Submit Block Reward', () => {
           validator.treasuryAddr.address,
           2_00,
           generateSamplePubkey(),
+          '0x',
           {
             value: initStakingAmount,
           }
@@ -207,6 +213,7 @@ describe('[Integration] Submit Block Reward', () => {
           validator.treasuryAddr.address,
           2_00,
           generateSamplePubkey(),
+          '0x',
           {
             value: initStakingAmount,
           }

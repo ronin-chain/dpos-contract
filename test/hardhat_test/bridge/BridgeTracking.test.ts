@@ -19,6 +19,7 @@ import {
   RoninTrustedOrganization__factory,
   Staking,
   Staking__factory,
+  MockProfile__factory,
 } from '../../../src/types';
 import { DEFAULT_ADDRESS } from '../../../src/utils';
 import {
@@ -156,6 +157,10 @@ describe('Bridge Tracking test', () => {
       .emit(bridgeTracking, 'ContractUpdated')
       .withArgs(ContractType.BRIDGE, mockGateway.address);
 
+    const mockProfileLogic = await new MockProfile__factory(deployer).deploy();
+    await mockProfileLogic.deployed();
+    await governanceAdminInterface.upgrade(profileAddress, mockProfileLogic.address);
+
     const mockValidatorLogic = await new MockRoninValidatorSetExtended__factory(deployer).deploy();
     await mockValidatorLogic.deployed();
     await governanceAdminInterface.upgrade(roninValidatorSet.address, mockValidatorLogic.address);
@@ -191,6 +196,7 @@ describe('Bridge Tracking test', () => {
           candidates[i].treasuryAddr.address,
           1,
           generateSamplePubkey(candidates[i].consensusAddr.address, candidates[i].candidateAdmin.address),
+          '0x',
           { value: minValidatorStakingAmount + candidates.length - i }
         );
     }

@@ -21,8 +21,11 @@ abstract contract ProfileStorage is IProfile, HasContracts {
   /// @dev Mapping from consensus address => id address.
   mapping(TConsensus => address) internal _consensus2Id;
 
+  /// @dev The cooldown time the change public key.
+  uint256 pubkeyChangeCooldown;
+
   /// @dev Upgradeable gap.
-  bytes32[48] __gap;
+  bytes32[47] __gap;
 
   /**
    * @dev Add a profile from memory to storage.
@@ -74,7 +77,12 @@ abstract contract ProfileStorage is IProfile, HasContracts {
   }
 
   function _setPubkey(CandidateProfile storage _profile, bytes memory pubkey) internal {
+    if (_profile.pubkey.length != 0) {
+      _profile.oldPubkey = _profile.pubkey;
+    }
+
     _profile.pubkey = pubkey;
+    _profile.pubkeyLastChange = block.timestamp;
     _registry[_hashPubkey(pubkey)] = true;
 
     emit PubkeyChanged(_profile.id, pubkey);
@@ -93,5 +101,9 @@ abstract contract ProfileStorage is IProfile, HasContracts {
    */
   function _hashPubkey(bytes memory pubkey) internal pure returns (uint256) {
     return uint256(keccak256(pubkey));
+  }
+
+  function _setPubkeyChangeCooldown(uint256 cooldown) internal {
+    pubkeyChangeCooldown = cooldown;
   }
 }
