@@ -8,7 +8,7 @@ import { Network } from "./utils/Network.sol";
 import { Contract } from "./utils/Contract.sol";
 
 contract GeneralConfig is BaseGeneralConfig {
-  constructor() BaseGeneralConfig("", "deployments/") {}
+  constructor() BaseGeneralConfig("", "deployments/") { }
 
   function _setUpNetworks() internal virtual override {
     super._setUpNetworks();
@@ -28,6 +28,14 @@ contract GeneralConfig is BaseGeneralConfig {
       Network.EthMainnet.deploymentDir(),
       Network.EthMainnet.envLabel(),
       Network.EthMainnet.explorer()
+    );
+    setNetworkInfo(
+      Network.RoninDevnet.chainId(),
+      Network.RoninDevnet.key(),
+      Network.RoninDevnet.chainAlias(),
+      Network.RoninDevnet.deploymentDir(),
+      Network.RoninDevnet.envLabel(),
+      Network.RoninDevnet.explorer()
     );
   }
 

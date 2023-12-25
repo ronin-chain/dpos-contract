@@ -16,9 +16,8 @@ contract Simulation__20231019_RecoverFund is RoninMigration {
 
   function run() public {
     address admin = makeAddr("eoa-admin");
-    RoninGovernanceAdmin roninGovernanceAdmin = RoninGovernanceAdmin(
-      config.getAddressFromCurrentNetwork(Contract.RoninGovernanceAdmin.key())
-    );
+    RoninGovernanceAdmin roninGovernanceAdmin =
+      RoninGovernanceAdmin(config.getAddressFromCurrentNetwork(Contract.RoninGovernanceAdmin.key()));
     address bridgeTracking = config.getAddressFromCurrentNetwork(Contract.BridgeTracking.key());
 
     uint256 balanceBefore = admin.balance;

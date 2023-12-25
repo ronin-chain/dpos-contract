@@ -5,7 +5,10 @@ import { ProxyAdmin } from "@openzeppelin/contracts/proxy/transparent/ProxyAdmin
 import { RoninGovernanceAdmin } from "@ronin/contracts/ronin/RoninGovernanceAdmin.sol";
 import { TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
 import { TransparentUpgradeableProxy } from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
-import { IRoninTrustedOrganization, RoninTrustedOrganization } from "@ronin/contracts/multi-chains/RoninTrustedOrganization.sol";
+import {
+  IRoninTrustedOrganization,
+  RoninTrustedOrganization
+} from "@ronin/contracts/multi-chains/RoninTrustedOrganization.sol";
 import { Proposal } from "@ronin/contracts/libraries/Proposal.sol";
 import { Ballot } from "@ronin/contracts/libraries/Ballot.sol";
 import { VoteStatusConsumer } from "@ronin/contracts/interfaces/consumers/VoteStatusConsumer.sol";
@@ -31,7 +34,7 @@ contract RoninMigration is BaseMigration, VoteStatusConsumer {
     Signature
   }
 
-  ISharedArgument public constant config = ISharedArgument(address(CONFIG));
+  ISharedArgument internal constant config = ISharedArgument(address(CONFIG));
 
   function _configByteCode() internal virtual override returns (bytes memory) {
     return abi.encodePacked(type(GeneralConfig).creationCode);
@@ -40,9 +43,8 @@ contract RoninMigration is BaseMigration, VoteStatusConsumer {
   function _sharedArguments() internal virtual override returns (bytes memory rawArgs) {
     ISharedArgument.SharedParameter memory param;
 
-    RoninTrustedOrganization trustedOrg = RoninTrustedOrganization(
-      config.getAddressFromCurrentNetwork(Contract.RoninTrustedOrganization.key())
-    );
+    RoninTrustedOrganization trustedOrg =
+      RoninTrustedOrganization(config.getAddressFromCurrentNetwork(Contract.RoninTrustedOrganization.key()));
     (uint256 num, uint256 denom) = trustedOrg.getThreshold();
     param.trustedOrgs = trustedOrg.getAllTrustedOrganizations();
 
@@ -69,23 +71,25 @@ contract RoninMigration is BaseMigration, VoteStatusConsumer {
     (deployed, proxyNonce) = _deployRaw(proxyAbsolutePath, abi.encode(logic, proxyAdmin, args));
     CONFIG.setAddress(network(), contractType, deployed);
     ARTIFACT_FACTORY.generateArtifact(
-      sender(),
-      deployed,
-      proxyAbsolutePath,
-      string.concat(contractName, "Proxy"),
-      args,
-      proxyNonce
+      sender(), deployed, proxyAbsolutePath, string.concat(contractName, "Proxy"), args, proxyNonce
     );
   }
 
-  function _upgradeRaw(address proxyAdmin, address payable proxy, address logic, bytes memory args) internal override {
+  function _upgradeRaw(address proxyAdmin, address payable proxy, address logic, bytes memory args)
+    internal
+    virtual
+    override
+  {
     assertTrue(proxyAdmin != address(0x0), "RoninMigration: Invalid {proxyAdmin} or {proxy} is not a Proxy contract");
     address governanceAdmin = _getProxyAdminFromCurrentNetwork();
     TNetwork currentNetwork = network();
 
     if (proxyAdmin == governanceAdmin) {
       // in case proxyAdmin is GovernanceAdmin
-      if (currentNetwork == DefaultNetwork.RoninTestnet.key() || currentNetwork == DefaultNetwork.RoninMainnet.key()) {
+      if (
+        currentNetwork == DefaultNetwork.RoninTestnet.key() || currentNetwork == DefaultNetwork.RoninMainnet.key()
+          || currentNetwork == Network.RoninDevnet.key()
+      ) {
         // handle for ronin network
         console.log(StdStyle.yellow("Voting on RoninGovernanceAdmin for upgrading..."));
 
@@ -139,7 +143,7 @@ contract RoninMigration is BaseMigration, VoteStatusConsumer {
     }
   }
 
-  function _getProxyAdminFromCurrentNetwork() internal view returns (address proxyAdmin) {
+  function _getProxyAdminFromCurrentNetwork() internal view virtual returns (address proxyAdmin) {
     TNetwork currentNetwork = network();
     if (currentNetwork == DefaultNetwork.RoninTestnet.key() || currentNetwork == DefaultNetwork.RoninMainnet.key()) {
       proxyAdmin = config.getAddressFromCurrentNetwork(Contract.RoninGovernanceAdmin.key());
@@ -154,25 +158,19 @@ contract RoninMigration is BaseMigration, VoteStatusConsumer {
     Proposal.ProposalDetail memory proposal
   ) internal {
     Ballot.VoteType support = Ballot.VoteType.For;
-    IRoninTrustedOrganization.TrustedOrganization[] memory allTrustedOrgs = roninTrustedOrg
-      .getAllTrustedOrganizations();
+    IRoninTrustedOrganization.TrustedOrganization[] memory allTrustedOrgs = roninTrustedOrg.getAllTrustedOrganizations();
 
-    vm.prank(allTrustedOrgs[0].governor);
+    vm.broadcast(allTrustedOrgs[0].governor);
     governanceAdmin.proposeProposalForCurrentNetwork(
-      proposal.expiryTimestamp,
-      proposal.targets,
-      proposal.values,
-      proposal.calldatas,
-      proposal.gasAmounts,
-      support
+      proposal.expiryTimestamp, proposal.targets, proposal.values, proposal.calldatas, proposal.gasAmounts, support
     );
 
     for (uint256 i = 1; i < allTrustedOrgs.length; ++i) {
-      (VoteStatus status, , , , ) = governanceAdmin.vote(block.chainid, proposal.nonce);
+      (VoteStatus status,,,,) = governanceAdmin.vote(block.chainid, proposal.nonce);
       if (status != VoteStatus.Pending) {
         break;
       }
-      vm.prank(allTrustedOrgs[i].governor);
+      vm.broadcast(allTrustedOrgs[i].governor);
       governanceAdmin.castProposalVoteForCurrentNetwork(proposal, support);
     }
   }
@@ -206,13 +204,7 @@ contract RoninMigration is BaseMigration, VoteStatusConsumer {
     vm.stopPrank();
 
     proposal = Proposal.ProposalDetail(
-      governanceAdmin.round(block.chainid) + 1,
-      block.chainid,
-      expiry,
-      targets,
-      values,
-      callDatas,
-      gasAmounts
+      governanceAdmin.round(block.chainid) + 1, block.chainid, expiry, targets, values, callDatas, gasAmounts
     );
 
     vm.revertTo(snapshotId);

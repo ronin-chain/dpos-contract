@@ -6,7 +6,8 @@ import { LibString } from "lib/foundry-deployment-kit/lib/solady/src/utils/LibSt
 
 enum Network {
   Goerli,
-  EthMainnet
+  EthMainnet,
+  RoninDevnet
 }
 
 using { key, name, chainId, chainAlias, envLabel, deploymentDir, explorer } for Network global;
@@ -14,6 +15,7 @@ using { key, name, chainId, chainAlias, envLabel, deploymentDir, explorer } for 
 function chainId(Network network) pure returns (uint256) {
   if (network == Network.Goerli) return 5;
   if (network == Network.EthMainnet) return 1;
+  if (network == Network.RoninDevnet) return 2022;
   revert("Network: Unknown chain id");
 }
 
@@ -28,6 +30,7 @@ function explorer(Network network) pure returns (string memory link) {
 
 function name(Network network) pure returns (string memory) {
   if (network == Network.Goerli) return "Goerli";
+  if (network == Network.RoninDevnet) return "RoninDevnet";
   if (network == Network.EthMainnet) return "EthMainnet";
   revert("Network: Unknown network name");
 }
@@ -35,11 +38,13 @@ function name(Network network) pure returns (string memory) {
 function deploymentDir(Network network) pure returns (string memory) {
   if (network == Network.Goerli) return "goerli/";
   if (network == Network.EthMainnet) return "ethereum/";
+  if (network == Network.RoninDevnet) return "ronin-devnet/";
   revert("Network: Unknown network deployment directory");
 }
 
 function envLabel(Network network) pure returns (string memory) {
   if (network == Network.Goerli) return "TESTNET_PK";
+  if (network == Network.RoninDevnet) return "DEVNET_PK";
   if (network == Network.EthMainnet) return "MAINNET_PK";
   revert("Network: Unknown private key env label");
 }
@@ -47,5 +52,6 @@ function envLabel(Network network) pure returns (string memory) {
 function chainAlias(Network network) pure returns (string memory) {
   if (network == Network.Goerli) return "goerli";
   if (network == Network.EthMainnet) return "ethereum";
+  if (network == Network.RoninDevnet) return "ronin-devnet";
   revert("Network: Unknown network alias");
 }

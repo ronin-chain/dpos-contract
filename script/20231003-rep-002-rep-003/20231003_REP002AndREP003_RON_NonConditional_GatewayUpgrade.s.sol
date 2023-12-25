@@ -92,37 +92,28 @@ contract Simulation_20231003_REP002AndREP003_RON_NonConditional_GatewayUpgrade i
     address expectedRoninBridgeManager = computeCreateAddress(sender(), bridgeManagerNonce);
 
     _bridgeSlash = BridgeSlash(
-      new BridgeSlashDeploy()
-        .overrideArgs(
-          abi.encodeCall(
-            BridgeSlash.initialize,
-            (
-              address(_validatorSet),
-              expectedRoninBridgeManager,
-              address(_bridgeTracking),
-              address(_roninGovernanceAdmin)
-            )
-          )
+      new BridgeSlashDeploy().overrideArgs(
+        abi.encodeCall(
+          BridgeSlash.initialize,
+          (address(_validatorSet), expectedRoninBridgeManager, address(_bridgeTracking), address(_roninGovernanceAdmin))
         )
-        .run()
+      ).run()
     );
 
     _bridgeReward = BridgeReward(
-      new BridgeRewardDeploy()
-        .overrideArgs(
-          abi.encodeCall(
-            BridgeReward.initialize,
-            (
-              expectedRoninBridgeManager,
-              address(_bridgeTracking),
-              address(_bridgeSlash),
-              address(_validatorSet),
-              address(_roninGovernanceAdmin),
-              1337_133
-            )
+      new BridgeRewardDeploy().overrideArgs(
+        abi.encodeCall(
+          BridgeReward.initialize,
+          (
+            expectedRoninBridgeManager,
+            address(_bridgeTracking),
+            address(_bridgeSlash),
+            address(_validatorSet),
+            address(_roninGovernanceAdmin),
+            1337_133
           )
         )
-        .run()
+      ).run()
     );
 
     RoninBridgeManager actualRoninBridgeManager = new RoninBridgeManagerDeploy().run();

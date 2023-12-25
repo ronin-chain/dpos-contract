@@ -45,8 +45,7 @@ contract Simulation__20231003_UpgradeREP002AndREP003_RON_NonConditional is
       // bump `SlashIndicator` to V2, V3
 
       _upgradeProxy(
-        Contract.SlashIndicator.key(),
-        abi.encodeCall(SlashIndicator.initializeV2, (address(_roninGovernanceAdmin)))
+        Contract.SlashIndicator.key(), abi.encodeCall(SlashIndicator.initializeV2, (address(_roninGovernanceAdmin)))
       );
       _slashIndicator.initializeV3(loadContractOrDeploy(Contract.Profile.key()));
     }

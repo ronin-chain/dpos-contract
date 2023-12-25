@@ -9,8 +9,14 @@ import { LibErrorHandler } from "foundry-deployment-kit/libraries/LibErrorHandle
 import { TContract } from "foundry-deployment-kit/types/Types.sol";
 import { Proposal, RoninMigration } from "script/RoninMigration.s.sol";
 import { LibString, Contract } from "script/utils/Contract.sol";
-import { RoninGovernanceAdmin, HardForkRoninGovernanceAdminDeploy } from "script/contracts/HardForkRoninGovernanceAdminDeploy.s.sol";
-import { RoninTrustedOrganization, TemporalRoninTrustedOrganizationDeploy } from "script/contracts/TemporalRoninTrustedOrganizationDeploy.s.sol";
+import {
+  RoninGovernanceAdmin,
+  HardForkRoninGovernanceAdminDeploy
+} from "script/contracts/HardForkRoninGovernanceAdminDeploy.s.sol";
+import {
+  RoninTrustedOrganization,
+  TemporalRoninTrustedOrganizationDeploy
+} from "script/contracts/TemporalRoninTrustedOrganizationDeploy.s.sol";
 
 contract Migration__20232811_ChangeGovernanceAdmin is RoninMigration {
   using LibString for *;
@@ -74,18 +80,12 @@ contract Migration__20232811_ChangeGovernanceAdmin is RoninMigration {
 
     // Build {changeAdmin} calldata to migrate to new Ronin Governance Admin
     for (uint256 i; i < targets.length; ++i) {
-      callDatas[i] = abi.encodeWithSelector(
-        TransparentUpgradeableProxy.changeAdmin.selector,
-        address(hardForkGovernanceAdmin)
-      );
+      callDatas[i] =
+        abi.encodeWithSelector(TransparentUpgradeableProxy.changeAdmin.selector, address(hardForkGovernanceAdmin));
     }
 
     Proposal.ProposalDetail memory proposal = _buildProposal(
-      RoninGovernanceAdmin(roninGovernanceAdmin),
-      block.timestamp + 5 minutes,
-      targets,
-      values,
-      callDatas
+      RoninGovernanceAdmin(roninGovernanceAdmin), block.timestamp + 5 minutes, targets, values, callDatas
     );
 
     // Execute the proposal
@@ -98,9 +98,10 @@ contract Migration__20232811_ChangeGovernanceAdmin is RoninMigration {
     _validateHardForkGovernanceAdmin(targets);
   }
 
-  function _validateHardForkGovernanceAdmin(
-    address[] memory targets
-  ) internal logFn("_validateHardForkGovernanceAdmin") {
+  function _validateHardForkGovernanceAdmin(address[] memory targets)
+    internal
+    logFn("_validateHardForkGovernanceAdmin")
+  {
     for (uint256 i; i < targets.length; ++i) {
       TContract contractType = config.getContractTypeFromCurrentNetwok(targets[i]);
       console.log("Upgrading contract:", vm.getLabel(targets[i]));
