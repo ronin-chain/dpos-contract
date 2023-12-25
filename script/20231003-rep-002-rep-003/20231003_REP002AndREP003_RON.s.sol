@@ -4,7 +4,7 @@ pragma solidity ^0.8.19;
 import "./20231003_REP002AndREP003_Base.s.sol";
 
 contract Simulation__20231003_UpgradeREP002AndREP003_RON is Simulation__20231003_UpgradeREP002AndREP003_Base {
-  function run() public virtual override trySetUp {
+  function run() public virtual override {
     super.run();
 
     _upgradeDPoSContracts();
@@ -36,7 +36,7 @@ contract Simulation__20231003_UpgradeREP002AndREP003_RON is Simulation__20231003
       // bump `Staking` to V2
       bytes[] memory stakingCallDatas = new bytes[](1);
       stakingCallDatas[0] = abi.encodeCall(Staking.initializeV2, ());
-      Staking(new NotifiedMigratorUpgrade().run(ContractKey.Staking, stakingCallDatas));
+      Staking(new NotifiedMigratorUpgrade().run(Contract.Staking, stakingCallDatas));
     }
 
     {
@@ -44,17 +44,17 @@ contract Simulation__20231003_UpgradeREP002AndREP003_RON is Simulation__20231003
       // bump `SlashIndicator` to V2, V3
       bytes[] memory slashIndicatorDatas = new bytes[](2);
       slashIndicatorDatas[0] = abi.encodeCall(
-        SlashIndicator.initializeV2,
-        (_config.getAddressFromCurrentNetwork(ContractKey.GovernanceAdmin))
+        SlashIndicator.initializeV2, (config.getAddressFromCurrentNetwork(Contract.RoninGovernanceAdmin.key()))
       );
-      slashIndicatorDatas[1] = abi.encodeCall(SlashIndicator.initializeV3, (loadContractOrDeploy(ContractKey.Profile)));
-      new NotifiedMigratorUpgrade().run(ContractKey.SlashIndicator, slashIndicatorDatas);
+      slashIndicatorDatas[1] =
+        abi.encodeCall(SlashIndicator.initializeV3, (loadContractOrDeploy(Contract.Profile.key())));
+      new NotifiedMigratorUpgrade().run(Contract.SlashIndicator, slashIndicatorDatas);
     }
 
     {
       // upgrade `RoninTrustedOrganization`
       bytes[] memory emptyCallDatas;
-      new NotifiedMigratorUpgrade().run(ContractKey.RoninTrustedOrganization, emptyCallDatas);
+      new NotifiedMigratorUpgrade().run(Contract.RoninTrustedOrganization, emptyCallDatas);
     }
 
     {
@@ -62,9 +62,7 @@ contract Simulation__20231003_UpgradeREP002AndREP003_RON is Simulation__20231003
       // bump `BridgeTracking` to V2
       bytes[] memory bridgeTrackingDatas = new bytes[](1);
       bridgeTrackingDatas[0] = abi.encodeCall(BridgeTracking.initializeV2, ());
-      _bridgeTracking = BridgeTracking(
-        new NotifiedMigratorUpgrade().run(ContractKey.BridgeTracking, bridgeTrackingDatas)
-      );
+      _bridgeTracking = BridgeTracking(new NotifiedMigratorUpgrade().run(Contract.BridgeTracking, bridgeTrackingDatas));
     }
   }
 }

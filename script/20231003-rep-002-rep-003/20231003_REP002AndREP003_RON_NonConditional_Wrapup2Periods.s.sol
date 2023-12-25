@@ -6,7 +6,7 @@ import "./20231003_REP002AndREP003_RON_NonConditional.s.sol";
 contract Simulation__20231003_UpgradeREP002AndREP003_RON_NonConditional_Wrapup2Periods is
   Simulation__20231003_UpgradeREP002AndREP003_RON_NonConditional
 {
-  function run() public virtual override trySetUp {
+  function run() public virtual override {
     super.run();
 
     // submit block reward for one epoch

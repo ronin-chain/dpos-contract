@@ -127,6 +127,10 @@ contract RoninTrustedOrganization is IRoninTrustedOrganization, HasProxyAdmin, H
     return _totalWeight;
   }
 
+  function totalWeights() external view returns (uint256) {
+    return this.totalWeight();
+  }
+
   /**
    * @inheritdoc IRoninTrustedOrganization
    */
@@ -212,6 +216,10 @@ contract RoninTrustedOrganization is IRoninTrustedOrganization, HasProxyAdmin, H
         ++_i;
       }
     }
+  }
+
+  function sumGovernorWeights(address[] calldata _list) external view returns (uint256 _res) {
+    return this.sumGovernorWeight(_list);
   }
 
   /**

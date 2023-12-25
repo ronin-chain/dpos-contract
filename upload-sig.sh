@@ -39,6 +39,7 @@ if [ ! -d "$folder" ]; then
     echo "Error: The specified folder does not exist for the selected network."
     exit 1
 fi
+index=0
 for file in "$folder"/*.json; do
     # Check if the file exists and is a regular file
     if [ -f "$file" ] && [ "$(basename "$file")" != ".chainId" ]; then
@@ -46,26 +47,40 @@ for file in "$folder"/*.json; do
         contractName=$(jq -r '.contractName' "$file")
         # Check if contractName and address are not empty
         if [ -n "$contractName" ]; then
-            # Initialize arrays to store events and errors keys
-            events_keys=()
-            errors_keys=()
-            # Get events and errors JSON data
-            events=$(forge inspect $contractName events)
-            errors=$(forge inspect $contractName errors)
-            # Extract keys and populate the arrays
-            while read -r key; do
-                events_keys+=("\"event $key\"")
-            done <<<"$(echo "$events" | jq -r 'keys[]')"
-            while read -r key; do
-                errors_keys+=("\"$key\"")
-            done <<<"$(echo "$errors" | jq -r 'keys[]')"
-            # Combine keys from events and errors
-            all_keys=("${events_keys[@]}" "${errors_keys[@]}")
-            # Call cast upload-signature
-            cast upload-signature "${all_keys[@]}"
+            # Increment the index
+            ((index++))
+            (
+                # Initialize arrays to store events and errors keys
+                events_keys=()
+                errors_keys=()
+                # Get events and errors JSON data
+                events=$(forge inspect $contractName events)
+                errors=$(forge inspect $contractName errors)
+                # Extract keys and populate the arrays
+                while read -r key; do
+                    events_keys+=("\"event $key\"")
+                done <<<"$(echo "$events" | jq -r 'keys[]')"
+                while read -r key; do
+                    errors_keys+=("\"$key\"")
+                done <<<"$(echo "$errors" | jq -r 'keys[]')"
+                # Combine keys from events and errors
+                all_keys=("${events_keys[@]}" "${errors_keys[@]}")
+                echo cast upload-signature "${all_keys[@]}"
+                # Call cast upload-signature
+                cast upload-signature "${all_keys[@]}"
+            ) &
         else
             echo "Error: Missing contractName or address in $file"
         fi
     fi
+
+    # Check if index is a multiple of 10, then wait
+    if [ $((index % 10)) -eq 0 ]; then
+        wait
+    fi
+
 done
-forge selectors upload --all
+
+forge selectors upload --all &
+
+wait

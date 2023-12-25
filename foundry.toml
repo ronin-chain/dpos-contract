@@ -4,6 +4,7 @@ test = 'test/foundry/'
 out = 'out'
 optimizer = true
 optimizer_runs = 1_000
+ffi=true
 
 libs = [
   'lib',
@@ -22,6 +23,7 @@ fs_permissions = [{ access = "read-write", path = "./" }]
 [fmt]
 line_length = 120
 tab_width = 2
+bracket_spacing = true
 
 [profile.ci]
 verbosity = 4

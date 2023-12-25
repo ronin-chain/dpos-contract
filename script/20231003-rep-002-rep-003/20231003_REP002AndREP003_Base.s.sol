@@ -20,12 +20,18 @@ import { MockPrecompile } from "@ronin/contracts/mocks/MockPrecompile.sol";
 import { MappedTokenConsumer } from "@ronin/contracts/interfaces/consumers/MappedTokenConsumer.sol";
 import { Token } from "@ronin/contracts/libraries/Token.sol";
 import { Transfer } from "@ronin/contracts/libraries/Transfer.sol";
-import { console2, BaseDeploy, ContractKey, Network } from "../BaseDeploy.s.sol";
-import { RoninValidatorSet, RoninValidatorSetTimedMigratorUpgrade } from "./contracts/RoninValidatorSetTimedMigratorUpgrade.s.sol";
-import { ProfileDeploy } from "./contracts/ProfileDeploy.s.sol";
-import { NotifiedMigratorUpgrade } from "./contracts/NotifiedMigratorUpgrade.s.sol";
 
-contract Simulation__20231003_UpgradeREP002AndREP003_Base is BaseDeploy, MappedTokenConsumer {
+import {
+  RoninValidatorSet,
+  RoninValidatorSetTimedMigratorUpgrade
+} from "script/contracts/RoninValidatorSetTimedMigratorUpgrade.s.sol";
+import { NotifiedMigratorUpgrade } from "script/contracts/NotifiedMigratorUpgrade.s.sol";
+import { ProfileDeploy } from "script/contracts/ProfileDeploy.s.sol";
+import { DefaultNetwork, RoninMigration } from "script/RoninMigration.s.sol";
+import { Network } from "script/utils/Network.sol";
+import { Contract } from "script/utils/Contract.sol";
+
+contract Simulation__20231003_UpgradeREP002AndREP003_Base is RoninMigration, MappedTokenConsumer {
   using Transfer for *;
 
   Staking internal _staking;
@@ -46,7 +52,7 @@ contract Simulation__20231003_UpgradeREP002AndREP003_Base is BaseDeploy, MappedT
   uint256 _depositCount;
 
   function _injectDependencies() internal virtual override {
-    _setDependencyDeployScript(ContractKey.Profile, new ProfileDeploy());
+    _setDependencyDeployScript(Contract.Profile.key(), address(new ProfileDeploy()));
   }
 
   function _hookSetDepositCount() internal pure virtual returns (uint256) {
@@ -57,27 +63,28 @@ contract Simulation__20231003_UpgradeREP002AndREP003_Base is BaseDeploy, MappedT
     return makeAccount("detach-operator-1").addr;
   }
 
-  function _afterDepositForOnlyOnRonin(Transfer.Receipt memory) internal virtual {}
+  function _afterDepositForOnlyOnRonin(Transfer.Receipt memory) internal virtual { }
 
-  function run() public virtual trySetUp {
+  function run() public virtual {
     {
-      address mockPrecompile = _deployLogic(ContractKey.MockPrecompile);
+      address mockPrecompile = _deployLogic(Contract.MockPrecompile.key());
       vm.etch(address(0x68), mockPrecompile.code);
       vm.makePersistent(address(0x68));
     }
 
-    _staking = Staking(_config.getAddressFromCurrentNetwork(ContractKey.Staking));
-    _roninGateway = RoninGatewayV3(_config.getAddressFromCurrentNetwork(ContractKey.RoninGatewayV3));
-    _bridgeTracking = BridgeTracking(_config.getAddressFromCurrentNetwork(ContractKey.BridgeTracking));
-    _slashIndicator = SlashIndicator(_config.getAddressFromCurrentNetwork(ContractKey.SlashIndicator));
-    _stakingVesting = StakingVesting(_config.getAddressFromCurrentNetwork(ContractKey.StakingVesting));
-    _validatorSet = RoninValidatorSet(_config.getAddressFromCurrentNetwork(ContractKey.RoninValidatorSet));
-    _trustedOrgs = RoninTrustedOrganization(_config.getAddressFromCurrentNetwork(ContractKey.RoninTrustedOrganization));
-    _fastFinalityTracking = FastFinalityTracking(
-      _config.getAddressFromCurrentNetwork(ContractKey.FastFinalityTracking)
-    );
-    _roninGovernanceAdmin = RoninGovernanceAdmin(_config.getAddressFromCurrentNetwork(ContractKey.GovernanceAdmin));
-    _roninBridgeManager = RoninBridgeManager(_config.getAddressFromCurrentNetwork(ContractKey.RoninBridgeManager));
+    _staking = Staking(config.getAddressFromCurrentNetwork(Contract.Staking.key()));
+    _roninGateway = RoninGatewayV3(config.getAddressFromCurrentNetwork(Contract.RoninGatewayV3.key()));
+    _bridgeTracking = BridgeTracking(config.getAddressFromCurrentNetwork(Contract.BridgeTracking.key()));
+    _slashIndicator = SlashIndicator(config.getAddressFromCurrentNetwork(Contract.SlashIndicator.key()));
+    _stakingVesting = StakingVesting(config.getAddressFromCurrentNetwork(Contract.StakingVesting.key()));
+    _validatorSet = RoninValidatorSet(config.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key()));
+    _trustedOrgs =
+      RoninTrustedOrganization(config.getAddressFromCurrentNetwork(Contract.RoninTrustedOrganization.key()));
+    _fastFinalityTracking =
+      FastFinalityTracking(config.getAddressFromCurrentNetwork(Contract.FastFinalityTracking.key()));
+    _roninGovernanceAdmin =
+      RoninGovernanceAdmin(config.getAddressFromCurrentNetwork(Contract.RoninGovernanceAdmin.key()));
+    _roninBridgeManager = RoninBridgeManager(config.getAddressFromCurrentNetwork(Contract.RoninBridgeManager.key()));
 
     _depositCount = _hookSetDepositCount();
   }
@@ -87,18 +94,14 @@ contract Simulation__20231003_UpgradeREP002AndREP003_Base is BaseDeploy, MappedT
     vm.makePersistent(user.addr);
     vm.deal(user.addr, 1000 ether);
 
-    Transfer.Request memory request = Transfer.Request(
-      user.addr,
-      address(0),
-      Token.Info(Token.Standard.ERC20, 0, 1 ether)
-    );
+    Transfer.Request memory request =
+      Transfer.Request(user.addr, address(0), Token.Info(Token.Standard.ERC20, 0, 1 ether));
 
-    MainchainGatewayV3 mainchainGateway = MainchainGatewayV3(
-      _config.getAddress(Network.EthMainnet, ContractKey.MainchainGatewayV3)
-    );
+    MainchainGatewayV3 mainchainGateway =
+      MainchainGatewayV3(config.getAddress(Network.EthMainnet.key(), Contract.MainchainGatewayV3.key()));
 
     // switch rpc to eth mainnet
-    _config.switchTo(Network.EthMainnet);
+    config.switchTo(Network.EthMainnet.key());
 
     address weth = address(mainchainGateway.wrappedNativeToken());
     MappedTokenConsumer.MappedToken memory token = mainchainGateway.getRoninToken(weth);
@@ -114,7 +117,7 @@ contract Simulation__20231003_UpgradeREP002AndREP003_Base is BaseDeploy, MappedT
     mainchainGateway.requestDepositFor{ value: 1 ether }(request);
 
     // switch rpc to ronin mainnet
-    _config.switchTo(Network.RoninMainnet);
+    config.switchTo(DefaultNetwork.RoninMainnet.key());
 
     address operator = _hookPrankOperator();
     vm.label(operator, "bridge-operator");
@@ -127,11 +130,8 @@ contract Simulation__20231003_UpgradeREP002AndREP003_Base is BaseDeploy, MappedT
     vm.makePersistent(user.addr);
     vm.deal(user.addr, 1000 ether);
 
-    Transfer.Request memory request = Transfer.Request(
-      user.addr,
-      address(0),
-      Token.Info(Token.Standard.ERC20, 0, 1 ether)
-    );
+    Transfer.Request memory request =
+      Transfer.Request(user.addr, address(0), Token.Info(Token.Standard.ERC20, 0, 1 ether));
 
     address weth = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
     address roninToken = 0xc99a6A985eD2Cac1ef41640596C5A5f9F4E19Ef5;
@@ -150,8 +150,8 @@ contract Simulation__20231003_UpgradeREP002AndREP003_Base is BaseDeploy, MappedT
   }
 
   function _dummySwitchNetworks() internal {
-    _config.switchTo(Network.EthMainnet);
-    _config.switchTo(Network.RoninMainnet);
+    config.switchTo(Network.EthMainnet.key());
+    config.switchTo(DefaultNetwork.RoninMainnet.key());
   }
 
   function _wrapUpEpoch() internal {
@@ -165,9 +165,7 @@ contract Simulation__20231003_UpgradeREP002AndREP003_Base is BaseDeploy, MappedT
 
     uint256 numberOfBlocksInEpoch = _validatorSet.numberOfBlocksInEpoch();
 
-    uint256 epochEndingBlockNumber = block.number +
-      (numberOfBlocksInEpoch - 1) -
-      (block.number % numberOfBlocksInEpoch);
+    uint256 epochEndingBlockNumber = block.number + (numberOfBlocksInEpoch - 1) - (block.number % numberOfBlocksInEpoch);
     uint256 nextDayTimestamp = block.timestamp + 1 days;
 
     // fast forward to next day
@@ -181,9 +179,7 @@ contract Simulation__20231003_UpgradeREP002AndREP003_Base is BaseDeploy, MappedT
 
     uint256 numberOfBlocksInEpoch = _validatorSet.numberOfBlocksInEpoch();
 
-    uint256 epochEndingBlockNumber = block.number +
-      (numberOfBlocksInEpoch - 1) -
-      (block.number % numberOfBlocksInEpoch);
+    uint256 epochEndingBlockNumber = block.number + (numberOfBlocksInEpoch - 1) - (block.number % numberOfBlocksInEpoch);
 
     // fast forward to next day
     vm.roll(epochEndingBlockNumber);

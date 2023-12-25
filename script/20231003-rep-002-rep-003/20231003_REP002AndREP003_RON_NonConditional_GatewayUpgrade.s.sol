@@ -1,19 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { StdStyle } from "forge-std/StdStyle.sol";
+import { TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
 
 import "./20231003_REP002AndREP003_RON_NonConditional_Wrapup2Periods.s.sol";
-import { BridgeRewardDeploy } from "./contracts/BridgeRewardDeploy.s.sol";
-import { BridgeSlashDeploy } from "./contracts/BridgeSlashDeploy.s.sol";
-import { RoninBridgeManagerDeploy } from "./contracts/RoninBridgeManagerDeploy.s.sol";
-
-import { RoninGatewayV3 } from "@ronin/contracts/ronin/gateway/RoninGatewayV3.sol";
-import { BridgeReward } from "@ronin/contracts/ronin/gateway/BridgeReward.sol";
-import { BridgeSlash } from "@ronin/contracts/ronin/gateway/BridgeSlash.sol";
-import { RoninBridgeManager } from "@ronin/contracts/ronin/gateway/RoninBridgeManager.sol";
-import { BridgeTracking } from "@ronin/contracts/ronin/gateway/BridgeTracking.sol";
-import { TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
+import { BridgeRewardDeploy } from "script/contracts/BridgeRewardDeploy.s.sol";
+import { BridgeSlashDeploy } from "script/contracts/BridgeSlashDeploy.s.sol";
+import { RoninBridgeManagerDeploy } from "script/contracts/RoninBridgeManagerDeploy.s.sol";
 
 contract Simulation_20231003_REP002AndREP003_RON_NonConditional_GatewayUpgrade is
   Simulation__20231003_UpgradeREP002AndREP003_RON_NonConditional_Wrapup2Periods
@@ -22,7 +15,7 @@ contract Simulation_20231003_REP002AndREP003_RON_NonConditional_GatewayUpgrade i
     return 42213; // fork-block-number 28327195
   }
 
-  function run() public virtual override trySetUp {
+  function run() public virtual override {
     Simulation__20231003_UpgradeREP002AndREP003_Base.run();
 
     // -------------- Day #1 --------------------
@@ -94,11 +87,9 @@ contract Simulation_20231003_REP002AndREP003_RON_NonConditional_GatewayUpgrade i
    * - Deploy RoninBridgeManager
    * - Top up for BridgeReward
    */
-  function _deployGatewayContracts() internal {
-    console2.log("> ", StdStyle.blue("_deployGatewayContracts"), "...");
-
-    uint256 bridgeManagerNonce = vm.getNonce(_sender) + 4;
-    address expectedRoninBridgeManager = computeCreateAddress(_sender, bridgeManagerNonce);
+  function _deployGatewayContracts() internal logFn("_deployGatewayContracts()") {
+    uint256 bridgeManagerNonce = vm.getNonce(sender()) + 4;
+    address expectedRoninBridgeManager = computeCreateAddress(sender(), bridgeManagerNonce);
 
     _bridgeSlash = BridgeSlash(
       new BridgeSlashDeploy()
@@ -146,12 +137,10 @@ contract Simulation_20231003_REP002AndREP003_RON_NonConditional_GatewayUpgrade i
    * - Upgrade RoninGatewayV3
    * - Upgrade BridgeTracking
    */
-  function _upgradeGatewayContracts() internal {
-    console2.log("> ", StdStyle.blue("_upgradeGatewayContracts"), "...");
-
+  function _upgradeGatewayContracts() internal logFn("_upgradeGatewayContracts()") {
     {
       // upgrade `RoninGatewayV3` and bump to V2
-      _upgradeProxy(ContractKey.RoninGatewayV3, abi.encodeCall(RoninGatewayV3.initializeV2, ()));
+      _upgradeProxy(Contract.RoninGatewayV3.key(), abi.encodeCall(RoninGatewayV3.initializeV2, ()));
       // bump `RoninGatewayV3` to V3
       _roninGateway.initializeV3(address(_roninBridgeManager));
     }
@@ -167,9 +156,7 @@ contract Simulation_20231003_REP002AndREP003_RON_NonConditional_GatewayUpgrade i
     }
   }
 
-  function _callInitREP2InGatewayContracts() internal {
-    console2.log("> ", StdStyle.blue("_callInitREP2InGatewayContracts"), "...");
-
+  function _callInitREP2InGatewayContracts() internal logFn("_callInitREP2InGatewayContracts()") {
     vm.startPrank(address(_roninGovernanceAdmin));
     TransparentUpgradeableProxyV2(payable(address(_bridgeReward))).functionDelegateCall(
       abi.encodeCall(BridgeReward.initializeREP2, ())
@@ -183,9 +170,7 @@ contract Simulation_20231003_REP002AndREP003_RON_NonConditional_GatewayUpgrade i
     vm.stopPrank();
   }
 
-  function _changeAdminOfGatewayContracts() internal {
-    console2.log("> ", StdStyle.blue("_changeAdminOfGatewayContracts"), "...");
-
+  function _changeAdminOfGatewayContracts() internal logFn("_changeAdminOfGatewayContracts()") {
     vm.startPrank(address(_roninGovernanceAdmin));
     TransparentUpgradeableProxyV2(payable(address(_roninGateway))).changeAdmin(address(_roninBridgeManager));
     vm.stopPrank();
