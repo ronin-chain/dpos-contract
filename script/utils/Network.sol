@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { TNetwork } from "foundry-deployment-kit/types/Types.sol";
-import { LibString } from "lib/foundry-deployment-kit/lib/solady/src/utils/LibString.sol";
+import { LibString, TNetwork } from "foundry-deployment-kit/types/Types.sol";
 
 enum Network {
   Goerli,
@@ -24,8 +23,8 @@ function key(Network network) pure returns (TNetwork) {
 }
 
 function explorer(Network network) pure returns (string memory link) {
-  if (network == Network.Goerli) return "https://goerli.etherscan.io";
-  if (network == Network.EthMainnet) return "https://etherscan.io";
+  if (network == Network.Goerli) return "https://goerli.etherscan.io/";
+  if (network == Network.EthMainnet) return "https://etherscan.io/";
 }
 
 function name(Network network) pure returns (string memory) {

@@ -153,35 +153,4 @@ contract Simulation__20231003_UpgradeREP002AndREP003_Base is RoninMigration, Map
     config.switchTo(Network.EthMainnet.key());
     config.switchTo(DefaultNetwork.RoninMainnet.key());
   }
-
-  function _wrapUpEpoch() internal {
-    vm.prank(block.coinbase);
-    _validatorSet.wrapUpEpoch();
-  }
-
-  function _fastForwardToNextDay() internal {
-    vm.warp(block.timestamp + 3 seconds);
-    vm.roll(block.number + 1);
-
-    uint256 numberOfBlocksInEpoch = _validatorSet.numberOfBlocksInEpoch();
-
-    uint256 epochEndingBlockNumber = block.number + (numberOfBlocksInEpoch - 1) - (block.number % numberOfBlocksInEpoch);
-    uint256 nextDayTimestamp = block.timestamp + 1 days;
-
-    // fast forward to next day
-    vm.warp(nextDayTimestamp);
-    vm.roll(epochEndingBlockNumber);
-  }
-
-  function _fastForwardToNextEpoch() internal {
-    vm.warp(block.timestamp + 3 seconds);
-    vm.roll(block.number + 1);
-
-    uint256 numberOfBlocksInEpoch = _validatorSet.numberOfBlocksInEpoch();
-
-    uint256 epochEndingBlockNumber = block.number + (numberOfBlocksInEpoch - 1) - (block.number % numberOfBlocksInEpoch);
-
-    // fast forward to next day
-    vm.roll(epochEndingBlockNumber);
-  }
 }

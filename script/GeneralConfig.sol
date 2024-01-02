@@ -11,8 +11,6 @@ contract GeneralConfig is BaseGeneralConfig {
   constructor() BaseGeneralConfig("", "deployments/") { }
 
   function _setUpNetworks() internal virtual override {
-    super._setUpNetworks();
-
     setNetworkInfo(
       Network.Goerli.chainId(),
       Network.Goerli.key(),
@@ -40,8 +38,6 @@ contract GeneralConfig is BaseGeneralConfig {
   }
 
   function _setUpContracts() internal virtual override {
-    super._setUpContracts();
-
     _mapContractname(Contract.Profile);
     _mapContractname(Contract.Staking);
     _mapContractname(Contract.Maintenance);

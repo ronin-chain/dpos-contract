@@ -14,25 +14,20 @@ import { Ballot } from "@ronin/contracts/libraries/Ballot.sol";
 import { VoteStatusConsumer } from "@ronin/contracts/interfaces/consumers/VoteStatusConsumer.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
 import { console2 as console } from "forge-std/console2.sol";
-import { BaseMigration } from "foundry-deployment-kit/BaseMigration.s.sol";
 import { LibProxy } from "foundry-deployment-kit/libraries/LibProxy.sol";
-import { LibErrorHandler } from "foundry-deployment-kit/libraries/LibErrorHandler.sol";
+import { LibErrorHandler } from "contract-libs/LibErrorHandler.sol";
 import { TContract, TNetwork } from "foundry-deployment-kit/types/Types.sol";
 import { Network } from "script/utils/Network.sol";
 import { Contract } from "script/utils/Contract.sol";
 import { GeneralConfig } from "./GeneralConfig.sol";
+import { PostChecker } from "./PostChecker.sol";
 import { DefaultNetwork } from "foundry-deployment-kit/utils/DefaultNetwork.sol";
 import { ISharedArgument } from "./interfaces/ISharedArgument.sol";
 
-contract RoninMigration is BaseMigration, VoteStatusConsumer {
+contract RoninMigration is PostChecker, VoteStatusConsumer {
   using StdStyle for *;
   using LibErrorHandler for bool;
   using LibProxy for address payable;
-
-  enum ProposalExecution {
-    DirectCall,
-    Signature
-  }
 
   ISharedArgument internal constant config = ISharedArgument(address(CONFIG));
 
@@ -75,11 +70,12 @@ contract RoninMigration is BaseMigration, VoteStatusConsumer {
     );
   }
 
-  function _upgradeRaw(address proxyAdmin, address payable proxy, address logic, bytes memory args)
-    internal
-    virtual
-    override
-  {
+  function _upgradeRaw(
+    address proxyAdmin,
+    address payable proxy,
+    address logic,
+    bytes memory args
+  ) internal virtual override {
     assertTrue(proxyAdmin != address(0x0), "RoninMigration: Invalid {proxyAdmin} or {proxy} is not a Proxy contract");
     address governanceAdmin = _getProxyAdminFromCurrentNetwork();
     TNetwork currentNetwork = network();
@@ -87,8 +83,9 @@ contract RoninMigration is BaseMigration, VoteStatusConsumer {
     if (proxyAdmin == governanceAdmin) {
       // in case proxyAdmin is GovernanceAdmin
       if (
-        currentNetwork == DefaultNetwork.RoninTestnet.key() || currentNetwork == DefaultNetwork.RoninMainnet.key()
-          || currentNetwork == Network.RoninDevnet.key()
+        currentNetwork == DefaultNetwork.RoninTestnet.key() ||
+        currentNetwork == DefaultNetwork.RoninMainnet.key() ||
+        currentNetwork == Network.RoninDevnet.key()
       ) {
         // handle for ronin network
         console.log(StdStyle.yellow("Voting on RoninGovernanceAdmin for upgrading..."));
@@ -128,10 +125,8 @@ contract RoninMigration is BaseMigration, VoteStatusConsumer {
       // in case proxyAdmin is an eoa
       console.log(StdStyle.yellow("Upgrading with EOA wallet..."));
       vm.broadcast(address(proxyAdmin));
-      vm.resumeGasMetering();
       if (args.length == 0) TransparentUpgradeableProxyV2(proxy).upgradeTo(logic);
       else TransparentUpgradeableProxyV2(proxy).upgradeToAndCall(logic, args);
-      vm.pauseGasMetering();
     } else {
       console.log(StdStyle.yellow("Upgrading with owner of ProxyAdmin contract..."));
       // in case proxyAdmin is a ProxyAdmin contract
@@ -188,19 +183,17 @@ contract RoninMigration is BaseMigration, VoteStatusConsumer {
     uint256 snapshotId = vm.snapshot();
 
     vm.startPrank(address(governanceAdmin));
-    vm.resumeGasMetering();
 
     for (uint256 i; i < targets.length; ++i) {
       vm.deal(address(governanceAdmin), values[0]);
       uint256 gas = gasleft();
       (bool success, bytes memory returnOrRevertData) = targets[i].call{ value: values[0] }(callDatas[i]);
       gas -= gasleft();
-      success.handleRevert(returnOrRevertData);
+      success.handleRevert(msg.sig, returnOrRevertData);
       // add 20% extra gas amount
       gasAmounts[i] = (gas * 120_00) / 100_00;
     }
 
-    vm.pauseGasMetering();
     vm.stopPrank();
 
     proposal = Proposal.ProposalDetail(
@@ -213,46 +206,60 @@ contract RoninMigration is BaseMigration, VoteStatusConsumer {
 
   function _logProposal(address governanceAdmin, Proposal.ProposalDetail memory proposal) internal {
     console.log(
-      StdStyle.magenta(
-        string.concat(
-          "\n=============================================== ",
-          "Proposal Detail",
-          " ===============================================\n"
-        )
+      string.concat(
+        StdStyle.magenta(
+          string.concat(
+            "\n================================================================================= ",
+            "Proposal Detail",
+            " =================================================================================\n"
+          )
+        ),
+        "GovernanceAdmin: ",
+        vm.getLabel(governanceAdmin),
+        "\tNonce: ",
+        vm.toString(proposal.nonce)
       )
     );
-    console.log("GovernanceAdmin:", vm.getLabel(governanceAdmin));
-    console.log("Nonce:", vm.toString(proposal.nonce));
 
     string[] memory commandInput = new string[](3);
     commandInput[0] = "cast";
     commandInput[1] = "4byte-decode";
 
+    bytes[] memory decodedCallDatas = new bytes[](proposal.targets.length);
     for (uint256 i; i < proposal.targets.length; ++i) {
       commandInput[2] = vm.toString(proposal.calldatas[i]);
-      bytes memory decodedCallData = vm.ffi(commandInput);
+      decodedCallDatas[i] = vm.ffi(commandInput);
+    }
 
+    for (uint256 i; i < proposal.targets.length; ++i) {
       console.log(
-        StdStyle.blue(
-          string.concat(
-            "\n=============================================== ",
-            "Index: ",
-            vm.toString(i),
-            " ===============================================\n"
-          )
+        string.concat(
+          StdStyle.blue(
+            string.concat(
+              "\n==================================================================== ",
+              "Index: ",
+              vm.toString(i),
+              " ====================================================================\n"
+            )
+          ),
+          "Target:\t",
+          vm.getLabel(proposal.targets[i]),
+          "\t|| Value:\t",
+          vm.toString(proposal.values[i]),
+          "\t|| Gas amount:\t",
+          vm.toString(proposal.gasAmounts[i]),
+          "\nCalldata:\n",
+          string(decodedCallDatas[i]).yellow()
         )
       );
-
-      console.log("Target:\t", vm.getLabel(proposal.targets[i]));
-      console.log("Value:\t", vm.toString(proposal.values[i]));
-      console.log("Gas amount:\t", vm.toString(proposal.gasAmounts[i]));
-      console.log("Calldata:\n", string(decodedCallData).yellow());
     }
 
     console.log(
       StdStyle.magenta(
         string.concat(
-          "\n==============================================================================================\n"
+          "\n=======================================================================",
+          "=========================================================================",
+          "===================================\n"
         )
       )
     );

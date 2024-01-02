@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { TContract } from "foundry-deployment-kit/types/Types.sol";
-import { LibString } from "lib/foundry-deployment-kit/lib/solady/src/utils/LibString.sol";
+import { LibString, TContract } from "foundry-deployment-kit/types/Types.sol";
 
 enum Contract {
   Profile,

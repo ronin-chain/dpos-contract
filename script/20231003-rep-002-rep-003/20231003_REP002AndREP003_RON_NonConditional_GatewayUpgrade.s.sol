@@ -42,12 +42,12 @@ contract Simulation_20231003_REP002AndREP003_RON_NonConditional_GatewayUpgrade i
     // _dummySwitchNetworks();
     _depositForOnlyOnRonin("after-upgrade-REP2");
 
-    _fastForwardToNextEpoch();
+    _fastForwardToNextDay();
     vm.warp(block.timestamp + 3 seconds);
     vm.roll(block.number + 1);
     _depositForOnlyOnRonin("after-upgrade-REP2_a");
 
-    _fastForwardToNextEpoch();
+    _fastForwardToNextDay();
     vm.warp(block.timestamp + 3 seconds);
     vm.roll(block.number + 1);
     _depositForOnlyOnRonin("after-upgrade-REP2_b");
@@ -63,7 +63,7 @@ contract Simulation_20231003_REP002AndREP003_RON_NonConditional_GatewayUpgrade i
     _depositForOnlyOnRonin("after-wrapup-Day2"); // share bridge reward here
     // _depositFor("after-DAY2");
 
-    _fastForwardToNextEpoch();
+    _fastForwardToNextDay();
     vm.warp(block.timestamp + 3 seconds);
     vm.roll(block.number + 1);
     _depositForOnlyOnRonin("after-wrapup-Day2_a");
