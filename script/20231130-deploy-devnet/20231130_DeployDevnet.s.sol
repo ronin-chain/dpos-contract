@@ -209,7 +209,9 @@ contract Migration__20231130_DeployDevnet is DevnetMigration {
   function _initStakingVesting(ISharedArgument.SharedParameter memory param) internal logFn("_initStakingVesting") {
     vm.startBroadcast(sender());
     stakingVesting.initialize(
-      address(validatorSet), param.blockProducerBonusPerBlock, param.bridgeOperatorBonusPerBlock
+      address(validatorSet),
+      param.blockProducerBonusPerBlock,
+      param.bridgeOperatorBonusPerBlock
     );
     // stakingVesting.initializeV2();
     stakingVesting.initializeV3(param.fastFinalityRewardPercent);
@@ -235,23 +237,5 @@ contract Migration__20231130_DeployDevnet is DevnetMigration {
     vm.startBroadcast(sender());
     fastFinalityTracking.initialize(address(validatorSet));
     vm.stopBroadcast();
-  }
-
-  function _wrapUpEpoch() internal {
-    vm.prank(block.coinbase);
-    validatorSet.wrapUpEpoch();
-  }
-
-  function _fastForwardToNextDay() internal {
-    vm.warp(block.timestamp + 3 seconds);
-    vm.roll(block.number + 1);
-
-    uint256 numberOfBlocksInEpoch = validatorSet.numberOfBlocksInEpoch();
-    uint256 epochEndingBlockNumber = block.number + (numberOfBlocksInEpoch - 1) - (block.number % numberOfBlocksInEpoch);
-    uint256 nextDayTimestamp = block.timestamp + 1 days;
-
-    // fast forward to next day
-    vm.warp(nextDayTimestamp);
-    vm.roll(epochEndingBlockNumber);
   }
 }

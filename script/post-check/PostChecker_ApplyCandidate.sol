@@ -22,6 +22,7 @@ abstract contract PostChecker_ApplyCandidate is BaseMigration, PostChecker_Helpe
     _staking = CONFIG.getAddressFromCurrentNetwork(Contract.Staking.key());
 
     _postCheck_ApplyingCandidate_EOA();
+    // TODO: uncomment this below test after fix the multisig
     // _postCheck_ApplyingCandidate_Multisig();
   }
 
