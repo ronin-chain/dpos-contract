@@ -6,6 +6,8 @@ import { Contract } from "script/utils/Contract.sol";
 import { RoninMigration } from "script/RoninMigration.s.sol";
 import { ISharedArgument, IRoninTrustedOrganization } from "./interfaces/ISharedArgument.sol";
 
+import { TConsensus } from "@ronin/contracts/udvts/Types.sol";
+
 contract DevnetMigration is RoninMigration {
   ISharedArgument internal constant devnetConfig = ISharedArgument(address(CONFIG));
 
@@ -75,16 +77,16 @@ contract DevnetMigration is RoninMigration {
       param.trustedOrganizations[2].weight = 100;
 
       param.trustedOrganizations[0].governor = 0x529502C69356E9f48C8D5427B030020941F9ef42;
-      param.trustedOrganizations[0].consensusAddr = 0x6D863059CF618cC03d314cfbC41707105DD3BB3d;
-      param.trustedOrganizations[0].bridgeVoter = 0xf098ec9886CCe889b36C92ccBc3c2b5fa64e09aE;
+      param.trustedOrganizations[0].consensusAddr = TConsensus.wrap(0x6D863059CF618cC03d314cfbC41707105DD3BB3d);
+      // param.trustedOrganizations[0].bridgeVoter = 0xf098ec9886CCe889b36C92ccBc3c2b5fa64e09aE;
 
       param.trustedOrganizations[1].governor = 0x85C5dBfadcBc36AeE39DD32365183c5E38A67E37;
-      param.trustedOrganizations[1].consensusAddr = 0x412cA41498e0522f054ebBA32fCaf59C9e55F099;
-      param.trustedOrganizations[1].bridgeVoter = 0x8C505D4a1B56DA76E77AE0510C25f78F57394671;
+      param.trustedOrganizations[1].consensusAddr = TConsensus.wrap(0x412cA41498e0522f054ebBA32fCaf59C9e55F099);
+      // param.trustedOrganizations[1].bridgeVoter = 0x8C505D4a1B56DA76E77AE0510C25f78F57394671;
 
       param.trustedOrganizations[2].governor = 0x947AB99ad90302b5ec1840c9b5CF4205554C72af;
-      param.trustedOrganizations[2].consensusAddr = 0x7CcE47da0E161BE6fA1c7D09A9d12986b03621A3;
-      param.trustedOrganizations[2].bridgeVoter = 0x336e8b062b1d3ce2D9A775929587c70Dc5E2Fa0B;
+      param.trustedOrganizations[2].consensusAddr = TConsensus.wrap(0x7CcE47da0E161BE6fA1c7D09A9d12986b03621A3);
+      // param.trustedOrganizations[2].bridgeVoter = 0x336e8b062b1d3ce2D9A775929587c70Dc5E2Fa0B;
 
       param.numerator = 0;
       param.denominator = 1;

@@ -45,7 +45,7 @@ contract RoninMigration is PostChecker, VoteStatusConsumer {
 
     // ToDo(TuDo1403): should remove this cheat
     for (uint256 i; i < param.trustedOrgs.length; ++i) {
-      param.trustedOrgs[i].bridgeVoter = address(ripemd160(abi.encode(param.trustedOrgs[i].consensusAddr)));
+      // param.trustedOrgs[i].bridgeVoter = address(ripemd160(abi.encode(param.trustedOrgs[i].consensusAddr)));
     }
     param.num = num;
     param.denom = denom;

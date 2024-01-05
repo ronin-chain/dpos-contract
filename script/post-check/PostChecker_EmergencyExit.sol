@@ -10,6 +10,7 @@ import { LibProxy } from "foundry-deployment-kit/libraries/LibProxy.sol";
 import { BaseMigration } from "foundry-deployment-kit/BaseMigration.s.sol";
 import { Contract } from "../utils/Contract.sol";
 
+import { ICandidateManager } from "@ronin/contracts/interfaces/validator/ICandidateManager.sol";
 import { ICandidateStaking } from "@ronin/contracts/interfaces/staking/ICandidateStaking.sol";
 import { IStaking } from "@ronin/contracts/interfaces/staking/IStaking.sol";
 import { RoninValidatorSet } from "@ronin/contracts/ronin/validator/RoninValidatorSet.sol";
@@ -35,7 +36,10 @@ abstract contract PostChecker_EmergencyExit is BaseMigration, PostChecker_Helper
     _consensusAddr = makeAddr("mock-consensus-addr-to-emergency-exit");
 
     _applyValidatorCandidate(_staking, _candidateAdmin, _consensusAddr);
-    assertTrue(RoninValidatorSet(_validatorSet).isValidatorCandidate(_consensusAddr));
+    (, bytes memory returndata) = _validatorSet.staticcall(
+      abi.encodeWithSelector(ICandidateManager.isValidatorCandidate.selector, _consensusAddr)
+    );
+    assertTrue(abi.decode(returndata, (bool)));
 
     _postCheck__RequestEmergencyExit();
   }
@@ -58,12 +62,14 @@ abstract contract PostChecker_EmergencyExit is BaseMigration, PostChecker_Helper
     _fastForwardToNextDay();
     _wrapUpEpoch();
     // The exited candidate still in candidate list until the time of being revoked.
-    assertTrue(RoninValidatorSet(_validatorSet).isValidatorCandidate(_consensusAddr));
+    (, bytes memory returndata) = _validatorSet.staticcall(      abi.encodeWithSelector(ICandidateManager.isValidatorCandidate.selector, _consensusAddr));
+    assertTrue(abi.decode(returndata, (bool)));
 
     vm.warp(block.timestamp + IStaking(_staking).waitingSecsToRevoke());
     _fastForwardToNextDay();
     _wrapUpEpoch();
-    assertFalse(RoninValidatorSet(_validatorSet).isValidatorCandidate(_consensusAddr));
+    (, returndata) = _validatorSet.staticcall(      abi.encodeWithSelector(ICandidateManager.isValidatorCandidate.selector, _consensusAddr));
+    assertFalse(abi.decode(returndata, (bool)));
 
     console.log(">", StdStyle.green("Post check Staking `requestEmergencyExit` successful"));
   }

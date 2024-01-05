@@ -68,7 +68,9 @@ abstract contract PostChecker_Staking is BaseMigration, PostChecker_Helper {
     consensusList[0] = _consensusAddr;
 
     vm.startPrank(_delegator);
-    IDelegatorStaking(_staking).claimRewards(consensusList);
+    (bool success, ) =_staking.call(abi.encodeWithSelector(IDelegatorStaking.claimRewards.selector, consensusList));
+    assertEq(success, true);
+
     vm.stopPrank();
 
     console.log(">", StdStyle.green("Post check Staking `claimRewards` successful"));

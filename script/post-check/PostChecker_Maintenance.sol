@@ -37,11 +37,16 @@ abstract contract PostChecker_Maintenance is BaseMigration, PostChecker_Helper {
     _maintenance = CONFIG.getAddressFromCurrentNetwork(Contract.Maintenance.key());
 
     _consensusAddr = RoninValidatorSet(_validatorSet).getValidators()[0];
-    ICandidateManager.ValidatorCandidate memory candidateInfo = RoninValidatorSet(_validatorSet).getCandidateInfo(
-      _consensusAddr
-    );
 
-    _candidateAdmin = candidateInfo.admin;
+    // ICandidateManager.ValidatorCandidate memory candidateInfo = RoninValidatorSet(_validatorSet).getCandidateInfo(
+    //   _consensusAddr
+    // );
+    (, bytes memory returndata) = _validatorSet.staticcall(
+      abi.encodeWithSelector(ICandidateManager.getCandidateInfo.selector, _consensusAddr)
+    );
+    uint256[7] memory candidateInfo_UintArrCasted = abi.decode(returndata, (uint256[7]));
+
+    _candidateAdmin = address(uint160(candidateInfo_UintArrCasted[0]));
 
     _postCheck_scheduleMaintenance();
   }
@@ -55,16 +60,32 @@ abstract contract PostChecker_Maintenance is BaseMigration, PostChecker_Helper {
 
     uint startBlock = latestEpochBlock + 200 + 1 + minOffset;
     uint endBlock = latestEpochBlock + 200 + minOffset + minDuration;
-    IMaintenance(_maintenance).schedule(_consensusAddr, startBlock, endBlock);
+    (bool success, ) = _maintenance.call(
+      abi.encodeWithSelector(IMaintenance.schedule.selector, _consensusAddr, startBlock, endBlock)
+    );
+    assertEq(success, true);
 
     vm.stopPrank();
 
-    assertFalse(IMaintenance(_maintenance).checkMaintained(_consensusAddr, startBlock - 1));
-    assertTrue(IMaintenance(_maintenance).checkMaintained(_consensusAddr, startBlock));
-    assertTrue(IMaintenance(_maintenance).checkMaintained(_consensusAddr, startBlock + 1));
-    assertTrue(IMaintenance(_maintenance).checkMaintained(_consensusAddr, endBlock - 1));
-    assertTrue(IMaintenance(_maintenance).checkMaintained(_consensusAddr, endBlock));
-    assertFalse(IMaintenance(_maintenance).checkMaintained(_consensusAddr, endBlock + 1));
+    bytes4 checkMaintained_Selector = IMaintenance.checkMaintained.selector;
+    bytes memory res;
+    (, res) = _maintenance.staticcall(abi.encodeWithSelector(checkMaintained_Selector, _consensusAddr, startBlock - 1));
+    assertFalse(abi.decode(res, (bool)));
+
+    (, res) = _maintenance.staticcall(abi.encodeWithSelector(checkMaintained_Selector, _consensusAddr, startBlock));
+    assertTrue(abi.decode(res, (bool)));
+
+    (, res) = _maintenance.staticcall(abi.encodeWithSelector(checkMaintained_Selector, _consensusAddr, startBlock + 1));
+    assertTrue(abi.decode(res, (bool)));
+
+    (, res) = _maintenance.staticcall(abi.encodeWithSelector(checkMaintained_Selector, _consensusAddr, endBlock - 1));
+    assertTrue(abi.decode(res, (bool)));
+
+    (, res) = _maintenance.staticcall(abi.encodeWithSelector(checkMaintained_Selector, _consensusAddr, endBlock));
+    assertTrue(abi.decode(res, (bool)));
+
+    (, res) = _maintenance.staticcall(abi.encodeWithSelector(checkMaintained_Selector, _consensusAddr, endBlock + 1));
+    assertFalse(abi.decode(res, (bool)));
 
     console.log(">", StdStyle.green("Post check Staking `schedule` successful"));
   }

@@ -2,6 +2,7 @@
 pragma solidity ^0.8.19;
 
 import { ICandidateStaking } from "@ronin/contracts/interfaces/staking/ICandidateStaking.sol";
+import { ICandidateManager } from "@ronin/contracts/interfaces/validator/ICandidateManager.sol";
 import { RoninValidatorSet } from "@ronin/contracts/ronin/validator/RoninValidatorSet.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
 import { console2 as console } from "forge-std/console2.sol";
@@ -40,7 +41,10 @@ abstract contract PostChecker_ApplyCandidate is BaseMigration, PostChecker_Helpe
 
     _applyValidatorCandidate(_staking, candidateAdmin, consensusAddr);
 
-    RoninValidatorSet(payable(_validatorSet)).isValidatorCandidate(consensusAddr);
+    (, bytes memory returndata) = _validatorSet.staticcall(
+      abi.encodeWithSelector(ICandidateManager.isValidatorCandidate.selector, consensusAddr)
+    );
+    assertTrue(abi.decode(returndata, (bool)));
 
     console.log(">", StdStyle.green("Post check Staking `applyValidatorCandidate` for EOA successful"));
   }
@@ -56,7 +60,10 @@ abstract contract PostChecker_ApplyCandidate is BaseMigration, PostChecker_Helpe
 
     _applyValidatorCandidate(_staking, candidateAdmin, consensusAddr);
 
-    RoninValidatorSet(payable(_validatorSet)).isValidatorCandidate(consensusAddr);
+    (, bytes memory returndata) = _validatorSet.staticcall(
+      abi.encodeWithSelector(ICandidateManager.isValidatorCandidate.selector, consensusAddr)
+    );
+    assertTrue(abi.decode(returndata, (bool)));
 
     console.log(">", StdStyle.green("Post check Staking `applyValidatorCandidate` for multisig successful"));
   }

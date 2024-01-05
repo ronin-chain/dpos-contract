@@ -11,10 +11,13 @@ import { BaseMigration } from "foundry-deployment-kit/BaseMigration.s.sol";
 import { Contract } from "../utils/Contract.sol";
 
 import { IStaking } from "@ronin/contracts/interfaces/staking/IStaking.sol";
+import { IBaseStaking } from "@ronin/contracts/interfaces/staking/IBaseStaking.sol";
 import { ISlashIndicator } from "@ronin/contracts/interfaces/slash-indicator/ISlashIndicator.sol";
+import { ISlashUnavailability } from "@ronin/contracts/interfaces/slash-indicator/ISlashUnavailability.sol";
 import { ICreditScore } from "@ronin/contracts/interfaces/slash-indicator/ICreditScore.sol";
 import { ICandidateManager } from "@ronin/contracts/interfaces/validator/ICandidateManager.sol";
 import { RoninValidatorSet } from "@ronin/contracts/ronin/validator/RoninValidatorSet.sol";
+import { IValidatorInfoV2 } from "@ronin/contracts/interfaces/validator/info-fragments/IValidatorInfoV2.sol";
 
 import "./PostChecker_Helper.sol";
 
@@ -53,38 +56,49 @@ abstract contract PostChecker_Slash is BaseMigration, PostChecker_Helper {
   }
 
   function _postCheckSlashUnavailability() private logFn("Post check slash unavailability") {
-    assertTrue(RoninValidatorSet(_validatorSet).isBlockProducer(_slashee));
+    bytes memory res;
+    (, res) = _validatorSet.staticcall(abi.encodeWithSelector(IValidatorInfoV2.isBlockProducer.selector, _slashee));
+    assertTrue(abi.decode(res, (bool)));
 
     vm.coinbase(_slasher);
     vm.startPrank(_slasher);
     for (uint i; i < _tier2Threshold; i++) {
-      ISlashIndicator(_slashingContract).slashUnavailability(_slashee);
+      (bool success, ) = _slashingContract.call(
+        abi.encodeWithSelector(ISlashUnavailability.slashUnavailability.selector, _slashee)
+      );
+      assertTrue(success);
       vm.roll(block.number + 1);
     }
     vm.stopPrank();
 
     _fastForwardToNextEpoch();
     _wrapUpEpoch();
-    assertFalse(RoninValidatorSet(_validatorSet).isBlockProducer(_slashee));
+    (, res) = _validatorSet.staticcall(abi.encodeWithSelector(IValidatorInfoV2.isBlockProducer.selector, _slashee));
+    assertFalse(abi.decode(res, (bool)));
     console.log(">", StdStyle.green("Post check Slashing `slashUnavailability` successful"));
   }
 
   function _postCheckBailOut() private logFn("Post check bail out") {
     vm.startPrank(_slasheeAdmin);
 
-    // vm.expectEmit(_slashingContract, true, false, false, false);
-    // emit BailedOut(_slashee, 0, 0);
-    uint creditScoreBefore = ISlashIndicator(_slashingContract).getCreditScore(_slashee);
-    ISlashIndicator(_slashingContract).bailOut(_slashee);
+    bytes memory res;
+    (, res) = _slashingContract.staticcall(abi.encodeWithSelector(ICreditScore.getCreditScore.selector, _slashee));
+    uint creditScoreBefore = abi.decode(res, (uint));
 
-    uint creditScoreAfter = ISlashIndicator(_slashingContract).getCreditScore(_slashee);
+    (bool success, ) = _slashingContract.call(abi.encodeWithSelector(ICreditScore.bailOut.selector, _slashee));
+    assertEq(success, true);
+
+    (, res) = _slashingContract.staticcall(abi.encodeWithSelector(ICreditScore.getCreditScore.selector, _slashee));
+    uint creditScoreAfter = abi.decode(res, (uint));
     assertTrue(creditScoreBefore > creditScoreAfter);
 
-    assertFalse(RoninValidatorSet(_validatorSet).isBlockProducer(_slashee));
+    (, res) = _validatorSet.staticcall(abi.encodeWithSelector(IValidatorInfoV2.isBlockProducer.selector, _slashee));
+    assertFalse(abi.decode(res, (bool)));
 
     _fastForwardToNextEpoch();
     _wrapUpEpoch();
-    assertTrue(RoninValidatorSet(_validatorSet).isBlockProducer(_slashee));
+    (, res) = _validatorSet.staticcall(abi.encodeWithSelector(IValidatorInfoV2.isBlockProducer.selector, _slashee));
+    assertTrue(abi.decode(res, (bool)));
 
     console.log(">", StdStyle.green("Post check Slashing `bailOut` successful"));
   }
@@ -100,14 +114,22 @@ abstract contract PostChecker_Slash is BaseMigration, PostChecker_Helper {
   }
 
   function _postCheckSlashUntilBelowRequirement() private logFn("Post check slash until below requirement") {
-    ICandidateManager.ValidatorCandidate memory info = RoninValidatorSet(_validatorSet).getCandidateInfo(_slashee);
+    // ICandidateManager.ValidatorCandidate memory info = RoninValidatorSet(_validatorSet).getCandidateInfo(_slashee);
+    (, bytes memory returndata) = _validatorSet.staticcall(
+      abi.encodeWithSelector(ICandidateManager.getCandidateInfo.selector, _slashee)
+    );
+    ICandidateManager.ValidatorCandidate memory info = abi.decode(returndata, (ICandidateManager.ValidatorCandidate));
     assertTrue(info.topupDeadline == 0);
     _postCheckSlashUnavailability();
 
     _fastForwardToNextDay();
     _wrapUpEpoch();
 
-    info = RoninValidatorSet(_validatorSet).getCandidateInfo(_slashee);
+    // info = RoninValidatorSet(_validatorSet).getCandidateInfo(_slashee);
+    (, returndata) = _validatorSet.staticcall(
+      abi.encodeWithSelector(ICandidateManager.getCandidateInfo.selector, _slashee)
+    );
+    info = abi.decode(returndata, (ICandidateManager.ValidatorCandidate));
     assertTrue(info.topupDeadline > 0);
 
     console.log(">", StdStyle.green("Post check Slashing `slash until below requirement` successful"));
@@ -116,7 +138,10 @@ abstract contract PostChecker_Slash is BaseMigration, PostChecker_Helper {
   function _pickRandomSlashee() private {
     address[] memory consensusLst = RoninValidatorSet(_validatorSet).getValidators();
     _slashee = consensusLst[0];
-    (_slasheeAdmin, , ) = IStaking(_staking).getPoolDetail(_slashee);
+    (, bytes memory returnedData) = _staking.staticcall(
+      abi.encodeWithSelector(IBaseStaking.getPoolDetail.selector, _slashee)
+    );
+    (_slasheeAdmin, , ) = abi.decode(returnedData, (address, uint, uint));
 
     _slasher = consensusLst[1];
   }
@@ -124,12 +149,16 @@ abstract contract PostChecker_Slash is BaseMigration, PostChecker_Helper {
   function _pickSuitableSlasheeForSlashBelowRequirement() private {
     uint i;
     uint stakingAmount;
+
     uint minStakingAmount = IStaking(_staking).minValidatorStakingAmount();
     address[] memory consensusLst = RoninValidatorSet(_validatorSet).getValidators();
 
+    bytes memory returnedData;
     do {
       _slashee = consensusLst[i];
-      (_slasheeAdmin, stakingAmount, ) = IStaking(_staking).getPoolDetail(_slashee);
+      (, returnedData) = _staking.staticcall(abi.encodeWithSelector(IBaseStaking.getPoolDetail.selector, _slashee));
+      (_slasheeAdmin, stakingAmount, ) = abi.decode(returnedData, (address, uint, uint));
+
       i++;
     } while (stakingAmount > _slashAmountTier2 + minStakingAmount && i < consensusLst.length);
 
