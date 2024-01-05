@@ -12,11 +12,17 @@ import { LibString, Contract } from "script/utils/Contract.sol";
 import { RoninGovernanceAdmin, HardForkRoninGovernanceAdminDeploy } from "script/contracts/HardForkRoninGovernanceAdminDeploy.s.sol";
 import { RoninTrustedOrganization, TemporalRoninTrustedOrganizationDeploy } from "script/contracts/TemporalRoninTrustedOrganizationDeploy.s.sol";
 
-contract Migration__20232811_ChangeGovernanceAdmin is RoninMigration {
+abstract contract Migration__20232811_ChangeGovernanceAdmin_Common is RoninMigration {
   using LibString for *;
   using LibErrorHandler for bool;
   using stdStorage for StdStorage;
   using LibProxy for address payable;
+
+  address internal __roninGovernanceAdmin;
+  RoninGovernanceAdmin internal __hardForkGovernanceAdmin;
+  address internal __trustedOrg;
+
+  function __node_hardfork_hook() internal virtual;
 
   function run() public {
     // ================================================= Simulation Scenario for HardFork Upgrade Scenario ==========================================
@@ -33,36 +39,10 @@ contract Migration__20232811_ChangeGovernanceAdmin is RoninMigration {
     // 4. Create and Execute Proposal of changing all system contracts that have ProxAdmin address of (X) to change from (X) -> (A)
     // 5. Validate (A) functionalities
 
-    // =============================================================================================================================================
+    // =========================================== NODE HARDFORK PARTS (1, 2, 3) ===============================================
+    __node_hardfork_hook();
 
-    // Get current broken Ronin Governance Admin
-    address roninGovernanceAdmin = config.getAddressFromCurrentNetwork(Contract.RoninGovernanceAdmin.key());
-
-    // Deploy temporal Ronin Trusted Organization
-    // RoninTrustedOrganization tmpTrustedOrg = new TemporalRoninTrustedOrganizationDeploy().run();
-    // vm.makePersistent(address(tmpTrustedOrg));
-
-    // Deploy new Ronin Governance Admin
-    RoninGovernanceAdmin hardForkGovernanceAdmin = new HardForkRoninGovernanceAdminDeploy().run();
-
-    // StdStorage storage $;
-    // assembly {
-    //   // Assign storage slot
-    //   $.slot := stdstore.slot
-    // }
-
-    // Cheat write into Trusted Organization storage slot with new temporal Trusted Organization contract
-    // $.target(roninGovernanceAdmin).sig("roninTrustedOrganizationContract()").checked_write(address(tmpTrustedOrg));
-    // (, bytes memory rawData) =
-    //   address(roninGovernanceAdmin).staticcall(abi.encodeWithSignature("roninTrustedOrganizationContract()"));
-    // assertEq(abi.decode(rawData, (address)), address(tmpTrustedOrg));
-
-    address trustedOrg = config.getAddressFromCurrentNetwork(Contract.RoninTrustedOrganization.key());
-    vm.store(
-      address(trustedOrg),
-      bytes32(0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc),
-      bytes32(uint256(uint160(0x6A51C2B073a6daDBeCAC1A420AFcA7788C81612f)))
-    );
+    // =========================================== CONTRACT PARTS (4, 5) ===============================================
 
     // Get all contracts deployed from the current network
     address payable[] memory addrs = config.getAllAddresses(network());
@@ -70,7 +50,7 @@ contract Migration__20232811_ChangeGovernanceAdmin is RoninMigration {
     // Identify proxy targets to change admin
     for (uint256 i; i < addrs.length; ++i) {
       try this.getProxyAdmin(addrs[i]) returns (address payable proxy) {
-        if (proxy == roninGovernanceAdmin) {
+        if (proxy == __roninGovernanceAdmin) {
           console.log("Target Proxy to change admin with proposal", vm.getLabel(addrs[i]));
           _proxyTargets.push(addrs[i]);
         }
@@ -85,12 +65,12 @@ contract Migration__20232811_ChangeGovernanceAdmin is RoninMigration {
     for (uint256 i; i < targets.length; ++i) {
       callDatas[i] = abi.encodeWithSelector(
         TransparentUpgradeableProxy.changeAdmin.selector,
-        address(hardForkGovernanceAdmin)
+        address(__hardForkGovernanceAdmin)
       );
     }
 
     Proposal.ProposalDetail memory proposal = _buildProposal(
-      RoninGovernanceAdmin(roninGovernanceAdmin),
+      RoninGovernanceAdmin(__roninGovernanceAdmin),
       block.timestamp + 5 minutes,
       targets,
       values,
@@ -98,9 +78,9 @@ contract Migration__20232811_ChangeGovernanceAdmin is RoninMigration {
     );
 
     // Execute the proposal
-    _executeProposal(RoninGovernanceAdmin(roninGovernanceAdmin), RoninTrustedOrganization(trustedOrg), proposal);
+    _executeProposal(RoninGovernanceAdmin(__roninGovernanceAdmin), RoninTrustedOrganization(__trustedOrg), proposal);
 
     // Change broken Ronin Governance Admin to new Ronin Governance Admin
-    config.setAddress(network(), Contract.RoninGovernanceAdmin.key(), address(hardForkGovernanceAdmin));
+    config.setAddress(network(), Contract.RoninGovernanceAdmin.key(), address(__hardForkGovernanceAdmin));
   }
 }
