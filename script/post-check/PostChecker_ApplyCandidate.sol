@@ -23,11 +23,10 @@ abstract contract PostChecker_ApplyCandidate is BaseMigration, PostChecker_Helpe
     _staking = CONFIG.getAddressFromCurrentNetwork(Contract.Staking.key());
 
     _postCheck_ApplyingCandidate_EOA();
-    // TODO: uncomment this below test after fix the multisig
-    // _postCheck_ApplyingCandidate_Multisig();
+    _postCheck_ApplyingCandidate_Multisig();
   }
 
-  function _postCheck_ApplyingCandidate_EOA() private logFn("Post check applying candidate") {
+  function _postCheck_ApplyingCandidate_EOA() private logFn("Post check applying candidate for EOA") {
     address candidateAdmin = makeAddr("mock-candidate-admin-t1");
     address consensusAddr = makeAddr("mock-consensus-addr-t1");
 
