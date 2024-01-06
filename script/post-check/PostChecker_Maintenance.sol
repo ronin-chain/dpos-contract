@@ -13,6 +13,7 @@ import { Contract } from "../utils/Contract.sol";
 import { ICandidateStaking } from "@ronin/contracts/interfaces/staking/ICandidateStaking.sol";
 import { IDelegatorStaking } from "@ronin/contracts/interfaces/staking/IDelegatorStaking.sol";
 import { ICandidateManager } from "@ronin/contracts/interfaces/validator/ICandidateManager.sol";
+import { IValidatorInfoV2 } from "@ronin/contracts/interfaces/validator/info-fragments/IValidatorInfoV2.sol";
 import { RoninValidatorSet } from "@ronin/contracts/ronin/validator/RoninValidatorSet.sol";
 import { IMaintenance } from "@ronin/contracts/interfaces/IMaintenance.sol";
 
@@ -36,17 +37,21 @@ abstract contract PostChecker_Maintenance is BaseMigration, PostChecker_Helper {
     _staking = CONFIG.getAddressFromCurrentNetwork(Contract.Staking.key());
     _maintenance = CONFIG.getAddressFromCurrentNetwork(Contract.Maintenance.key());
 
-    _consensusAddr = RoninValidatorSet(_validatorSet).getValidators()[0];
+    {
+      (, bytes memory returnedData) = _validatorSet.staticcall(
+        abi.encodeWithSelector(IValidatorInfoV2.getValidators.selector)
+      );
+      address[] memory consensusList_AddrArrCasted = abi.decode(returnedData, (address[]));
+      _consensusAddr = consensusList_AddrArrCasted[0];
+    }
 
-    // ICandidateManager.ValidatorCandidate memory candidateInfo = RoninValidatorSet(_validatorSet).getCandidateInfo(
-    //   _consensusAddr
-    // );
-    (, bytes memory returndata) = _validatorSet.staticcall(
-      abi.encodeWithSelector(ICandidateManager.getCandidateInfo.selector, _consensusAddr)
-    );
-    uint256[7] memory candidateInfo_UintArrCasted = abi.decode(returndata, (uint256[7]));
-
-    _candidateAdmin = address(uint160(candidateInfo_UintArrCasted[0]));
+    {
+      (, bytes memory returnedData) = _validatorSet.staticcall(
+        abi.encodeWithSelector(ICandidateManager.getCandidateInfo.selector, _consensusAddr)
+      );
+      uint256[7] memory candidateInfo_UintArrCasted = abi.decode(returnedData, (uint256[7]));
+      _candidateAdmin = address(uint160(candidateInfo_UintArrCasted[0]));
+    }
 
     _postCheck_scheduleMaintenance();
   }

@@ -136,9 +136,13 @@ abstract contract PostChecker_Slash is BaseMigration, PostChecker_Helper {
   }
 
   function _pickRandomSlashee() private {
-    address[] memory consensusLst = RoninValidatorSet(_validatorSet).getValidators();
+    (, bytes memory returnedData) = _validatorSet.staticcall(
+      abi.encodeWithSelector(IValidatorInfoV2.getValidators.selector)
+    );
+    address[] memory consensusLst = abi.decode(returnedData, (address[]));
     _slashee = consensusLst[0];
-    (, bytes memory returnedData) = _staking.staticcall(
+
+    (, returnedData) = _staking.staticcall(
       abi.encodeWithSelector(IBaseStaking.getPoolDetail.selector, _slashee)
     );
     (_slasheeAdmin, , ) = abi.decode(returnedData, (address, uint, uint));
@@ -151,9 +155,12 @@ abstract contract PostChecker_Slash is BaseMigration, PostChecker_Helper {
     uint stakingAmount;
 
     uint minStakingAmount = IStaking(_staking).minValidatorStakingAmount();
-    address[] memory consensusLst = RoninValidatorSet(_validatorSet).getValidators();
 
-    bytes memory returnedData;
+    (, bytes memory returnedData) = _validatorSet.staticcall(
+      abi.encodeWithSelector(IValidatorInfoV2.getValidators.selector)
+    );
+    address[] memory consensusLst = abi.decode(returnedData, (address[]));
+
     do {
       _slashee = consensusLst[i];
       (, returnedData) = _staking.staticcall(abi.encodeWithSelector(IBaseStaking.getPoolDetail.selector, _slashee));

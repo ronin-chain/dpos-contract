@@ -13,6 +13,7 @@ import { Contract } from "../utils/Contract.sol";
 import { IStaking } from "@ronin/contracts/interfaces/staking/IStaking.sol";
 import { ICandidateStaking } from "@ronin/contracts/interfaces/staking/ICandidateStaking.sol";
 import { IDelegatorStaking } from "@ronin/contracts/interfaces/staking/IDelegatorStaking.sol";
+import { IValidatorInfoV2 } from "@ronin/contracts/interfaces/validator/info-fragments/IValidatorInfoV2.sol";
 import { RoninValidatorSet } from "@ronin/contracts/ronin/validator/RoninValidatorSet.sol";
 
 import "./PostChecker_Helper.sol";
@@ -33,8 +34,13 @@ abstract contract PostChecker_Staking is BaseMigration, PostChecker_Helper {
     _validatorSet = CONFIG.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key());
     _staking = CONFIG.getAddressFromCurrentNetwork(Contract.Staking.key());
 
-    _consensusAddr = RoninValidatorSet(_validatorSet).getValidators()[0];
-    _consensusAddr2 = RoninValidatorSet(_validatorSet).getValidators()[1];
+    (, bytes memory returnedData) = _validatorSet.staticcall(
+      abi.encodeWithSelector(IValidatorInfoV2.getValidators.selector)
+    );
+    address[] memory consensusList_AddrArrCasted = abi.decode(returnedData, (address[]));
+
+    _consensusAddr = consensusList_AddrArrCasted[0];
+    _consensusAddr2 = consensusList_AddrArrCasted[1];
     _delegator = payable(makeAddr("mock-delegator"));
 
     _delegatingValue = 100 ether;
@@ -68,7 +74,7 @@ abstract contract PostChecker_Staking is BaseMigration, PostChecker_Helper {
     consensusList[0] = _consensusAddr;
 
     vm.startPrank(_delegator);
-    (bool success, ) =_staking.call(abi.encodeWithSelector(IDelegatorStaking.claimRewards.selector, consensusList));
+    (bool success, ) = _staking.call(abi.encodeWithSelector(IDelegatorStaking.claimRewards.selector, consensusList));
     assertEq(success, true);
 
     vm.stopPrank();
