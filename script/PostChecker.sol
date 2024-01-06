@@ -52,6 +52,9 @@ abstract contract PostChecker is
       address mockPrecompile = _deployImmutable(Contract.MockPrecompile.key());
       vm.etch(address(0x68), mockPrecompile.code);
       vm.makePersistent(address(0x68));
+
+      vm.etch(address(0x6a), mockPrecompile.code);
+      vm.makePersistent(address(0x6a));
     }
 
     _fastForwardToNextDay();

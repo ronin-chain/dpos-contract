@@ -27,6 +27,8 @@ abstract contract PostChecker_Helper is BaseMigration {
   ) internal {
     vm.deal(candidateAdmin, value);
     vm.startPrank(candidateAdmin);
+
+    // After fixed BLS REP-4 ABI
     (bool success, bytes memory returnData) = staking.call{ value: value }(
       abi.encodeWithSelector(
         ICandidateStaking.applyValidatorCandidate.selector,
@@ -34,9 +36,24 @@ abstract contract PostChecker_Helper is BaseMigration {
         consensusAddr,
         candidateAdmin,
         15_00,
-        bytes(string.concat("mock-pub-key", vm.toString(candidateAdmin)))
+        bytes(string.concat("mock-pub-key", vm.toString(candidateAdmin))),
+        bytes(string.concat("mock-proof-of-possession", vm.toString(candidateAdmin)))
       )
     );
+
+    // REP-3 ABI
+    if (!success) {
+      abi.encodeWithSelector(
+        ICandidateStaking.applyValidatorCandidate.selector,
+        candidateAdmin,
+        consensusAddr,
+        candidateAdmin,
+        15_00,
+        bytes(string.concat("mock-pub-key", vm.toString(candidateAdmin)))
+      );
+    }
+
+    // Before REP-3 ABI
     if (!success) {
       (success, returnData) = staking.call{ value: value }(
         abi.encodeWithSelector(
