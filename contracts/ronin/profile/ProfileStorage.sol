@@ -4,6 +4,7 @@ pragma solidity ^0.8.9;
 
 import "../../udvts/Types.sol";
 import "../../extensions/collections/HasContracts.sol";
+import "../../utils/RoleAccess.sol";
 import { IProfile } from "../../interfaces/IProfile.sol";
 
 abstract contract ProfileStorage is IProfile, HasContracts {
@@ -44,16 +45,22 @@ abstract contract ProfileStorage is IProfile, HasContracts {
 
     _profile.consensus = consensus;
     _registry[uint256(uint160(TConsensus.unwrap(consensus)))] = true;
+
+    emit ProfileAddressChanged(_profile.id, RoleAccess.CONSENSUS, TConsensus.unwrap(consensus));
   }
 
   function _setAdmin(CandidateProfile storage _profile, address admin) internal {
     _profile.admin = admin;
     _registry[uint256(uint160(admin))] = true;
+
+    emit ProfileAddressChanged(_profile.id, RoleAccess.CANDIDATE_ADMIN, admin);
   }
 
   function _setTreasury(CandidateProfile storage _profile, address payable treasury) internal {
     _profile.treasury = treasury;
     _registry[uint256(uint160(address(treasury)))] = true;
+
+    emit ProfileAddressChanged(_profile.id, RoleAccess.TREASURY, treasury);
   }
 
   /**
@@ -69,6 +76,8 @@ abstract contract ProfileStorage is IProfile, HasContracts {
   function _setPubkey(CandidateProfile storage _profile, bytes memory pubkey) internal {
     _profile.pubkey = pubkey;
     _registry[_hashPubkey(pubkey)] = true;
+
+    emit PubkeyChanged(_profile.id, pubkey);
   }
 
   /**

@@ -29,8 +29,11 @@ interface IProfile {
 
   /// @dev Event emitted when a profile with `id` is added.
   event ProfileAdded(address indexed id);
+
+  /// @dev Event emitted when the profile is migrated (mostly when REP-4 update).
+  event ProfileMigrated(address indexed id, address indexed admin, address indexed treasury);
   /// @dev Event emitted when a address in a profile is changed.
-  event ProfileAddressChanged(address indexed id, RoleAccess indexed addressType);
+  event ProfileAddressChanged(address indexed id, RoleAccess indexed addressType, address indexed addr);
   /// @dev Event emitted when the pubkey of the `id` is changed.
   event PubkeyChanged(address indexed id, bytes pubkey);
 

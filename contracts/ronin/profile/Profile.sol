@@ -103,7 +103,6 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     CandidateProfile storage _profile = _getId2ProfileHelper(id);
     _requireCandidateAdmin(_profile);
     _requireNonZeroAndNonDuplicated(RoleAccess.CANDIDATE_ADMIN, newAdminAddr);
-    _setAdmin(_profile, newAdminAddr);
 
     IStaking stakingContract = IStaking(getContract(ContractType.STAKING));
     stakingContract.execChangeAdminAddress(id, newAdminAddr);
@@ -111,7 +110,7 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     IRoninValidatorSet validatorContract = IRoninValidatorSet(getContract(ContractType.VALIDATOR));
     validatorContract.execChangeAdminAddress(id, newAdminAddr);
 
-    emit ProfileAddressChanged(id, RoleAccess.CANDIDATE_ADMIN);
+    _setAdmin(_profile, newAdminAddr);
   }
 
   /**
@@ -142,7 +141,6 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     _requireNonZeroAndNonDuplicated(RoleAccess.CONSENSUS, TConsensus.unwrap(newConsensusAddr));
 
     TConsensus oldConsensusAddr = _profile.consensus;
-    _setConsensus(_profile, newConsensusAddr);
 
     IRoninValidatorSet validatorContract = IRoninValidatorSet(getContract(ContractType.VALIDATOR));
     validatorContract.execChangeConsensusAddress(id, newConsensusAddr);
@@ -155,7 +153,7 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
       newConsensusAddr: newConsensusAddr
     });
 
-    emit ProfileAddressChanged(id, RoleAccess.CONSENSUS);
+    _setConsensus(_profile, newConsensusAddr);
   }
 
   /**
@@ -173,12 +171,11 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     CandidateProfile storage _profile = _getId2ProfileHelper(id);
     _requireCandidateAdmin(_profile);
     _requireNonZeroAndNonDuplicated(RoleAccess.TREASURY, newTreasury);
-    _setTreasury(_profile, newTreasury);
 
     IRoninValidatorSet validatorContract = IRoninValidatorSet(getContract(ContractType.VALIDATOR));
     validatorContract.execChangeTreasuryAddress(id, newTreasury);
 
-    emit ProfileAddressChanged(id, RoleAccess.TREASURY);
+    _setTreasury(_profile, newTreasury);
   }
 
   /**
@@ -189,8 +186,6 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     _requireCandidateAdmin(_profile);
     _requireNonDuplicatedPubkey(pubkey);
     _setPubkey(_profile, pubkey);
-
-    emit PubkeyChanged(id, pubkey);
   }
 
   function _requireCandidateAdmin(CandidateProfile storage sProfile) internal view {
