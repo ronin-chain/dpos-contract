@@ -22,6 +22,7 @@ contract Profile_Testnet is Profile {
       _setConsensus(_profile, TConsensus.wrap(id));
       _setAdmin(_profile, lAdmin[i]);
       _setTreasury(_profile, payable(lTreasury[i]));
+      emit ProfileMigrated(id, candidateAdmin, treasury);
     }
   }
 
