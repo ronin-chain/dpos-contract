@@ -7,7 +7,6 @@ import { stdStorage, StdStorage } from "forge-std/StdStorage.sol";
 import { LibErrorHandler } from "contract-libs/LibErrorHandler.sol";
 import { TContract } from "foundry-deployment-kit/types/Types.sol";
 import { LibProxy } from "foundry-deployment-kit/libraries/LibProxy.sol";
-import { DefaultNetwork } from "foundry-deployment-kit/utils/DefaultNetwork.sol";
 import { Proposal, RoninMigration } from "script/RoninMigration.s.sol";
 import { LibString, Contract } from "script/utils/Contract.sol";
 import { RoninGovernanceAdmin, HardForkRoninGovernanceAdminDeploy } from "script/contracts/HardForkRoninGovernanceAdminDeploy.s.sol";
@@ -41,17 +40,17 @@ contract Migration__20232811_ChangeGovernanceAdmin_NotYetHardfork is Migration__
       // TODO: put the adding profile to Profile_Testnet
       // Cheat add Profile for community-validator: 0x9687e8C41fa369aD08FD278a43114C4207856a61
 
-      address profileContract = config.getAddressFromCurrentNetwork(Contract.Profile.key());
-      vm.store(
-        profileContract,
-        bytes32(0xe2b5ca0375b8eef7b8b64fc95e405858a03b6325b0d163d50bf963cf7c15b633),
-        bytes32(uint256(uint160(0x9687e8C41fa369aD08FD278a43114C4207856a61)))
-      );
-      vm.store(
-        profileContract,
-        bytes32(0xe2b5ca0375b8eef7b8b64fc95e405858a03b6325b0d163d50bf963cf7c15b634),
-        bytes32(uint256(uint160(0x9687e8C41fa369aD08FD278a43114C4207856a61)))
-      );
+      // address profileContract = config.getAddressFromCurrentNetwork(Contract.Profile.key());
+      // vm.store(
+      //   profileContract,
+      //   bytes32(0xe2b5ca0375b8eef7b8b64fc95e405858a03b6325b0d163d50bf963cf7c15b633),
+      //   bytes32(uint256(uint160(0x9687e8C41fa369aD08FD278a43114C4207856a61)))
+      // );
+      // vm.store(
+      //   profileContract,
+      //   bytes32(0xe2b5ca0375b8eef7b8b64fc95e405858a03b6325b0d163d50bf963cf7c15b634),
+      //   bytes32(uint256(uint160(0x9687e8C41fa369aD08FD278a43114C4207856a61)))
+      // );
     }
   }
 }
