@@ -41,6 +41,7 @@ abstract contract PostChecker_Slash is BaseMigration, PostChecker_Helper {
     _validatorSet = CONFIG.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key());
     _staking = CONFIG.getAddressFromCurrentNetwork(Contract.Staking.key());
     _slashingContract = CONFIG.getAddressFromCurrentNetwork(Contract.SlashIndicator.key());
+    _postCheck_RandomQueryData();
 
     (, _tier2Threshold, _slashAmountTier2, ) = ISlashIndicator(_slashingContract).getUnavailabilitySlashingConfigs();
 
@@ -53,6 +54,17 @@ abstract contract PostChecker_Slash is BaseMigration, PostChecker_Helper {
     vm.revertTo(snapshotId);
     _pickSuitableSlasheeForSlashBelowRequirement();
     _postCheckSlashUntilBelowRequirement();
+  }
+
+  function _postCheck_RandomQueryData() private view logFn("Post check slash: random query data") {
+    (uint tier1Threshold, uint tier2Threshold, uint slashAmountTier2, uint jailDuration) = ISlashIndicator(
+      _slashingContract
+    ).getUnavailabilitySlashingConfigs();
+    require(tier1Threshold < NORMAL_SMALL_NUMBER || tier1Threshold == 0, "abnormal tier 1");
+    require(tier2Threshold < NORMAL_SMALL_NUMBER || tier2Threshold == 0, "abnormal tier 2");
+    require(slashAmountTier2 >= 1 ether, "abnormal slash amount tier 2");
+    require(jailDuration < NORMAL_BLOCK_NUMBER || jailDuration == 0, "abnormal jail duration");
+    console.log(">", StdStyle.green("Post check Slashing `random query data` successful"));
   }
 
   function _postCheckSlashUnavailability() private logFn("Post check slash unavailability") {
@@ -142,9 +154,7 @@ abstract contract PostChecker_Slash is BaseMigration, PostChecker_Helper {
     address[] memory consensusLst = abi.decode(returnedData, (address[]));
     _slashee = consensusLst[0];
 
-    (, returnedData) = _staking.staticcall(
-      abi.encodeWithSelector(IBaseStaking.getPoolDetail.selector, _slashee)
-    );
+    (, returnedData) = _staking.staticcall(abi.encodeWithSelector(IBaseStaking.getPoolDetail.selector, _slashee));
     (_slasheeAdmin, , ) = abi.decode(returnedData, (address, uint, uint));
 
     _slasher = consensusLst[1];

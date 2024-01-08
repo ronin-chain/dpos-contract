@@ -40,6 +40,7 @@ contract GeneralConfig is BaseGeneralConfig {
   function _setUpContracts() internal virtual override {
     _mapContractname(Contract.Profile);
     _mapContractname(Contract.Profile_Testnet);
+    _mapContractname(Contract.Profile_Mainnet);
     _mapContractname(Contract.Staking);
     _mapContractname(Contract.Maintenance);
     _mapContractname(Contract.BridgeSlash);

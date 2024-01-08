@@ -27,7 +27,8 @@ enum Contract {
   HardForkRoninGovernanceAdmin,
   TemporalRoninTrustedOrganization,
   RoninValidatorSetTimedMigrator,
-  Profile_Testnet
+  Profile_Testnet,
+  Profile_Mainnet
 }
 
 using { key, name } for Contract global;
@@ -39,6 +40,7 @@ function key(Contract contractEnum) pure returns (TContract) {
 function name(Contract contractEnum) pure returns (string memory) {
   if (contractEnum == Contract.Profile) return "Profile";
   if (contractEnum == Contract.Profile_Testnet) return "Profile_Testnet";
+  if (contractEnum == Contract.Profile_Mainnet) return "Profile_Mainnet";
   if (contractEnum == Contract.Staking) return "Staking";
   if (contractEnum == Contract.Maintenance) return "Maintenance";
   if (contractEnum == Contract.BridgeSlash) return "BridgeSlash";

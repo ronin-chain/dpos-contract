@@ -3,6 +3,7 @@ pragma solidity ^0.8.19;
 
 import { TransparentUpgradeableProxy } from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 import { TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
+import { StdStyle } from "forge-std/StdStyle.sol";
 import { console2 as console } from "forge-std/console2.sol";
 import { stdStorage, StdStorage } from "forge-std/StdStorage.sol";
 import { LibErrorHandler } from "contract-libs/LibErrorHandler.sol";
@@ -14,6 +15,8 @@ import { LibString, Contract } from "script/utils/Contract.sol";
 import { RoninGovernanceAdmin, HardForkRoninGovernanceAdminDeploy } from "script/contracts/HardForkRoninGovernanceAdminDeploy.s.sol";
 import { RoninTrustedOrganization, TemporalRoninTrustedOrganizationDeploy } from "script/contracts/TemporalRoninTrustedOrganizationDeploy.s.sol";
 import { Profile_Testnet } from "@ronin/contracts/ronin/profile/Profile_Testnet.sol";
+import { Profile_Mainnet } from "@ronin/contracts/ronin/profile/Profile_Mainnet.sol";
+import { Profile } from "@ronin/contracts/ronin/profile/Profile.sol";
 
 abstract contract Migration__20232811_ChangeGovernanceAdmin_Common is RoninMigration {
   using LibString for *;
@@ -52,10 +55,20 @@ abstract contract Migration__20232811_ChangeGovernanceAdmin_Common is RoninMigra
 
     // Identify proxy targets to change admin
     for (uint256 i; i < addrs.length; ++i) {
-      try this.getProxyAdmin(addrs[i]) returns (address payable proxy) {
-        if (proxy == __roninGovernanceAdmin) {
+      try this.getProxyAdmin(addrs[i]) returns (address payable adminOfProxy) {
+        if (adminOfProxy == __roninGovernanceAdmin) {
           console.log("Target Proxy to change admin with proposal", vm.getLabel(addrs[i]));
           _proxyTargets.push(addrs[i]);
+        } else {
+          console.log(
+            string.concat(
+              StdStyle.yellow(unicode"⚠️ [WARNING] "),
+              "Contract ",
+              vm.getLabel(addrs[i]),
+              "has different admin: ",
+              vm.toString(adminOfProxy)
+            )
+          );
         }
       } catch {}
     }
@@ -89,39 +102,75 @@ abstract contract Migration__20232811_ChangeGovernanceAdmin_Common is RoninMigra
     config.setAddress(network(), Contract.RoninGovernanceAdmin.key(), address(__hardForkGovernanceAdmin));
 
     // Migrate Profile contract for REP-4
-    if (block.chainid == DefaultNetwork.RoninTestnet.chainId()) {
-      // Cheat add Profile for community-validator: 0x9687e8C41fa369aD08FD278a43114C4207856a61,  0x32F66d0F9F19Db7b0EF1E9f13160884DA65467e7
-
-      address profileProxy = config.getAddressFromCurrentNetwork(Contract.Profile.key());
-      address newProfileLogic = _deployLogic(Contract.Profile_Testnet.key());
-
+    {
       address[] memory targets = new address[](2);
-      targets[0] = profileProxy;
-      targets[1] = profileProxy;
       uint256[] memory values = new uint256[](targets.length);
       bytes[] memory callDatas = new bytes[](targets.length);
+      uint cooldownTimeChangePubkey = 1 days;
 
-      callDatas[0] = abi.encodeWithSelector(TransparentUpgradeableProxy.upgradeTo.selector, newProfileLogic);
-      callDatas[1] = abi.encodeWithSelector(
-        TransparentUpgradeableProxyV2.functionDelegateCall.selector,
-        // address(__hardForkGovernanceAdmin)
-        abi.encodeWithSelector(Profile_Testnet.migrateRenouncedCandidate.selector)
-      );
+      if (block.chainid == DefaultNetwork.RoninTestnet.chainId()) {
+        // Cheat add Profile for community-validator: 0x9687e8C41fa369aD08FD278a43114C4207856a61,  0x32F66d0F9F19Db7b0EF1E9f13160884DA65467e7
+        address profileProxy = config.getAddressFromCurrentNetwork(Contract.Profile.key());
+        address newProfileLogic = _deployLogic(Contract.Profile_Testnet.key());
 
-      Proposal.ProposalDetail memory proposal = _buildProposal(
-        RoninGovernanceAdmin(__hardForkGovernanceAdmin),
-        block.timestamp + 5 minutes,
-        targets,
-        values,
-        callDatas
-      );
+        targets[0] = profileProxy;
+        targets[1] = profileProxy;
 
-      // Execute the proposal
-      _executeProposal(
-        RoninGovernanceAdmin(__hardForkGovernanceAdmin),
-        RoninTrustedOrganization(__trustedOrg),
-        proposal
-      );
+        callDatas[0] = abi.encodeWithSelector(
+          TransparentUpgradeableProxy.upgradeToAndCall.selector,
+          newProfileLogic,
+          abi.encodeWithSelector(Profile.initializeV3.selector, cooldownTimeChangePubkey)
+        );
+        callDatas[1] = abi.encodeWithSelector(
+          TransparentUpgradeableProxyV2.functionDelegateCall.selector,
+          // address(__hardForkGovernanceAdmin)
+          abi.encodeWithSelector(Profile_Testnet.migrateRenouncedCandidate.selector)
+        );
+      } else if (block.chainid == DefaultNetwork.RoninMainnet.chainId()) {
+        address profileProxy = config.getAddressFromCurrentNetwork(Contract.Profile.key());
+
+        // Change Profile admin from Bao's EOA to Proxy Admin
+        vm.startPrank(0x4d58Ea7231c394d5804e8B06B1365915f906E27F);
+        TransparentUpgradeableProxy(payable(profileProxy)).changeAdmin(address(__hardForkGovernanceAdmin));
+        vm.stopPrank();
+
+        // Prepare proposal for Profile
+        address newProfileLogic = _deployLogic(Contract.Profile_Mainnet.key());
+
+        targets[0] = profileProxy;
+        targets[1] = profileProxy;
+
+        address stakingContract = config.getAddressFromCurrentNetwork(Contract.Staking.key());
+
+        callDatas[0] = abi.encodeWithSelector(
+          TransparentUpgradeableProxy.upgradeToAndCall.selector,
+          newProfileLogic,
+          abi.encodeCall(Profile.initializeV2, (stakingContract, __trustedOrg))
+        );
+        callDatas[1] = abi.encodeWithSelector(
+          TransparentUpgradeableProxyV2.functionDelegateCall.selector,
+          abi.encodeCall(Profile.initializeV3, (cooldownTimeChangePubkey))
+        );
+      }
+
+      // Propose and execute proposal to upgrade and initialize REP-4
+      if (targets[0] != address(0)) {
+        console.log("====== Propose and execute proposal to upgrade and initialize REP-4 ======");
+        Proposal.ProposalDetail memory proposal = _buildProposal(
+          RoninGovernanceAdmin(__hardForkGovernanceAdmin),
+          block.timestamp + 5 minutes,
+          targets,
+          values,
+          callDatas
+        );
+
+        // Execute the proposal
+        _executeProposal(
+          RoninGovernanceAdmin(__hardForkGovernanceAdmin),
+          RoninTrustedOrganization(__trustedOrg),
+          proposal
+        );
+      }
     }
   }
 }

@@ -12,6 +12,9 @@ import { ICandidateStaking } from "@ronin/contracts/interfaces/staking/ICandidat
 import { RoninValidatorSet } from "@ronin/contracts/ronin/validator/RoninValidatorSet.sol";
 
 abstract contract PostChecker_Helper is BaseMigration {
+  uint NORMAL_SMALL_NUMBER = 1_000_000;
+  uint NORMAL_BLOCK_NUMBER = 100_000_000;
+
   using LibErrorHandler for bool;
 
   function _applyValidatorCandidate(address staking, address candidateAdmin, address consensusAddr) internal {
