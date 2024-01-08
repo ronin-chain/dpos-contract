@@ -5,25 +5,38 @@ import "./Profile.sol";
 pragma solidity ^0.8.9;
 
 contract Profile_Testnet is Profile {
-  function __migrationRenouncedCandidates() internal override onlyInitializing {
-    if (block.chainid != 2021) return;
+  function migrateRenouncedCandidate() external onlyAdmin {
+    __defaultMigrate();
+  }
 
-    CandidateProfile storage _profile;
+  function manualMigrate(address id, address candidateAdmin, address treasury) external onlyAdmin {
+    __migrate(id, candidateAdmin, treasury);
+  }
+
+  function __migrationRenouncedCandidates() internal override onlyInitializing {
+    __defaultMigrate();
+  }
+
+  function __defaultMigrate() private {
+    if (block.chainid != 2021) return;
 
     address[76] memory lConsensus = __consensuses();
     address[76] memory lAdmin = __admins();
     address[76] memory lTreasury = __treasuries();
 
     for (uint i; i < lConsensus.length; ++i) {
-      address id = lConsensus[i];
-
-      _profile = _id2Profile[id];
-      _profile.id = id;
-      _setConsensus(_profile, TConsensus.wrap(id));
-      _setAdmin(_profile, lAdmin[i]);
-      _setTreasury(_profile, payable(lTreasury[i]));
-      emit ProfileMigrated(id, candidateAdmin, treasury);
+      __migrate(lConsensus[i], lAdmin[i], lTreasury[i]);
     }
+  }
+
+  function __migrate(address id, address candidateAdmin, address treasury) private {
+    CandidateProfile storage _profile = _id2Profile[id];
+    _profile.id = id;
+
+    _setConsensus(_profile, TConsensus.wrap(id));
+    _setAdmin(_profile, candidateAdmin);
+    _setTreasury(_profile, payable(treasury));
+    emit ProfileMigrated(id, candidateAdmin, treasury);
   }
 
   function __admins() private pure returns (address[76] memory list) {

@@ -15,15 +15,18 @@ contract Profile_Mainnet is Profile {
     address[4] memory lTreasury = __treasuries();
 
     for (uint i; i < lConsensus.length; ++i) {
-      address id = lConsensus[i];
-
-      _profile = _id2Profile[id];
-      _profile.id = id;
-      _setConsensus(_profile, TConsensus.wrap(id));
-      _setAdmin(_profile, lAdmin[i]);
-      _setTreasury(_profile, payable(lTreasury[i]));
-      emit ProfileMigrated(id, candidateAdmin, treasury);
+      __migrate(lConsensus[i], lAdmin[i], lTreasury[i]);
     }
+  }
+
+  function __migrate(address id, address candidateAdmin, address treasury) private {
+    CandidateProfile storage _profile = _id2Profile[id];
+    _profile.id = id;
+
+    _setConsensus(_profile, TConsensus.wrap(id));
+    _setAdmin(_profile, candidateAdmin);
+    _setTreasury(_profile, payable(treasury));
+    emit ProfileMigrated(id, candidateAdmin, treasury);
   }
 
   function __admins() private pure returns (address[4] memory list) {
