@@ -10,9 +10,9 @@ contract Profile_Testnet is Profile {
 
     CandidateProfile storage _profile;
 
-    address[74] memory lConsensus = __consensuses();
-    address[74] memory lAdmin = __admins();
-    address[74] memory lTreasury = __treasuries();
+    address[76] memory lConsensus = __consensuses();
+    address[76] memory lAdmin = __admins();
+    address[76] memory lTreasury = __treasuries();
 
     for (uint i; i < lConsensus.length; ++i) {
       address id = lConsensus[i];
@@ -26,8 +26,10 @@ contract Profile_Testnet is Profile {
     }
   }
 
-  function __admins() private pure returns (address[74] memory list) {
+  function __admins() private pure returns (address[76] memory list) {
     return [
+      0xcF0E23AED16D5d971910e748ACd48849E4b7239C, // outside validator,
+      0x32f66D0F9F19db7B0EF1E9F13160884Da65467E6, // outside validator,
       0xD682DC6D64710D6191512133dE957e146e9AA58f,
       0xEFeaFf1d9f1E4EDB00c6084aE4016143B29Ed924,
       0xC2caE7311FC0fe400A838d2dDe06A89E1d3e9Da7,
@@ -105,8 +107,10 @@ contract Profile_Testnet is Profile {
     ];
   }
 
-  function __consensuses() private pure returns (address[74] memory list) {
+  function __consensuses() private pure returns (address[76] memory list) {
     return [
+      0x9687e8C41fa369aD08FD278a43114C4207856a61, // outside validator
+      0x32F66d0F9F19Db7b0EF1E9f13160884DA65467e7, // outside validator
       0xD682dc6D64710D6191512133De957e146e9Aa58e,
       0xEFeaFf1d9f1e4eDB00C6084ae4016143B29eD925,
       0x57b572A9de68Bd29074e1C51c790Fc45C592ba39,
@@ -184,8 +188,10 @@ contract Profile_Testnet is Profile {
     ];
   }
 
-  function __treasuries() private pure returns (address[74] memory list) {
+  function __treasuries() private pure returns (address[76] memory list) {
     return [
+      0xcF0E23AED16D5d971910e748ACd48849E4b7239C, // outside validator
+      0x32f66D0F9F19db7B0EF1E9F13160884Da65467E6, // outside validator
       0xD682DC6D64710D6191512133dE957e146e9AA58f,
       0xEFeaFf1d9f1E4EDB00c6084aE4016143B29Ed924,
       0xC2caE7311FC0fe400A838d2dDe06A89E1d3e9Da7,
