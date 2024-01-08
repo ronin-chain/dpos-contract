@@ -29,16 +29,6 @@ contract Profile_Testnet is Profile {
     }
   }
 
-  function __migrate(address id, address candidateAdmin, address treasury) private {
-    CandidateProfile storage _profile = _id2Profile[id];
-    _profile.id = id;
-
-    _setConsensus(_profile, TConsensus.wrap(id));
-    _setAdmin(_profile, candidateAdmin);
-    _setTreasury(_profile, payable(treasury));
-    emit ProfileMigrated(id, candidateAdmin, treasury);
-  }
-
   function __admins() private pure returns (address[76] memory list) {
     return [
       0xcF0E23AED16D5d971910e748ACd48849E4b7239C, // outside validator,

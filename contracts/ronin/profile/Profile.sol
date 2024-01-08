@@ -42,6 +42,23 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
    */
   function __migrationRenouncedCandidates() internal virtual {}
 
+
+  /**
+   * @dev This method is used in REP-4 migration, which creates profile for all community-validators and renounced validators.
+   * This method can be removed after REP-4 goes live.
+   *
+   * DO NOT use for any other purpose.
+   */
+  function __migrate(address id, address candidateAdmin, address treasury) internal {
+    CandidateProfile storage _profile = _id2Profile[id];
+    _profile.id = id;
+
+    _setConsensus(_profile, TConsensus.wrap(id));
+    _setAdmin(_profile, candidateAdmin);
+    _setTreasury(_profile, payable(treasury));
+    emit ProfileMigrated(id, candidateAdmin, treasury);
+  }
+
   /**
    * @inheritdoc IProfile
    */
