@@ -26,7 +26,6 @@ contract Migration__20232811_ChangeGovernanceAdmin_NotYetHardfork is Migration__
     __roninGovernanceAdmin = config.getAddressFromCurrentNetwork(Contract.RoninGovernanceAdmin.key());
 
     // Deploy new Ronin Governance Admin
-    __hardForkGovernanceAdmin = new HardForkRoninGovernanceAdminDeploy().run();
     __trustedOrg = config.getAddressFromCurrentNetwork(Contract.RoninTrustedOrganization.key());
 
     // Deploy temporary Ronin Trusted Organization

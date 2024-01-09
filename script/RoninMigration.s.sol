@@ -151,7 +151,7 @@ contract RoninMigration is PostChecker, VoteStatusConsumer {
     RoninGovernanceAdmin governanceAdmin,
     RoninTrustedOrganization roninTrustedOrg,
     Proposal.ProposalDetail memory proposal
-  ) internal {
+  ) internal override {
     Ballot.VoteType support = Ballot.VoteType.For;
     IRoninTrustedOrganization.TrustedOrganization[] memory allTrustedOrgs = roninTrustedOrg.getAllTrustedOrganizations();
 
@@ -189,7 +189,7 @@ contract RoninMigration is PostChecker, VoteStatusConsumer {
     address[] memory targets,
     uint256[] memory values,
     bytes[] memory callDatas
-  ) internal returns (Proposal.ProposalDetail memory proposal) {
+  ) internal override returns (Proposal.ProposalDetail memory proposal) {
     require(targets.length == values.length && values.length == callDatas.length, "RoninMigration: Length mismatch");
 
     uint256[] memory gasAmounts = new uint256[](targets.length);

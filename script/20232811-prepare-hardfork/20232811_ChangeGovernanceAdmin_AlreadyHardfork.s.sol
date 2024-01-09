@@ -25,9 +25,6 @@ contract Migration__20232811_ChangeGovernanceAdmin_AlreadyHardfork is Migration_
     // Get current broken Ronin Governance Admin
     __roninGovernanceAdmin = config.getAddressFromCurrentNetwork(Contract.RoninGovernanceAdmin.key());
 
-    // Deploy new Ronin Governance Admin
-    __hardForkGovernanceAdmin = new HardForkRoninGovernanceAdminDeploy().run();
-
     // Cheat storage slot of impl in Trusted Org Proxy
     __trustedOrg = config.getAddressFromCurrentNetwork(Contract.RoninTrustedOrganization.key());
 

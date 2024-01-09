@@ -11,6 +11,7 @@ import { LibProxy } from "foundry-deployment-kit/libraries/LibProxy.sol";
 import { BaseMigration } from "foundry-deployment-kit/BaseMigration.s.sol";
 import { ScriptExtended } from "foundry-deployment-kit/extensions/ScriptExtended.s.sol";
 import { Contract } from "./utils/Contract.sol";
+import "./post-check/PostChecker_GovernanceAdmin.s.sol";
 import "./post-check/PostChecker_ApplyCandidate.sol";
 import "./post-check/PostChecker_Staking.sol";
 import "./post-check/PostChecker_Renounce.sol";
@@ -21,6 +22,7 @@ import "./post-check/PostChecker_Slash.sol";
 abstract contract PostChecker is
   BaseMigration,
   PostChecker_ApplyCandidate,
+  PostChecker_GovernanceAdmin,
   PostChecker_Staking,
   PostChecker_Renounce,
   PostChecker_EmergencyExit,
@@ -30,17 +32,14 @@ abstract contract PostChecker is
   using LibProxy for *;
   using LibErrorHandler for bool;
 
-  // @dev Array to store all proxy targets that share same proxy admin
-  address[] internal _proxyTargets;
-
   function run(bytes calldata callData, string calldata command) public override {
     super.run(callData, command);
 
     CONFIG.setBroadcastDisableStatus(true);
 
-    console.log(StdStyle.cyan("Post checking..."));
+    console.log(StdStyle.cyan("==========================\n\nPost checking..."));
     _postCheckValidatorSet();
-    _postCheckGovernanceAdmin();
+    _postCheck__GovernanceAdmin();
     _postCheck__ApplyCandidate();
     _postCheck__Staking();
     _postCheck__Renounce();
@@ -67,32 +66,5 @@ abstract contract PostChecker is
     _wrapUpEpoch();
 
     console.log(">", StdStyle.green("Post check Validator `wrapUpEpoch` successful"));
-  }
-
-  function _postCheckGovernanceAdmin() internal logFn("Post check Governance Admin") {
-    // Get all contracts deployed from the current network
-    address payable[] memory addrs = CONFIG.getAllAddresses(network());
-    address payable governanceAdmin = CONFIG.getAddressFromCurrentNetwork(Contract.RoninGovernanceAdmin.key());
-    // Identify proxy targets to upgrade with proposal
-    for (uint256 i; i < addrs.length; ++i) {
-      try this.getProxyAdmin(addrs[i]) returns (address payable proxy) {
-        if (proxy == governanceAdmin) {
-          console.log("Target Proxy to test upgrade with proposal", vm.getLabel(addrs[i]));
-          _proxyTargets.push(addrs[i]);
-        }
-      } catch {}
-    }
-    address[] memory targets = _proxyTargets;
-    for (uint256 i; i < targets.length; ++i) {
-      TContract contractType = CONFIG.getContractTypeFromCurrentNetwok(targets[i]);
-      console.log("Upgrading contract:", vm.getLabel(targets[i]));
-      _upgradeProxy(contractType);
-    }
-
-    console.log(">", StdStyle.green("Post check Governance Admin Upgrade Proposal successful"));
-  }
-
-  function getProxyAdmin(address payable proxy) external returns (address payable proxyAdmin) {
-    return proxy.getProxyAdmin();
   }
 }
