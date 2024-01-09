@@ -36,6 +36,8 @@ abstract contract PostChecker is
   function run(bytes calldata callData, string calldata command) public override {
     super.run(callData, command);
 
+    CONFIG.setBroadcastDisableStatus(true);
+
     console.log(StdStyle.cyan("Post checking..."));
     _postCheckValidatorSet();
     _postCheckGovernanceAdmin();
@@ -45,6 +47,8 @@ abstract contract PostChecker is
     _postCheck__EmergencyExit();
     _postCheck__Maintenance();
     _postCheck__Slash();
+
+    CONFIG.setBroadcastDisableStatus(false);
   }
 
   function _postCheckValidatorSet() internal logFn("Post check Validator Set") {

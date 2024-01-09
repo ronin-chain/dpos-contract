@@ -155,7 +155,14 @@ contract RoninMigration is PostChecker, VoteStatusConsumer {
     Ballot.VoteType support = Ballot.VoteType.For;
     IRoninTrustedOrganization.TrustedOrganization[] memory allTrustedOrgs = roninTrustedOrg.getAllTrustedOrganizations();
 
-    vm.broadcast(allTrustedOrgs[0].governor);
+    bool shouldPrankOnly = CONFIG.isBroadcastDisable();
+    address trustedOrg0 = allTrustedOrgs[0].governor;
+
+    if (shouldPrankOnly) {
+      vm.prank(trustedOrg0);
+    } else {
+      vm.broadcast(trustedOrg0);
+    }
     governanceAdmin.proposeProposalForCurrentNetwork(
       proposal.expiryTimestamp, proposal.targets, proposal.values, proposal.calldatas, proposal.gasAmounts, support
     );
@@ -165,7 +172,13 @@ contract RoninMigration is PostChecker, VoteStatusConsumer {
       if (status != VoteStatus.Pending) {
         break;
       }
-      vm.broadcast(allTrustedOrgs[i].governor);
+
+      address iTrustedOrg = allTrustedOrgs[i].governor;
+      if (shouldPrankOnly) {
+        vm.prank(iTrustedOrg);
+      } else {
+        vm.broadcast(iTrustedOrg);
+      }
       governanceAdmin.castProposalVoteForCurrentNetwork(proposal, support);
     }
   }
@@ -184,14 +197,15 @@ contract RoninMigration is PostChecker, VoteStatusConsumer {
 
     vm.startPrank(address(governanceAdmin));
 
+    uint DEFAULT_PROPOSAL_GAS = 1_000_000;
     for (uint256 i; i < targets.length; ++i) {
       vm.deal(address(governanceAdmin), values[0]);
       uint256 gas = gasleft();
       (bool success, bytes memory returnOrRevertData) = targets[i].call{ value: values[0] }(callDatas[i]);
       gas -= gasleft();
       success.handleRevert(msg.sig, returnOrRevertData);
-      // add 20% extra gas amount
-      gasAmounts[i] = (gas * 120_00) / 100_00;
+      // add 50% extra gas amount
+      gasAmounts[i] = gas < DEFAULT_PROPOSAL_GAS / 2 ? DEFAULT_PROPOSAL_GAS : (gas * 150_00) / 100_00;
     }
 
     vm.stopPrank();
