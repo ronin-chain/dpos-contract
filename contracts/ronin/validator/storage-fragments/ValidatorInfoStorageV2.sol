@@ -81,7 +81,7 @@ abstract contract ValidatorInfoStorageV2 is IValidatorInfoV2, HasContracts, HasT
       }
     }
 
-    assembly {
+    assembly ("memory-safe") {
       mstore(cids, count)
     }
   }
