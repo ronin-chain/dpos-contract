@@ -282,7 +282,7 @@ contract RoninTrustedOrganization is IRoninTrustedOrganization, HasProxyAdmin, H
     TConsensus newAddr
   ) external override onlyContract(ContractType.PROFILE) {
     (bool found, uint256 index) = _findTrustedOrgIndexByConsensus(oldAddr);
-    if (!found) return;
+    if (!found) revert ErrConsensusAddressIsNotAdded(oldAddr);
 
     _consensusList[index] = newAddr;
     _consensusWeight[newAddr] = _consensusWeight[oldAddr];
