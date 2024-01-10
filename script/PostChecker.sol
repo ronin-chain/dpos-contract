@@ -35,10 +35,9 @@ abstract contract PostChecker is
   function run(bytes calldata callData, string calldata command) public override {
     super.run(callData, command);
 
-    console.log(
-      StdStyle.bold(StdStyle.cyan("\n\n ====================== Post checking... ======================"))
-    );
+    console.log(StdStyle.bold(StdStyle.cyan("\n\n ====================== Post checking... ======================")));
 
+    CONFIG.setUserDefinedConfig(CONFIG.DISABLE_LOG_ARTIFACT(), bytes32(uint256(0x01)));
     CONFIG.setBroadcastDisableStatus(true);
     _setDisableLogProposalStatus(true);
 
@@ -52,12 +51,11 @@ abstract contract PostChecker is
     _postCheck__Slash();
     _postCheck__GovernanceAdmin();
 
+    CONFIG.setUserDefinedConfig(CONFIG.DISABLE_LOG_ARTIFACT(), bytes32(uint256(0x00)));
     CONFIG.setBroadcastDisableStatus(false);
     _setDisableLogProposalStatus(false);
 
-    console.log(
-      StdStyle.bold(StdStyle.cyan("\n\n================== Finish post checking ==================\n\n"))
-    );
+    console.log(StdStyle.bold(StdStyle.cyan("\n\n================== Finish post checking ==================\n\n")));
   }
 
   function _postCheckValidatorSet() internal logPostCheck("[ValidatorSet] wrap up epoch") {
