@@ -85,7 +85,7 @@ abstract contract Migration__20232811_ChangeGovernanceAdmin_Common is RoninMigra
               }
 
               if (target == profileProxy) {
-                address newProfileLogic = _deployLogic(Contract.Profile_Testnet.key());
+                address newProfileLogic = _deployLogic(Contract.Profile.key());
 
                 __scriptProxyTarget.push(target);
                 __values.push(0);
@@ -149,11 +149,9 @@ abstract contract Migration__20232811_ChangeGovernanceAdmin_Common is RoninMigra
         // );
       }
 
-      // address[] memory targets = _proxyTargets;
-      // uint256[] memory values = __values;
-      // bytes[] memory callDatas = __calldatas;
-
+      // ===============================
       // Propose and execute proposal to upgrade and initialize REP-4
+      // ===============================
       if (__scriptProxyTarget[0] != address(0)) {
         console.log("====== Propose and execute proposal to upgrade and initialize REP-4 ======");
         Proposal.ProposalDetail memory proposal = _buildProposal(
