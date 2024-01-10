@@ -93,16 +93,6 @@ abstract contract Migration__20232811_ChangeGovernanceAdmin_Common is RoninMigra
                     abi.encodeWithSelector(Profile.initializeV3.selector, cooldownTimeChangePubkey)
                   )
                 );
-
-                // Cheat add Profile for community-validator: 0x9687e8C41fa369aD08FD278a43114C4207856a61,  0x32F66d0F9F19Db7b0EF1E9f13160884DA65467e7
-                __scriptProxyTarget.push(target);
-                __values.push(0);
-                __calldatas.push(
-                  abi.encodeWithSelector(
-                    TransparentUpgradeableProxyV2.functionDelegateCall.selector,
-                    abi.encodeWithSelector(Profile_Testnet.migrateRenouncedCandidate.selector)
-                  )
-                );
               } else {
                 address newLogic = _deployLogic(contractType);
                 __scriptProxyTarget.push(target);
@@ -122,6 +112,16 @@ abstract contract Migration__20232811_ChangeGovernanceAdmin_Common is RoninMigra
             }
           } catch {}
         }
+
+        // Cheat add Profile for community-validator: 0x9687e8C41fa369aD08FD278a43114C4207856a61,  0x32F66d0F9F19Db7b0EF1E9f13160884DA65467e7
+        __scriptProxyTarget.push(profileProxy);
+        __values.push(0);
+        __calldatas.push(
+          abi.encodeWithSelector(
+            TransparentUpgradeableProxyV2.functionDelegateCall.selector,
+            abi.encodeWithSelector(Profile_Testnet.migrateRenouncedCandidate.selector)
+          )
+        );
       } else if (block.chainid == DefaultNetwork.RoninMainnet.chainId()) {
         // address profileProxy = config.getAddressFromCurrentNetwork(Contract.Profile.key());
         // // Change Profile admin from Bao's EOA to Proxy Admin
