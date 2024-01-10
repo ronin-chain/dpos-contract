@@ -33,6 +33,10 @@ contract RoninTrustedOrganization is IRoninTrustedOrganization, HasProxyAdmin, H
   /// @dev Bridge voters array
   address[] internal __deprecatedBridgeVoterList;
 
+  constructor() {
+    _disableInitializers();
+  }
+
   /**
    * @dev Initializes the contract storage.
    */
