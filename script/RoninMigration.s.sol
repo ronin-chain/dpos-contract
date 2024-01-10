@@ -224,7 +224,7 @@ contract RoninMigration is PostChecker, VoteStatusConsumer {
       gas -= gasleft();
       success.handleRevert(msg.sig, returnOrRevertData);
       // add 50% extra gas amount
-      gasAmounts[i] = gas < DEFAULT_PROPOSAL_GAS / 2 ? DEFAULT_PROPOSAL_GAS : (gas * 150_00) / 100_00;
+      gasAmounts[i] = gas < DEFAULT_PROPOSAL_GAS / 2 ? DEFAULT_PROPOSAL_GAS : (gas * 200_00) / 100_00;
     }
 
     vm.stopPrank();
