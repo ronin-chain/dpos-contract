@@ -27,6 +27,7 @@ abstract contract Migration__20232811_ChangeGovernanceAdmin_Common is RoninMigra
   address[] private __scriptProxyTarget;
   address internal __roninGovernanceAdmin;
   address internal __trustedOrg;
+  uint256 private _proposalDuration;
 
   uint256[] __values;
   bytes[] __calldatas;
@@ -55,6 +56,7 @@ abstract contract Migration__20232811_ChangeGovernanceAdmin_Common is RoninMigra
 
     // Get all contracts deployed from the current network
     address payable[] memory addrs = config.getAllAddresses(network());
+    _proposalDuration = 10 days;
 
     // Migrate Profile contract for REP-4
     {
@@ -63,6 +65,8 @@ abstract contract Migration__20232811_ChangeGovernanceAdmin_Common is RoninMigra
       uint cooldownTimeChangePubkey = 1 days;
 
       if (block.chainid == DefaultNetwork.RoninTestnet.chainId()) {
+        _proposalDuration = 1 days;
+
         address profileProxy = config.getAddressFromCurrentNetwork(Contract.Profile.key());
         address gatewayPauseEnforcer = config.getAddressFromCurrentNetwork(Contract.RoninGatewayPauseEnforcer.key());
 
@@ -123,6 +127,7 @@ abstract contract Migration__20232811_ChangeGovernanceAdmin_Common is RoninMigra
           )
         );
       } else if (block.chainid == DefaultNetwork.RoninMainnet.chainId()) {
+        _proposalDuration = 10 days;
         // address profileProxy = config.getAddressFromCurrentNetwork(Contract.Profile.key());
         // // Change Profile admin from Bao's EOA to Proxy Admin
         // vm.startPrank(0x4d58Ea7231c394d5804e8B06B1365915f906E27F);
@@ -153,7 +158,7 @@ abstract contract Migration__20232811_ChangeGovernanceAdmin_Common is RoninMigra
         console.log("====== Propose and execute proposal to upgrade and initialize REP-4 ======");
         Proposal.ProposalDetail memory proposal = _buildProposal(
           RoninGovernanceAdmin(__roninGovernanceAdmin),
-          block.timestamp + 5 minutes,
+          block.timestamp + _proposalDuration,
           __scriptProxyTarget,
           __values,
           __calldatas
