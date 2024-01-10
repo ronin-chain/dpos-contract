@@ -35,9 +35,13 @@ abstract contract PostChecker is
   function run(bytes calldata callData, string calldata command) public override {
     super.run(callData, command);
 
-    CONFIG.setBroadcastDisableStatus(true);
+    console.log(
+      StdStyle.bold(StdStyle.cyan("\n\n ====================== Post checking... ======================"))
+    );
 
-    console.log(StdStyle.cyan("==========================\n\nPost checking..."));
+    CONFIG.setBroadcastDisableStatus(true);
+    _setDisableLogProposalStatus(true);
+
     _postCheckValidatorSet();
     _postCheck__GovernanceAdmin();
     _postCheck__ApplyCandidate();
@@ -46,11 +50,17 @@ abstract contract PostChecker is
     _postCheck__EmergencyExit();
     _postCheck__Maintenance();
     _postCheck__Slash();
+    _postCheck__GovernanceAdmin();
 
     CONFIG.setBroadcastDisableStatus(false);
+    _setDisableLogProposalStatus(false);
+
+    console.log(
+      StdStyle.bold(StdStyle.cyan("\n\n================== Finish post checking ==================\n\n"))
+    );
   }
 
-  function _postCheckValidatorSet() internal logFn("Post check Validator Set") {
+  function _postCheckValidatorSet() internal logPostCheck("[ValidatorSet] wrap up epoch") {
     if (address(0x68).code.length == 0) {
       address mockPrecompile = _deployImmutable(Contract.MockPrecompile.key());
       vm.etch(address(0x68), mockPrecompile.code);
@@ -64,7 +74,5 @@ abstract contract PostChecker is
     _wrapUpEpoch();
     _fastForwardToNextDay();
     _wrapUpEpoch();
-
-    console.log(">", StdStyle.green("Post check Validator `wrapUpEpoch` successful"));
   }
 }

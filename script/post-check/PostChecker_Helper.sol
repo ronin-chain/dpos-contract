@@ -17,6 +17,12 @@ abstract contract PostChecker_Helper is BaseMigration {
 
   using LibErrorHandler for bool;
 
+  modifier logPostCheck(string memory task) {
+    console.log(string.concat("[>] Post-checking: ", task, "..."));
+    _;
+    console.log(StdStyle.green(string.concat("    Check success: ", task, unicode"... ✅")));
+  }
+
   function _applyValidatorCandidate(address staking, address candidateAdmin, address consensusAddr) internal {
     uint256 value = ICandidateStaking(staking).minValidatorStakingAmount();
     _applyValidatorCandidate(staking, candidateAdmin, consensusAddr, value);

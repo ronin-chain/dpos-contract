@@ -26,7 +26,7 @@ abstract contract PostChecker_ApplyCandidate is BaseMigration, PostChecker_Helpe
     _postCheck_ApplyingCandidate_Multisig();
   }
 
-  function _postCheck_ApplyingCandidate_EOA() private logFn("Post check applying candidate for EOA") {
+  function _postCheck_ApplyingCandidate_EOA() private logPostCheck("[ValidatorSet] applying candidate EOA") {
     address candidateAdmin = makeAddr("mock-candidate-admin-t1");
     address consensusAddr = makeAddr("mock-consensus-addr-t1");
 
@@ -44,11 +44,9 @@ abstract contract PostChecker_ApplyCandidate is BaseMigration, PostChecker_Helpe
       abi.encodeWithSelector(ICandidateManager.isValidatorCandidate.selector, consensusAddr)
     );
     assertTrue(abi.decode(returndata, (bool)));
-
-    console.log(">", StdStyle.green("Post check Staking `applyValidatorCandidate` for EOA successful"));
   }
 
-  function _postCheck_ApplyingCandidate_Multisig() private logFn("Post check applying candidate for multisig") {
+  function _postCheck_ApplyingCandidate_Multisig() private logPostCheck("[ValidatorSet] applying candidate multisig") {
     address candidateAdmin = makeAddr("multisig-candidate-admin");
     address consensusAddr = makeAddr("multisig-consensus-addr");
 
@@ -63,7 +61,5 @@ abstract contract PostChecker_ApplyCandidate is BaseMigration, PostChecker_Helpe
       abi.encodeWithSelector(ICandidateManager.isValidatorCandidate.selector, consensusAddr)
     );
     assertTrue(abi.decode(returndata, (bool)));
-
-    console.log(">", StdStyle.green("Post check Staking `applyValidatorCandidate` for multisig successful"));
   }
 }

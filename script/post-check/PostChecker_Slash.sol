@@ -56,7 +56,7 @@ abstract contract PostChecker_Slash is BaseMigration, PostChecker_Helper {
     _postCheckSlashUntilBelowRequirement();
   }
 
-  function _postCheck_RandomQueryData() private view logFn("Post check slash: random query data") {
+  function _postCheck_RandomQueryData() private view logPostCheck("[Slash] query random data") {
     (uint tier1Threshold, uint tier2Threshold, uint slashAmountTier2, uint jailDuration) = ISlashIndicator(
       _slashingContract
     ).getUnavailabilitySlashingConfigs();
@@ -64,10 +64,9 @@ abstract contract PostChecker_Slash is BaseMigration, PostChecker_Helper {
     require(tier2Threshold < NORMAL_SMALL_NUMBER || tier2Threshold == 0, "abnormal tier 2");
     require(slashAmountTier2 >= 1 ether, "abnormal slash amount tier 2");
     require(jailDuration < NORMAL_BLOCK_NUMBER || jailDuration == 0, "abnormal jail duration");
-    console.log(">", StdStyle.green("Post check Slashing `random query data` successful"));
   }
 
-  function _postCheckSlashUnavailability() private logFn("Post check slash unavailability") {
+  function _postCheckSlashUnavailability() private logPostCheck("[Slash] slash unavailability tier-2") {
     bytes memory res;
     (, res) = _validatorSet.staticcall(abi.encodeWithSelector(IValidatorInfoV2.isBlockProducer.selector, _slashee));
     assertTrue(abi.decode(res, (bool)));
@@ -87,10 +86,9 @@ abstract contract PostChecker_Slash is BaseMigration, PostChecker_Helper {
     _wrapUpEpoch();
     (, res) = _validatorSet.staticcall(abi.encodeWithSelector(IValidatorInfoV2.isBlockProducer.selector, _slashee));
     assertFalse(abi.decode(res, (bool)));
-    console.log(">", StdStyle.green("Post check Slashing `slashUnavailability` successful"));
   }
 
-  function _postCheckBailOut() private logFn("Post check bail out") {
+  function _postCheckBailOut() private logPostCheck("[Slash] bail out after slashed") {
     vm.startPrank(_slasheeAdmin);
 
     bytes memory res;
@@ -111,22 +109,17 @@ abstract contract PostChecker_Slash is BaseMigration, PostChecker_Helper {
     _wrapUpEpoch();
     (, res) = _validatorSet.staticcall(abi.encodeWithSelector(IValidatorInfoV2.isBlockProducer.selector, _slashee));
     assertTrue(abi.decode(res, (bool)));
-
-    console.log(">", StdStyle.green("Post check Slashing `bailOut` successful"));
   }
 
-  function _postCheckSlashTier2AndBailOutAgain() private logFn("Post check slash tier 2 and bail out again") {
+  function _postCheckSlashTier2AndBailOutAgain() private logPostCheck("[Slash] slashed tier 2 and bail out again") {
     _postCheckSlashUnavailability();
 
     vm.startPrank(_slasheeAdmin);
     (bool success, ) = _slashingContract.call(abi.encodeWithSelector(ICreditScore.bailOut.selector, _slashee));
     assertFalse(success);
-
-    console.log(">", StdStyle.green("Post check Slashing `bailOut second time` successful"));
   }
 
-  function _postCheckSlashUntilBelowRequirement() private logFn("Post check slash until below requirement") {
-    // ICandidateManager.ValidatorCandidate memory info = RoninValidatorSet(_validatorSet).getCandidateInfo(_slashee);
+  function _postCheckSlashUntilBelowRequirement() private logPostCheck("[Slash] slash until below requirement") {
     (, bytes memory returndata) = _validatorSet.staticcall(
       abi.encodeWithSelector(ICandidateManager.getCandidateInfo.selector, _slashee)
     );
@@ -137,14 +130,11 @@ abstract contract PostChecker_Slash is BaseMigration, PostChecker_Helper {
     _fastForwardToNextDay();
     _wrapUpEpoch();
 
-    // info = RoninValidatorSet(_validatorSet).getCandidateInfo(_slashee);
     (, returndata) = _validatorSet.staticcall(
       abi.encodeWithSelector(ICandidateManager.getCandidateInfo.selector, _slashee)
     );
     info = abi.decode(returndata, (ICandidateManager.ValidatorCandidate));
     assertTrue(info.topupDeadline > 0);
-
-    console.log(">", StdStyle.green("Post check Slashing `slash until below requirement` successful"));
   }
 
   function _pickRandomSlashee() private {

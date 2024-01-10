@@ -5,10 +5,7 @@ import { ProxyAdmin } from "@openzeppelin/contracts/proxy/transparent/ProxyAdmin
 import { RoninGovernanceAdmin } from "@ronin/contracts/ronin/RoninGovernanceAdmin.sol";
 import { TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
 import { TransparentUpgradeableProxy } from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
-import {
-  IRoninTrustedOrganization,
-  RoninTrustedOrganization
-} from "@ronin/contracts/multi-chains/RoninTrustedOrganization.sol";
+import { IRoninTrustedOrganization, RoninTrustedOrganization } from "@ronin/contracts/multi-chains/RoninTrustedOrganization.sol";
 import { Proposal } from "@ronin/contracts/libraries/Proposal.sol";
 import { Ballot } from "@ronin/contracts/libraries/Ballot.sol";
 import { VoteStatusConsumer } from "@ronin/contracts/interfaces/consumers/VoteStatusConsumer.sol";
@@ -29,7 +26,17 @@ contract RoninMigration is PostChecker, VoteStatusConsumer {
   using LibErrorHandler for bool;
   using LibProxy for address payable;
 
+  string private slotSig = "Proposal Status";
   ISharedArgument internal constant config = ISharedArgument(address(CONFIG));
+
+  function _setDisableLogProposalStatus(bool flag) internal override {
+    uint256 uFlag = flag ? 0x01 : 0x00;
+    config.setUserDefinedConfig(slotSig, bytes32(uFlag));
+  }
+
+  function _getDisableLogProposalStatus() internal view returns (bool) {
+    return config.getUserDefinedConfig(slotSig) == 0 ? false : true;
+  }
 
   function _configByteCode() internal virtual override returns (bytes memory) {
     return abi.encodePacked(type(GeneralConfig).creationCode);
@@ -38,8 +45,9 @@ contract RoninMigration is PostChecker, VoteStatusConsumer {
   function _sharedArguments() internal virtual override returns (bytes memory rawArgs) {
     ISharedArgument.SharedParameter memory param;
 
-    RoninTrustedOrganization trustedOrg =
-      RoninTrustedOrganization(config.getAddressFromCurrentNetwork(Contract.RoninTrustedOrganization.key()));
+    RoninTrustedOrganization trustedOrg = RoninTrustedOrganization(
+      config.getAddressFromCurrentNetwork(Contract.RoninTrustedOrganization.key())
+    );
     (uint256 num, uint256 denom) = trustedOrg.getThreshold();
     param.trustedOrgs = trustedOrg.getAllTrustedOrganizations();
 
@@ -66,7 +74,12 @@ contract RoninMigration is PostChecker, VoteStatusConsumer {
     (deployed, proxyNonce) = _deployRaw(proxyAbsolutePath, abi.encode(logic, proxyAdmin, args));
     CONFIG.setAddress(network(), contractType, deployed);
     ARTIFACT_FACTORY.generateArtifact(
-      sender(), deployed, proxyAbsolutePath, string.concat(contractName, "Proxy"), args, proxyNonce
+      sender(),
+      deployed,
+      proxyAbsolutePath,
+      string.concat(contractName, "Proxy"),
+      args,
+      proxyNonce
     );
   }
 
@@ -153,7 +166,8 @@ contract RoninMigration is PostChecker, VoteStatusConsumer {
     Proposal.ProposalDetail memory proposal
   ) internal override {
     Ballot.VoteType support = Ballot.VoteType.For;
-    IRoninTrustedOrganization.TrustedOrganization[] memory allTrustedOrgs = roninTrustedOrg.getAllTrustedOrganizations();
+    IRoninTrustedOrganization.TrustedOrganization[] memory allTrustedOrgs = roninTrustedOrg
+      .getAllTrustedOrganizations();
 
     bool shouldPrankOnly = CONFIG.isBroadcastDisable();
     address trustedOrg0 = allTrustedOrgs[0].governor;
@@ -164,11 +178,16 @@ contract RoninMigration is PostChecker, VoteStatusConsumer {
       vm.broadcast(trustedOrg0);
     }
     governanceAdmin.proposeProposalForCurrentNetwork(
-      proposal.expiryTimestamp, proposal.targets, proposal.values, proposal.calldatas, proposal.gasAmounts, support
+      proposal.expiryTimestamp,
+      proposal.targets,
+      proposal.values,
+      proposal.calldatas,
+      proposal.gasAmounts,
+      support
     );
 
     for (uint256 i = 1; i < allTrustedOrgs.length; ++i) {
-      (VoteStatus status,,,,) = governanceAdmin.vote(block.chainid, proposal.nonce);
+      (VoteStatus status, , , , ) = governanceAdmin.vote(block.chainid, proposal.nonce);
       if (status != VoteStatus.Pending) {
         break;
       }
@@ -211,23 +230,43 @@ contract RoninMigration is PostChecker, VoteStatusConsumer {
     vm.stopPrank();
 
     proposal = Proposal.ProposalDetail(
-      governanceAdmin.round(block.chainid) + 1, block.chainid, expiry, targets, values, callDatas, gasAmounts
+      governanceAdmin.round(block.chainid) + 1,
+      block.chainid,
+      expiry,
+      targets,
+      values,
+      callDatas,
+      gasAmounts
     );
 
     vm.revertTo(snapshotId);
+
     _logProposal(address(governanceAdmin), proposal);
   }
 
   function _logProposal(address governanceAdmin, Proposal.ProposalDetail memory proposal) internal {
+    if (_getDisableLogProposalStatus()) {
+      console.log(StdStyle.italic(StdStyle.magenta("Proposal details omitted:")));
+      console.log(
+        string.concat(
+          "\tGovernance Admin:        \t",
+          vm.getLabel(governanceAdmin),
+          "\n\tNonce:                 \t",
+          vm.toString(proposal.nonce),
+          "\n\tNumber of internal calls:\t",
+          vm.toString(proposal.targets.length),
+          "\n"
+        )
+      );
+    } else {
+      _printLogProposal(address(governanceAdmin), proposal);
+    }
+  }
+
+  function _printLogProposal(address governanceAdmin, Proposal.ProposalDetail memory proposal) private {
     console.log(
       string.concat(
-        StdStyle.magenta(
-          string.concat(
-            "\n================================================================================= ",
-            "Proposal Detail",
-            " =================================================================================\n"
-          )
-        ),
+        StdStyle.magenta("\n================================= Proposal Detail =================================\n"),
         "GovernanceAdmin: ",
         vm.getLabel(governanceAdmin),
         "\tNonce: ",
@@ -249,18 +288,13 @@ contract RoninMigration is PostChecker, VoteStatusConsumer {
       console.log(
         string.concat(
           StdStyle.blue(
-            string.concat(
-              "\n==================================================================== ",
-              "Index: ",
-              vm.toString(i),
-              " ====================================================================\n"
-            )
+            string.concat("\n========================== ", "Index: ", vm.toString(i), " ==========================\n")
           ),
-          "Target:\t",
+          "Target:      \t",
           vm.getLabel(proposal.targets[i]),
-          "\t|| Value:\t",
+          "\nValue:     \t",
           vm.toString(proposal.values[i]),
-          "\t|| Gas amount:\t",
+          "\nGas amount:\t",
           vm.toString(proposal.gasAmounts[i]),
           "\nCalldata:\n",
           string(decodedCallDatas[i]).yellow()
@@ -268,14 +302,6 @@ contract RoninMigration is PostChecker, VoteStatusConsumer {
       );
     }
 
-    console.log(
-      StdStyle.magenta(
-        string.concat(
-          "\n=======================================================================",
-          "=========================================================================",
-          "===================================\n"
-        )
-      )
-    );
+    console.log(StdStyle.magenta("\n==============================================================================\n"));
   }
 }

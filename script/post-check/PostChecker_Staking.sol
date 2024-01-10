@@ -52,7 +52,7 @@ abstract contract PostChecker_Staking is BaseMigration, PostChecker_Helper {
     _postCheckRedelegate();
   }
 
-  function _postCheckDelegate() private logFn("Post check delegate") {
+  function _postCheckDelegate() private logPostCheck("[Staking] delegate") {
     vm.startPrank(_delegator);
     (bool success, bytes memory returnData) = _staking.call{ value: _delegatingValue }(
       abi.encodeWithSelector(IDelegatorStaking.delegate.selector, _consensusAddr)
@@ -61,11 +61,9 @@ abstract contract PostChecker_Staking is BaseMigration, PostChecker_Helper {
     vm.stopPrank();
     success.handleRevert(ICandidateStaking.applyValidatorCandidate.selector, returnData);
     assertTrue(success);
-
-    console.log(">", StdStyle.green("Post check Staking `delegate` successful"));
   }
 
-  function _postCheckClaimReward() private logFn("Post check claim reward") {
+  function _postCheckClaimReward() private logPostCheck("[Staking] claim rewards") {
     vm.coinbase(_consensusAddr);
     _fastForwardToNextDay();
     _wrapUpEpoch();
@@ -78,11 +76,9 @@ abstract contract PostChecker_Staking is BaseMigration, PostChecker_Helper {
     assertEq(success, true);
 
     vm.stopPrank();
-
-    console.log(">", StdStyle.green("Post check Staking `claimRewards` successful"));
   }
 
-  function _postCheckUndelegate() private logFn("Post check undelegate") {
+  function _postCheckUndelegate() private logPostCheck("[Staking] undelegate") {
     _fastForwardToNextDay();
     _fastForwardToNextDay();
     _fastForwardToNextDay();
@@ -100,11 +96,9 @@ abstract contract PostChecker_Staking is BaseMigration, PostChecker_Helper {
     assertTrue(success);
 
     vm.stopPrank();
-
-    console.log(">", StdStyle.green("Post check Staking `undelegate` successful"));
   }
 
-  function _postCheckRedelegate() private logFn("Post check redelegate") {
+  function _postCheckRedelegate() private logPostCheck("[Staking] redelegate") {
     _postCheckDelegate();
     vm.warp(block.timestamp + IStaking(_staking).cooldownSecsToUndelegate() + 1);
 
@@ -115,7 +109,5 @@ abstract contract PostChecker_Staking is BaseMigration, PostChecker_Helper {
     assertTrue(success);
 
     vm.stopPrank();
-
-    console.log(">", StdStyle.green("Post check Staking `redelegate` successful"));
   }
 }

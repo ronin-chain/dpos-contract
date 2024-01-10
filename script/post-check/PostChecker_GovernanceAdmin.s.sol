@@ -48,7 +48,11 @@ abstract contract PostChecker_GovernanceAdmin is BaseMigration, PostChecker_Help
     _postCheck__ChangeAdminAllContracts();
   }
 
-  function _postCheck__UpgradeAllContracts() private cleanUpProxyTargets logFn("Post check upgrade all contracts") {
+  function _postCheck__UpgradeAllContracts()
+    private
+    cleanUpProxyTargets
+    logPostCheck("[GovernanceAdmin] upgrade all contracts")
+  {
     // Get all contracts deployed from the current network
     address payable[] memory addrs = CONFIG.getAllAddresses(network());
 
@@ -68,13 +72,12 @@ abstract contract PostChecker_GovernanceAdmin is BaseMigration, PostChecker_Help
       console.log("Upgrading contract:", vm.getLabel(targets[i]));
       _upgradeProxy(contractType);
     }
-    console.log(">", StdStyle.green("Post check GovernanceAdmin `upgrade all contracts` successful"));
   }
 
   function _postCheck__ChangeAdminAllContracts()
     private
     cleanUpProxyTargets
-    logFn("Post check change admin all contracts")
+    logPostCheck("[GovernanceAdmin] change admin all contracts")
   {
     ISharedArgument.SharedParameter memory param = ISharedArgument(address(CONFIG)).sharedArguments();
 
@@ -136,9 +139,8 @@ abstract contract PostChecker_GovernanceAdmin is BaseMigration, PostChecker_Help
 
     // Change broken Ronin Governance Admin to new Ronin Governance Admin
     CONFIG.setAddress(network(), Contract.RoninGovernanceAdmin.key(), address(__newGovernanceAdmin));
-
-    console.log(">", StdStyle.green("Post check GovernanceAdmin `change admin all contracts` successful"));
   }
+
   function getProxyAdmin(address payable proxy) external returns (address payable proxyAdmin) {
     return proxy.getProxyAdmin();
   }
@@ -156,4 +158,6 @@ abstract contract PostChecker_GovernanceAdmin is BaseMigration, PostChecker_Help
     uint256[] memory values,
     bytes[] memory callDatas
   ) internal virtual returns (Proposal.ProposalDetail memory proposal);
+
+  function _setDisableLogProposalStatus(bool flag) internal virtual;
 }

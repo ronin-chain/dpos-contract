@@ -56,7 +56,7 @@ abstract contract PostChecker_Maintenance is BaseMigration, PostChecker_Helper {
     _postCheck_scheduleMaintenance();
   }
 
-  function _postCheck_scheduleMaintenance() private logFn("Post check schedule") {
+  function _postCheck_scheduleMaintenance() private logPostCheck("[Maintenance] full flow of on schedule") {
     vm.startPrank(_candidateAdmin);
 
     uint latestEpochBlock = RoninValidatorSet(_validatorSet).getLastUpdatedBlock();
@@ -91,7 +91,5 @@ abstract contract PostChecker_Maintenance is BaseMigration, PostChecker_Helper {
 
     (, res) = _maintenance.staticcall(abi.encodeWithSelector(checkMaintained_Selector, _consensusAddr, endBlock + 1));
     assertFalse(abi.decode(res, (bool)));
-
-    console.log(">", StdStyle.green("Post check Staking `schedule` successful"));
   }
 }

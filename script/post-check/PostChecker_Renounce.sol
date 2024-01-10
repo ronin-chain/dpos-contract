@@ -44,7 +44,7 @@ abstract contract PostChecker_Renounce is BaseMigration, PostChecker_Helper {
     _postCheck__RequestRenounceSuccess();
   }
 
-  function _postCheck__RequestRenounceSuccess() private logFn("Post check request renounce") {
+  function _postCheck__RequestRenounceSuccess() private logPostCheck("[Staking][Renounce] request renounce") {
     vm.startPrank(_candidateAdmin);
     (bool success, ) = _staking.call(
       abi.encodeWithSelector(ICandidateStaking.requestRenounce.selector, _consensusAddr)
@@ -59,7 +59,5 @@ abstract contract PostChecker_Renounce is BaseMigration, PostChecker_Helper {
       abi.encodeWithSelector(ICandidateManager.isValidatorCandidate.selector, _consensusAddr)
     );
     assertFalse(abi.decode(returndata, (bool)));
-
-    console.log(">", StdStyle.green("Post check Staking `requestRenounce` successful"));
   }
 }
