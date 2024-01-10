@@ -249,9 +249,9 @@ contract RoninMigration is PostChecker, VoteStatusConsumer {
       console.log(StdStyle.italic(StdStyle.magenta("Proposal details omitted:")));
       console.log(
         string.concat(
-          "\tGovernance Admin:        \t",
+          "\tGovernance Admin:          \t",
           vm.getLabel(governanceAdmin),
-          "\n\tNonce:                 \t",
+          "\n\tNonce:                   \t",
           vm.toString(proposal.nonce),
           "\n\tNumber of internal calls:\t",
           vm.toString(proposal.targets.length),
