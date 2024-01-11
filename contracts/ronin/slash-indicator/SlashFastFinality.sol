@@ -42,11 +42,22 @@ abstract contract SlashFastFinality is ISlashFastFinality, HasContracts, PCUVali
   ) external override onlyGoverningValidator {
     address validatorId = __css2cid(consensusAddr);
     IProfile profileContract = IProfile(getContract(ContractType.PROFILE));
-    bytes memory expectingPubKey = (profileContract.getId2Profile(validatorId)).pubkey;
-    if (keccak256(voterPublicKey) != keccak256(expectingPubKey)) revert ErrInvalidArguments(msg.sig);
+
+    IProfile.CandidateProfile memory profile = profileContract.getId2Profile(validatorId);
+    bytes32 voterPublicKeyHash = keccak256(voterPublicKey);
+    if (
+      (voterPublicKeyHash != keccak256(profile.pubkey)) &&
+      (voterPublicKeyHash != keccak256(profile.oldPubkey))
+    ) {
+      revert ErrInvalidArguments(msg.sig);
+    }
 
     bytes32 evidenceHash = keccak256(abi.encodePacked(consensusAddr, targetBlockNumber));
     if (_processedEvidence[evidenceHash]) revert ErrEvidenceAlreadySubmitted();
+
+    if (!profileContract.arePublicKeysRegistered(listOfPublicKey)) {
+      revert ErrUnregisteredPublicKey();
+    }
 
     if (
       _pcValidateFastFinalityEvidence(

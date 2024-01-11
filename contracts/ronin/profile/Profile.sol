@@ -25,23 +25,43 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     _setContract(ContractType.STAKING, stakingContract);
     _setContract(ContractType.RONIN_TRUSTED_ORGANIZATION, trustedOrgContract);
 
-    address[] memory validatorCandidates = IRoninValidatorSet(getContract(ContractType.VALIDATOR))
+    TConsensus[] memory validatorCandidates = IRoninValidatorSet(getContract(ContractType.VALIDATOR))
       .getValidatorCandidates();
-    TConsensus[] memory consensuses;
-    assembly ("memory-safe") {
-      consensuses := validatorCandidates
-    }
+
     for (uint256 i; i < validatorCandidates.length; ++i) {
-      _consensus2Id[consensuses[i]] = validatorCandidates[i];
+      TConsensus consensus = validatorCandidates[i];
+      address id = TConsensus.unwrap(consensus);
+      _consensus2Id[consensus] = id;
     }
 
     __migrationRenouncedCandidates();
   }
 
+  function initializeV3(uint256 cooldown) external reinitializer(3) {
+    _setPubkeyChangeCooldown(cooldown);
+  }
+
   /**
-   * @dev Add addresses of renounced candidates into registry. Only called during {initializeV2}F.
+   * @dev Add addresses of renounced candidates into registry. Only called during {initializeV2}.
    */
   function __migrationRenouncedCandidates() internal virtual {}
+
+
+  /**
+   * @dev This method is used in REP-4 migration, which creates profile for all community-validators and renounced validators.
+   * This method can be removed after REP-4 goes live.
+   *
+   * DO NOT use for any other purpose.
+   */
+  function __migrate(address id, address candidateAdmin, address treasury) internal {
+    CandidateProfile storage _profile = _id2Profile[id];
+    _profile.id = id;
+
+    _setConsensus(_profile, TConsensus.wrap(id));
+    _setAdmin(_profile, candidateAdmin);
+    _setTreasury(_profile, payable(treasury));
+    emit ProfileMigrated(id, candidateAdmin, treasury);
+  }
 
   /**
    * @inheritdoc IProfile
@@ -103,8 +123,7 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
   function requestChangeAdminAddress(address id, address newAdminAddr) external {
     CandidateProfile storage _profile = _getId2ProfileHelper(id);
     _requireCandidateAdmin(_profile);
-    _requireNonZeroAndNonDuplicated(RoleAccess.ADMIN, newAdminAddr);
-    _setAdmin(_profile, newAdminAddr);
+    _requireNonZeroAndNonDuplicated(RoleAccess.CANDIDATE_ADMIN, newAdminAddr);
 
     IStaking stakingContract = IStaking(getContract(ContractType.STAKING));
     stakingContract.execChangeAdminAddress(id, newAdminAddr);
@@ -112,7 +131,7 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     IRoninValidatorSet validatorContract = IRoninValidatorSet(getContract(ContractType.VALIDATOR));
     validatorContract.execChangeAdminAddress(id, newAdminAddr);
 
-    emit ProfileAddressChanged(id, RoleAccess.ADMIN);
+    _setAdmin(_profile, newAdminAddr);
   }
 
   /**
@@ -143,7 +162,6 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     _requireNonZeroAndNonDuplicated(RoleAccess.CONSENSUS, TConsensus.unwrap(newConsensusAddr));
 
     TConsensus oldConsensusAddr = _profile.consensus;
-    _setConsensus(_profile, newConsensusAddr);
 
     IRoninValidatorSet validatorContract = IRoninValidatorSet(getContract(ContractType.VALIDATOR));
     validatorContract.execChangeConsensusAddress(id, newConsensusAddr);
@@ -156,7 +174,7 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
       newConsensusAddr: newConsensusAddr
     });
 
-    emit ProfileAddressChanged(id, RoleAccess.CONSENSUS);
+    _setConsensus(_profile, newConsensusAddr);
   }
 
   /**
@@ -174,30 +192,36 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     CandidateProfile storage _profile = _getId2ProfileHelper(id);
     _requireCandidateAdmin(_profile);
     _requireNonZeroAndNonDuplicated(RoleAccess.TREASURY, newTreasury);
-    _setTreasury(_profile, newTreasury);
 
     IRoninValidatorSet validatorContract = IRoninValidatorSet(getContract(ContractType.VALIDATOR));
     validatorContract.execChangeTreasuryAddress(id, newTreasury);
 
-    emit ProfileAddressChanged(id, RoleAccess.TREASURY);
+    _setTreasury(_profile, newTreasury);
   }
 
   /**
    * @inheritdoc IProfile
    */
-  function changePubkey(address id, bytes memory pubkey) external {
+  function changePubkey(address id, bytes calldata pubkey, bytes calldata proofOfPossession) external {
     CandidateProfile storage _profile = _getId2ProfileHelper(id);
     _requireCandidateAdmin(_profile);
     _requireNonDuplicatedPubkey(pubkey);
+    _checkPubkeyChangeCooldown(_profile);
+    _verifyPubkey(pubkey, proofOfPossession);
     _setPubkey(_profile, pubkey);
-
-    emit PubkeyChanged(id, pubkey);
   }
 
   function _requireCandidateAdmin(CandidateProfile storage sProfile) internal view {
     if (
       msg.sender != sProfile.admin ||
       !IRoninValidatorSet(getContract(ContractType.VALIDATOR)).isCandidateAdmin(sProfile.consensus, msg.sender)
-    ) revert ErrUnauthorized(msg.sig, RoleAccess.ADMIN);
+    ) revert ErrUnauthorized(msg.sig, RoleAccess.CANDIDATE_ADMIN);
+  }
+
+  /**
+   * @inheritdoc IProfile
+   */
+  function setPubkeyChangeCooldown(uint256 cooldown) external onlyAdmin {
+    _setPubkeyChangeCooldown(cooldown);
   }
 }

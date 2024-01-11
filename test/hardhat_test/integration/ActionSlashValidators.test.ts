@@ -15,6 +15,7 @@ import {
   RoninGovernanceAdmin__factory,
   Profile__factory,
   Profile,
+  MockProfile__factory,
 } from '../../../src/types';
 
 import { EpochController, expects as RoninValidatorSetExpects } from '../helpers/ronin-validator-set';
@@ -126,6 +127,10 @@ describe('[Integration] Slash validators', () => {
       roninTrustedOrganizationAddress,
     });
 
+    const mockProfileLogic = await new MockProfile__factory(deployer).deploy();
+    await mockProfileLogic.deployed();
+    await governanceAdminInterface.upgrade(profileAddress, mockProfileLogic.address);
+
     const mockValidatorLogic = await new MockRoninValidatorSetExtended__factory(deployer).deploy();
     await mockValidatorLogic.deployed();
     await governanceAdminInterface.upgrade(validatorContract.address, mockValidatorLogic.address);
@@ -163,6 +168,7 @@ describe('[Integration] Slash validators', () => {
           slashee.treasuryAddr.address,
           2_00,
           generateSamplePubkey(),
+          '0x',
           {
             value: slasheeInitStakingAmount,
           }
@@ -218,6 +224,7 @@ describe('[Integration] Slash validators', () => {
             slashee.treasuryAddr.address,
             2_00,
             generateSamplePubkey(),
+            '0x',
             {
               value: slasheeInitStakingAmount,
             }
@@ -367,6 +374,7 @@ describe('[Integration] Slash validators', () => {
               slashees[i].treasuryAddr.address,
               2_00,
               generateSamplePubkey(),
+              '0x',
               {
                 value: slasheeInitStakingAmount.add(slashees.length - i),
               }
@@ -605,6 +613,7 @@ describe('[Integration] Slash validators', () => {
                 slashee.treasuryAddr.address,
                 2_00,
                 generateSamplePubkey(),
+                '0x',
                 {
                   value: slasheeInitStakingAmount,
                 }

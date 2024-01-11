@@ -33,6 +33,10 @@ contract RoninTrustedOrganization is IRoninTrustedOrganization, HasProxyAdmin, H
   /// @dev Bridge voters array
   address[] internal __deprecatedBridgeVoterList;
 
+  constructor() {
+    _disableInitializers();
+  }
+
   /**
    * @dev Initializes the contract storage.
    */
@@ -127,6 +131,10 @@ contract RoninTrustedOrganization is IRoninTrustedOrganization, HasProxyAdmin, H
     return _totalWeight;
   }
 
+  function totalWeights() external view returns (uint256) {
+    return this.totalWeight();
+  }
+
   /**
    * @inheritdoc IRoninTrustedOrganization
    */
@@ -214,6 +222,10 @@ contract RoninTrustedOrganization is IRoninTrustedOrganization, HasProxyAdmin, H
     }
   }
 
+  function sumGovernorWeights(address[] calldata _list) external view returns (uint256 _res) {
+    return this.sumGovernorWeight(_list);
+  }
+
   /**
    * @inheritdoc IRoninTrustedOrganization
    */
@@ -243,10 +255,10 @@ contract RoninTrustedOrganization is IRoninTrustedOrganization, HasProxyAdmin, H
   /**
    * @inheritdoc IRoninTrustedOrganization
    */
-  function getTrustedOrganization(TConsensus _consensusAddr) external view returns (TrustedOrganization memory) {
+  function getTrustedOrganization(TConsensus _consensusAddr) external view returns (TrustedOrganization memory res) {
     for (uint i = 0; i < _consensusList.length; ++i) {
       if (_consensusList[i] == _consensusAddr) {
-        return getTrustedOrganizationAt(i);
+        res = getTrustedOrganizationAt(i);
       }
     }
   }
@@ -273,7 +285,9 @@ contract RoninTrustedOrganization is IRoninTrustedOrganization, HasProxyAdmin, H
     TConsensus oldAddr,
     TConsensus newAddr
   ) external override onlyContract(ContractType.PROFILE) {
-    uint256 index = _findTrustedOrgIndexByConsensus(oldAddr);
+    (bool found, uint256 index) = _findTrustedOrgIndexByConsensus(oldAddr);
+    if (!found) revert ErrConsensusAddressIsNotAdded(oldAddr);
+
     _consensusList[index] = newAddr;
     _consensusWeight[newAddr] = _consensusWeight[oldAddr];
     _addedBlock[newAddr] = block.number;
@@ -378,7 +392,7 @@ contract RoninTrustedOrganization is IRoninTrustedOrganization, HasProxyAdmin, H
     uint256 weight = _consensusWeight[addr];
     if (weight == 0) revert ErrConsensusAddressIsNotAdded(addr);
 
-    uint256 index = _findTrustedOrgIndexByConsensus(addr);
+    (, uint256 index) = _findTrustedOrgIndexByConsensus(addr);
 
     _totalWeight -= weight;
     _deleteConsensusInMappings(addr);
@@ -392,11 +406,11 @@ contract RoninTrustedOrganization is IRoninTrustedOrganization, HasProxyAdmin, H
     _governorList.pop();
   }
 
-  function _findTrustedOrgIndexByConsensus(TConsensus addr) private view returns (uint256 index) {
+  function _findTrustedOrgIndexByConsensus(TConsensus addr) private view returns (bool found, uint256 index) {
     uint256 count = _consensusList.length;
     for (uint256 i = 0; i < count; i++) {
       if (_consensusList[i] == addr) {
-        return i;
+        return (true, i);
       }
     }
   }

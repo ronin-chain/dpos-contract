@@ -60,7 +60,8 @@ abstract contract CandidateStaking is BaseStaking, ICandidateStaking, GlobalConf
     TConsensus consensusAddr,
     address payable treasuryAddr,
     uint256 commissionRate,
-    bytes calldata pubkey
+    bytes calldata pubkey,
+    bytes calldata proofOfPossession
   ) external payable override nonReentrant {
     if (isAdminOfActivePool(msg.sender)) revert ErrAdminOfAnyActivePoolForbidden(msg.sender);
     if (commissionRate > _maxCommissionRate || commissionRate < _minCommissionRate) revert ErrInvalidCommissionRate();
@@ -75,6 +76,7 @@ abstract contract CandidateStaking is BaseStaking, ICandidateStaking, GlobalConf
       poolId: poolId,
       treasuryAddr: treasuryAddr,
       pubkey: pubkey,
+      proofOfPossession: proofOfPossession,
       commissionRate: commissionRate,
       amount: amount
     });
@@ -225,6 +227,7 @@ abstract contract CandidateStaking is BaseStaking, ICandidateStaking, GlobalConf
     address poolId,
     address payable treasuryAddr,
     bytes memory pubkey,
+    bytes memory proofOfPossession,
     uint256 commissionRate,
     uint256 amount
   ) internal {
@@ -252,7 +255,7 @@ abstract contract CandidateStaking is BaseStaking, ICandidateStaking, GlobalConf
     });
 
     IProfile profileContract = IProfile(getContract(ContractType.PROFILE));
-    profileContract.execApplyValidatorCandidate(candidateAdmin, poolId, treasuryAddr, pubkey);
+    profileContract.execApplyValidatorCandidate(candidateAdmin, poolId, treasuryAddr, pubkey, proofOfPossession);
   }
 
   /**

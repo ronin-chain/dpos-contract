@@ -6,6 +6,7 @@ import { ethers, network } from 'hardhat';
 import {
   Profile,
   Profile__factory,
+  MockProfile__factory,
   Staking,
   Staking__factory,
   TransparentUpgradeableProxyV2,
@@ -65,7 +66,7 @@ describe('Staking test', () => {
     const validatorContractAddr = ethers.utils.getContractAddress({ from: deployer.address, nonce: nonce + 2 });
     const stakingContractAddr = ethers.utils.getContractAddress({ from: deployer.address, nonce: nonce + 4 });
 
-    const profileLogicContract = await new Profile__factory(deployer).deploy();
+    const profileLogicContract = await new MockProfile__factory(deployer).deploy();
     const profileContractProxy = await new TransparentUpgradeableProxyV2__factory(deployer).deploy(
       profileLogicContract.address,
       proxyAdmin.address,
@@ -124,7 +125,8 @@ describe('Staking test', () => {
           userA.address,
           userA.address,
           1,
-          generateSamplePubkey(userA.address, userA.address)
+          generateSamplePubkey(userA.address, userA.address),
+          '0x'
         )
       ).revertedWithCustomError(stakingContract, 'ErrInsufficientStakingAmount');
     });
@@ -140,6 +142,7 @@ describe('Staking test', () => {
           candidate.consensusAddr.address,
           1 /* 0.01% */,
           generateSamplePubkey(),
+          '0x',
           { value: minValidatorStakingAmount.mul(2) }
         );
       await expect(tx).revertedWithCustomError(stakingContract, 'ErrThreeInteractionAddrsNotEqual');
@@ -156,6 +159,7 @@ describe('Staking test', () => {
             candidate.treasuryAddr.address,
             1 /* 0.01% */,
             generateSamplePubkey(),
+            '0x',
             { value: minValidatorStakingAmount.mul(2) }
           );
         await expect(tx)
@@ -179,6 +183,7 @@ describe('Staking test', () => {
             sparePoolAddrSet.treasuryAddr.address,
             0,
             generateSamplePubkey(),
+            '0x',
             {
               value: minValidatorStakingAmount,
             }
@@ -387,6 +392,7 @@ describe('Staking test', () => {
           poolAddrSet.treasuryAddr.address,
           1 /* 0.01% */,
           generateSamplePubkey(),
+          '0x',
           { value: minValidatorStakingAmount.mul(2) }
         );
       await expect(reApplyTx).revertedWithCustomError(profileContract, 'ErrExistentProfile');
@@ -404,6 +410,7 @@ describe('Staking test', () => {
             poolAddrSet.treasuryAddr.address,
             1 /* 0.01% */,
             generateSamplePubkey(),
+            '0x',
             { value: minValidatorStakingAmount.mul(2) }
           )
       )

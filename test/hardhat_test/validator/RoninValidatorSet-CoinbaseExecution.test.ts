@@ -16,6 +16,7 @@ import {
   StakingVesting,
   Profile,
   Profile__factory,
+  MockProfile__factory,
 } from '../../../src/types';
 import { EpochController } from '../helpers/ronin-validator-set';
 import { expects as RoninValidatorSetExpects } from '../helpers/ronin-validator-set';
@@ -160,6 +161,10 @@ describe('Ronin Validator Set: Coinbase execution test', () => {
       ...trustedOrgs.map((_) => _.governor)
     );
 
+    const mockProfileLogic = await new MockProfile__factory(deployer).deploy();
+    await mockProfileLogic.deployed();
+    await governanceAdminInterface.upgrade(profileAddress, mockProfileLogic.address);
+
     const mockValidatorLogic = await new MockRoninValidatorSetExtended__factory(deployer).deploy();
     await mockValidatorLogic.deployed();
     await governanceAdminInterface.upgrade(roninValidatorSet.address, mockValidatorLogic.address);
@@ -234,6 +239,7 @@ describe('Ronin Validator Set: Coinbase execution test', () => {
             validatorCandidates[i].treasuryAddr.address,
             2_00,
             generateSamplePubkey(),
+            '0x',
             {
               value: minValidatorStakingAmount.add(i * dummyStakingMultiplier),
             }
@@ -299,6 +305,7 @@ describe('Ronin Validator Set: Coinbase execution test', () => {
           treasury.address,
           1_00 /* 1% */,
           generateSamplePubkey(),
+          '0x',
           {
             value: minValidatorStakingAmount.mul(100),
           }
@@ -312,6 +319,7 @@ describe('Ronin Validator Set: Coinbase execution test', () => {
             validatorCandidates[i].treasuryAddr.address,
             2_00,
             generateSamplePubkey(),
+            '0x',
             {
               value: minValidatorStakingAmount.add(i * dummyStakingMultiplier),
             }

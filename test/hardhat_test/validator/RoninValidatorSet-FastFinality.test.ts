@@ -16,6 +16,7 @@ import {
   StakingVesting,
   FastFinalityTracking__factory,
   FastFinalityTracking,
+  MockProfile__factory,
 } from '../../../src/types';
 import { EpochController } from '../helpers/ronin-validator-set';
 import { deployTestSuite } from '../helpers/fixture';
@@ -149,6 +150,10 @@ describe('Ronin Validator Set: Fast Finality test', () => {
       roninTrustedOrganizationAddress,
     });
 
+    const mockProfileLogic = await new MockProfile__factory(deployer).deploy();
+    await mockProfileLogic.deployed();
+    await governanceAdminInterface.upgrade(profileAddress, mockProfileLogic.address);
+
     const mockValidatorLogic = await new MockRoninValidatorSetExtended__factory(deployer).deploy();
     await mockValidatorLogic.deployed();
     await governanceAdminInterface.upgrade(validatorContract.address, mockValidatorLogic.address);
@@ -168,6 +173,7 @@ describe('Ronin Validator Set: Fast Finality test', () => {
           validatorCandidates[i].treasuryAddr.address,
           100_00,
           generateSamplePubkey(),
+          '0x',
           { value: minValidatorStakingAmount.mul(2).add(maxValidatorNumber).sub(i) }
         );
     }

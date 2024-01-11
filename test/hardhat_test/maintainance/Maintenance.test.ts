@@ -14,6 +14,7 @@ import {
   MockRoninValidatorSetOverridePrecompile__factory,
   RoninGovernanceAdmin,
   RoninGovernanceAdmin__factory,
+  MockProfile__factory,
 } from '../../../src/types';
 import { deployTestSuite } from '../helpers/fixture';
 import { EpochController, expects as ValidatorSetExpects } from '../helpers/ronin-validator-set';
@@ -130,6 +131,10 @@ describe('Maintenance test', () => {
       roninTrustedOrganizationAddress,
     });
 
+    const mockProfileLogic = await new MockProfile__factory(deployer).deploy();
+    await mockProfileLogic.deployed();
+    await governanceAdminInterface.upgrade(profileAddress, mockProfileLogic.address);
+
     const mockValidatorLogic = await new MockRoninValidatorSetOverridePrecompile__factory(deployer).deploy();
     await mockValidatorLogic.deployed();
     await governanceAdminInterface.upgrade(validatorContract.address, mockValidatorLogic.address);
@@ -144,6 +149,7 @@ describe('Maintenance test', () => {
           validatorCandidates[i].treasuryAddr.address,
           1,
           generateSamplePubkey(),
+          '0x',
           { value: minValidatorStakingAmount.add(maxValidatorNumber).sub(i) }
         );
     }

@@ -5,8 +5,9 @@ pragma solidity ^0.8.9;
 import "../../udvts/Types.sol";
 import "../../utils/RoleAccess.sol";
 import { ProfileStorage } from "./ProfileStorage.sol";
+import { PCUVerifyBLSPublicKey } from "../../precompile-usages/PCUVerifyBLSPublicKey.sol";
 
-abstract contract ProfileHandler is ProfileStorage {
+abstract contract ProfileHandler is PCUVerifyBLSPublicKey, ProfileStorage {
   /**
    * @dev Checks each element in the new profile and reverts if there is duplication with any existing profile.
    */
@@ -24,22 +25,36 @@ abstract contract ProfileHandler is ProfileStorage {
   }
 
   function _requireNonDuplicated(RoleAccess addressType, address addr) internal view {
-    if (_checkNonDuplicatedAddr(addr)) {
+    if (_isRegisteredAddr(addr)) {
       revert ErrDuplicatedInfo(addressType, uint256(uint160(addr)));
     }
   }
 
-  function _checkNonDuplicatedAddr(address addr) internal view returns (bool) {
+  function _isRegisteredAddr(address addr) internal view returns (bool) {
     return _registry[uint256(uint160(addr))];
   }
 
   function _requireNonDuplicatedPubkey(bytes memory pubkey) internal view {
-    if (_checkNonDuplicatedPubkey(pubkey)) {
+    if (_isRegisteredPubkey(pubkey)) {
       revert ErrDuplicatedPubkey(pubkey);
     }
   }
 
-  function _checkNonDuplicatedPubkey(bytes memory pubkey) internal view returns (bool) {
+  function _isRegisteredPubkey(bytes memory pubkey) internal view returns (bool) {
     return _registry[_hashPubkey(pubkey)];
+  }
+
+  function _verifyPubkey(bytes calldata publicKey, bytes calldata proofOfPossession) internal {
+    if (!_pcVerifyBLSPublicKey(publicKey, proofOfPossession)) {
+      revert ErrInvalidProofOfPossession(publicKey, proofOfPossession);
+    } else {
+      emit PubkeyVerified(publicKey, proofOfPossession);
+    }
+  }
+
+  function _checkPubkeyChangeCooldown(CandidateProfile storage profile) internal view {
+    if (block.timestamp <= profile.pubkeyLastChange + pubkeyChangeCooldown) {
+      revert ErrPubkeyChangeCooldownNotEnded();
+    }
   }
 }

@@ -12,6 +12,7 @@ import {
   RoninValidatorSet,
   Staking,
   Staking__factory,
+  MockProfile__factory,
 } from '../../../src/types';
 import { SlashType } from '../../../src/script/slash-indicator';
 import { deployTestSuite } from '../helpers/fixture';
@@ -151,7 +152,7 @@ describe('Slash indicator test', () => {
       stakingContractAddress,
       validatorContractAddress,
       roninTrustedOrganizationAddress,
-      maintenanceContractAddress: undefined
+      maintenanceContractAddress: undefined,
     });
 
     stakingContract = Staking__factory.connect(stakingContractAddress, deployer);
@@ -164,6 +165,10 @@ describe('Slash indicator test', () => {
       { proposalExpiryDuration },
       ...trustedOrgs.map((_) => _.governor)
     );
+
+    const mockProfileLogic = await new MockProfile__factory(deployer).deploy();
+    await mockProfileLogic.deployed();
+    await governanceAdminInterface.upgrade(profileAddress, mockProfileLogic.address);
 
     const mockValidatorLogic = await new MockRoninValidatorSetOverridePrecompile__factory(deployer).deploy();
     await mockValidatorLogic.deployed();
@@ -183,6 +188,7 @@ describe('Slash indicator test', () => {
           validatorCandidates[i].treasuryAddr.address,
           1,
           generateSamplePubkey(),
+          '0x',
           { value: minValidatorStakingAmount.mul(2).add(maxValidatorNumber).sub(i) }
         );
     }

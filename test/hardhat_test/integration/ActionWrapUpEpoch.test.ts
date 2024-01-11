@@ -12,6 +12,7 @@ import {
   MockRoninValidatorSetExtended,
   RoninGovernanceAdmin,
   RoninGovernanceAdmin__factory,
+  MockProfile__factory,
 } from '../../../src/types';
 import { expects as StakingExpects } from '../helpers/staking';
 import { EpochController, expects as ValidatorSetExpects } from '../helpers/ronin-validator-set';
@@ -112,6 +113,10 @@ describe('[Integration] Wrap up epoch', () => {
       roninTrustedOrganizationAddress,
     });
 
+    const mockProfileLogic = await new MockProfile__factory(deployer).deploy();
+    await mockProfileLogic.deployed();
+    await governanceAdminInterface.upgrade(profileAddress, mockProfileLogic.address);
+
     const mockValidatorLogic = await new MockRoninValidatorSetExtended__factory(deployer).deploy();
     await mockValidatorLogic.deployed();
     await governanceAdminInterface.upgrade(validatorContract.address, mockValidatorLogic.address);
@@ -166,6 +171,7 @@ describe('[Integration] Wrap up epoch', () => {
             validatorCandidates[i].treasuryAddr.address,
             2_00,
             generateSamplePubkey(),
+            '0x',
             {
               value: minValidatorStakingAmount.mul(2).add(i),
             }
@@ -275,6 +281,7 @@ describe('[Integration] Wrap up epoch', () => {
             validators[i].treasuryAddr.address,
             2_00,
             generateSamplePubkey(),
+            '0x',
             {
               value: minValidatorStakingAmount.mul(3).add(i),
             }

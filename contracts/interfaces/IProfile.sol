@@ -25,14 +25,23 @@ interface IProfile {
     address __reservedGovernor;
     /// @dev Public key for fast finality.
     bytes pubkey;
+    /// @dev Last public key change timestamp.
+    uint256 pubkeyLastChange;
+    /// @dev Old public key for fast finality.
+    bytes oldPubkey;
   }
 
   /// @dev Event emitted when a profile with `id` is added.
   event ProfileAdded(address indexed id);
+
+  /// @dev Event emitted when the profile is migrated (mostly when REP-4 update).
+  event ProfileMigrated(address indexed id, address indexed admin, address indexed treasury);
   /// @dev Event emitted when a address in a profile is changed.
-  event ProfileAddressChanged(address indexed id, RoleAccess indexed addressType);
+  event ProfileAddressChanged(address indexed id, RoleAccess indexed addressType, address indexed addr);
   /// @dev Event emitted when the pubkey of the `id` is changed.
   event PubkeyChanged(address indexed id, bytes pubkey);
+  /// @dev Event emitted when the pubkey is verified successfully.
+  event PubkeyVerified(bytes pubkey, bytes proofOfPossession);
 
   /// @dev Error of already existed profile.
   error ErrExistentProfile();
@@ -40,6 +49,8 @@ interface IProfile {
   error ErrNonExistentProfile();
   /// @dev Error when create a new profile whose id and consensus are not identical.
   error ErrIdAndConsensusDiffer();
+  /// @dev Error when failed to change public key because cooldown is not ended.
+  error ErrPubkeyChangeCooldownNotEnded();
   /**
    * @dev Error when there is a duplicated info of `value`, which is uin256-padding value of any address or hash of public key,
    * and with value type of `infoType`.
@@ -48,6 +59,7 @@ interface IProfile {
   error ErrDuplicatedPubkey(bytes pubkey);
   error ErrZeroAddress(RoleAccess infoType);
   error ErrZeroPubkey();
+  error ErrInvalidProofOfPossession(bytes pubkey, bytes proofOfPossession);
 
   /// @dev Getter to query full `profile` from `id` address.
   function getId2Profile(address id) external view returns (CandidateProfile memory profile);
@@ -77,7 +89,13 @@ interface IProfile {
    * Requirements:
    * - Only `stakingContract` can call this method.
    */
-  function execApplyValidatorCandidate(address admin, address id, address treasury, bytes calldata pubkey) external;
+  function execApplyValidatorCandidate(
+    address admin,
+    address id,
+    address treasury,
+    bytes calldata pubkey,
+    bytes calldata proofOfPossession
+  ) external;
 
   /**
    * @dev Updated the treasury address of candidate id `id` immediately without waiting time.
@@ -107,7 +125,26 @@ interface IProfile {
    * - The profile must be existed.
    * - Only user with candidate admin role can call this method.
    * - New public key must not be duplicated.
+   * - The proof of public key possession must be verified successfully.
+   * - The public key change cooldown must be ended.
    */
 
-  function changePubkey(address id, bytes memory pubkey) external;
+  function changePubkey(address id, bytes memory pubkey, bytes memory proofOfPossession) external;
+
+  /**
+   * @dev Cross-contract function to for slash indicator to check the list of public
+   * keys in finality slash proof
+   *
+   * Returns whether all public keys are registered.
+   */
+
+  function arePublicKeysRegistered(bytes[][2] calldata listOfPublicKey) external view returns (bool);
+
+  /**
+   * @dev Change the cooldown between 2 public key change
+   *
+   * Requirement:
+   *  - Only admin can call this method
+   */
+  function setPubkeyChangeCooldown(uint256 cooldown) external;
 }

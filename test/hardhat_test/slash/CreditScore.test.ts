@@ -15,6 +15,7 @@ import {
   RoninValidatorSet,
   Staking,
   Staking__factory,
+  MockProfile__factory,
 } from '../../../src/types';
 import { deployTestSuite } from '../helpers/fixture';
 import { EpochController, expects as RoninValidatorSetExpects } from '../helpers/ronin-validator-set';
@@ -214,6 +215,10 @@ describe('Credit score and bail out test', () => {
       ...trustedOrgs.map((_) => _.governor)
     );
 
+    const mockProfileLogic = await new MockProfile__factory(deployer).deploy();
+    await mockProfileLogic.deployed();
+    await governanceAdminInterface.upgrade(profileAddress, mockProfileLogic.address);
+
     const mockValidatorLogic = await new MockRoninValidatorSetOverridePrecompile__factory(deployer).deploy();
     await mockValidatorLogic.deployed();
     await governanceAdminInterface.upgrade(validatorContract.address, mockValidatorLogic.address);
@@ -241,6 +246,7 @@ describe('Credit score and bail out test', () => {
           validatorCandidates[i].treasuryAddr.address,
           100_00,
           generateSamplePubkey(),
+          '0x',
           { value: minValidatorStakingAmount.mul(2).sub(i) }
         );
     }

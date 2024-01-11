@@ -19,6 +19,7 @@ import {
   Staking,
   Staking__factory,
   TransparentUpgradeableProxyV2__factory,
+  MockProfile__factory,
 } from '../../../src/types';
 import { ERC20PresetMinterPauser } from '../../../src/types/ERC20PresetMinterPauser';
 import { ReceiptStruct } from '../../../src/types/IRoninGatewayV3';
@@ -183,6 +184,10 @@ describe('[Integration] Bridge Tracking test', () => {
       roninTrustedOrganizationAddress,
     });
 
+    const mockProfileLogic = await new MockProfile__factory(deployer).deploy();
+    await mockProfileLogic.deployed();
+    await governanceAdminInterface.upgrade(profileAddress, mockProfileLogic.address);
+
     const mockValidatorLogic = await new MockRoninValidatorSetExtended__factory(deployer).deploy();
     await mockValidatorLogic.deployed();
     await governanceAdminInterface.upgrade(roninValidatorSet.address, mockValidatorLogic.address);
@@ -225,6 +230,7 @@ describe('[Integration] Bridge Tracking test', () => {
           candidates[i].treasuryAddr.address,
           1,
           generateSamplePubkey(),
+          '0x',
           { value: minValidatorStakingAmount + candidates.length - i }
         );
     }

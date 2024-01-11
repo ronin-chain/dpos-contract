@@ -219,3 +219,11 @@ export interface GatewayPauseEnforcerArguments {
 export interface GatewayPauseEnforcerConfig {
   [network: LiteralNetwork]: GatewayPauseEnforcerArguments | undefined;
 }
+
+export interface ProfileArguments {
+  pubkeyChangeCooldown?: BigNumberish;
+}
+
+export interface ProfileConfig {
+  [network: LiteralNetwork]: ProfileArguments | undefined;
+}

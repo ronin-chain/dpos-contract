@@ -8,20 +8,12 @@ contract Profile_Mainnet is Profile {
   function __migrationRenouncedCandidates() internal override onlyInitializing {
     if (block.chainid != 2020) return;
 
-    CandidateProfile storage _profile;
-
     address[4] memory lConsensus = __consensuses();
     address[4] memory lAdmin = __admins();
     address[4] memory lTreasury = __treasuries();
 
     for (uint i; i < lConsensus.length; ++i) {
-      address id = lConsensus[i];
-
-      _profile = _id2Profile[id];
-      _profile.id = id;
-      _setConsensus(_profile, TConsensus.wrap(id));
-      _setAdmin(_profile, lAdmin[i]);
-      _setTreasury(_profile, payable(lTreasury[i]));
+      __migrate(lConsensus[i], lAdmin[i], lTreasury[i]);
     }
   }
 
