@@ -9,8 +9,6 @@ import { TContract } from "foundry-deployment-kit/types/Types.sol";
 import { LibProxy } from "foundry-deployment-kit/libraries/LibProxy.sol";
 import { BaseMigration } from "foundry-deployment-kit/BaseMigration.s.sol";
 import { Contract } from "../utils/Contract.sol";
-import { ISharedArgument } from "../interfaces/ISharedArgument.sol";
-
 import { TransparentUpgradeableProxy } from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 
 import { ICandidateManager } from "@ronin/contracts/interfaces/validator/ICandidateManager.sol";
@@ -79,13 +77,11 @@ abstract contract PostChecker_GovernanceAdmin is BaseMigration, PostChecker_Help
     cleanUpProxyTargets
     logPostCheck("[GovernanceAdmin] change admin all contracts")
   {
-    ISharedArgument.SharedParameter memory param = ISharedArgument(address(CONFIG)).sharedArguments();
-
     __newGovernanceAdmin = new RoninGovernanceAdmin(
       block.chainid,
       __trustedOrg,
       CONFIG.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key()),
-      param.expiryDuration
+      type(uint256).max
     );
 
     // Get all contracts deployed from the current network

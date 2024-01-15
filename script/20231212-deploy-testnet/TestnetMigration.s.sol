@@ -104,7 +104,7 @@ contract TestnetMigration is RoninMigration {
       param.emergencyExitLockedAmount = 500;
       param.emergencyExpiryDuration = 14 days; // 14 days
 
-      param.proposalExpiryDuration = 14 days;
+      param.expiryDuration = 14 days;
     } else {
       revert("TestnetMigration: Other network unsupported");
     }
