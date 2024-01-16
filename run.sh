@@ -1,6 +1,5 @@
 verify_arg=""
 extra_argument=""
-op_command="op run --env-file="./.env" --"
 
 for arg in "$@"; do
     case $arg in
@@ -24,4 +23,4 @@ done
 extra_argument="${extra_argument%%@}"
 
 calldata=$(cast calldata 'run()')
-${op_command} forge script ${verify_arg} --legacy ${@} --sig 'run(bytes,string)' ${calldata} "${extra_argument}"
+forge script ${verify_arg} --legacy ${@} --sig 'run(bytes,string)' ${calldata} "${extra_argument}"
