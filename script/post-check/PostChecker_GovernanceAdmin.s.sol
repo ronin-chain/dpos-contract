@@ -81,7 +81,7 @@ abstract contract PostChecker_GovernanceAdmin is BaseMigration, PostChecker_Help
       block.chainid,
       __trustedOrg,
       CONFIG.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key()),
-      type(uint256).max
+      14 days
     );
 
     // Get all contracts deployed from the current network

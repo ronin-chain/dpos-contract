@@ -192,6 +192,7 @@ contract Migration__20231212_DeployTestnet is TestnetMigration {
       param.maxSchedules,
       param.cooldownSecsToMaintain
     );
+    maintenance.initializeV3(address(profile));
     vm.stopBroadcast();
   }
 

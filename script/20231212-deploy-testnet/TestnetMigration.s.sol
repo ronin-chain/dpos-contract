@@ -71,7 +71,7 @@ contract TestnetMigration is RoninMigration {
       param.unavailabilitySlashing.jailDurationForUnavailabilityTier2Threshold = 28800 * 2;
 
       param.creditScore.gainCreditScore = 50;
-      param.creditScore.maxCreditScore = 600;
+      param.creditScore.maxCreditScore = 1800;
       param.creditScore.bailOutCostMultiplier = 5;
       param.creditScore.cutOffPercentageAfterBailout = 50_00; // 50%
 

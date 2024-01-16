@@ -24,6 +24,9 @@ abstract contract PostChecker_ApplyCandidate is BaseMigration, PostChecker_Helpe
 
     _postCheck_ApplyingCandidate_EOA();
     _postCheck_ApplyingCandidate_Multisig();
+
+    _fastForwardToNextDay();
+    _wrapUpEpoch();
   }
 
   function _postCheck_ApplyingCandidate_EOA() private logPostCheck("[ValidatorSet] applying candidate EOA") {
@@ -40,9 +43,8 @@ abstract contract PostChecker_ApplyCandidate is BaseMigration, PostChecker_Helpe
 
     _applyValidatorCandidate(_staking, candidateAdmin, consensusAddr);
 
-    (, bytes memory returndata) = _validatorSet.staticcall(
-      abi.encodeWithSelector(ICandidateManager.isValidatorCandidate.selector, consensusAddr)
-    );
+    (, bytes memory returndata) =
+      _validatorSet.staticcall(abi.encodeWithSelector(ICandidateManager.isValidatorCandidate.selector, consensusAddr));
     assertTrue(abi.decode(returndata, (bool)));
   }
 
@@ -57,9 +59,8 @@ abstract contract PostChecker_ApplyCandidate is BaseMigration, PostChecker_Helpe
 
     _applyValidatorCandidate(_staking, candidateAdmin, consensusAddr);
 
-    (, bytes memory returndata) = _validatorSet.staticcall(
-      abi.encodeWithSelector(ICandidateManager.isValidatorCandidate.selector, consensusAddr)
-    );
+    (, bytes memory returndata) =
+      _validatorSet.staticcall(abi.encodeWithSelector(ICandidateManager.isValidatorCandidate.selector, consensusAddr));
     assertTrue(abi.decode(returndata, (bool)));
   }
 }
