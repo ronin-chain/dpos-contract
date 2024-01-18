@@ -7,6 +7,7 @@ import { console2 as console } from "forge-std/console2.sol";
 import { LibErrorHandler } from "contract-libs/LibErrorHandler.sol";
 import { TContract } from "foundry-deployment-kit/types/Types.sol";
 import { LibProxy } from "foundry-deployment-kit/libraries/LibProxy.sol";
+import { LibSharedAddress } from "foundry-deployment-kit/libraries/LibSharedAddress.sol";
 import { BaseMigration } from "foundry-deployment-kit/BaseMigration.s.sol";
 import { Contract } from "../utils/Contract.sol";
 
@@ -38,17 +39,15 @@ abstract contract PostChecker_Maintenance is BaseMigration, PostChecker_Helper {
     _maintenance = CONFIG.getAddressFromCurrentNetwork(Contract.Maintenance.key());
 
     {
-      (, bytes memory returnedData) = _validatorSet.staticcall(
-        abi.encodeWithSelector(IValidatorInfoV2.getValidators.selector)
-      );
+      (, bytes memory returnedData) =
+        _validatorSet.staticcall(abi.encodeWithSelector(IValidatorInfoV2.getValidators.selector));
       address[] memory consensusList_AddrArrCasted = abi.decode(returnedData, (address[]));
       _consensusAddr = consensusList_AddrArrCasted[0];
     }
 
     {
-      (, bytes memory returnedData) = _validatorSet.staticcall(
-        abi.encodeWithSelector(ICandidateManager.getCandidateInfo.selector, _consensusAddr)
-      );
+      (, bytes memory returnedData) =
+        _validatorSet.staticcall(abi.encodeWithSelector(ICandidateManager.getCandidateInfo.selector, _consensusAddr));
       uint256[7] memory candidateInfo_UintArrCasted = abi.decode(returnedData, (uint256[7]));
       _candidateAdmin = address(uint160(candidateInfo_UintArrCasted[0]));
     }
@@ -59,15 +58,16 @@ abstract contract PostChecker_Maintenance is BaseMigration, PostChecker_Helper {
   function _postCheck_scheduleMaintenance() private logPostCheck("[Maintenance] full flow of on schedule") {
     vm.startPrank(_candidateAdmin);
 
-    uint latestEpochBlock = RoninValidatorSet(_validatorSet).getLastUpdatedBlock();
-    uint minOffset = IMaintenance(_maintenance).minOffsetToStartSchedule();
-    uint minDuration = IMaintenance(_maintenance).minMaintenanceDurationInBlock();
+    uint256 latestEpochBlock = RoninValidatorSet(_validatorSet).getLastUpdatedBlock();
+    uint256 minOffset = IMaintenance(_maintenance).minOffsetToStartSchedule();
+    uint256 numberOfBlocksInEpoch = RoninValidatorSet(_validatorSet).numberOfBlocksInEpoch();
+    uint256 minDuration = IMaintenance(_maintenance).minMaintenanceDurationInBlock();
 
-    uint startBlock = latestEpochBlock + 200 + 1 + minOffset;
-    uint endBlock = latestEpochBlock + 200 + minOffset + minDuration;
-    (bool success, ) = _maintenance.call(
-      abi.encodeWithSelector(IMaintenance.schedule.selector, _consensusAddr, startBlock, endBlock)
-    );
+    uint256 startBlock = latestEpochBlock + numberOfBlocksInEpoch + 1 + minOffset;
+    uint256 endBlock = latestEpochBlock + numberOfBlocksInEpoch + minOffset
+      + numberOfBlocksInEpoch * (minDuration / numberOfBlocksInEpoch + 1);
+    (bool success,) =
+      _maintenance.call(abi.encodeWithSelector(IMaintenance.schedule.selector, _consensusAddr, startBlock, endBlock));
     assertEq(success, true);
 
     vm.stopPrank();
