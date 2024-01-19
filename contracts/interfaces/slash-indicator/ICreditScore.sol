@@ -37,7 +37,7 @@ interface ICreditScore {
     uint256 cutOffPercentageAfterBailout
   );
   /// @dev Emitted the credit score of validators is updated.
-  event CreditScoresUpdated(address[] validators, uint256[] creditScores);
+  event CreditScoresUpdated(address[] cids, uint256[] creditScores);
   /// @dev Emitted when a validator bailed out of jail.
   event BailedOut(address indexed cid, uint256 period, uint256 usedCreditScore);
 

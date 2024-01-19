@@ -47,7 +47,7 @@ interface IBaseStaking {
   /// @dev Error of admin of any active pool cannot delegate.
   error ErrAdminOfAnyActivePoolForbidden(address admin);
   /// @dev Error of querying inactive pool.
-  error ErrInactivePool(TConsensus consensusAddr, address poolAddr);
+  error ErrInactivePool(TConsensus consensusAddr, address poolId);
   /// @dev Error of length of input arrays are not of the same.
   error ErrInvalidArrays();
 
