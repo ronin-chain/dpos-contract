@@ -291,6 +291,22 @@ abstract contract CandidateStaking is BaseStaking, ICandidateStaking, GlobalConf
   }
 
   /**
+   * @dev Clear the staking balance of `requester` and move the `newStakeholder` in the `pool.delegate` mapping.
+   */
+  function _changeStakeholder(
+    PoolDetail storage _pool,
+    address requester,
+    address newStakeholder
+  ) internal onlyPoolAdmin(_pool, requester) {
+    uint256 stakingAmount = _pool.stakingAmount;
+
+    _changeDelegatingAmount(_pool, requester, 0, _pool.stakingTotal - stakingAmount);
+    _changeDelegatingAmount(_pool, newStakeholder, stakingAmount, _pool.stakingTotal + stakingAmount);
+
+    emit StakeholderChanged(_pool.pid, requester, newStakeholder, stakingAmount);
+  }
+
+  /**
    * @dev Deducts from staking amount of the validator `_consensusAddr` for `_amount`.
    *
    * Emits the event `Unstaked`.

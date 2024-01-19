@@ -46,7 +46,6 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
    */
   function __migrationRenouncedCandidates() internal virtual {}
 
-
   /**
    * @dev This method is used in REP-4 migration, which creates profile for all community-validators and renounced validators.
    * This method can be removed after REP-4 goes live.
@@ -117,8 +116,11 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
    * - Update Staking contract:
    *    + [x] Update (id => PoolDetail) mapping in {BaseStaking.sol}.
    *    + [x] Update `_adminOfActivePoolMapping` in {BaseStaking.sol}.
+   *    + [x] Move staking amount of previous admin to the the new admin.
    * - Update Validator contract:
    *    + [x] Update (id => ValidatorCandidate) mapping
+   *
+   * - See other side-effects for treasury in {requestChangeTreasury}, since treasury and admin must be identical.
    */
   function requestChangeAdminAddress(address id, address newAdminAddr) external {
     CandidateProfile storage _profile = _getId2ProfileHelper(id);
@@ -126,10 +128,11 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     _requireNonZeroAndNonDuplicated(RoleAccess.CANDIDATE_ADMIN, newAdminAddr);
 
     IStaking stakingContract = IStaking(getContract(ContractType.STAKING));
-    stakingContract.execChangeAdminAddress(id, newAdminAddr);
+    stakingContract.execChangeAdminAddress({ poolId: id, currAdminAddr: msg.sender, newAdminAddr: newAdminAddr });
 
     IRoninValidatorSet validatorContract = IRoninValidatorSet(getContract(ContractType.VALIDATOR));
     validatorContract.execChangeAdminAddress(id, newAdminAddr);
+    validatorContract.execChangeTreasuryAddress(id, payable(newAdminAddr));
 
     _setAdmin(_profile, newAdminAddr);
   }
@@ -189,14 +192,7 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
    *          create a new ballot on behalf of the validator contract.
    */
   function requestChangeTreasuryAddr(address id, address payable newTreasury) external {
-    CandidateProfile storage _profile = _getId2ProfileHelper(id);
-    _requireCandidateAdmin(_profile);
-    _requireNonZeroAndNonDuplicated(RoleAccess.TREASURY, newTreasury);
-
-    IRoninValidatorSet validatorContract = IRoninValidatorSet(getContract(ContractType.VALIDATOR));
-    validatorContract.execChangeTreasuryAddress(id, newTreasury);
-
-    _setTreasury(_profile, newTreasury);
+    revert("Not supported");
   }
 
   /**

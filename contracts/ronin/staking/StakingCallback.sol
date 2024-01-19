@@ -14,9 +14,12 @@ abstract contract StakingCallback is CandidateStaking, DelegatorStaking, IStakin
    */
   function execChangeAdminAddress(
     address poolId,
+    address currAdminAddr,
     address newAdminAddr
   ) external override onlyContract(ContractType.PROFILE) {
     PoolDetail storage _pool = _poolDetail[poolId];
+
+    _changeStakeholder({ _pool: _pool, requester: currAdminAddr, newStakeholder: newAdminAddr });
 
     _adminOfActivePoolMapping[_pool.__shadowedPoolAdmin] = address(0);
     _pool.__shadowedPoolAdmin = newAdminAddr;

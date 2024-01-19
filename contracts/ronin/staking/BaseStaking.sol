@@ -22,7 +22,7 @@ abstract contract BaseStaking is
   HasValidatorDeprecated
 {
   /// @dev Mapping from pool address (i.e. validator id) => staking pool detail
-  mapping(address => PoolDetail) internal _poolDetail;
+  mapping(address pid => PoolDetail) internal _poolDetail;
 
   /// @dev The cooldown time in seconds to undelegate from the last timestamp (s)he delegated.
   uint256 internal _cooldownSecsToUndelegate;
@@ -30,7 +30,7 @@ abstract contract BaseStaking is
   uint256 internal _waitingSecsToRevoke;
 
   /// @dev Mapping from "admin address of an active pool" => "pool id".
-  mapping(address => address) internal _adminOfActivePoolMapping;
+  mapping(address adminOfActivePool => address poolId) internal _adminOfActivePoolMapping;
   /**
    * @dev This empty reserved space is put in place to allow future versions to add new
    * variables without shifting down storage in the inheritance chain.
