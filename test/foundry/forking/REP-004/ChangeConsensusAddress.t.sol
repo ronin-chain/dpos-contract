@@ -89,6 +89,78 @@ contract ChangeConsensusAddressForkTest is Test {
     vm.label(address(_slashIndicator), "SlashIndicator");
   }
 
+  function _toSingletonArrayConsensuses(address consensus) private pure returns (TConsensus[] memory arr) {
+    arr = new TConsensus[](1);
+    arr[0] = TConsensus.wrap(consensus);
+  }
+
+  function testFork_ChangeCandidateAdmin_StakingRewardsFlow() external upgrade {
+    // apply validator candidate
+    _applyValidatorCandidate("a1", "c1");
+    address c1 = makeAddr("c1");
+    address a1 = makeAddr("a1");
+    address a2 = makeAddr("a2");
+    
+    // change admin of c1 -> a2
+    vm.startPrank(a1);
+    _profile.requestChangeAdminAddress(c1, a2);
+    vm.stopPrank(); 
+
+    address coinbase = block.coinbase;
+
+    vm.coinbase(c1);
+    _bulkSubmitBlockReward(1);
+    _bulkWrapUpEpoch(1);
+
+    // reset coinbase
+    vm.coinbase(coinbase);
+
+    vm.deal(a1, 1000 ether);
+    vm.deal(a2, 1000 ether);
+
+    uint256 snapshotId = vm.snapshot();
+
+    // a2 can claim reward c1
+    vm.prank(a2);
+    _staking.claimRewards(_toSingletonArrayConsensuses(c1));
+
+    vm.revertTo(snapshotId);
+    // a1 cannot calim reward c1
+    vm.prank(a1);
+    vm.expectRevert();
+    _staking.claimRewards(_toSingletonArrayConsensuses(c1));
+    
+    // a2 cannot delegate c1
+    vm.prank(a2);
+    vm.expectRevert();
+    _staking.delegate{value: 100 ether}(TConsensus.wrap(c1));
+
+    // a2 can stake c1
+    vm.prank(a2);
+    _staking.stake{value: 100 ether}(TConsensus.wrap(c1));
+    
+    // a1 can delegate c1
+    vm.prank(a1);
+    _staking.delegate{value: 100 ether}(TConsensus.wrap(c1));
+
+    // a1 cannot stake c1
+    vm.prank(a1);
+    vm.expectRevert();
+    _staking.stake{value: 100 ether}(TConsensus.wrap(c1));
+
+    uint256 a2BalanceBefore = a2.balance;
+
+    vm.prank(a2);
+    _staking.requestRenounce(TConsensus.wrap(c1));
+
+    _bulkWrapUpEpoch(7);
+
+    // a2 received balance after renounce
+    uint256 a2BalanceAfter = a2.balance;
+    assertTrue(a2BalanceAfter - a2BalanceBefore != 0);
+    console2.log("Received:", a2BalanceAfter - a2BalanceBefore);
+  }
+
   function testFork_AfterUpgraded_AddNewTrustedOrg_CanVoteProposal() external upgrade {
     _cheatSetRoninGACode();
     // add trusted org
