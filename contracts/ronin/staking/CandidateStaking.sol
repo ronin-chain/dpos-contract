@@ -85,6 +85,7 @@ abstract contract CandidateStaking is BaseStaking, ICandidateStaking, GlobalConf
     _pool.__shadowedPoolAdmin = poolAdmin;
     _pool.pid = poolId;
     _adminOfActivePoolMapping[poolAdmin] = poolId;
+    _pool.wasAdmin[poolAdmin] = true;
 
     _stake(_poolDetail[poolId], poolAdmin, amount);
     emit PoolApproved(poolId, poolAdmin);
