@@ -3,12 +3,14 @@
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 import "../../libraries/Math.sol";
 import "../../interfaces/staking/IStaking.sol";
 import "../../interfaces/validator/IRoninValidatorSet.sol";
+import "../../utils/CommonErrors.sol";
 import "./StakingCallback.sol";
 
-contract Staking is IStaking, StakingCallback, Initializable {
+contract Staking is IStaking, StakingCallback, Initializable, AccessControlEnumerable {
   bytes32 public constant MIGRATOR_ROLE = keccak256("MIGRATOR_ROLE");
 
   constructor() {
@@ -59,8 +61,8 @@ contract Staking is IStaking, StakingCallback, Initializable {
     address[] calldata admins,
     bool[] calldata flags
   ) external onlyRole(MIGRATOR_ROLE) {
-    if (poolIds.length != admins.length || poolIds.length != flag.length) {
-      revert ErrInvalidArguments();
+    if (poolIds.length != admins.length || poolIds.length != flags.length) {
+      revert ErrInvalidArguments(msg.sig);
     }
 
     for (uint i; i < poolIds.length; ++i) {
