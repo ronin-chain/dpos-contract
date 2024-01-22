@@ -66,7 +66,7 @@ abstract contract BaseStaking is
   }
 
   function _anyExceptPoolAdmin(PoolDetail storage _pool, address delegator) private view {
-    if (_pool.__shadowedPoolAdmin == delegator || _pool.wasAdmin[delegator]) revert ErrPoolAdminForbidden();
+    if (_pool.wasAdmin[delegator]) revert ErrPoolAdminForbidden();
   }
 
   function _poolOfConsensusIsActive(TConsensus consensusAddr) private view {
