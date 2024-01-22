@@ -120,7 +120,7 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
    * - Update Validator contract:
    *    + [x] Update (id => ValidatorCandidate) mapping
    *
-   * - See other side-effects for treasury in {requestChangeTreasury}, since treasury and admin must be identical.
+   * - See other side-effects for treasury in {requestChangeTreasuryAddr}, since treasury and admin must be identical.
    */
   function requestChangeAdminAddress(address id, address newAdminAddr) external {
     CandidateProfile storage _profile = _getId2ProfileHelper(id);
@@ -182,6 +182,9 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
 
   /**
    * @inheritdoc IProfile
+   *
+   * @notice This method is not supported. Change treasury also requires changing the admin address.
+   * Using the {requestChangeAdminAddress} method instead
    *
    * @dev Side-effects on other contracts:
    * - Update Validator contract:
