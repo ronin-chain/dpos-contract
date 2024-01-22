@@ -9,6 +9,8 @@ import "../../interfaces/validator/IRoninValidatorSet.sol";
 import "./StakingCallback.sol";
 
 contract Staking is IStaking, StakingCallback, Initializable {
+  bytes32 public constant MIGRATOR_ROLE = keccak256("MIGRATOR_ROLE");
+
   constructor() {
     _disableInitializers();
   }
@@ -47,6 +49,25 @@ contract Staking is IStaking, StakingCallback, Initializable {
    */
   function initializeV3(address __profileContract) external reinitializer(3) {
     _setContract(ContractType.PROFILE, __profileContract);
+  }
+
+  /**
+   * @dev Migrate REP-4
+   */
+  function migrateWasAdmin(
+    address[] calldata poolIds,
+    address[] calldata admins,
+    bool[] calldata flags
+  ) external onlyRole(MIGRATOR_ROLE) {
+    if (poolIds.length != admins.length || poolIds.length != flag.length) {
+      revert ErrInvalidArguments();
+    }
+
+    for (uint i; i < poolIds.length; ++i) {
+      _poolDetail[poolIds[i]].wasAdmin[admins[i]] = flags[i];
+    }
+
+    emit MigrateWasAdminFinished();
   }
 
   /**
