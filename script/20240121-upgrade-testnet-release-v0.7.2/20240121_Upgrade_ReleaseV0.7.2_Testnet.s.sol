@@ -15,8 +15,8 @@ contract Migration__20240121_UpgradeReleaseV0_7_2_Testnet is RoninMigration {
   using LibProxy for *;
   using StdStyle for *;
 
-  address private constant MIGRATOR = 0xf72bEAE310d08e184DDB0990ECc6ABe6340CF6eF;
-  address private constant DEFAULT_ADMIN = address(0x0);
+  address private constant STAKING_MIGRATOR = 0xf72bEAE310d08e184DDB0990ECc6ABe6340CF6eF;
+  address private constant STAKING_DEFAULT_ADMIN = 0x6bd1931fdEBc97c5EEc0604a6b219989d64efb7c;
 
   address[] private contractsToUpgrade;
   TContract[] private contractTypesToUpgrade;
@@ -72,7 +72,7 @@ contract Migration__20240121_UpgradeReleaseV0_7_2_Testnet is RoninMigration {
         callDatas[i] = contractTypesToUpgrade[i] == Contract.Staking.key()
           ? abi.encodeCall(
             TransparentUpgradeableProxy.upgradeToAndCall,
-            (logics[i], abi.encodeCall(Staking.initializeV4, (DEFAULT_ADMIN, MIGRATOR)))
+            (logics[i], abi.encodeCall(Staking.initializeV4, (STAKING_DEFAULT_ADMIN, STAKING_MIGRATOR)))
           )
           : abi.encodeCall(TransparentUpgradeableProxy.upgradeTo, (logics[i]));
       }
