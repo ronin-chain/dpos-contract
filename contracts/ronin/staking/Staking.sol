@@ -53,6 +53,11 @@ contract Staking is IStaking, StakingCallback, Initializable, AccessControlEnume
     _setContract(ContractType.PROFILE, __profileContract);
   }
 
+  function initializeV4(address admin, address migrator) external reinitializer(4) {
+    _grantRole(DEFAULT_ADMIN_ROLE, admin);
+    _grantRole(MIGRATOR_ROLE, migrator);
+  }
+
   /**
    * @dev Migrate REP-4
    */
