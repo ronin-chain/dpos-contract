@@ -24,6 +24,8 @@ import { Proposal } from "@ronin/contracts/libraries/Proposal.sol";
 import { Ballot } from "@ronin/contracts/libraries/Ballot.sol";
 
 contract ChangeConsensusAddressForkTest is Test {
+  using StdStyle for *;
+
   string constant RONIN_TEST_RPC = "https://saigon-archive.roninchain.com/rpc";
   string constant RONIN_MAIN_RPC = "https://api-archived.roninchain.com/rpc";
   bytes32 constant ADMIN_SLOT = 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103;
@@ -97,6 +99,8 @@ contract ChangeConsensusAddressForkTest is Test {
   function testFork_ChangeCandidateAdmin_StakingRewardsFlow() external upgrade {
     // apply validator candidate
     _applyValidatorCandidate("a1", "c1");
+    _bulkWrapUpEpoch(1);
+
     address c1 = makeAddr("c1");
     address a1 = makeAddr("a1");
     address a2 = makeAddr("a2");
@@ -112,38 +116,47 @@ contract ChangeConsensusAddressForkTest is Test {
     _bulkSubmitBlockReward(1);
     _bulkWrapUpEpoch(1);
 
+    vm.coinbase(c1);
+    _bulkSubmitBlockReward(1);
+    _bulkWrapUpEpoch(1);
+
     // reset coinbase
     vm.coinbase(coinbase);
 
     vm.deal(a1, 1000 ether);
     vm.deal(a2, 1000 ether);
 
+
     uint256 snapshotId = vm.snapshot();
 
-    // a2 can claim reward c1
+    uint256 amount = a2.balance;
+    console2.log("a2 can claim reward c1".yellow());
     vm.prank(a2);
     _staking.claimRewards(_toSingletonArrayConsensuses(c1));
+    assertTrue(a2.balance > amount, "a2 can claim reward c1".red());
 
     vm.revertTo(snapshotId);
-    // a1 cannot calim reward c1
+    console2.log("a1 cannot claim reward c1".yellow());
+    amount = a1.balance;
     vm.prank(a1);
-    vm.expectRevert();
     _staking.claimRewards(_toSingletonArrayConsensuses(c1));
+    assertTrue(a2.balance == amount, "a1 cannot claim reward c1".red());
     
-    // a2 cannot delegate c1
+    console2.log("a2 cannot delegate c1".yellow());
     vm.prank(a2);
     vm.expectRevert();
     _staking.delegate{value: 100 ether}(TConsensus.wrap(c1));
 
-    // a2 can stake c1
+    console2.log("a2 can stake c1".yellow());
     vm.prank(a2);
     _staking.stake{value: 100 ether}(TConsensus.wrap(c1));
     
-    // a1 can delegate c1
+    console2.log("a1 cannot delegate c1".yellow());
     vm.prank(a1);
+    vm.expectRevert();
     _staking.delegate{value: 100 ether}(TConsensus.wrap(c1));
 
-    // a1 cannot stake c1
+    console2.log("a1 cannot stake c1".yellow());
     vm.prank(a1);
     vm.expectRevert();
     _staking.stake{value: 100 ether}(TConsensus.wrap(c1));
