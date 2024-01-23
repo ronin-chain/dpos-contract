@@ -29,6 +29,9 @@ interface IBaseStaking {
 
     /// @dev Mapping from delegator => the last timestamp that delegator staked
     mapping(address => uint256) lastDelegatingTimestamp;
+
+    /// @dev Mapping that indicate an admin was either current or previous admin of this pool
+    mapping(address => bool) wasAdmin;
   }
 
   /// @dev Emitted when the minium number of seconds to undelegate is updated.
