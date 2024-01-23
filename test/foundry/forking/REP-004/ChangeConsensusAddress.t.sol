@@ -133,7 +133,7 @@ contract ChangeConsensusAddressForkTest is Test {
     console2.log("a2 can claim reward c1".yellow());
     vm.prank(a2);
     _staking.claimRewards(_toSingletonArrayConsensuses(c1));
-    assertTrue(a2.balance > amount, "a2 cannot claim reward c1".red());
+    assertTrue(a2.balance > amount, "a2 can claim reward c1".red());
 
     vm.revertTo(snapshotId);
     console2.log("a1 cannot claim reward c1".yellow());
