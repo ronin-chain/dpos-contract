@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
+import { Staking } from "@ronin/contracts/ronin/staking/Staking.sol";
 import { TransparentUpgradeableProxy } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
 import { console2 as console } from "forge-std/console2.sol";
@@ -13,6 +14,9 @@ import { Contract } from "script/utils/Contract.sol";
 contract Migration__20240121_UpgradeReleaseV0_7_2_Testnet is RoninMigration {
   using LibProxy for *;
   using StdStyle for *;
+
+  address private constant STAKING_MIGRATOR = 0xf72bEAE310d08e184DDB0990ECc6ABe6340CF6eF;
+  address private constant STAKING_DEFAULT_ADMIN = 0x968D0Cd7343f711216817E617d3f92a23dC91c07;  // Testnet Proxy Admin
 
   address[] private contractsToUpgrade;
   TContract[] private contractTypesToUpgrade;
@@ -64,7 +68,12 @@ contract Migration__20240121_UpgradeReleaseV0_7_2_Testnet is RoninMigration {
 
     for (uint256 i; i < innerCallCount; ++i) {
       logics[i] = _deployLogic(contractTypesToUpgrade[i]);
-      callDatas[i] = abi.encodeCall(TransparentUpgradeableProxy.upgradeTo, (logics[i]));
+      callDatas[i] = contractTypesToUpgrade[i] == Contract.Staking.key()
+        ? abi.encodeCall(
+          TransparentUpgradeableProxy.upgradeToAndCall,
+          (logics[i], abi.encodeCall(Staking.initializeV4, (STAKING_DEFAULT_ADMIN, STAKING_MIGRATOR)))
+        )
+        : abi.encodeCall(TransparentUpgradeableProxy.upgradeTo, (logics[i]));
 
       console.log("Code hash for:", vm.getLabel(logics[i]), vm.toString(logics[i].codehash));
       console.log(
