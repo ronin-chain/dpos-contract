@@ -140,7 +140,7 @@ contract ChangeConsensusAddressForkTest is Test {
     amount = a1.balance;
     vm.prank(a1);
     _staking.claimRewards(_toSingletonArrayConsensuses(c1));
-    assertTrue(a2.balance == amount, "a1 can claim reward c1".red());
+    assertTrue(a2.balance == amount, "a1 cannot claim reward c1".red());
     
     console2.log("a2 cannot delegate c1".yellow());
     vm.prank(a2);
