@@ -68,14 +68,12 @@ contract Migration__20240121_UpgradeReleaseV0_7_2_Testnet is RoninMigration {
 
     for (uint256 i; i < innerCallCount; ++i) {
       logics[i] = _deployLogic(contractTypesToUpgrade[i]);
-      if (contractTypesToUpgrade[i] == Contract.Staking.key()) {
-        callDatas[i] = contractTypesToUpgrade[i] == Contract.Staking.key()
-          ? abi.encodeCall(
-            TransparentUpgradeableProxy.upgradeToAndCall,
-            (logics[i], abi.encodeCall(Staking.initializeV4, (STAKING_DEFAULT_ADMIN, STAKING_MIGRATOR)))
-          )
-          : abi.encodeCall(TransparentUpgradeableProxy.upgradeTo, (logics[i]));
-      }
+      callDatas[i] = contractTypesToUpgrade[i] == Contract.Staking.key()
+        ? abi.encodeCall(
+          TransparentUpgradeableProxy.upgradeToAndCall,
+          (logics[i], abi.encodeCall(Staking.initializeV4, (STAKING_DEFAULT_ADMIN, STAKING_MIGRATOR)))
+        )
+        : abi.encodeCall(TransparentUpgradeableProxy.upgradeTo, (logics[i]));
 
       console.log("Code hash for:", vm.getLabel(logics[i]), vm.toString(logics[i].codehash));
       console.log(
