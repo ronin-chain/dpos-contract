@@ -691,7 +691,7 @@
       "inputs": []
     }
   ],
-  "address": "0x7993C7EfA53909583f77c8dcbdf2FF7F1ddA1055",
+  "address": "0xc92090C0de6eaFc6981787FE2d93000ACfB31E61",
   "args": "0x",
   "ast": {
     "absolutePath": "contracts/ronin/profile/Profile.sol",

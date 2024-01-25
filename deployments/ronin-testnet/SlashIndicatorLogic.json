@@ -911,7 +911,7 @@
       ]
     }
   ],
-  "address": "0x963F61e201D06ac73270818439d0d29F18D4E303",
+  "address": "0x35ce4eef93809b997addaee8e0d979d966dbd02d",
   "args": "0x",
   "ast": {
     "absolutePath": "contracts/ronin/slash-indicator/SlashIndicator.sol",

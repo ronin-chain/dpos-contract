@@ -2262,7 +2262,7 @@
       "inputs": []
     }
   ],
-  "address": "0x99DA0Fb31C830eBb0bDe0EfCEf428A02D72994Be",
+  "address": "0xdab228a4121f19ed1a4bbb7c21b40febd3536330",
   "args": "0x",
   "ast": {
     "absolutePath": "contracts/ronin/validator/RoninValidatorSet.sol",

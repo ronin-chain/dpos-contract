@@ -991,7 +991,7 @@
       ]
     }
   ],
-  "address": "0xa853B4D09a2505c895f2701Cb64ea6f8Cd413D3E",
+  "address": "0x43865cbfd22a55c4f95197aed47805d5bd498e88",
   "args": "0x",
   "ast": {
     "absolutePath": "contracts/multi-chains/RoninTrustedOrganization.sol",
