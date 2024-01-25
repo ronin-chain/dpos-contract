@@ -750,7 +750,7 @@
       ]
     }
   ],
-  "address": "0x2Ea4bdF79cc13bf01a66f0D6E9732c0650C2b3a4",
+  "address": "0xaad5541eb4e5de1f353bcc8eabd124fc42107507",
   "args": "0x",
   "ast": {
     "absolutePath": "contracts/ronin/Maintenance.sol",

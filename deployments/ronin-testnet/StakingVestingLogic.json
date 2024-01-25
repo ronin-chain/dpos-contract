@@ -481,7 +481,7 @@
       ]
     }
   ],
-  "address": "0x374138F56f2d9A24d1dBf1D55dE00980b3bD436a",
+  "address": "0x6bfc4376552d503b8bd83aabca9b8ce45ce540e3",
   "args": "0x",
   "ast": {
     "absolutePath": "contracts/ronin/StakingVesting.sol",

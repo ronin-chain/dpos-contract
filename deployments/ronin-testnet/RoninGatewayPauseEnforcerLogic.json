@@ -435,7 +435,7 @@
       "inputs": []
     }
   ],
-  "address": "0x9D457F3a70fA0333C232Cb7C8D3D87a2089c459A",
+  "address": "0x579f7b862f8ad848968e0cd673ff7bf91b2aafe8",
   "args": "0x",
   "ast": {
     "absolutePath": "contracts/ronin/gateway/PauseEnforcer.sol",

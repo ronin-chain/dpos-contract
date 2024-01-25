@@ -173,7 +173,7 @@
       ]
     }
   ],
-  "address": "0x00a3c1E196d96632699DFc34f085b633426Ae94f",
+  "address": "0x591a38ba0f6c4110057b0a4842b87e9796b3ed94",
   "args": "0x",
   "ast": {
     "absolutePath": "contracts/ronin/fast-finality/FastFinalityTracking.sol",

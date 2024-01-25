@@ -1867,7 +1867,7 @@
       "inputs": []
     }
   ],
-  "address": "0xF86e81E3ca775a628Fa5747aA49Dd9C01Dd409D3",
+  "address": "0x301d5ebe4c1049a007720d2bfb4099e9dcbc061e",
   "args": "0x",
   "ast": {
     "absolutePath": "contracts/ronin/staking/Staking.sol",
