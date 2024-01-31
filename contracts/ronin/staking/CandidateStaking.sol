@@ -304,10 +304,6 @@ abstract contract CandidateStaking is BaseStaking, ICandidateStaking, GlobalConf
     _changeDelegatingAmount(_pool, requester, 0, _pool.stakingTotal - stakingAmount);
     _changeDelegatingAmount(_pool, newStakeholder, stakingAmount, _pool.stakingTotal + stakingAmount);
 
-    // _changeUserRewardStakeHolder({poolId: _pool.pid, currUser: requester, newUser: newStakeholder});
-    // _pool.delegatingAmount[newStakeholder] = _pool.delegatingAmount[requester];
-    // delete _pool.delegatingAmount[requester];
-
     emit StakeholderChanged(_pool.pid, requester, newStakeholder, stakingAmount);
   }
 
