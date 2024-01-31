@@ -8,6 +8,7 @@ export type ValidatorCandidateAddressSet = {
   consensusAddr: SignerWithAddress;
   treasuryAddr: SignerWithAddress;
   bridgeOperator: SignerWithAddress;
+  cid: SignerWithAddress;
 };
 
 export const createValidatorCandidateAddressSet = (
@@ -22,6 +23,7 @@ export const createValidatorCandidateAddressSet = (
     candidateAdmin: addrs[0],
     treasuryAddr: addrs[0],
     consensusAddr: addrs[1],
+    cid: addrs[1],
     bridgeOperator: addrs[2],
   };
 };
@@ -44,6 +46,7 @@ export function createManyValidatorCandidateAddressSets(
   bridgeOperators?: SignerWithAddress[]
 ): ValidatorCandidateAddressSet[] {
   let poolAdmins: SignerWithAddress[] = [];
+  let cids: SignerWithAddress[] = [];
 
   if (!candidateAdmins || !consensusAddrs || !treasuryAddrs || !bridgeOperators) {
     expect(signers.length % 3).eq(0, 'createManyValidatorCandidateAddressSets: signers length must be divisible by 3');
@@ -51,7 +54,10 @@ export function createManyValidatorCandidateAddressSets(
     poolAdmins = signers.splice(0, _length);
     candidateAdmins = poolAdmins;
     treasuryAddrs = poolAdmins;
+
     consensusAddrs = signers.splice(0, _length);
+    cids = consensusAddrs;
+
     bridgeOperators = signers.splice(0, _length);
   } else {
     poolAdmins = signers;
@@ -64,8 +70,9 @@ export function createManyValidatorCandidateAddressSets(
 
   return poolAdmins.map((v, i) => ({
     poolAdmin: v,
-    candidateAdmin: candidateAdmins![i],
     consensusAddr: consensusAddrs![i],
+    cid: cids![i],
+    candidateAdmin: candidateAdmins![i],
     treasuryAddr: treasuryAddrs![i],
     bridgeOperator: bridgeOperators![i],
   }));
