@@ -231,7 +231,7 @@ abstract contract BaseStaking is
     return _poolDetail[poolId].delegatingAmount[user];
   }
 
-  function __css2cid(TConsensus consensusAddr) internal view returns (address) {
+  function __css2cid(TConsensus consensusAddr) internal override view returns (address) {
     return IProfile(getContract(ContractType.PROFILE)).getConsensus2Id(consensusAddr);
   }
 

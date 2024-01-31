@@ -112,4 +112,6 @@ contract MockStaking is RewardCalculation, GlobalConfigConsumer {
   function getManyStakingTotalsById(
     address[] calldata poolIds
   ) external view returns (uint256[] memory stakingAmounts_) {}
+
+  function __css2cid(TConsensus consensusAddr) internal view virtual override returns (address)  {}
 }

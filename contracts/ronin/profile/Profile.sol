@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: MIT
+pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import "../../interfaces/validator/ICandidateManager.sol";
@@ -9,8 +10,6 @@ import "../../interfaces/IProfile.sol";
 import "./ProfileXComponents.sol";
 import { ErrUnauthorized, RoleAccess } from "../../utils/CommonErrors.sol";
 import { ContractType } from "../../utils/ContractType.sol";
-
-pragma solidity ^0.8.9;
 
 contract Profile is IProfile, ProfileXComponents, Initializable {
   constructor() {
@@ -85,7 +84,16 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
    * @inheritdoc IProfile
    */
   function getConsensus2Id(TConsensus consensus) external view returns (address id) {
+    return _getConsensus2Id(consensus);
+  }
+
+  /**
+   * @dev Look up the `id` by `consensus`, revert if not found.
+   */
+  function _getConsensus2Id(TConsensus consensus) internal view returns (address id) {
     id = _consensus2Id[consensus];
+    if (id == address(0))
+      revert ErrLookUpIdFailed(consensus);
   }
 
   /**
@@ -95,7 +103,7 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     idList = new address[](consensusList.length);
     unchecked {
       for (uint i; i < consensusList.length; ++i) {
-        idList[i] = _consensus2Id[consensusList[i]];
+        idList[i] = _getConsensus2Id(consensusList[i]);
       }
     }
   }
@@ -214,7 +222,7 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
   function _requireCandidateAdmin(CandidateProfile storage sProfile) internal view {
     if (
       msg.sender != sProfile.admin ||
-      !IRoninValidatorSet(getContract(ContractType.VALIDATOR)).isCandidateAdmin(sProfile.consensus, msg.sender)
+      !IRoninValidatorSet(getContract(ContractType.VALIDATOR)).isCandidateAdminById(sProfile.id, msg.sender)
     ) revert ErrUnauthorized(msg.sig, RoleAccess.CANDIDATE_ADMIN);
   }
 

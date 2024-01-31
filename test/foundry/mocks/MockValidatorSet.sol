@@ -18,10 +18,11 @@ contract MockValidatorSet {
     return new address[](0);
   }
 
-  function isCandidateAdmin(
-    TConsensus /*consensus*/,
-    address /*admin*/
-  ) external pure returns (bool) {
+  function isCandidateAdmin(TConsensus /*consensus*/, address /*admin*/) external pure returns (bool) {
+    return true;
+  }
+
+  function isCandidateAdmin(address /*cid*/, address /*admin*/) external pure returns (bool) {
     return true;
   }
 }
