@@ -83,17 +83,29 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
   /**
    * @inheritdoc IProfile
    */
-  function getConsensus2Id(TConsensus consensus) external view returns (address id) {
+  function getConsensus2Id(TConsensus consensus) external view returns (address) {
     return _getConsensus2Id(consensus);
+  }
+
+  function _getConsensus2Id(TConsensus consensus) internal view returns (address) {
+    (bool found, address id) =  _tryGetConsensus2Id(consensus);
+    if (!found) revert ErrLookUpIdFailed(consensus);
+    return id;
+  }
+
+  /**
+   * @inheritdoc IProfile
+   */
+  function tryGetConsensus2Id(TConsensus consensus) external view returns (bool found, address id) {
+    return _tryGetConsensus2Id(consensus);
   }
 
   /**
    * @dev Look up the `id` by `consensus`, revert if not found.
    */
-  function _getConsensus2Id(TConsensus consensus) internal view returns (address id) {
+  function _tryGetConsensus2Id(TConsensus consensus) internal view returns (bool found, address id) {
     id = _consensus2Id[consensus];
-    if (id == address(0))
-      revert ErrLookUpIdFailed(consensus);
+    found = id != address(0);
   }
 
   /**

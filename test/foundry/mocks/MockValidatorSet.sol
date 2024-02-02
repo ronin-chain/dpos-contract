@@ -22,7 +22,7 @@ contract MockValidatorSet {
     return true;
   }
 
-  function isCandidateAdmin(address /*cid*/, address /*admin*/) external pure returns (bool) {
+  function isCandidateAdminById(address /*cid*/, address /*admin*/) external pure returns (bool) {
     return true;
   }
 }

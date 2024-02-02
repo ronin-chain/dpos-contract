@@ -339,7 +339,7 @@ describe.skip('Profile: change admin - delegator reward', () => {
     });
   });
 
-  describe.only('Change admin from A1 to A2, 1 delegator, multi-period and verifying delegator reward', async () => {
+  describe('Change admin from A1 to A2, 1 delegator, multi-period and verifying delegator reward', async () => {
     // before(async () => {
     //   await stakingContract.connect(delegator).delegate(validatorCandidates[0].consensusAddr.address, {value: minValidatorStakingAmount});
 

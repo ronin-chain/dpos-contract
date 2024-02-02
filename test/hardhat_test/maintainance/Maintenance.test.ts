@@ -15,6 +15,8 @@ import {
   RoninGovernanceAdmin,
   RoninGovernanceAdmin__factory,
   MockProfile__factory,
+  Profile__factory,
+  Profile,
 } from '../../../src/types';
 import { deployTestSuite } from '../helpers/fixture';
 import { EpochController, expects as ValidatorSetExpects } from '../helpers/ronin-validator-set';
@@ -40,6 +42,7 @@ let maintenanceContract: Maintenance;
 let slashContract: SlashIndicator;
 let stakingContract: Staking;
 let validatorContract: RoninValidatorSet;
+let profileContract: Profile;
 let governanceAdmin: RoninGovernanceAdmin;
 let governanceAdminInterface: GovernanceAdminInterface;
 
@@ -112,6 +115,7 @@ describe('Maintenance test', () => {
     slashContract = SlashIndicator__factory.connect(slashContractAddress, deployer);
     stakingContract = Staking__factory.connect(stakingContractAddress, deployer);
     validatorContract = MockRoninValidatorSetOverridePrecompile__factory.connect(validatorContractAddress, deployer);
+    profileContract = Profile__factory.connect(profileAddress, deployer);
     governanceAdmin = RoninGovernanceAdmin__factory.connect(roninGovernanceAdminAddress, deployer);
     governanceAdminInterface = new GovernanceAdminInterface(
       governanceAdmin,
@@ -284,7 +288,7 @@ describe('Maintenance test', () => {
     it('Should not be able to schedule maintenance for non-validator address', async () => {
       await expect(
         maintenanceContract.connect(validatorCandidates[0].candidateAdmin).schedule(deployer.address, 0, 100)
-      ).revertedWithCustomError(maintenanceContract, 'ErrUnauthorized');
+      ).revertedWithCustomError(profileContract, 'ErrLookUpIdFailed').withArgs(deployer.address);
     });
 
     it('Should be able to schedule maintenance using validator admin account', async () => {

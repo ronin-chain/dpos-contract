@@ -136,7 +136,7 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
     IRoninValidatorSet validatorContract = IRoninValidatorSet(getContract(ContractType.VALIDATOR));
     address candidateId = __css2cid(consensusAddr);
 
-    if (!validatorContract.isBlockProducer(consensusAddr)) revert ErrUnauthorized(msg.sig, RoleAccess.BLOCK_PRODUCER);
+    if (!validatorContract.isBlockProducerById(candidateId)) revert ErrUnauthorized(msg.sig, RoleAccess.BLOCK_PRODUCER);
     if (!validatorContract.isCandidateAdminById(candidateId, msg.sender))
       revert ErrUnauthorized(msg.sig, RoleAccess.CANDIDATE_ADMIN);
     if (_checkScheduledById(candidateId)) revert ErrAlreadyScheduled();

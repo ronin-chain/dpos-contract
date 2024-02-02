@@ -68,8 +68,11 @@ interface IProfile {
   /// @dev Getter to batch query from `id` to `consensus`, return address(0) if the profile not exist.
   function getManyId2Consensus(address[] calldata idList) external view returns (TConsensus[] memory consensusList);
 
-  /// @dev Getter to backward query from `consensus` address to `id` address.
+  /// @dev Getter to backward query from `consensus` address to `id` address, revert if not found.
   function getConsensus2Id(TConsensus consensus) external view returns (address id);
+
+  /// @dev Getter to backward query from `consensus` address to `id` address.
+  function tryGetConsensus2Id(TConsensus consensus) external view returns (bool found, address id);
 
   /// @dev Getter to backward batch query from `consensus` address to `id` address.
   function getManyConsensus2Id(TConsensus[] memory consensus) external view returns (address[] memory);
