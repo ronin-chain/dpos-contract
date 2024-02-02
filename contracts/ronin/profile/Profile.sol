@@ -87,8 +87,11 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     return _getConsensus2Id(consensus);
   }
 
+  /**
+   * @dev Look up the `id` by `consensus`, revert if not found.
+   */
   function _getConsensus2Id(TConsensus consensus) internal view returns (address) {
-    (bool found, address id) =  _tryGetConsensus2Id(consensus);
+    (bool found, address id) = _tryGetConsensus2Id(consensus);
     if (!found) revert ErrLookUpIdFailed(consensus);
     return id;
   }
@@ -101,7 +104,7 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
   }
 
   /**
-   * @dev Look up the `id` by `consensus`, revert if not found.
+   * @dev Try look up the `id` by `consensus`, return a boolean indicating whether the query success.
    */
   function _tryGetConsensus2Id(TConsensus consensus) internal view returns (bool found, address id) {
     id = _consensus2Id[consensus];
@@ -177,8 +180,11 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
    * - Update in Proposal contract for:
    *   + [-] Preserve the consensus address and recipient target of locked amount of emergency exit
    * - Update Trusted Org contracts:
-   *   + [x] Remove and delete weight of the old consensus
-   *   + [x] Replace and add weight for the new consensus
+   *   + If the current consensus is governor:
+   *      - [x] Remove and delete weight of the old consensus
+   *      - [x] Replace and add weight for the new consensus
+   *   + If the current consensus is not governor:
+   *      - [x] Do nothing
    */
   function requestChangeConsensusAddr(address id, TConsensus newConsensusAddr) external {
     CandidateProfile storage _profile = _getId2ProfileHelper(id);
@@ -190,13 +196,17 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     IRoninValidatorSet validatorContract = IRoninValidatorSet(getContract(ContractType.VALIDATOR));
     validatorContract.execChangeConsensusAddress(id, newConsensusAddr);
 
-    IRoninTrustedOrganization trustedOrgContract = IRoninTrustedOrganization(
-      getContract(ContractType.RONIN_TRUSTED_ORGANIZATION)
+    address trustedOrgContractAddr = getContract(ContractType.RONIN_TRUSTED_ORGANIZATION);
+    (bool success, ) = trustedOrgContractAddr.call(
+      abi.encodeCall(
+        IRoninTrustedOrganization.execChangeConsensusAddressForTrustedOrg,
+        (oldConsensusAddr, newConsensusAddr)
+      )
     );
-    trustedOrgContract.execChangeConsensusAddressForTrustedOrg({
-      oldConsensusAddr: oldConsensusAddr,
-      newConsensusAddr: newConsensusAddr
-    });
+
+    if (!success) {
+      emit ConsensusAddressOfNonGovernorChanged(id);
+    }
 
     _setConsensus(_profile, newConsensusAddr);
   }

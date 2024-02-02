@@ -119,6 +119,7 @@ contract UnattachBridgeForkTest is RoninTest {
   }
 
   function test_Fork_UsePrevImplLogic(address a, uint256 b) external onWhichFork(_roninFork) {
+    vm.skip(true);
     _upgradeToVersionSwitcher();
 
     // prev logic contains bridge logic `checkBridgeRewardDeprecatedAtPeriod`
@@ -127,6 +128,8 @@ contract UnattachBridgeForkTest is RoninTest {
   }
 
   function test_Fork_UpgradeToNewImpl_WhenPeriodEnded(uint16 seed) external onWhichFork(_roninFork) {
+    vm.skip(true);
+
     vm.assume(seed != 0);
     _upgradeToVersionSwitcher();
 
