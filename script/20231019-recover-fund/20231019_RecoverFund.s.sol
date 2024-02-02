@@ -29,7 +29,7 @@ contract Simulation__20231019_RecoverFund is RoninMigration {
     address admin = sender();
     console.log("Default sender:", admin);
 
-    address deployer = 0x4d58Ea7231c394d5804e8B06B1365915f906E27F;
+    address deployer = 0xFE490b68E64B190B415Bb92F8D2F7566243E6ea0; // Mainnet Shadow deployer address
 
     RoninGovernanceAdmin roninGovernanceAdmin = RoninGovernanceAdmin(config.getAddressFromCurrentNetwork(Contract.RoninGovernanceAdmin.key()));
     RoninTrustedOrganization trustedOrgContract = RoninTrustedOrganization(config.getAddressFromCurrentNetwork(Contract.RoninTrustedOrganization.key()));
