@@ -112,21 +112,6 @@ abstract contract RewardCalculation is IRewardPool {
     }
   }
 
-  function _changeUserRewardStakeHolder(address poolId, address currUser, address newUser) internal {
-    UserRewardFields storage _currReward = _userReward[poolId][currUser];
-    UserRewardFields storage _newReward = _userReward[poolId][newUser];
-
-    _newReward.debited = _currReward.debited;
-    _newReward.aRps = _currReward.aRps;
-    _newReward.lowestAmount = _currReward.lowestAmount;
-    _newReward.lastPeriod = _currReward.lastPeriod;
-
-    delete _currReward.debited;
-    delete _currReward.aRps;
-    delete _currReward.lowestAmount;
-    delete _currReward.lastPeriod;
-  }
-
   /**
    * @dev Syncs the minimum staking amount of an user in the current period.
    */
