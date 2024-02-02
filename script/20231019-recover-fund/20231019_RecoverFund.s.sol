@@ -13,16 +13,31 @@ import { RoninTrustedOrganization } from "@ronin/contracts/multi-chains/RoninTru
 import { BridgeReward } from "@ronin/contracts/ronin/gateway/BridgeReward.sol";
 import { TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
 
+import { IRoninTrustedOrganization, RoninTrustedOrganization } from "@ronin/contracts/multi-chains/RoninTrustedOrganization.sol";
+
 contract Simulation__20231019_RecoverFund is RoninMigration {
   BridgeReward public constant DEPRECATED_BRIDGE_REWARD = BridgeReward(0x1C952D6717eBFd2E92E5f43Ef7C1c3f7677F007D);
 
+  /**
+   * Steps:
+   * 1. [hardfork] Change logic of ronin trusted org
+   * 2. Change admin of bridge tracking to a temp admin
+   * 3. Use temp admin in (2) to upgrade bridge tracking to bridge tracking recovery logic
+   * 4. Run script to recover fund
+   */
   function run() public onlyOn(DefaultNetwork.RoninMainnet.key()) {
     address admin = sender();
-    RoninGovernanceAdmin roninGovernanceAdmin =
-      RoninGovernanceAdmin(config.getAddressFromCurrentNetwork(Contract.RoninGovernanceAdmin.key()));
-    RoninTrustedOrganization trustedOrg =
-      RoninTrustedOrganization(config.getAddressFromCurrentNetwork(Contract.RoninTrustedOrganization.key()));
+    console.log("Default sender:", admin);
+
+    address deployer = 0x4d58Ea7231c394d5804e8B06B1365915f906E27F;
+
+    RoninGovernanceAdmin roninGovernanceAdmin = RoninGovernanceAdmin(config.getAddressFromCurrentNetwork(Contract.RoninGovernanceAdmin.key()));
+    RoninTrustedOrganization trustedOrgContract = RoninTrustedOrganization(config.getAddressFromCurrentNetwork(Contract.RoninTrustedOrganization.key()));
     address bridgeTracking = config.getAddressFromCurrentNetwork(Contract.BridgeTracking.key());
+
+    // _initBalanceForUser(trustedOrgContract);
+
+    // Step 2
 
     uint256 balanceBefore = admin.balance;
     console.log("balanceBefore", balanceBefore);
@@ -36,21 +51,55 @@ contract Simulation__20231019_RecoverFund is RoninMigration {
     callDatas[0] = abi.encodeCall(GovernanceAdmin.changeProxyAdmin, (bridgeTracking, admin));
     callDatas[1] = abi.encodeCall(BridgeReward.initializeREP2, ());
 
-    Proposal.ProposalDetail memory proposal =
-      _buildProposal(roninGovernanceAdmin, block.timestamp + 5 minutes, tos, values, callDatas);
-    _executeProposal(roninGovernanceAdmin, trustedOrg, proposal);
+    Proposal.ProposalDetail memory proposal = _buildProposal(roninGovernanceAdmin, block.timestamp + 20 minutes, tos, values, callDatas);
+    _executeProposal(roninGovernanceAdmin, trustedOrgContract, proposal);
 
-    vm.startPrank(admin);
+    // Step 3
+    bool shouldPrankOnly = CONFIG.isBroadcastDisable();
+
+    if (shouldPrankOnly) {
+      vm.prank(deployer);
+    } else {
+      vm.broadcast(deployer);
+    }
     address logic = address(new BridgeTrackingRecoveryLogic());
+
+    if (shouldPrankOnly) {
+      vm.prank(admin);
+    } else {
+      vm.broadcast(admin);
+    }
     TransparentUpgradeableProxyV2(payable((bridgeTracking))).upgradeTo(logic);
+
+    if (shouldPrankOnly) {
+      vm.prank(admin);
+    } else {
+      vm.broadcast(admin);
+    }
     TransparentUpgradeableProxyV2(payable((bridgeTracking))).functionDelegateCall(
       abi.encodeCall(BridgeTrackingRecoveryLogic.recoverFund, ())
     );
-    vm.stopPrank();
 
     uint256 balanceAfter = admin.balance;
     console.log("balanceAfter", balanceAfter);
     uint256 recoveredFund = balanceAfter - balanceBefore;
     console.log("recoveredFund", recoveredFund);
+  }
+
+  function _initBalanceForUser(RoninTrustedOrganization trustedOrgContract) internal {
+    address genesisUser = sender();
+    bool shouldPrankOnly = CONFIG.isBroadcastDisable();
+
+    IRoninTrustedOrganization.TrustedOrganization[] memory allTrustedOrgs = trustedOrgContract.getAllTrustedOrganizations();
+
+    for (uint256 i = 0; i < allTrustedOrgs.length; ++i) {
+
+      if (shouldPrankOnly) {
+        vm.prank(genesisUser);
+      } else {
+        vm.broadcast(genesisUser);
+      }
+      payable(allTrustedOrgs[i].governor).transfer(2 ether);
+    }
   }
 }

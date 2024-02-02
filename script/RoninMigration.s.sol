@@ -218,22 +218,24 @@ contract RoninMigration is PostChecker, VoteStatusConsumer {
     require(targets.length == values.length && values.length == callDatas.length, "RoninMigration: Length mismatch");
 
     uint256[] memory gasAmounts = new uint256[](targets.length);
-    uint256 snapshotId = vm.snapshot();
 
+    uint256 snapshotId = vm.snapshot();
     vm.startPrank(address(governanceAdmin));
 
-    uint DEFAULT_PROPOSAL_GAS = 1_000_000;
-    for (uint256 i; i < targets.length; ++i) {
-      vm.deal(address(governanceAdmin), values[0]);
-      uint256 gas = gasleft();
-      (bool success, bytes memory returnOrRevertData) = targets[i].call{ value: values[0] }(callDatas[i]);
-      gas -= gasleft();
-      success.handleRevert(msg.sig, returnOrRevertData);
-      // add 50% extra gas amount
-      gasAmounts[i] = gas < DEFAULT_PROPOSAL_GAS / 2 ? DEFAULT_PROPOSAL_GAS : (gas * 200_00) / 100_00;
+    {
+      uint DEFAULT_PROPOSAL_GAS = 1_000_000;
+      for (uint256 i; i < targets.length; ++i) {
+        vm.deal(address(governanceAdmin), values[0]);
+        uint256 gas = gasleft();
+        (bool success, bytes memory returnOrRevertData) = targets[i].call{ value: values[0] }(callDatas[i]);
+        gas -= gasleft();
+        success.handleRevert(msg.sig, returnOrRevertData);
+        // add 50% extra gas amount
+        gasAmounts[i] = gas < DEFAULT_PROPOSAL_GAS / 2 ? DEFAULT_PROPOSAL_GAS : (gas * 200_00) / 100_00;
+      }
     }
-
     vm.stopPrank();
+    vm.revertTo(snapshotId);
 
     proposal = Proposal.ProposalDetail(
       governanceAdmin.round(block.chainid) + 1,
@@ -244,8 +246,6 @@ contract RoninMigration is PostChecker, VoteStatusConsumer {
       callDatas,
       gasAmounts
     );
-
-    vm.revertTo(snapshotId);
 
     _logProposal(address(governanceAdmin), proposal);
   }
