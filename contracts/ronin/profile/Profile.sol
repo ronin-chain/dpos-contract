@@ -135,6 +135,7 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     validatorContract.execChangeTreasuryAddress(id, payable(newAdminAddr));
 
     _setAdmin(_profile, newAdminAddr);
+    _setTreasury(_profile, payable(newAdminAddr));
   }
 
   /**

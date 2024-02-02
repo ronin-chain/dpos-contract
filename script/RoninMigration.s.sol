@@ -186,6 +186,12 @@ contract RoninMigration is PostChecker, VoteStatusConsumer {
       support
     );
 
+    uint256 totalGas;
+    for (uint256 i; i < proposal.gasAmounts.length; ++i) {
+      totalGas += proposal.gasAmounts[i];
+    }
+    totalGas += totalGas * 20_00 / 100_00;
+
     for (uint256 i = 1; i < allTrustedOrgs.length; ++i) {
       (VoteStatus status, , , , ) = governanceAdmin.vote(block.chainid, proposal.nonce);
       if (status != VoteStatus.Pending) {
@@ -198,7 +204,7 @@ contract RoninMigration is PostChecker, VoteStatusConsumer {
       } else {
         vm.broadcast(iTrustedOrg);
       }
-      governanceAdmin.castProposalVoteForCurrentNetwork(proposal, support);
+      governanceAdmin.castProposalVoteForCurrentNetwork{gas: totalGas}(proposal, support);
     }
   }
 
