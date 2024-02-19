@@ -8,7 +8,7 @@ import { Network } from "./utils/Network.sol";
 import { Contract } from "./utils/Contract.sol";
 
 contract GeneralConfig is BaseGeneralConfig {
-  constructor() BaseGeneralConfig("", "deployments/") { }
+  constructor() BaseGeneralConfig("", "deployments/") {}
 
   function _setUpNetworks() internal virtual override {
     setNetworkInfo(
@@ -39,8 +39,6 @@ contract GeneralConfig is BaseGeneralConfig {
 
   function _setUpContracts() internal virtual override {
     _mapContractname(Contract.Profile);
-    _mapContractname(Contract.Profile_Testnet);
-    _mapContractname(Contract.Profile_Mainnet);
     _mapContractname(Contract.Staking);
     _mapContractname(Contract.Maintenance);
     _mapContractname(Contract.BridgeSlash);
@@ -65,6 +63,12 @@ contract GeneralConfig is BaseGeneralConfig {
     _contractNameMap[Contract.RoninGatewayPauseEnforcer.key()] = "PauseEnforcer";
     _contractNameMap[Contract.HardForkRoninGovernanceAdmin.key()] = Contract.RoninGovernanceAdmin.name();
     _contractNameMap[Contract.TemporalRoninTrustedOrganization.key()] = Contract.RoninTrustedOrganization.name();
+
+    if (block.chainid == 2021) {
+      _contractNameMap[Contract.Profile.key()] = "Profile_Testnet";
+    } else if (block.chainid == 2020) {
+      _contractNameMap[Contract.Profile.key()] = "Profile_Mainnet";
+    }
   }
 
   function _mapContractname(Contract contractEnum) internal {

@@ -13,7 +13,7 @@ contract RoninGovernanceAdminDeploy is TestnetMigration {
       block.chainid,
       config.getAddressFromCurrentNetwork(Contract.RoninTrustedOrganization.key()),
       config.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key()),
-      param.proposalExpiryDuration
+      param.expiryDuration
     );
   }
 

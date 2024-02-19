@@ -258,32 +258,42 @@ contract RoninMigration is PostChecker, VoteStatusConsumer {
   function _logProposal(address governanceAdmin, Proposal.ProposalDetail memory proposal) internal {
     if (_getDisableLogProposalStatus()) {
       console.log(StdStyle.italic(StdStyle.magenta("Proposal details omitted:")));
-      console.log(
-        string.concat(
-          "\tGovernance Admin:          \t",
-          vm.getLabel(governanceAdmin),
-          "\n\tNonce:                   \t",
-          vm.toString(proposal.nonce),
-          "\n\tNumber of internal calls:\t",
-          vm.toString(proposal.targets.length),
-          "\n"
-        )
-      );
+      _printLogProposalSummary(governanceAdmin, proposal);
     } else {
       _printLogProposal(address(governanceAdmin), proposal);
     }
   }
 
-  function _printLogProposal(address governanceAdmin, Proposal.ProposalDetail memory proposal) private {
+  function _printLogProposalSummary(address governanceAdmin, Proposal.ProposalDetail memory proposal) private {
     console.log(
       string.concat(
-        StdStyle.magenta("\n================================= Proposal Detail =================================\n"),
-        "GovernanceAdmin: ",
+        "\tGovernance Admin:          \t",
         vm.getLabel(governanceAdmin),
-        "\tNonce: ",
-        vm.toString(proposal.nonce)
+        "\n\tNonce:                   \t",
+        vm.toString(proposal.nonce),
+        "\n\tExpiry:                  \t",
+        vm.toString(proposal.expiryTimestamp),
+        "\n\tNumber of internal calls:\t",
+        vm.toString(proposal.targets.length),
+        "\n"
       )
     );
+  }
+
+  function _printLogProposal(address governanceAdmin, Proposal.ProposalDetail memory proposal) private {
+    console.log(
+      // string.concat(
+      StdStyle.magenta("\n================================= Proposal Detail =================================\n")
+      //   "GovernanceAdmin: ",
+      //   vm.getLabel(governanceAdmin),
+      //   "\tNonce: ",
+      //   vm.toString(proposal.nonce),
+      //   "\tExpiry: ",
+      //   vm.toString(proposal.expiryTimestamp)
+      // )
+    );
+
+    _printLogProposalSummary(governanceAdmin, proposal);
 
     string[] memory commandInput = new string[](3);
     commandInput[0] = "cast";

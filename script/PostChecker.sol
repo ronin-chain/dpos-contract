@@ -35,12 +35,10 @@ abstract contract PostChecker is
   function run(bytes calldata callData, string calldata command) public override {
     super.run(callData, command);
 
-    console.log(
-      StdStyle.bold(StdStyle.cyan("\n\n ====================== Post checking... ======================"))
-    );
+    console.log(StdStyle.bold(StdStyle.cyan("\n\n ====================== Post checking... ======================")));
 
+    CONFIG.setUserDefinedConfig(CONFIG.DISABLE_LOG_ARTIFACT(), bytes32(uint256(0x01)));
     CONFIG.setBroadcastDisableStatus(true);
-    CONFIG.setUserDefinedConfig(CONFIG.DISABLE_LOG_ARTIFACT(), bytes32(uint256(1)));
     _setDisableLogProposalStatus(true);
 
     _postCheckValidatorSet();
@@ -53,13 +51,11 @@ abstract contract PostChecker is
     _postCheck__Slash();
     _postCheck__GovernanceAdmin();
 
+    CONFIG.setUserDefinedConfig(CONFIG.DISABLE_LOG_ARTIFACT(), bytes32(uint256(0x00)));
     CONFIG.setBroadcastDisableStatus(false);
     _setDisableLogProposalStatus(false);
-    CONFIG.setUserDefinedConfig(CONFIG.DISABLE_LOG_ARTIFACT(), bytes32(uint256(0)));
 
-    console.log(
-      StdStyle.bold(StdStyle.cyan("\n\n================== Finish post checking ==================\n\n"))
-    );
+    console.log(StdStyle.bold(StdStyle.cyan("\n\n================== Finish post checking ==================\n\n")));
   }
 
   function _postCheckValidatorSet() internal logPostCheck("[ValidatorSet] wrap up epoch") {
@@ -72,9 +68,7 @@ abstract contract PostChecker is
       vm.makePersistent(address(0x6a));
     }
 
+    _wrapUpEpochs(2);
     _fastForwardToNextDay();
-    _wrapUpEpoch();
-    _fastForwardToNextDay();
-    _wrapUpEpoch();
   }
 }
