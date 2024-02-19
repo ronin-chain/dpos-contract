@@ -93,6 +93,10 @@ abstract contract ValidatorInfoStorageV2 is IValidatorInfoV2, HasContracts, HasT
     return _isBlockProducerById(__css2cid(consensusAddr));
   }
 
+  function isBlockProducerById(address id) external view override returns (bool) {
+    return _isBlockProducerById(id);
+  }
+
   function _isBlockProducerById(address id) internal view returns (bool) {
     return _validatorMap[id].hasFlag(EnumFlags.ValidatorFlag.BlockProducer);
   }

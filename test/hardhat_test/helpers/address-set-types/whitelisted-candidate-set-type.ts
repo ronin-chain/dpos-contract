@@ -10,6 +10,7 @@ export function mergeToWhitelistedCandidateAddressSet(
   candidate: ValidatorCandidateAddressSet
 ): WhitelistedCandidateAddressSet {
   candidate.consensusAddr = trustedOrg.consensusAddr;
+  candidate.cid = trustedOrg.consensusAddr;
   return { ...trustedOrg, ...candidate };
 }
 

@@ -21,4 +21,8 @@ contract MockValidatorSet {
   function isCandidateAdmin(TConsensus /*consensus*/, address /*admin*/) external pure returns (bool) {
     return true;
   }
+
+  function isCandidateAdminById(address /*cid*/, address /*admin*/) external pure returns (bool) {
+    return true;
+  }
 }

@@ -102,7 +102,7 @@ abstract contract CreditScore is
     if (!validatorContract.isValidatorCandidate(consensusAddr))
       revert ErrUnauthorized(msg.sig, RoleAccess.VALIDATOR_CANDIDATE);
 
-    if (!validatorContract.isCandidateAdmin(consensusAddr, msg.sender))
+    if (!validatorContract.isCandidateAdminById(validatorId, msg.sender))
       revert ErrUnauthorized(msg.sig, RoleAccess.CANDIDATE_ADMIN);
 
     (bool isJailed, , uint256 jailedEpochLeft) = validatorContract.getJailedTimeLeft(consensusAddr);

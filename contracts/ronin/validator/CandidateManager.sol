@@ -211,6 +211,10 @@ abstract contract CandidateManager is
     return _isCandidateAdminById(__css2cid(consensusAddr), admin);
   }
 
+  function isCandidateAdminById(address candidateId, address admin) external view returns (bool) {
+    return _isCandidateAdminById(candidateId, admin);
+  }
+
   function _isCandidateAdminById(address candidateId, address admin) internal view returns (bool) {
     return _candidateInfo[candidateId].__shadowedAdmin == admin;
   }

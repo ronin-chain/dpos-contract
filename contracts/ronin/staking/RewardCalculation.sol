@@ -12,11 +12,11 @@ import { TPoolId } from "../../udvts/Types.sol";
  */
 abstract contract RewardCalculation is IRewardPool {
   /// @dev Mapping from pool address => period number => accumulated rewards per share (one unit staking)
-  mapping(address => mapping(uint256 => PeriodWrapper)) private _accumulatedRps;
+  mapping(address poolId => mapping(uint256 periodNumber => PeriodWrapper)) private _accumulatedRps;
   /// @dev Mapping from the pool address => user address => the reward info of the user
-  mapping(address => mapping(address => UserRewardFields)) private _userReward;
+  mapping(address poolId => mapping(address user => UserRewardFields)) private _userReward;
   /// @dev Mapping from the pool address => reward pool fields
-  mapping(address => PoolFields) private _stakingPool;
+  mapping(address poolId => PoolFields) private _stakingPool;
 
   /**
    * @dev This empty reserved space is put in place to allow future versions to add new
@@ -28,7 +28,7 @@ abstract contract RewardCalculation is IRewardPool {
    * @inheritdoc IRewardPool
    */
   function getReward(TConsensus consensusAddr, address user) external view returns (uint256) {
-    address poolId = TConsensus.unwrap(consensusAddr);
+    address poolId = __css2cid(consensusAddr);
     return _getReward(poolId, user, _currentPeriod(), _getStakingAmount(poolId, user));
   }
 
@@ -226,4 +226,6 @@ abstract contract RewardCalculation is IRewardPool {
    * @dev Returns the current period.
    */
   function _currentPeriod() internal view virtual returns (uint256);
+
+  function __css2cid(TConsensus consensusAddr) internal view virtual returns (address);
 }
