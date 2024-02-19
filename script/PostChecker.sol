@@ -40,6 +40,7 @@ abstract contract PostChecker is
     );
 
     CONFIG.setBroadcastDisableStatus(true);
+    CONFIG.setUserDefinedConfig(CONFIG.DISABLE_LOG_ARTIFACT(), bytes32(uint256(1)));
     _setDisableLogProposalStatus(true);
 
     _postCheckValidatorSet();
@@ -54,6 +55,7 @@ abstract contract PostChecker is
 
     CONFIG.setBroadcastDisableStatus(false);
     _setDisableLogProposalStatus(false);
+    CONFIG.setUserDefinedConfig(CONFIG.DISABLE_LOG_ARTIFACT(), bytes32(uint256(0)));
 
     console.log(
       StdStyle.bold(StdStyle.cyan("\n\n================== Finish post checking ==================\n\n"))
