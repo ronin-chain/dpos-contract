@@ -24,6 +24,8 @@ import { Proposal } from "@ronin/contracts/libraries/Proposal.sol";
 import { Ballot } from "@ronin/contracts/libraries/Ballot.sol";
 
 contract ChangeConsensusAddressForkTest is Test {
+  using StdStyle for *;
+
   string constant RONIN_TEST_RPC = "https://saigon-archive.roninchain.com/rpc";
   string constant RONIN_MAIN_RPC = "https://api-archived.roninchain.com/rpc";
   bytes32 constant ADMIN_SLOT = 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103;
@@ -87,6 +89,89 @@ contract ChangeConsensusAddressForkTest is Test {
     vm.label(address(_roninGA), "GovernanceAdmin");
     vm.label(address(_roninTO), "TrustedOrganizations");
     vm.label(address(_slashIndicator), "SlashIndicator");
+  }
+
+  function _toSingletonArrayConsensuses(address consensus) private pure returns (TConsensus[] memory arr) {
+    arr = new TConsensus[](1);
+    arr[0] = TConsensus.wrap(consensus);
+  }
+
+  function testFork_ChangeCandidateAdmin_StakingRewardsFlow() external upgrade {
+    // apply validator candidate
+    _applyValidatorCandidate("a1", "c1");
+    _bulkWrapUpEpoch(1);
+
+    address c1 = makeAddr("c1");
+    address a1 = makeAddr("a1");
+    address a2 = makeAddr("a2");
+
+    // change admin of c1 -> a2
+    vm.startPrank(a1);
+    _profile.requestChangeAdminAddress(c1, a2);
+    vm.stopPrank();
+
+    address coinbase = block.coinbase;
+
+    vm.coinbase(c1);
+    _bulkSubmitBlockReward(1);
+    _bulkWrapUpEpoch(1);
+
+    vm.coinbase(c1);
+    _bulkSubmitBlockReward(1);
+    _bulkWrapUpEpoch(1);
+
+    // reset coinbase
+    vm.coinbase(coinbase);
+
+    vm.deal(a1, 1000 ether);
+    vm.deal(a2, 1000 ether);
+
+
+    uint256 snapshotId = vm.snapshot();
+
+    uint256 amount = a2.balance;
+    console2.log("a2 can claim reward c1".yellow());
+    vm.prank(a2);
+    _staking.claimRewards(_toSingletonArrayConsensuses(c1));
+    assertTrue(a2.balance > amount, "a2 can claim reward c1".red());
+
+    vm.revertTo(snapshotId);
+    console2.log("a1 cannot claim reward c1".yellow());
+    amount = a1.balance;
+    vm.prank(a1);
+    _staking.claimRewards(_toSingletonArrayConsensuses(c1));
+    assertTrue(a2.balance == amount, "a1 cannot claim reward c1".red());
+
+    console2.log("a2 cannot delegate c1".yellow());
+    vm.prank(a2);
+    vm.expectRevert();
+    _staking.delegate{value: 100 ether}(TConsensus.wrap(c1));
+
+    console2.log("a2 can stake c1".yellow());
+    vm.prank(a2);
+    _staking.stake{value: 100 ether}(TConsensus.wrap(c1));
+
+    console2.log("a1 cannot delegate c1".yellow());
+    vm.prank(a1);
+    vm.expectRevert();
+    _staking.delegate{value: 100 ether}(TConsensus.wrap(c1));
+
+    console2.log("a1 cannot stake c1".yellow());
+    vm.prank(a1);
+    vm.expectRevert();
+    _staking.stake{value: 100 ether}(TConsensus.wrap(c1));
+
+    uint256 a2BalanceBefore = a2.balance;
+
+    vm.prank(a2);
+    _staking.requestRenounce(TConsensus.wrap(c1));
+
+    _bulkWrapUpEpoch(7);
+
+    // a2 received balance after renounce
+    uint256 a2BalanceAfter = a2.balance;
+    assertTrue(a2BalanceAfter - a2BalanceBefore != 0);
+    console2.log("Received:", a2BalanceAfter - a2BalanceBefore);
   }
 
   function testFork_AfterUpgraded_AddNewTrustedOrg_CanVoteProposal() external upgrade {
@@ -208,14 +293,20 @@ contract ChangeConsensusAddressForkTest is Test {
     // apply validator candidate
     _applyValidatorCandidate("candidate-admin", "consensus");
 
-    address newAdmin = makeAddr("new-admin");
     address admin = makeAddr("candidate-admin");
-    address newTreasury = makeAddr("new-treasury");
+    address newAdmin = makeAddr("new-admin");
+    address newTreasury = newAdmin;
+    address newDummyTreasury = makeAddr("new-dummy-treasury");
     address newConsensus = makeAddr("new-consensus");
+
     vm.startPrank(admin);
-    _profile.requestChangeConsensusAddr(consensus, TConsensus.wrap(newConsensus));
-    _profile.requestChangeTreasuryAddr(consensus, payable(newTreasury));
-    _profile.requestChangeAdminAddress(consensus, newAdmin);
+    {
+      _profile.requestChangeConsensusAddr(consensus, TConsensus.wrap(newConsensus));
+      _profile.requestChangeAdminAddress(consensus, newAdmin);
+
+      vm.expectRevert("Not supported");
+      _profile.requestChangeTreasuryAddr(consensus, payable(newDummyTreasury));
+    }
     vm.stopPrank();
 
     // change new governor
@@ -264,14 +355,21 @@ contract ChangeConsensusAddressForkTest is Test {
     );
     IRoninTrustedOrganization.TrustedOrganization[] memory trustedOrgs = _addTrustedOrg(newTrustedOrg);
 
-    address newAdmin = makeAddr("new-admin");
     address admin = makeAddr("candidate-admin");
-    address newTreasury = makeAddr("new-treasury");
+
+    address newAdmin = makeAddr("new-admin");
+    address newTreasury = newAdmin;
+    address newDummyTreasury = makeAddr("new-dummy-treasury");
     address newConsensus = makeAddr("new-consensus");
+
     vm.startPrank(admin);
-    _profile.requestChangeConsensusAddr(consensus, TConsensus.wrap(newConsensus));
-    _profile.requestChangeTreasuryAddr(consensus, payable(newTreasury));
-    _profile.requestChangeAdminAddress(consensus, newAdmin);
+    {
+      _profile.requestChangeConsensusAddr(consensus, TConsensus.wrap(newConsensus));
+      _profile.requestChangeAdminAddress(consensus, newAdmin);
+
+      vm.expectRevert("Not supported");
+      _profile.requestChangeTreasuryAddr(consensus, payable(newDummyTreasury));
+    }
     vm.stopPrank();
 
     // change new governor
@@ -320,6 +418,9 @@ contract ChangeConsensusAddressForkTest is Test {
     }
   }
 
+  /**
+   * @dev After emergency exit success, the validator changes his addresses, but the refunded amount must be claimed by the old admin.
+   */
   function testFork_AfterUpgraded_WithdrawableFund_execEmergencyExit() external upgrade {
     // TODO(bao): @TuDo1403 please enhance this test
     _cheatSetRoninGACode();
@@ -332,8 +433,8 @@ contract ChangeConsensusAddressForkTest is Test {
     console2.log("admin", admin);
 
     address newAdmin = makeAddr("new-admin");
-    address payable newTreasury = payable(makeAddr("new-treasury"));
     TConsensus newConsensusAddr = TConsensus.wrap(makeAddr("new-consensus"));
+    address payable newDummyTreasury = payable(makeAddr("new-dummy-treasury"));
 
     uint256 proposalRequestAt = block.timestamp;
     uint256 proposalExpiredAt = proposalRequestAt + _validator.emergencyExpiryDuration();
@@ -355,8 +456,10 @@ contract ChangeConsensusAddressForkTest is Test {
     );
     _staking.requestEmergencyExit(validatorCandidate);
     _profile.requestChangeConsensusAddr(TConsensus.unwrap(validatorCandidate), newConsensusAddr);
-    _profile.requestChangeTreasuryAddr(TConsensus.unwrap(validatorCandidate), newTreasury);
     _profile.requestChangeAdminAddress(TConsensus.unwrap(validatorCandidate), newAdmin);
+
+    vm.expectRevert("Not supported");
+    _profile.requestChangeTreasuryAddr(TConsensus.unwrap(validatorCandidate), newDummyTreasury);
     vm.stopPrank();
 
     // NOTE: locked fund refunded to the old treasury
@@ -580,13 +683,16 @@ contract ChangeConsensusAddressForkTest is Test {
 
     // change validator admin
     address newAdmin = makeAddr("new-admin");
+    address newTreasury = newAdmin;
     address newConsensus = makeAddr("new-consensus");
-    address payable newTreasury = payable(makeAddr("new-treasury"));
+    address payable newDummyTreasury = payable(makeAddr("new-dummy-treasury"));
 
     vm.startPrank(candidateAdmin);
     _profile.requestChangeConsensusAddr(cid, TConsensus.wrap(newConsensus));
-    _profile.requestChangeTreasuryAddr(cid, newTreasury);
     _profile.requestChangeAdminAddress(cid, newAdmin);
+
+    vm.expectRevert("Not supported");
+    _profile.requestChangeTreasuryAddr(cid, newDummyTreasury);
     vm.stopPrank();
 
     // store snapshot state
@@ -739,8 +845,13 @@ contract ChangeConsensusAddressForkTest is Test {
     _bulkSlashIndicator(newConsensus, 150);
     _bulkWrapUpEpoch(1);
 
-    assertFalse(_maintenance.checkMaintained(validatorCandidate, block.number + 1));
+    assertTrue(_maintenance.checkMaintained(newConsensus, block.number + 1));
+    assertTrue(_maintenance.checkMaintainedById(TConsensus.unwrap(validatorCandidate), block.number + 1));
     assertFalse(_validator.isBlockProducer(newConsensus));
+
+    vm.expectRevert(abi.encodeWithSignature("ErrLookUpIdFailed(address)", TConsensus.unwrap(validatorCandidate)));
+    _maintenance.checkMaintained(validatorCandidate, block.number + 1);
+
     balanceAfter = recipient.balance;
     console2.log("after-upgrade:balanceAfter", balanceBefore);
     uint256 afterUpgradedReward = balanceAfter - balanceBefore;

@@ -9,5 +9,5 @@ interface IStakingCallback {
    * @dev Requirements:
    * - Only Profile contract can call this method.
    */
-  function execChangeAdminAddress(address poolAddr, address newAdminAddr) external;
+  function execChangeAdminAddress(address poolId, address currAdminAddr, address newAdminAddr) external;
 }

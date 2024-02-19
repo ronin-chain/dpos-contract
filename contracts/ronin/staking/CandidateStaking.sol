@@ -85,6 +85,7 @@ abstract contract CandidateStaking is BaseStaking, ICandidateStaking, GlobalConf
     _pool.__shadowedPoolAdmin = poolAdmin;
     _pool.pid = poolId;
     _adminOfActivePoolMapping[poolAdmin] = poolId;
+    _pool.wasAdmin[poolAdmin] = true;
 
     _stake(_poolDetail[poolId], poolAdmin, amount);
     emit PoolApproved(poolId, poolAdmin);
@@ -288,6 +289,22 @@ abstract contract CandidateStaking is BaseStaking, ICandidateStaking, GlobalConf
     _pool.stakingAmount -= amount;
     _changeDelegatingAmount(_pool, requester, _pool.stakingAmount, _pool.stakingTotal - amount);
     emit Unstaked(_pool.pid, amount);
+  }
+
+  /**
+   * @dev Clear the staking balance of `requester` and move the `newStakeholder` in the `pool.delegate` mapping.
+   */
+  function _changeStakeholder(
+    PoolDetail storage _pool,
+    address requester,
+    address newStakeholder
+  ) internal onlyPoolAdmin(_pool, requester) {
+    uint256 stakingAmount = _pool.stakingAmount;
+
+    _changeDelegatingAmount(_pool, requester, 0, _pool.stakingTotal - stakingAmount);
+    _changeDelegatingAmount(_pool, newStakeholder, stakingAmount, _pool.stakingTotal + stakingAmount);
+
+    emit StakeholderChanged(_pool.pid, requester, newStakeholder, stakingAmount);
   }
 
   /**

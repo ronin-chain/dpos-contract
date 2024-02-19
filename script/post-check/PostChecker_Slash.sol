@@ -157,10 +157,10 @@ abstract contract PostChecker_Slash is BaseMigration, PostChecker_Helper {
   }
 
   function _pickSuitableSlasheeForSlashBelowRequirement() private {
-    uint256 i;
-    uint256 stakingAmount;
+    uint i;
+    uint stakingAmount;
 
-    uint256 minStakingAmount = IStaking(_staking).minValidatorStakingAmount();
+    uint minStakingAmount = IStaking(_staking).minValidatorStakingAmount();
 
     (, bytes memory returnedData) =
       _validatorSet.staticcall(abi.encodeWithSelector(IValidatorInfoV2.getValidators.selector));

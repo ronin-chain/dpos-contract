@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: MIT
+pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import "../../interfaces/validator/ICandidateManager.sol";
@@ -9,8 +10,6 @@ import "../../interfaces/IProfile.sol";
 import "./ProfileXComponents.sol";
 import { ErrUnauthorized, RoleAccess } from "../../utils/CommonErrors.sol";
 import { ContractType } from "../../utils/ContractType.sol";
-
-pragma solidity ^0.8.9;
 
 contract Profile is IProfile, ProfileXComponents, Initializable {
   constructor() {
@@ -45,7 +44,6 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
    * @dev Add addresses of renounced candidates into registry. Only called during {initializeV2}.
    */
   function __migrationRenouncedCandidates() internal virtual {}
-
 
   /**
    * @dev This method is used in REP-4 migration, which creates profile for all community-validators and renounced validators.
@@ -85,8 +83,32 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
   /**
    * @inheritdoc IProfile
    */
-  function getConsensus2Id(TConsensus consensus) external view returns (address id) {
+  function getConsensus2Id(TConsensus consensus) external view returns (address) {
+    return _getConsensus2Id(consensus);
+  }
+
+  /**
+   * @dev Look up the `id` by `consensus`, revert if not found.
+   */
+  function _getConsensus2Id(TConsensus consensus) internal view returns (address) {
+    (bool found, address id) = _tryGetConsensus2Id(consensus);
+    if (!found) revert ErrLookUpIdFailed(consensus);
+    return id;
+  }
+
+  /**
+   * @inheritdoc IProfile
+   */
+  function tryGetConsensus2Id(TConsensus consensus) external view returns (bool found, address id) {
+    return _tryGetConsensus2Id(consensus);
+  }
+
+  /**
+   * @dev Try look up the `id` by `consensus`, return a boolean indicating whether the query success.
+   */
+  function _tryGetConsensus2Id(TConsensus consensus) internal view returns (bool found, address id) {
     id = _consensus2Id[consensus];
+    found = id != address(0);
   }
 
   /**
@@ -96,7 +118,7 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     idList = new address[](consensusList.length);
     unchecked {
       for (uint i; i < consensusList.length; ++i) {
-        idList[i] = _consensus2Id[consensusList[i]];
+        idList[i] = _getConsensus2Id(consensusList[i]);
       }
     }
   }
@@ -117,8 +139,11 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
    * - Update Staking contract:
    *    + [x] Update (id => PoolDetail) mapping in {BaseStaking.sol}.
    *    + [x] Update `_adminOfActivePoolMapping` in {BaseStaking.sol}.
+   *    + [x] Move staking amount of previous admin to the the new admin.
    * - Update Validator contract:
    *    + [x] Update (id => ValidatorCandidate) mapping
+   *
+   * - See other side-effects for treasury in {requestChangeTreasuryAddr}, since treasury and admin must be identical.
    */
   function requestChangeAdminAddress(address id, address newAdminAddr) external {
     CandidateProfile storage _profile = _getId2ProfileHelper(id);
@@ -126,12 +151,14 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     _requireNonZeroAndNonDuplicated(RoleAccess.CANDIDATE_ADMIN, newAdminAddr);
 
     IStaking stakingContract = IStaking(getContract(ContractType.STAKING));
-    stakingContract.execChangeAdminAddress(id, newAdminAddr);
+    stakingContract.execChangeAdminAddress({ poolId: id, currAdminAddr: msg.sender, newAdminAddr: newAdminAddr });
 
     IRoninValidatorSet validatorContract = IRoninValidatorSet(getContract(ContractType.VALIDATOR));
     validatorContract.execChangeAdminAddress(id, newAdminAddr);
+    validatorContract.execChangeTreasuryAddress(id, payable(newAdminAddr));
 
     _setAdmin(_profile, newAdminAddr);
+    _setTreasury(_profile, payable(newAdminAddr));
   }
 
   /**
@@ -153,8 +180,11 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
    * - Update in Proposal contract for:
    *   + [-] Preserve the consensus address and recipient target of locked amount of emergency exit
    * - Update Trusted Org contracts:
-   *   + [x] Remove and delete weight of the old consensus
-   *   + [x] Replace and add weight for the new consensus
+   *   + If the current consensus is governor:
+   *      - [x] Remove and delete weight of the old consensus
+   *      - [x] Replace and add weight for the new consensus
+   *   + If the current consensus is not governor:
+   *      - [x] Do nothing
    */
   function requestChangeConsensusAddr(address id, TConsensus newConsensusAddr) external {
     CandidateProfile storage _profile = _getId2ProfileHelper(id);
@@ -166,19 +196,26 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     IRoninValidatorSet validatorContract = IRoninValidatorSet(getContract(ContractType.VALIDATOR));
     validatorContract.execChangeConsensusAddress(id, newConsensusAddr);
 
-    IRoninTrustedOrganization trustedOrgContract = IRoninTrustedOrganization(
-      getContract(ContractType.RONIN_TRUSTED_ORGANIZATION)
+    address trustedOrgContractAddr = getContract(ContractType.RONIN_TRUSTED_ORGANIZATION);
+    (bool success, ) = trustedOrgContractAddr.call(
+      abi.encodeCall(
+        IRoninTrustedOrganization.execChangeConsensusAddressForTrustedOrg,
+        (oldConsensusAddr, newConsensusAddr)
+      )
     );
-    trustedOrgContract.execChangeConsensusAddressForTrustedOrg({
-      oldConsensusAddr: oldConsensusAddr,
-      newConsensusAddr: newConsensusAddr
-    });
+
+    if (!success) {
+      emit ConsensusAddressOfNonGovernorChanged(id);
+    }
 
     _setConsensus(_profile, newConsensusAddr);
   }
 
   /**
    * @inheritdoc IProfile
+   *
+   * @notice This method is not supported. Change treasury also requires changing the admin address.
+   * Using the {requestChangeAdminAddress} method instead
    *
    * @dev Side-effects on other contracts:
    * - Update Validator contract:
@@ -188,15 +225,8 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
    *          Cannot impl since we cannot cancel the previous the ballot and
    *          create a new ballot on behalf of the validator contract.
    */
-  function requestChangeTreasuryAddr(address id, address payable newTreasury) external {
-    CandidateProfile storage _profile = _getId2ProfileHelper(id);
-    _requireCandidateAdmin(_profile);
-    _requireNonZeroAndNonDuplicated(RoleAccess.TREASURY, newTreasury);
-
-    IRoninValidatorSet validatorContract = IRoninValidatorSet(getContract(ContractType.VALIDATOR));
-    validatorContract.execChangeTreasuryAddress(id, newTreasury);
-
-    _setTreasury(_profile, newTreasury);
+  function requestChangeTreasuryAddr(address /*id */, address payable /* newTreasury */) external pure {
+    revert("Not supported");
   }
 
   /**
@@ -214,7 +244,7 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
   function _requireCandidateAdmin(CandidateProfile storage sProfile) internal view {
     if (
       msg.sender != sProfile.admin ||
-      !IRoninValidatorSet(getContract(ContractType.VALIDATOR)).isCandidateAdmin(sProfile.consensus, msg.sender)
+      !IRoninValidatorSet(getContract(ContractType.VALIDATOR)).isCandidateAdminById(sProfile.id, msg.sender)
     ) revert ErrUnauthorized(msg.sig, RoleAccess.CANDIDATE_ADMIN);
   }
 

@@ -44,9 +44,14 @@ interface IValidatorInfoV2 {
   function getBlockProducerIds() external view returns (address[] memory cids);
 
   /**
-   * @dev Returns whether the address is block producer or not.
+   * @dev Returns whether the consensus address is block producer or not.
    */
   function isBlockProducer(TConsensus consensusAddr) external view returns (bool);
+
+  /**
+   * @dev Returns whether the id is block producer or not.
+   */
+  function isBlockProducerById(address id) external view returns (bool);
 
   /**
    * @dev Returns total numbers of the block producers.

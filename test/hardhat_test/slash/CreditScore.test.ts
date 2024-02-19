@@ -16,6 +16,8 @@ import {
   Staking,
   Staking__factory,
   MockProfile__factory,
+  Profile__factory,
+  Profile,
 } from '../../../src/types';
 import { deployTestSuite } from '../helpers/fixture';
 import { EpochController, expects as RoninValidatorSetExpects } from '../helpers/ronin-validator-set';
@@ -39,6 +41,7 @@ let maintenanceContract: Maintenance;
 let slashContract: MockSlashIndicatorExtended;
 let mockSlashLogic: MockSlashIndicatorExtended;
 let stakingContract: Staking;
+let profileContract: Profile;
 let governanceAdmin: RoninGovernanceAdmin;
 let governanceAdminInterface: GovernanceAdminInterface;
 
@@ -207,6 +210,7 @@ describe('Credit score and bail out test', () => {
     stakingContract = Staking__factory.connect(stakingContractAddress, deployer);
     validatorContract = MockRoninValidatorSetOverridePrecompile__factory.connect(validatorContractAddress, deployer);
     slashContract = MockSlashIndicatorExtended__factory.connect(slashContractAddress, deployer);
+    profileContract = Profile__factory.connect(profileAddress, deployer);
     governanceAdmin = RoninGovernanceAdmin__factory.connect(roninGovernanceAdminAddress, deployer);
     governanceAdminInterface = new GovernanceAdminInterface(
       governanceAdmin,
@@ -376,7 +380,7 @@ describe('Credit score and bail out test', () => {
           slashContract
             .connect(validatorCandidates[0].candidateAdmin)
             .bailOut(validatorCandidates[2].consensusAddr.address)
-        ).revertedWithCustomError(slashContract, 'ErrUnauthorized');
+        ).revertedWithCustomError(profileContract, 'ErrLookUpIdFailed').withArgs(validatorCandidates[2].consensusAddr.address);
       });
     });
 

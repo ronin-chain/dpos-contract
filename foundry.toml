@@ -16,8 +16,8 @@ libs = [
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config
 
 solc = '0.8.22'
-extra_output = ["devdoc", "userdoc", "storagelayout"]
 use_literal_content = true
+extra_output = ["devdoc", "userdoc", "storagelayout"]
 evm_version = 'istanbul'
 cache_path = 'cache_foundry'
 fs_permissions = [{ access = "read-write", path = "./" }]
@@ -26,6 +26,7 @@ fs_permissions = [{ access = "read-write", path = "./" }]
 line_length = 120
 tab_width = 2
 bracket_spacing = true
+int_types = 'preserve'
 
 [profile.ci]
 verbosity = 4
@@ -56,3 +57,4 @@ ronin-testnet = "https://saigon-archive.roninchain.com/rpc"
 ronin-devnet = "https://hcm-rpc.skymavis.one/rpc"
 localhost = "http://localhost:8545"
 ronin-testnet-shadow = "http://34.27.172.168:8545"
+ronin-mainnet-shadow = "http://35.225.161.81:8545"

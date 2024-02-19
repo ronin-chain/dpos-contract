@@ -68,6 +68,7 @@ abstract contract PostChecker is
       vm.makePersistent(address(0x6a));
     }
 
-    _wrapUpEpochs(10);
+    _wrapUpEpochs(2);
+    _fastForwardToNextDay();
   }
 }

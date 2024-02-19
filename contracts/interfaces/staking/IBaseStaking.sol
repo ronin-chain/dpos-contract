@@ -29,6 +29,9 @@ interface IBaseStaking {
 
     /// @dev Mapping from delegator => the last timestamp that delegator staked
     mapping(address => uint256) lastDelegatingTimestamp;
+
+    /// @dev Mapping that indicate an admin was either current or previous admin of this pool
+    mapping(address => bool) wasAdmin;
   }
 
   /// @dev Emitted when the minium number of seconds to undelegate is updated.
@@ -47,7 +50,7 @@ interface IBaseStaking {
   /// @dev Error of admin of any active pool cannot delegate.
   error ErrAdminOfAnyActivePoolForbidden(address admin);
   /// @dev Error of querying inactive pool.
-  error ErrInactivePool(TConsensus consensusAddr, address poolAddr);
+  error ErrInactivePool(TConsensus consensusAddr, address poolId);
   /// @dev Error of length of input arrays are not of the same.
   error ErrInvalidArrays();
 

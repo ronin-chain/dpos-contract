@@ -22,5 +22,5 @@ interface IBaseSlash {
   error ErrUnregisteredPublicKey();
 
   /// @dev Emitted when the validator is slashed.
-  event Slashed(address indexed validator, SlashType slashType, uint256 period);
+  event Slashed(address indexed cid, SlashType slashType, uint256 period);
 }

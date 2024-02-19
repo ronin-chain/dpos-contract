@@ -22,7 +22,7 @@ abstract contract BaseStaking is
   HasValidatorDeprecated
 {
   /// @dev Mapping from pool address (i.e. validator id) => staking pool detail
-  mapping(address => PoolDetail) internal _poolDetail;
+  mapping(address pid => PoolDetail) internal _poolDetail;
 
   /// @dev The cooldown time in seconds to undelegate from the last timestamp (s)he delegated.
   uint256 internal _cooldownSecsToUndelegate;
@@ -30,7 +30,7 @@ abstract contract BaseStaking is
   uint256 internal _waitingSecsToRevoke;
 
   /// @dev Mapping from "admin address of an active pool" => "pool id".
-  mapping(address => address) internal _adminOfActivePoolMapping;
+  mapping(address adminOfActivePool => address poolId) internal _adminOfActivePoolMapping;
   /**
    * @dev This empty reserved space is put in place to allow future versions to add new
    * variables without shifting down storage in the inheritance chain.
@@ -66,7 +66,7 @@ abstract contract BaseStaking is
   }
 
   function _anyExceptPoolAdmin(PoolDetail storage _pool, address delegator) private view {
-    if (_pool.__shadowedPoolAdmin == delegator) revert ErrPoolAdminForbidden();
+    if (_pool.wasAdmin[delegator]) revert ErrPoolAdminForbidden();
   }
 
   function _poolOfConsensusIsActive(TConsensus consensusAddr) private view {
@@ -231,7 +231,7 @@ abstract contract BaseStaking is
     return _poolDetail[poolId].delegatingAmount[user];
   }
 
-  function __css2cid(TConsensus consensusAddr) internal view returns (address) {
+  function __css2cid(TConsensus consensusAddr) internal override view returns (address) {
     return IProfile(getContract(ContractType.PROFILE)).getConsensus2Id(consensusAddr);
   }
 

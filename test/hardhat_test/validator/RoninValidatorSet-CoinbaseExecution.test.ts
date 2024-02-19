@@ -293,7 +293,8 @@ describe('Ronin Validator Set: Coinbase execution test', () => {
     });
 
     it('Should non-validator is set with correct flags', async () => {
-      expect(await roninValidatorSet.isBlockProducer(deployer.address)).eq(false);
+      await expect(roninValidatorSet.isBlockProducer(deployer.address)).revertedWithCustomError(profileContract, "ErrLookUpIdFailed").withArgs(deployer.address);
+      expect(await roninValidatorSet.isBlockProducerById(deployer.address)).eq(false);
     });
 
     it('Should be able to wrap up epoch at the end of period and pick top `maxValidatorNumber` to be validators', async () => {
