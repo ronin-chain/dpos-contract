@@ -18,7 +18,6 @@ libs = [
 solc = '0.8.22'
 use_literal_content = true
 extra_output = ["devdoc", "userdoc", "storagelayout"]
-use_literal_content = true
 evm_version = 'istanbul'
 cache_path = 'cache_foundry'
 fs_permissions = [{ access = "read-write", path = "./" }]
@@ -27,6 +26,7 @@ fs_permissions = [{ access = "read-write", path = "./" }]
 line_length = 120
 tab_width = 2
 bracket_spacing = true
+int_types = 'preserve'
 
 [profile.ci]
 verbosity = 4
