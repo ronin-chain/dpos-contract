@@ -12,8 +12,8 @@ import { ICandidateStaking } from "@ronin/contracts/interfaces/staking/ICandidat
 import { RoninValidatorSet } from "@ronin/contracts/ronin/validator/RoninValidatorSet.sol";
 
 abstract contract PostChecker_Helper is BaseMigration {
-  uint NORMAL_SMALL_NUMBER = 1_000_000;
-  uint NORMAL_BLOCK_NUMBER = 100_000_000;
+  uint256 NORMAL_SMALL_NUMBER = 1_000_000;
+  uint256 NORMAL_BLOCK_NUMBER = 100_000_000;
 
   using LibErrorHandler for bool;
 
@@ -28,12 +28,9 @@ abstract contract PostChecker_Helper is BaseMigration {
     _applyValidatorCandidate(staking, candidateAdmin, consensusAddr, value);
   }
 
-  function _applyValidatorCandidate(
-    address staking,
-    address candidateAdmin,
-    address consensusAddr,
-    uint256 value
-  ) internal {
+  function _applyValidatorCandidate(address staking, address candidateAdmin, address consensusAddr, uint256 value)
+    internal
+  {
     vm.deal(candidateAdmin, value);
     vm.startPrank(candidateAdmin);
 
@@ -66,16 +63,19 @@ abstract contract PostChecker_Helper is BaseMigration {
     if (!success) {
       (success, returnData) = staking.call{ value: value }(
         abi.encodeWithSelector(
-          ICandidateStaking.applyValidatorCandidate.selector,
-          candidateAdmin,
-          consensusAddr,
-          candidateAdmin,
-          15_00
+          ICandidateStaking.applyValidatorCandidate.selector, candidateAdmin, consensusAddr, candidateAdmin, 15_00
         )
       );
     }
     vm.stopPrank();
     success.handleRevert(ICandidateStaking.applyValidatorCandidate.selector, returnData);
+  }
+
+  function _wrapUpEpochs(uint256 times) internal {
+    for (uint256 i; i < times; ++i) {
+      _fastForwardToNextDay();
+      _wrapUpEpoch();
+    }
   }
 
   function _wrapUpEpoch() internal {
@@ -92,12 +92,9 @@ abstract contract PostChecker_Helper is BaseMigration {
     vm.warp(block.timestamp + 3 seconds);
     vm.roll(block.number + 1);
 
-    uint256 numberOfBlocksInEpoch = RoninValidatorSet(
-      CONFIG.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key())
-    ).numberOfBlocksInEpoch();
-    uint256 epochEndingBlockNumber = block.number +
-      (numberOfBlocksInEpoch - 1) -
-      (block.number % numberOfBlocksInEpoch);
+    uint256 numberOfBlocksInEpoch =
+      RoninValidatorSet(CONFIG.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key())).numberOfBlocksInEpoch();
+    uint256 epochEndingBlockNumber = block.number + (numberOfBlocksInEpoch - 1) - (block.number % numberOfBlocksInEpoch);
 
     vm.roll(epochEndingBlockNumber);
   }

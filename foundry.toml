@@ -1,6 +1,7 @@
 [profile.default]
 src = 'contracts'
 test = 'test/foundry/'
+script = 'script'
 out = 'out'
 optimizer = true
 optimizer_runs = 1_000
@@ -17,6 +18,7 @@ libs = [
 solc = '0.8.22'
 use_literal_content = true
 extra_output = ["devdoc", "userdoc", "storagelayout"]
+use_literal_content = true
 evm_version = 'istanbul'
 cache_path = 'cache_foundry'
 fs_permissions = [{ access = "read-write", path = "./" }]

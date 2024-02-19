@@ -72,11 +72,11 @@ contract Migration__20231212_DeployTestnet is TestnetMigration {
     assertEq(payable(address(fastFinalityTracking)).getProxyAdmin(), address(governanceAdmin));
 
     // initialize neccessary config
-    _initProfile();
     _initStaking(param);
     _initTrustedOrg(param);
-    _initMaintenance(param);
     _initValidatorSet(param);
+    _initProfile();
+    _initMaintenance(param);
     _initSlashIndicator(param);
     _initStakingVesting(param);
     _initFastFinalityTracking();
@@ -85,6 +85,7 @@ contract Migration__20231212_DeployTestnet is TestnetMigration {
   function _initProfile() internal logFn("_initProfile") {
     vm.startBroadcast(sender());
     profile.initialize(address(validatorSet));
+    profile.initializeV2(address(staking), address(trustedOrg));
     vm.stopBroadcast();
   }
 
@@ -128,6 +129,7 @@ contract Migration__20231212_DeployTestnet is TestnetMigration {
   function _initTrustedOrg(ISharedArgument.SharedParameter memory param) internal logFn("_initTrustedOrg") {
     vm.startBroadcast(sender());
     trustedOrg.initialize(param.trustedOrganizations, param.numerator, param.denominator);
+    trustedOrg.initializeV2(address(profile));
     vm.stopBroadcast();
   }
 
@@ -153,6 +155,7 @@ contract Migration__20231212_DeployTestnet is TestnetMigration {
     );
     // validatorSet.initializeV2();
     validatorSet.initializeV3(address(fastFinalityTracking));
+    validatorSet.initializeV4(address(profile));
     vm.stopBroadcast();
   }
 
@@ -165,6 +168,7 @@ contract Migration__20231212_DeployTestnet is TestnetMigration {
       param.cooldownSecsToUndelegate,
       param.waitingSecsToRevoke
     );
+    staking.initializeV3(address(profile));
     vm.stopBroadcast();
   }
 
@@ -188,6 +192,7 @@ contract Migration__20231212_DeployTestnet is TestnetMigration {
       param.maxSchedules,
       param.cooldownSecsToMaintain
     );
+    maintenance.initializeV3(address(profile));
     vm.stopBroadcast();
   }
 

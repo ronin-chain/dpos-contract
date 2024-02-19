@@ -75,7 +75,7 @@ interface ISharedArgument is IGeneralConfig {
     uint256 numerator;
     uint256 denominator;
     // governance admin
-    uint256 proposalExpiryDuration;
+    uint256 expiryDuration;
   }
 
   function sharedArguments() external view returns (SharedParameter memory param);
