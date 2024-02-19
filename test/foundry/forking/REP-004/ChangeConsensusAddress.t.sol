@@ -433,7 +433,6 @@ contract ChangeConsensusAddressForkTest is Test {
     console2.log("admin", admin);
 
     address newAdmin = makeAddr("new-admin");
-    address payable newTreasury = payable(newAdmin);
     TConsensus newConsensusAddr = TConsensus.wrap(makeAddr("new-consensus"));
     address payable newDummyTreasury = payable(makeAddr("new-dummy-treasury"));
 
