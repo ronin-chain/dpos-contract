@@ -192,6 +192,11 @@ contract RoninMigration is PostChecker, VoteStatusConsumer {
     }
     totalGas += totalGas * 20_00 / 100_00;
 
+    uint DEFAULT_PROPOSAL_GAS = 1_000_000;
+    if (totalGas < DEFAULT_PROPOSAL_GAS) {
+      totalGas = DEFAULT_PROPOSAL_GAS * 120_00 / 100_00;
+    }
+
     for (uint256 i = 1; i < allTrustedOrgs.length; ++i) {
       (VoteStatus status, , , , ) = governanceAdmin.vote(block.chainid, proposal.nonce);
       if (status != VoteStatus.Pending) {
