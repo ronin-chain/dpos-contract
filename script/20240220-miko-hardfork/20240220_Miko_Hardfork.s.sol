@@ -5,7 +5,7 @@ import { TContract } from "foundry-deployment-kit/types/Types.sol";
 import { LibProxy } from "foundry-deployment-kit/libraries/LibProxy.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
 
-import { BridgeTrackingRecoveryLogic } from "../20231019-recover-fund/contracts/BridgeTrackingRecoveryLogic.sol";
+import { BridgeTrackingRecoveryLogic, BridgeTracking } from "../20231019-recover-fund/contracts/BridgeTrackingRecoveryLogic.sol";
 
 import { SlashIndicator } from "@ronin/contracts/ronin/slash-indicator/SlashIndicator.sol";
 import { Staking } from "@ronin/contracts/ronin/staking/Staking.sol";
@@ -14,6 +14,8 @@ import { Maintenance } from "@ronin/contracts/ronin/Maintenance.sol";
 import { RoninValidatorSet } from "@ronin/contracts/ronin/validator/RoninValidatorSet.sol";
 import { StakingVesting } from "@ronin/contracts/ronin/StakingVesting.sol";
 import { FastFinalityTracking } from "@ronin/contracts/ronin/fast-finality/FastFinalityTracking.sol";
+
+import { AccessControl } from "@openzeppelin/contracts/access/AccessControl.sol";
 
 import "./MikoHelper.s.sol";
 
@@ -34,6 +36,7 @@ contract Proposal__20240220_MikoHardfork is MikoHelper {
   RoninTrustedOrganization private trustedOrgContract;
 
   address private bridgeTracking;
+  address private roninBridgeManager;
   SlashIndicator private slashIndicatorContract;
   FastFinalityTracking private fastFinalityTrackingContract;
   Profile private profileContract;
@@ -133,6 +136,12 @@ contract Proposal__20240220_MikoHardfork is MikoHelper {
 
     // [C2.] The `doctor` will withdraw the locked fund.
     _doctor__recoverFund();
+
+    /*
+     * [C3.] The `doctor` will upgrade the Bridge Tracking contract to remove the recovery method.
+     * [C4.] The `doctor` will transfer admin to BridgeManager.
+     */
+    _doctor__rollbackBridgeTracking();
   }
 
   function _sys__loadContracts() internal {
@@ -142,6 +151,7 @@ contract Proposal__20240220_MikoHardfork is MikoHelper {
     trustedOrgContract = RoninTrustedOrganization(
       config.getAddressFromCurrentNetwork(Contract.RoninTrustedOrganization.key())
     );
+    roninBridgeManager = config.getAddressFromCurrentNetwork(Contract.RoninBridgeManager.key());
 
     bridgeTracking = config.getAddressFromCurrentNetwork(Contract.BridgeTracking.key());
 
@@ -254,9 +264,9 @@ contract Proposal__20240220_MikoHardfork is MikoHelper {
     returns (bytes[] memory callDatas, address[] memory targets, uint256[] memory values)
   {
     // See https://www.notion.so/skymavis/DPoS-Gateway-Contract-list-58e189d5feab435d9b78b04a3012155c?pvs=4#67e1c4291c834c5980a6915fc5489865
-    targets = new address[](7);
-    callDatas = new bytes[](7);
-    values = new uint256[](7);
+    targets = new address[](9);
+    callDatas = new bytes[](9);
+    values = new uint256[](9);
 
     targets[0] = address(maintenanceContract);
     callDatas[0] = abi.encodeCall(
@@ -299,6 +309,23 @@ contract Proposal__20240220_MikoHardfork is MikoHelper {
       TransparentUpgradeableProxyV2.functionDelegateCall,
       abi.encodeCall(Staking.initializeV4, (address(roninGovernanceAdmin), STAKING_MIGRATOR))
     );
+
+    // [C1.] The `MIGRATOR_ROLE` in the Staking will migrate the list of `wasAdmin`.
+    {
+      targets[7] = address(stakingContract);
+      callDatas[7] = abi.encodeCall(
+        TransparentUpgradeableProxyV2.functionDelegateCall,
+        abi.encodeCall(AccessControl.grantRole, (MIGRATOR_ROLE, address(roninGovernanceAdmin)))
+      );
+
+      targets[8] = address(stakingContract);
+      callDatas[8] = abi.encodeCall(TransparentUpgradeableProxyV2.functionDelegateCall, _migrator__migrateWasAdmin());
+    }
+  }
+
+  function _migrator__migrateWasAdmin() internal view returns (bytes memory) {
+    (address[] memory poolIds, address[] memory admins, bool[] memory flags) = _parseMigrateData(MIGRATE_DATA_PATH);
+    return abi.encodeCall(Staking.migrateWasAdmin, (poolIds, admins, flags));
   }
 
   function _ga__changeAdminAllContracts()
@@ -383,5 +410,31 @@ contract Proposal__20240220_MikoHardfork is MikoHelper {
     console.log("balanceAfter", balanceAfter);
     uint256 recoveredFund = balanceAfter - balanceBefore;
     console.log("recoveredFund", recoveredFund);
+  }
+
+  function _doctor__rollbackBridgeTracking() internal {
+    address doctor = ADMIN_TMP_BRIDGE_TRACKING;
+    bool shouldPrankOnly = CONFIG.isBroadcastDisable();
+
+    if (shouldPrankOnly) {
+      vm.prank(DEPLOYER);
+    } else {
+      vm.broadcast(DEPLOYER);
+    }
+    address logic = address(new BridgeTracking());
+
+    if (shouldPrankOnly) {
+      vm.prank(doctor);
+    } else {
+      vm.broadcast(doctor);
+    }
+    TransparentUpgradeableProxyV2(payable((bridgeTracking))).upgradeTo(logic);
+
+    if (shouldPrankOnly) {
+      vm.prank(doctor);
+    } else {
+      vm.broadcast(doctor);
+    }
+    TransparentUpgradeableProxyV2(payable((bridgeTracking))).changeAdmin(roninBridgeManager);
   }
 }
