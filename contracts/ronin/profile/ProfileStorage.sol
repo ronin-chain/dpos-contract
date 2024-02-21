@@ -82,10 +82,13 @@ abstract contract ProfileStorage is IProfile, HasContracts {
     }
 
     _profile.pubkey = pubkey;
-    _profile.pubkeyLastChange = block.timestamp;
     _registry[_hashPubkey(pubkey)] = true;
 
     emit PubkeyChanged(_profile.id, pubkey);
+  }
+
+  function _setCooldown(CandidateProfile storage _profile) internal {
+    _profile.profileLastChange = block.timestamp;
   }
 
   /**
@@ -103,7 +106,7 @@ abstract contract ProfileStorage is IProfile, HasContracts {
     return uint256(keccak256(pubkey));
   }
 
-  function _setPubkeyChangeCooldown(uint256 cooldown) internal {
+  function _setCooldownConfig(uint256 cooldown) internal {
     pubkeyChangeCooldown = cooldown;
   }
 }

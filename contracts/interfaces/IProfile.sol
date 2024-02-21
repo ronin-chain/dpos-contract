@@ -26,7 +26,7 @@ interface IProfile {
     /// @dev Public key for fast finality.
     bytes pubkey;
     /// @dev Last public key change timestamp.
-    uint256 pubkeyLastChange;
+    uint256 profileLastChange;
     /// @dev Old public key for fast finality.
     bytes oldPubkey;
   }
@@ -152,5 +152,5 @@ interface IProfile {
    * Requirement:
    *  - Only admin can call this method
    */
-  function setPubkeyChangeCooldown(uint256 cooldown) external;
+  function setCooldownConfig(uint256 cooldown) external;
 }

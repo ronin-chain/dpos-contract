@@ -39,7 +39,7 @@ contract Profile_Unit_Test is Base_Test {
       treasury: payable(address(0x20000)),
       __reservedGovernor: address(0),
       pubkey: '',
-      pubkeyLastChange: 0,
+      profileLastChange: 0,
       oldPubkey: ''
     })));
 
