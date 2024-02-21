@@ -97,7 +97,7 @@ contract Profile_Unit_Test is Base_Test {
 
     _profile.changePubkey(address(0x20000), '0xaa', '');
 
-    vm.expectRevert(IProfile.ErrPubkeyChangeCooldownNotEnded.selector);
+    vm.expectRevert(IProfile.ErrProfileChangeCooldownNotEnded.selector);
     _profile.changePubkey(address(0x20000), '0xbb', '');
 
     vm.warp(block.timestamp + 11);

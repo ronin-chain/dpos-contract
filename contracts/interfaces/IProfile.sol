@@ -51,8 +51,8 @@ interface IProfile {
   error ErrNonExistentProfile();
   /// @dev Error when create a new profile whose id and consensus are not identical.
   error ErrIdAndConsensusDiffer();
-  /// @dev Error when failed to change public key because cooldown is not ended.
-  error ErrPubkeyChangeCooldownNotEnded();
+  /// @dev Error when failed to change any address or pubkey in the profile because cooldown is not ended.
+  error ErrProfileChangeCooldownNotEnded();
   /**
    * @dev Error when there is a duplicated info of `value`, which is uin256-padding value of any address or hash of public key,
    * and with value type of `infoType`.
