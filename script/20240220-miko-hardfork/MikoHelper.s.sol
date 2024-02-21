@@ -32,7 +32,7 @@ abstract contract MikoHelper is RoninMigration {
   address public constant STAKING_MIGRATOR = 0x555a4D1201DecF7d5C87EcF67B1f0b6430bED2Ed; // [Mainnet][DPoS] Staking Migrator
   address public constant TRUSTED_ORG_RECOVERY_LOGIC = 0x59646258Ec25CC329f5ce93223e0A50ccfA3e885;
 
-  uint256 public constant PROPOSAL_DURATION = 20 minutes;
+  uint256 public constant PROPOSAL_DURATION = 14 days; // FIXME: `20 minutes` on mainnet shadow
   BridgeReward public constant DEPRECATED_BRIDGE_REWARD = BridgeReward(0x1C952D6717eBFd2E92E5f43Ef7C1c3f7677F007D);
 
   uint256 public constant PROFILE_PUBKEY_CHANGE_COOLDOWN = 1 days;
