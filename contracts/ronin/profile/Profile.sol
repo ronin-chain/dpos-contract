@@ -149,7 +149,7 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     CandidateProfile storage _profile = _getId2ProfileHelper(id);
     _requireCandidateAdmin(_profile);
     _requireNonZeroAndNonDuplicated(RoleAccess.CANDIDATE_ADMIN, newAdminAddr);
-    _requireCooldownPassedAndSetCooldown(_profile);
+    _requireCooldownPassedAndStartCooldown(_profile);
 
     IStaking stakingContract = IStaking(getContract(ContractType.STAKING));
     stakingContract.execChangeAdminAddress({ poolId: id, currAdminAddr: msg.sender, newAdminAddr: newAdminAddr });
@@ -191,7 +191,7 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     CandidateProfile storage _profile = _getId2ProfileHelper(id);
     _requireCandidateAdmin(_profile);
     _requireNonZeroAndNonDuplicated(RoleAccess.CONSENSUS, TConsensus.unwrap(newConsensusAddr));
-    _requireCooldownPassedAndSetCooldown(_profile);
+    _requireCooldownPassedAndStartCooldown(_profile);
 
     TConsensus oldConsensusAddr = _profile.consensus;
 
@@ -239,7 +239,7 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     _requireCandidateAdmin(_profile);
     _requireNonDuplicatedPubkey(pubkey);
     _verifyPubkey(pubkey, proofOfPossession);
-    _requireCooldownPassedAndSetCooldown(_profile);
+    _requireCooldownPassedAndStartCooldown(_profile);
     _setPubkey(_profile, pubkey);
   }
 
