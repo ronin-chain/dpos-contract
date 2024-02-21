@@ -21,7 +21,7 @@ abstract contract ProfileStorage is IProfile, HasContracts {
   /// @dev Mapping from consensus address => id address.
   mapping(TConsensus => address) internal _consensus2Id;
 
-  /// @dev The cooldown time the change public key.
+  /// @dev The cooldown time to change any info in the profile.
   uint256 internal _profileChangeCooldown;
 
   /// @dev Upgradeable gap.
