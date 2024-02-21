@@ -16,7 +16,7 @@ import {
   RoninTrustedOrganization,
   RoninTrustedOrganization__factory,
 } from '../../../src/types';
-import { StakingVestingArguments } from '../../../src/utils';
+import { ProfileArguments, StakingVestingArguments } from '../../../src/utils';
 import { defaultTestConfig } from './fixture';
 
 let maintenanceContract: Maintenance | undefined;
@@ -38,6 +38,7 @@ export interface InitializeTestSuiteInput {
   validatorContractAddress?: Address;
   stakingVestingAddress?: Address;
   roninTrustedOrganizationAddress?: Address;
+  profileArgs?: ProfileArguments;
 }
 
 interface InitREP2Input {
@@ -60,6 +61,7 @@ interface InitREP4Input {
   profileContract?: Profile;
   stakingContract?: Staking;
   roninTrustedOrgContract?: RoninTrustedOrganization;
+  profileArgs?: ProfileArguments;
 }
 
 export const initializeTestSuite = async (input: InitializeTestSuiteInput) => {
@@ -110,6 +112,7 @@ export const initializeTestSuite = async (input: InitializeTestSuiteInput) => {
     profileContract,
     stakingContract,
     roninTrustedOrgContract,
+    profileArgs: input.profileArgs
   });
 };
 
@@ -120,7 +123,7 @@ const upgradeRep2 = async (input: InitREP2Input) => {
 
   if (input.stakingVestingContract) {
     await input.stakingVestingContract.initializeV3(
-      input.stakingVestingArgs!.fastFinalityRewardPercent ??
+      input.stakingVestingArgs?.fastFinalityRewardPercent ??
         defaultTestConfig.stakingVestingArguments?.fastFinalityRewardPercent!
     );
   }
@@ -147,6 +150,10 @@ const upgradeRep3 = async (input: InitREP3Input) => {
 const upgradeRep4 = async (input: InitREP4Input) => {
   if (input.profileContract) {
     await input.profileContract.initializeV2(input.stakingContract?.address!, input.roninTrustedOrgContract?.address!);
+    await input.profileContract.initializeV3(
+      input.profileArgs?.profileChangeCooldown ??
+      defaultTestConfig.profileArguments?.profileChangeCooldown!
+    );
   }
 
   if (input.roninTrustedOrgContract) {
