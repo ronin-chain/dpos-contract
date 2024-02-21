@@ -17,11 +17,13 @@ import { FastFinalityTracking } from "@ronin/contracts/ronin/fast-finality/FastF
 
 import { AccessControl } from "@openzeppelin/contracts/access/AccessControl.sol";
 
+import "./ArrayReplaceLib.sol";
 import "./MikoHelper.s.sol";
 
 contract Proposal__20240220_MikoHardfork is MikoHelper {
   using LibProxy for *;
   using StdStyle for *;
+  using ArrayReplaceLib for *;
 
   uint256 balanceBefore;
 
@@ -63,16 +65,16 @@ contract Proposal__20240220_MikoHardfork is MikoHelper {
 
     // [B1.] Change admin of Bridge Tracking to doctor
     {
-      address doctor = ADMIN_TMP_BRIDGE_TRACKING;
-      console.log("Doctor address", doctor);
-      balanceBefore = doctor.balance;
-      console.log("balanceBefore", balanceBefore);
+      (
+        bytes[] memory sub_callDatas,
+        address[] memory sub_targets,
+        uint256[] memory sub_values
+      ) = _ga__changeAdminBridgeTracking();
 
-      tos[prCnt] = address(roninGovernanceAdmin);
-      callDatas[prCnt++] = abi.encodeCall(GovernanceAdmin.changeProxyAdmin, (bridgeTracking, doctor));
-
-      tos[prCnt] = address(DEPRECATED_BRIDGE_REWARD);
-      callDatas[prCnt++] = abi.encodeCall(BridgeReward.initializeREP2, ());
+      tos = tos.replace(sub_targets, prCnt);
+      callDatas = callDatas.replace(sub_callDatas, prCnt);
+      values = values.replace(sub_values, prCnt);
+      prCnt += sub_callDatas.length;
     }
 
     // [B2.] Upgrade all contracts
@@ -82,23 +84,21 @@ contract Proposal__20240220_MikoHardfork is MikoHelper {
         address[] memory sub_targets,
         uint256[] memory sub_values
       ) = _ga__upgradeAllDPoSContracts();
-      uint b2_len = sub_callDatas.length;
-      for (uint i; i < b2_len; i++) {
-        tos[prCnt] = sub_targets[i];
-        callDatas[prCnt] = sub_callDatas[i];
-        values[prCnt++] = sub_values[i];
-      }
+
+      tos = tos.replace(sub_targets, prCnt);
+      callDatas = callDatas.replace(sub_callDatas, prCnt);
+      values = values.replace(sub_values, prCnt);
+      prCnt += sub_callDatas.length;
     }
 
     // [B3.] Initialize contracts
     {
       (bytes[] memory sub_callDatas, address[] memory sub_targets, uint256[] memory sub_values) = _ga__initContracts();
-      uint b2_len = sub_callDatas.length;
-      for (uint i; i < b2_len; i++) {
-        tos[prCnt] = sub_targets[i];
-        callDatas[prCnt] = sub_callDatas[i];
-        values[prCnt++] = sub_values[i];
-      }
+
+      tos = tos.replace(sub_targets, prCnt);
+      callDatas = callDatas.replace(sub_callDatas, prCnt);
+      values = values.replace(sub_values, prCnt);
+      prCnt += sub_callDatas.length;
     }
 
     // [B4.] Change admin of all contracts
@@ -108,12 +108,11 @@ contract Proposal__20240220_MikoHardfork is MikoHelper {
         address[] memory sub_targets,
         uint256[] memory sub_values
       ) = _ga__changeAdminAllContracts();
-      uint b2_len = sub_callDatas.length;
-      for (uint i; i < b2_len; i++) {
-        tos[prCnt] = sub_targets[i];
-        callDatas[prCnt] = sub_callDatas[i];
-        values[prCnt++] = sub_values[i];
-      }
+
+      tos = tos.replace(sub_targets, prCnt);
+      callDatas = callDatas.replace(sub_callDatas, prCnt);
+      values = values.replace(sub_values, prCnt);
+      prCnt += sub_callDatas.length;
     }
 
     // [Build proposal]
@@ -178,6 +177,26 @@ contract Proposal__20240220_MikoHardfork is MikoHelper {
   function _node__changeStorage() internal {
     // Cheat storage slot of impl in Trusted Org Proxy
     vm.store(address(trustedOrgContract), bytes32($_IMPL_SLOT), bytes32(uint256(uint160(TRUSTED_ORG_RECOVERY_LOGIC))));
+  }
+
+  function _ga__changeAdminBridgeTracking()
+    internal
+    returns (bytes[] memory callDatas, address[] memory targets, uint256[] memory values)
+  {
+    targets = new address[](2);
+    callDatas = new bytes[](2);
+    values = new uint256[](2);
+
+    address doctor = ADMIN_TMP_BRIDGE_TRACKING;
+    console.log("Doctor address:", doctor);
+    balanceBefore = doctor.balance;
+    console.log("balanceBefore", balanceBefore);
+
+    targets[0] = address(roninGovernanceAdmin);
+    callDatas[0] = abi.encodeCall(GovernanceAdmin.changeProxyAdmin, (bridgeTracking, doctor));
+
+    targets[1] = address(DEPRECATED_BRIDGE_REWARD);
+    callDatas[1] = abi.encodeCall(BridgeReward.initializeREP2, ());
   }
 
   function _ga__upgradeAllDPoSContracts()
