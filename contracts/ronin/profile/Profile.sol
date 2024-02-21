@@ -253,6 +253,13 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
   /**
    * @inheritdoc IProfile
    */
+  function getCooldownConfig() external view returns (uint256) {
+    return _profileChangeCooldown;
+  }
+
+  /**
+   * @inheritdoc IProfile
+   */
   function setCooldownConfig(uint256 cooldown) external onlyAdmin {
     _setCooldownConfig(cooldown);
   }

@@ -53,7 +53,7 @@ abstract contract ProfileHandler is PCUVerifyBLSPublicKey, ProfileStorage {
   }
 
   function _requireCooldownPassed(CandidateProfile storage _profile) internal view {
-    if (block.timestamp <= _profile.profileLastChange + pubkeyChangeCooldown) {
+    if (block.timestamp < _profile.profileLastChange + _profileChangeCooldown) {
       revert ErrProfileChangeCooldownNotEnded();
     }
   }

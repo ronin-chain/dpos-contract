@@ -153,4 +153,9 @@ interface IProfile {
    *  - Only admin can call this method
    */
   function setCooldownConfig(uint256 cooldown) external;
+
+  /**
+   * @dev Returns the config of cool down on change profile info.
+   */
+  function getCooldownConfig() external view returns (uint256);
 }

@@ -22,7 +22,7 @@ abstract contract ProfileStorage is IProfile, HasContracts {
   mapping(TConsensus => address) internal _consensus2Id;
 
   /// @dev The cooldown time the change public key.
-  uint256 pubkeyChangeCooldown;
+  uint256 internal _profileChangeCooldown;
 
   /// @dev Upgradeable gap.
   bytes32[47] __gap;
@@ -107,6 +107,6 @@ abstract contract ProfileStorage is IProfile, HasContracts {
   }
 
   function _setCooldownConfig(uint256 cooldown) internal {
-    pubkeyChangeCooldown = cooldown;
+    _profileChangeCooldown = cooldown;
   }
 }
