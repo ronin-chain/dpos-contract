@@ -7,6 +7,7 @@ import { StdStyle } from "forge-std/StdStyle.sol";
 
 import { BridgeTrackingRecoveryLogic } from "../20231019-recover-fund/contracts/BridgeTrackingRecoveryLogic.sol";
 
+import { SlashIndicator } from "@ronin/contracts/ronin/slash-indicator/SlashIndicator.sol";
 import { Staking } from "@ronin/contracts/ronin/staking/Staking.sol";
 import { Profile } from "@ronin/contracts/ronin/profile/Profile.sol";
 import { Maintenance } from "@ronin/contracts/ronin/Maintenance.sol";
@@ -33,6 +34,7 @@ contract Proposal__20240220_MikoHardfork is MikoHelper {
   RoninTrustedOrganization private trustedOrgContract;
 
   address private bridgeTracking;
+  SlashIndicator private slashIndicatorContract;
   FastFinalityTracking private fastFinalityTrackingContract;
   Profile private profileContract;
   Staking private stakingContract;
@@ -79,11 +81,8 @@ contract Proposal__20240220_MikoHardfork is MikoHelper {
       ) = _ga__upgradeAllDPoSContracts();
       uint b2_len = sub_callDatas.length;
       for (uint i; i < b2_len; i++) {
-        console.log("hehe", i);
         tos[prCnt] = sub_targets[i];
-        console.log("hehe2", i);
         callDatas[prCnt] = sub_callDatas[i];
-        console.log("hehe3  ", i);
         values[prCnt++] = sub_values[i];
       }
     }
@@ -93,11 +92,8 @@ contract Proposal__20240220_MikoHardfork is MikoHelper {
       (bytes[] memory sub_callDatas, address[] memory sub_targets, uint256[] memory sub_values) = _ga__initContracts();
       uint b2_len = sub_callDatas.length;
       for (uint i; i < b2_len; i++) {
-        console.log("hihi", i);
         tos[prCnt] = sub_targets[i];
-        console.log("hihi2", i);
         callDatas[prCnt] = sub_callDatas[i];
-        console.log("hihi3", i);
         values[prCnt++] = sub_values[i];
       }
     }
@@ -111,11 +107,8 @@ contract Proposal__20240220_MikoHardfork is MikoHelper {
       ) = _ga__changeAdminAllContracts();
       uint b2_len = sub_callDatas.length;
       for (uint i; i < b2_len; i++) {
-        console.log("huhu", i);
         tos[prCnt] = sub_targets[i];
-        console.log("huhu2", i);
         callDatas[prCnt] = sub_callDatas[i];
-        console.log("huhu3", i);
         values[prCnt++] = sub_values[i];
       }
     }
@@ -157,6 +150,7 @@ contract Proposal__20240220_MikoHardfork is MikoHelper {
     );
     maintenanceContract = Maintenance(config.getAddressFromCurrentNetwork(Contract.Maintenance.key()));
     profileContract = Profile(config.getAddressFromCurrentNetwork(Contract.Profile.key()));
+    slashIndicatorContract = SlashIndicator(config.getAddressFromCurrentNetwork(Contract.SlashIndicator.key()));
     stakingContract = Staking(config.getAddressFromCurrentNetwork(Contract.Staking.key()));
     stakingVestingContract = StakingVesting(config.getAddressFromCurrentNetwork(Contract.StakingVesting.key()));
     validatorContract = RoninValidatorSet(config.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key()));
@@ -165,6 +159,7 @@ contract Proposal__20240220_MikoHardfork is MikoHelper {
     allDPoSContracts.push(payable(address(fastFinalityTrackingContract)));
     allDPoSContracts.push(payable(address(maintenanceContract)));
     allDPoSContracts.push(payable(address(profileContract)));
+    allDPoSContracts.push(payable(address(slashIndicatorContract)));
     allDPoSContracts.push(payable(address(stakingContract)));
     allDPoSContracts.push(payable(address(stakingVestingContract)));
     allDPoSContracts.push(payable(address(validatorContract)));
