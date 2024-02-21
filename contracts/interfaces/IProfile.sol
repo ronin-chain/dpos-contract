@@ -25,7 +25,7 @@ interface IProfile {
     address __reservedGovernor;
     /// @dev Public key for fast finality.
     bytes pubkey;
-    /// @dev Last public key change timestamp.
+    /// @dev Timestamp of last change of any profile info.
     uint256 profileLastChange;
     /// @dev Old public key for fast finality.
     bytes oldPubkey;
