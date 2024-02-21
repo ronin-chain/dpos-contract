@@ -60,6 +60,6 @@ abstract contract ProfileHandler is PCUVerifyBLSPublicKey, ProfileStorage {
 
   function _requireCooldownPassedAndSetCooldown(CandidateProfile storage _profile) internal {
     _requireCooldownPassed(_profile);
-    _setCooldown(_profile);
+    _startCooldown(_profile);
   }
 }

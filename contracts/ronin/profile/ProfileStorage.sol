@@ -87,7 +87,7 @@ abstract contract ProfileStorage is IProfile, HasContracts {
     emit PubkeyChanged(_profile.id, pubkey);
   }
 
-  function _setCooldown(CandidateProfile storage _profile) internal {
+  function _startCooldown(CandidateProfile storage _profile) internal {
     _profile.profileLastChange = block.timestamp;
   }
 
