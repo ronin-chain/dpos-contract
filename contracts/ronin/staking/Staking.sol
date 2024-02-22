@@ -14,12 +14,12 @@ contract Staking is IStaking, StakingCallback, Initializable, AccessControlEnume
   bytes32 public constant MIGRATOR_ROLE = keccak256("MIGRATOR_ROLE");
 
   // keccak256(abi.encode(uint256(keccak256("ronin.storage.StakingRep4MigratedStorageLocation")) - 1)) & ~bytes32(uint256(0xff))
-  bytes32 private constant $_REP_4_MIGRATED = 0x02b7258856b9f6bdff23dae2002215e15e9b3a0101a83005baf0725f1e37df00;
+  bytes32 private constant $_StakingRep4MigratedStorageLocation = 0x02b7258856b9f6bdff23dae2002215e15e9b3a0101a83005baf0725f1e37df00;
 
   modifier onRep4Migration {
     uint256 val;
     assembly ("memory-safe") {
-      val := sload($_REP_4_MIGRATED)
+      val := sload($_StakingRep4MigratedStorageLocation)
     }
 
     if (val > 0) revert ErrMigrateWasAdminAlreadyDone();
@@ -95,7 +95,7 @@ contract Staking is IStaking, StakingCallback, Initializable, AccessControlEnume
    */
   function disableMigrateWasAdmin() external onRep4Migration onlyRole(MIGRATOR_ROLE) {
     assembly {
-      sstore($_REP_4_MIGRATED, 0x01)
+      sstore($_StakingRep4MigratedStorageLocation, 0x01)
     }
 
     emit MigrateWasAdminDisabled();
