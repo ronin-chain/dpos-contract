@@ -221,7 +221,7 @@ export interface GatewayPauseEnforcerConfig {
 }
 
 export interface ProfileArguments {
-  pubkeyChangeCooldown?: BigNumberish;
+  profileChangeCooldown?: BigNumberish;
 }
 
 export interface ProfileConfig {

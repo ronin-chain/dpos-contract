@@ -25,8 +25,8 @@ interface IProfile {
     address __reservedGovernor;
     /// @dev Public key for fast finality.
     bytes pubkey;
-    /// @dev Last public key change timestamp.
-    uint256 pubkeyLastChange;
+    /// @dev Timestamp of last change of any profile info.
+    uint256 profileLastChange;
     /// @dev Old public key for fast finality.
     bytes oldPubkey;
   }
@@ -51,8 +51,8 @@ interface IProfile {
   error ErrNonExistentProfile();
   /// @dev Error when create a new profile whose id and consensus are not identical.
   error ErrIdAndConsensusDiffer();
-  /// @dev Error when failed to change public key because cooldown is not ended.
-  error ErrPubkeyChangeCooldownNotEnded();
+  /// @dev Error when failed to change any address or pubkey in the profile because cooldown is not ended.
+  error ErrProfileChangeCooldownNotEnded();
   /**
    * @dev Error when there is a duplicated info of `value`, which is uin256-padding value of any address or hash of public key,
    * and with value type of `infoType`.
@@ -152,5 +152,10 @@ interface IProfile {
    * Requirement:
    *  - Only admin can call this method
    */
-  function setPubkeyChangeCooldown(uint256 cooldown) external;
+  function setCooldownConfig(uint256 cooldown) external;
+
+  /**
+   * @dev Returns the config of cool down on change profile info.
+   */
+  function getCooldownConfig() external view returns (uint256);
 }

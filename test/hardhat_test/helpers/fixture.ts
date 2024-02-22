@@ -23,6 +23,7 @@ import {
   SlashIndicatorArguments,
   StakingArguments,
   StakingVestingArguments,
+  ProfileArguments,
 } from '../../../src/utils';
 import {
   BridgeManagerArguments,
@@ -62,6 +63,7 @@ export interface DeployTestSuiteInput {
   governanceAdminArguments?: RoninGovernanceAdminArguments;
   bridgeManagerArguments?: BridgeManagerArguments;
   bridgeRewardArguments?: BridgeRewardArguments;
+  profileArguments?: ProfileArguments;
 }
 
 export const defaultTestConfig: DeployTestSuiteInput = {
@@ -152,6 +154,10 @@ export const defaultTestConfig: DeployTestSuiteInput = {
     rewardPerPeriod: 5_000,
     topupAmount: BigNumber.from(100_000_000_000),
   },
+
+  profileArguments: {
+    profileChangeCooldown: 60 // 1 mintues
+  }
 };
 
 export const deployTestSuite = (id: string) =>

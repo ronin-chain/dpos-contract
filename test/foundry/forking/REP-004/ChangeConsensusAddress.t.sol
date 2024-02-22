@@ -38,8 +38,11 @@ contract ChangeConsensusAddressForkTest is Test {
   SlashIndicator internal _slashIndicator;
   RoninTrustedOrganization internal _roninTO;
 
+  uint _profileCooldownConfig;
+
   modifier upgrade() {
     _upgradeContracts();
+    _profileCooldownConfig = _profile.getCooldownConfig();
     _;
   }
 
@@ -126,7 +129,6 @@ contract ChangeConsensusAddressForkTest is Test {
     vm.deal(a1, 1000 ether);
     vm.deal(a2, 1000 ether);
 
-
     uint256 snapshotId = vm.snapshot();
 
     uint256 amount = a2.balance;
@@ -145,21 +147,21 @@ contract ChangeConsensusAddressForkTest is Test {
     console2.log("a2 cannot delegate c1".yellow());
     vm.prank(a2);
     vm.expectRevert();
-    _staking.delegate{value: 100 ether}(TConsensus.wrap(c1));
+    _staking.delegate{ value: 100 ether }(TConsensus.wrap(c1));
 
     console2.log("a2 can stake c1".yellow());
     vm.prank(a2);
-    _staking.stake{value: 100 ether}(TConsensus.wrap(c1));
+    _staking.stake{ value: 100 ether }(TConsensus.wrap(c1));
 
     console2.log("a1 cannot delegate c1".yellow());
     vm.prank(a1);
     vm.expectRevert();
-    _staking.delegate{value: 100 ether}(TConsensus.wrap(c1));
+    _staking.delegate{ value: 100 ether }(TConsensus.wrap(c1));
 
     console2.log("a1 cannot stake c1".yellow());
     vm.prank(a1);
     vm.expectRevert();
-    _staking.stake{value: 100 ether}(TConsensus.wrap(c1));
+    _staking.stake{ value: 100 ether }(TConsensus.wrap(c1));
 
     uint256 a2BalanceBefore = a2.balance;
 
@@ -301,9 +303,13 @@ contract ChangeConsensusAddressForkTest is Test {
 
     vm.startPrank(admin);
     {
+      vm.warp(block.timestamp + _profileCooldownConfig);
       _profile.requestChangeConsensusAddr(consensus, TConsensus.wrap(newConsensus));
+
+      vm.warp(block.timestamp + _profileCooldownConfig);
       _profile.requestChangeAdminAddress(consensus, newAdmin);
 
+      vm.warp(block.timestamp + _profileCooldownConfig);
       vm.expectRevert("Not supported");
       _profile.requestChangeTreasuryAddr(consensus, payable(newDummyTreasury));
     }
@@ -339,6 +345,7 @@ contract ChangeConsensusAddressForkTest is Test {
 
   function testFork_AfterUpgraded_ApplyValidatorCandidateBefore_AddNewTrustedOrgAfter() external upgrade {
     uint256 newWeight = 1000;
+    _profileCooldownConfig = _profile.getCooldownConfig();
 
     // apply validator candidate
     _applyValidatorCandidate("candidate-admin", "consensus");
@@ -364,9 +371,12 @@ contract ChangeConsensusAddressForkTest is Test {
 
     vm.startPrank(admin);
     {
+      vm.warp(block.timestamp + _profileCooldownConfig);
       _profile.requestChangeConsensusAddr(consensus, TConsensus.wrap(newConsensus));
+      vm.warp(block.timestamp + _profileCooldownConfig);
       _profile.requestChangeAdminAddress(consensus, newAdmin);
 
+      vm.warp(block.timestamp + _profileCooldownConfig);
       vm.expectRevert("Not supported");
       _profile.requestChangeTreasuryAddr(consensus, payable(newDummyTreasury));
     }
@@ -455,9 +465,12 @@ contract ChangeConsensusAddressForkTest is Test {
       proposalExpiredAt
     );
     _staking.requestEmergencyExit(validatorCandidate);
+    vm.warp(block.timestamp + _profileCooldownConfig);
     _profile.requestChangeConsensusAddr(TConsensus.unwrap(validatorCandidate), newConsensusAddr);
+    vm.warp(block.timestamp + _profileCooldownConfig);
     _profile.requestChangeAdminAddress(TConsensus.unwrap(validatorCandidate), newAdmin);
 
+    vm.warp(block.timestamp + _profileCooldownConfig);
     vm.expectRevert("Not supported");
     _profile.requestChangeTreasuryAddr(TConsensus.unwrap(validatorCandidate), newDummyTreasury);
     vm.stopPrank();
