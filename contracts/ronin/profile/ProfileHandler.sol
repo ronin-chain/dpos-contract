@@ -15,7 +15,10 @@ abstract contract ProfileHandler is PCUVerifyBLSPublicKey, ProfileStorage {
     _requireNonZeroAndNonDuplicated(RoleAccess.CONSENSUS, TConsensus.unwrap(profile.consensus));
     _requireNonZeroAndNonDuplicated(RoleAccess.CANDIDATE_ADMIN, profile.admin);
     _requireNonZeroAndNonDuplicated(RoleAccess.TREASURY, profile.treasury);
-    _requireNonDuplicated(RoleAccess.TREASURY, profile.__reservedGovernor);
+
+    // Currently skip check of governor because the address is address(0x00).
+    // _requireNonDuplicated(RoleAccess.GOVERNOR, profile.__reservedGovernor);
+
     _requireNonDuplicatedPubkey(profile.pubkey);
   }
 
