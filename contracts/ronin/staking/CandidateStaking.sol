@@ -232,12 +232,6 @@ abstract contract CandidateStaking is BaseStaking, ICandidateStaking, GlobalConf
     uint256 commissionRate,
     uint256 amount
   ) internal {
-    if (!_unsafeSendRONLimitGas(poolAdmin, 0, DEFAULT_ADDITION_GAS)) {
-      revert ErrCannotInitTransferRON(poolAdmin, "pool admin");
-    }
-    if (!_unsafeSendRONLimitGas(treasuryAddr, 0, DEFAULT_ADDITION_GAS)) {
-      revert ErrCannotInitTransferRON(treasuryAddr, "treasury");
-    }
     if (amount < _minValidatorStakingAmount) revert ErrInsufficientStakingAmount();
     if (poolAdmin != candidateAdmin || candidateAdmin != treasuryAddr) revert ErrThreeInteractionAddrsNotEqual();
 

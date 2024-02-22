@@ -36,8 +36,6 @@ interface ICandidateStaking is IRewardPool {
     uint256 contractBalance
   );
 
-  /// @dev Error of cannot transfer RON to specified target.
-  error ErrCannotInitTransferRON(address addr, string extraInfo);
   /// @dev Error of three interaction addresses must be of the same in applying for validator candidate.
   error ErrThreeInteractionAddrsNotEqual();
   /// @dev Error of unstaking zero amount.
