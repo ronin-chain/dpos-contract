@@ -101,7 +101,21 @@ contract Proposal__20240220_MikoHardfork is MikoHelper {
       prCnt += sub_callDatas.length;
     }
 
-    // [B4.] Change admin of all contracts
+    // [B4.] Replace StableNode governor
+    {
+      (
+        bytes[] memory sub_callDatas,
+        address[] memory sub_targets,
+        uint256[] memory sub_values
+      ) = _ga__changeGovernorStableNode();
+
+      tos = tos.replace(sub_targets, prCnt);
+      callDatas = callDatas.replace(sub_callDatas, prCnt);
+      values = values.replace(sub_values, prCnt);
+      prCnt += sub_callDatas.length;
+    }
+
+    // [B5.] Change admin of all contracts
     {
       (
         bytes[] memory sub_callDatas,
@@ -342,6 +356,39 @@ contract Proposal__20240220_MikoHardfork is MikoHelper {
       targets[8] = address(stakingContract);
       callDatas[8] = abi.encodeCall(TransparentUpgradeableProxyV2.functionDelegateCall, _migrator__migrateWasAdmin());
     }
+  }
+
+  function _ga__changeGovernorStableNode()
+    internal
+    view
+    returns (bytes[] memory callDatas, address[] memory targets, uint256[] memory values)
+  {
+    callDatas = new bytes[](2);
+    targets = new address[](2);
+    values = new uint256[](2);
+
+    // Remove current governor of StableNode
+    TConsensus[] memory cssList = new TConsensus[](1);
+    cssList[0] = STABLE_NODE_CONSENSUS; // StableNode
+
+    targets[0] = address(trustedOrgContract);
+    callDatas[0] = abi.encodeCall(
+      TransparentUpgradeableProxyV2.functionDelegateCall,
+      abi.encodeCall(RoninTrustedOrganization.removeTrustedOrganizations, (cssList))
+    );
+
+    // Add new governor for StableNode
+    IRoninTrustedOrganization.TrustedOrganization[]
+      memory trOrgLst = new IRoninTrustedOrganization.TrustedOrganization[](1);
+    trOrgLst[0].consensusAddr = STABLE_NODE_CONSENSUS;
+    trOrgLst[0].governor = STABLE_NODE_GOVERNOR;
+    trOrgLst[0].weight = 100;
+
+    targets[1] = address(trustedOrgContract);
+    callDatas[1] = abi.encodeCall(
+      TransparentUpgradeableProxyV2.functionDelegateCall,
+      abi.encodeCall(RoninTrustedOrganization.addTrustedOrganizations, (trOrgLst))
+    );
   }
 
   function _migrator__migrateWasAdmin() internal view returns (bytes memory) {
