@@ -186,7 +186,7 @@ abstract contract SlashUnavailability is ISlashUnavailability, HasContracts, Has
     _unavailabilityTier1Threshold = tier1Threshold;
     _unavailabilityTier2Threshold = tier2Threshold;
     _slashAmountForUnavailabilityTier2Threshold = slashAmountForTier2;
-    _jailDurationForUnavailabilityTier2Threshold = jailDurationForTier2
+    _jailDurationForUnavailabilityTier2Threshold = jailDurationForTier2;
     emit UnavailabilitySlashingConfigsUpdated(
       tier1Threshold,
       tier2Threshold,
