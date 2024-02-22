@@ -52,9 +52,14 @@ abstract contract ProfileHandler is PCUVerifyBLSPublicKey, ProfileStorage {
     }
   }
 
-  function _checkPubkeyChangeCooldown(CandidateProfile storage profile) internal view {
-    if (block.timestamp <= profile.pubkeyLastChange + pubkeyChangeCooldown) {
-      revert ErrPubkeyChangeCooldownNotEnded();
+  function _requireCooldownPassed(CandidateProfile storage _profile) internal view {
+    if (block.timestamp < _profile.profileLastChange + _profileChangeCooldown) {
+      revert ErrProfileChangeCooldownNotEnded();
     }
+  }
+
+  function _requireCooldownPassedAndStartCooldown(CandidateProfile storage _profile) internal {
+    _requireCooldownPassed(_profile);
+    _startCooldown(_profile);
   }
 }

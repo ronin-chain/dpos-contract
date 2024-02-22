@@ -37,7 +37,7 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
   }
 
   function initializeV3(uint256 cooldown) external reinitializer(3) {
-    _setPubkeyChangeCooldown(cooldown);
+    _setCooldownConfig(cooldown);
   }
 
   /**
@@ -149,6 +149,7 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     CandidateProfile storage _profile = _getId2ProfileHelper(id);
     _requireCandidateAdmin(_profile);
     _requireNonZeroAndNonDuplicated(RoleAccess.CANDIDATE_ADMIN, newAdminAddr);
+    _requireCooldownPassedAndStartCooldown(_profile);
 
     IStaking stakingContract = IStaking(getContract(ContractType.STAKING));
     stakingContract.execChangeAdminAddress({ poolId: id, currAdminAddr: msg.sender, newAdminAddr: newAdminAddr });
@@ -190,6 +191,7 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     CandidateProfile storage _profile = _getId2ProfileHelper(id);
     _requireCandidateAdmin(_profile);
     _requireNonZeroAndNonDuplicated(RoleAccess.CONSENSUS, TConsensus.unwrap(newConsensusAddr));
+    _requireCooldownPassedAndStartCooldown(_profile);
 
     TConsensus oldConsensusAddr = _profile.consensus;
 
@@ -236,8 +238,8 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     CandidateProfile storage _profile = _getId2ProfileHelper(id);
     _requireCandidateAdmin(_profile);
     _requireNonDuplicatedPubkey(pubkey);
-    _checkPubkeyChangeCooldown(_profile);
     _verifyPubkey(pubkey, proofOfPossession);
+    _requireCooldownPassedAndStartCooldown(_profile);
     _setPubkey(_profile, pubkey);
   }
 
@@ -251,7 +253,14 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
   /**
    * @inheritdoc IProfile
    */
-  function setPubkeyChangeCooldown(uint256 cooldown) external onlyAdmin {
-    _setPubkeyChangeCooldown(cooldown);
+  function getCooldownConfig() external view returns (uint256) {
+    return _profileChangeCooldown;
+  }
+
+  /**
+   * @inheritdoc IProfile
+   */
+  function setCooldownConfig(uint256 cooldown) external onlyAdmin {
+    _setCooldownConfig(cooldown);
   }
 }

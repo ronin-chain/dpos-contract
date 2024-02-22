@@ -29,7 +29,7 @@ abstract contract ProfileXComponents is IProfile, ProfileHandler {
       treasury: payable(treasury),
       __reservedGovernor: address(0),
       pubkey: pubkey,
-      pubkeyLastChange: 0,
+      profileLastChange: 0,
       oldPubkey: ""
     });
     _requireNonDuplicatedInRegistry(profile);
@@ -41,8 +41,8 @@ abstract contract ProfileXComponents is IProfile, ProfileHandler {
    * @inheritdoc IProfile
    */
   function arePublicKeysRegistered(bytes[][2] calldata listOfPublicKey) external view returns (bool) {
-    for (uint256 i; i < listOfPublicKey.length; ) {
-      for (uint256 j; j < listOfPublicKey[i].length; ) {
+    for (uint i; i < listOfPublicKey.length; ) {
+      for (uint j; j < listOfPublicKey[i].length; ) {
         if (!_isRegisteredPubkey(listOfPublicKey[i][j])) {
           return false;
         }
