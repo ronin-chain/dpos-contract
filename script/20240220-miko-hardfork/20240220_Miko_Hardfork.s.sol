@@ -8,7 +8,7 @@ import { StdStyle } from "forge-std/StdStyle.sol";
 import { BridgeTrackingRecoveryLogic, BridgeTracking } from "../20231019-recover-fund/contracts/BridgeTrackingRecoveryLogic.sol";
 
 import { SlashIndicator } from "@ronin/contracts/ronin/slash-indicator/SlashIndicator.sol";
-import { Staking } from "@ronin/contracts/ronin/staking/Staking.sol";
+import { Staking, IStaking } from "@ronin/contracts/ronin/staking/Staking.sol";
 import { Profile } from "@ronin/contracts/ronin/profile/Profile.sol";
 import { Maintenance } from "@ronin/contracts/ronin/Maintenance.sol";
 import { RoninValidatorSet } from "@ronin/contracts/ronin/validator/RoninValidatorSet.sol";
@@ -141,6 +141,8 @@ contract Proposal__20240220_MikoHardfork is MikoHelper {
      * [C4.] The `doctor` will transfer admin to BridgeManager.
      */
     _doctor__rollbackBridgeTracking();
+
+    _migrator__disableMigrate();
   }
 
   function _sys__loadContracts() internal {
@@ -345,6 +347,19 @@ contract Proposal__20240220_MikoHardfork is MikoHelper {
   function _migrator__migrateWasAdmin() internal view returns (bytes memory) {
     (address[] memory poolIds, address[] memory admins, bool[] memory flags) = _parseMigrateData(MIGRATE_DATA_PATH);
     return abi.encodeCall(Staking.migrateWasAdmin, (poolIds, admins, flags));
+  }
+
+  function _migrator__disableMigrate() internal {
+    vm.prank(STAKING_MIGRATOR);
+    stakingContract.disableMigrateWasAdmin();
+
+    address[] memory poolIds = new address[](1);
+    address[] memory admins = new address[](1);
+    bool[] memory flags = new bool[](1);
+
+    vm.prank(STAKING_MIGRATOR);
+    vm.expectRevert(abi.encodeWithSelector(IStaking.ErrMigrateWasAdminAlreadyDone.selector));
+    stakingContract.migrateWasAdmin(poolIds, admins, flags);
   }
 
   function _ga__changeAdminAllContracts()
