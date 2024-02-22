@@ -32,7 +32,7 @@ contract Profile_Unit_Test is Base_Test {
     vm.startPrank(address(1));
 
     TransparentUpgradeableProxyV2 _proxy = TransparentUpgradeableProxyV2(payable(address(_profile)));
-    _proxy.functionDelegateCall(abi.encodeWithSelector(IProfile.addNewProfile.selector, IProfile.CandidateProfile({
+    _proxy.functionDelegateCall(abi.encodeWithSelector(MockProfile.addNewProfile.selector, IProfile.CandidateProfile({
       id: address(0x20000),
       consensus: TConsensus.wrap(address(0x20000)),
       admin: _validatorAdmin,

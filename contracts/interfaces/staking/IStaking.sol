@@ -10,6 +10,11 @@ import "./IDelegatorStaking.sol";
 interface IStaking is IRewardPool, IBaseStaking, ICandidateStaking, IDelegatorStaking, IStakingCallback {
   /// @dev Event emitted when the `wasAdmin` is finished to migrate.
   event MigrateWasAdminFinished();
+  /// @dev Event emitted when the `migrateWasAdmin` method is disabled.
+  event MigrateWasAdminDisabled();
+
+  /// @dev Error indicating that the REP-4 migration is already done.
+  error ErrMigrateWasAdminAlreadyDone();
 
   /**
    * @dev Records the amount of rewards `_rewards` for the pools `_consensusAddrs`.

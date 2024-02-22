@@ -125,15 +125,6 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
 
   /**
    * @inheritdoc IProfile
-   */
-  function addNewProfile(CandidateProfile memory profile) external onlyAdmin {
-    CandidateProfile storage _profile = _id2Profile[profile.id];
-    if (_profile.id != address(0)) revert ErrExistentProfile();
-    _addNewProfile(_profile, profile);
-  }
-
-  /**
-   * @inheritdoc IProfile
    *
    * @dev Side-effects on other contracts:
    * - Update Staking contract:
