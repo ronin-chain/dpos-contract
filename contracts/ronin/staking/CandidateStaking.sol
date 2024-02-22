@@ -241,12 +241,7 @@ abstract contract CandidateStaking is BaseStaking, ICandidateStaking, GlobalConf
     if (amount < _minValidatorStakingAmount) revert ErrInsufficientStakingAmount();
     if (poolAdmin != candidateAdmin || candidateAdmin != treasuryAddr) revert ErrThreeInteractionAddrsNotEqual();
 
-    {
-      address[] memory diffAddrs = new address[](3);
-      diffAddrs[0] = poolAdmin;
-      diffAddrs[1] = poolId;
-      if (AddressArrayUtils.hasDuplicate(diffAddrs)) revert AddressArrayUtils.ErrDuplicated(msg.sig);
-    }
+    if (poolAdmin == poolId) revert AddressArrayUtils.ErrDuplicated(msg.sig);
 
     IRoninValidatorSet(getContract(ContractType.VALIDATOR)).execApplyValidatorCandidate({
       candidateAdmin: candidateAdmin,
