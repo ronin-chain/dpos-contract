@@ -3,7 +3,6 @@ pragma solidity ^0.8.19;
 
 import { console2 as console } from "forge-std/console2.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
-import { JSONParserLib } from "lib/foundry-deployment-kit/lib/solady/src/utils/JSONParserLib.sol";
 
 import { TConsensus } from "@ronin/contracts/udvts/Types.sol";
 import { Proposal, RoninMigration } from "script/RoninMigration.s.sol";
@@ -18,8 +17,7 @@ import { TransparentUpgradeableProxy, TransparentUpgradeableProxyV2 } from "@ron
 import { IRoninTrustedOrganization, RoninTrustedOrganization } from "@ronin/contracts/multi-chains/RoninTrustedOrganization.sol";
 import { GovernanceAdmin, RoninGovernanceAdmin } from "@ronin/contracts/ronin/RoninGovernanceAdmin.sol";
 
-abstract contract MikoHelper is RoninMigration {
-  using JSONParserLib for *;
+abstract contract MikoConfig is RoninMigration {
   using StdStyle for *;
 
   bytes32 public constant $_IMPL_SLOT = 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc;
@@ -50,27 +48,4 @@ abstract contract MikoHelper is RoninMigration {
 
   TConsensus public constant STABLE_NODE_CONSENSUS = TConsensus.wrap(0x6E46924371d0e910769aaBE0d867590deAC20684);
   address public constant STABLE_NODE_GOVERNOR = 0x3C583c0c97646a73843aE57b93f33e1995C8DC80;
-
-  function _parseMigrateData(
-    string memory path
-  ) internal view returns (address[] memory poolIds, address[] memory admins, bool[] memory flags) {
-    string memory raw = vm.readFile(path);
-    JSONParserLib.Item memory data = raw.parse();
-    uint256 size = data.size();
-    console.log("size", size);
-
-    poolIds = new address[](size);
-    admins = new address[](size);
-    flags = new bool[](size);
-
-    for (uint256 i; i < size; ++i) {
-      poolIds[i] = vm.parseAddress(data.at(i).at('"cid"').value().decodeString());
-      admins[i] = vm.parseAddress(data.at(i).at('"admin"').value().decodeString());
-      flags[i] = true;
-
-      console.log("\nPool ID:".cyan(), vm.toString(poolIds[i]));
-      console.log("Admin:".cyan(), vm.toString(admins[i]));
-      console.log("Flags:".cyan(), flags[i]);
-    }
-  }
 }

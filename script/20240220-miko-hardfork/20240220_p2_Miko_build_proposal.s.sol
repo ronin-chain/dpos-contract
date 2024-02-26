@@ -18,47 +18,17 @@ import { FastFinalityTracking } from "@ronin/contracts/ronin/fast-finality/FastF
 import { AccessControl } from "@openzeppelin/contracts/access/AccessControl.sol";
 
 import "./ArrayReplaceLib.sol";
-import "./MikoHelper.s.sol";
+import "./20240220_Base_Miko_Hardfork.s.sol";
 
-contract Proposal__20240220_MikoHardfork is MikoHelper {
+abstract contract Proposal__20240220_MikoHardfork_BuildProposal is Proposal__Base_20240220_MikoHardfork {
   using LibProxy for *;
   using StdStyle for *;
   using ArrayReplaceLib for *;
 
-  uint256 balanceBefore;
-
-  address internal _newGA;
-
-  address payable[] private allDPoSContracts;
-  address[] private contractsToUpgrade;
-  address[] private contractsToChangeAdmin;
-  address[] private contractsToChangeDefaultAdminRole;
-  TContract[] private contractTypesToUpgrade;
-
-  RoninGovernanceAdmin private roninGovernanceAdmin;
-  RoninTrustedOrganization private trustedOrgContract;
-
-  address private bridgeTracking;
-  address private roninBridgeManager;
-  SlashIndicator private slashIndicatorContract;
-  FastFinalityTracking private fastFinalityTrackingContract;
-  Profile private profileContract;
-  Staking private stakingContract;
-  StakingVesting private stakingVestingContract;
-  Maintenance private maintenanceContract;
-  RoninValidatorSet private validatorContract;
-
   /**
    * See `README.md`
    */
-  function run() public onlyOn(DefaultNetwork.RoninMainnet.key()) {
-    address sender = sender();
-    console.log("Default sender:", sender);
-
-    _sys__loadContracts();
-    // _node__changeStorage();
-    _eoa__changeAdminToGA();
-
+  function _buildFinalProposal() internal returns (Proposal.ProposalDetail memory proposal) {
     address[] memory tos = new address[](40);
     bytes[] memory callDatas = new bytes[](40);
     uint256[] memory values = new uint256[](40);
@@ -150,64 +120,13 @@ contract Proposal__20240220_MikoHardfork is MikoHelper {
       mstore(values, prCnt)
     }
 
-    Proposal.ProposalDetail memory proposal = _buildProposal(
+    proposal = _buildProposal(
       roninGovernanceAdmin,
       block.timestamp + PROPOSAL_DURATION,
       tos,
       values,
       callDatas
     );
-    _executeProposal(roninGovernanceAdmin, trustedOrgContract, proposal, SKY_MAVIS_GOVERNOR);
-
-    CONFIG.setAddress(network(), Contract.RoninGovernanceAdmin.key(), address(_newGA));
-
-    // [C2.] The `doctor` will withdraw the locked fund.
-    _doctor__recoverFund();
-
-    /*
-     * [C3.] The `doctor` will upgrade the Bridge Tracking contract to remove the recovery method.
-     * [C4.] The `doctor` will transfer admin to BridgeManager.
-     * [C5.] The `doctor` will transfer all fund to Andy's trezor.
-     */
-    _doctor__rollbackBridgeTracking();
-
-    _migrator__disableMigrate();
-  }
-
-  function _sys__loadContracts() internal {
-    roninGovernanceAdmin = RoninGovernanceAdmin(
-      config.getAddressFromCurrentNetwork(Contract.RoninGovernanceAdmin.key())
-    );
-    trustedOrgContract = RoninTrustedOrganization(
-      config.getAddressFromCurrentNetwork(Contract.RoninTrustedOrganization.key())
-    );
-    roninBridgeManager = config.getAddressFromCurrentNetwork(Contract.RoninBridgeManager.key());
-
-    bridgeTracking = config.getAddressFromCurrentNetwork(Contract.BridgeTracking.key());
-
-    fastFinalityTrackingContract = FastFinalityTracking(
-      config.getAddressFromCurrentNetwork(Contract.FastFinalityTracking.key())
-    );
-    maintenanceContract = Maintenance(config.getAddressFromCurrentNetwork(Contract.Maintenance.key()));
-    profileContract = Profile(config.getAddressFromCurrentNetwork(Contract.Profile.key()));
-    slashIndicatorContract = SlashIndicator(config.getAddressFromCurrentNetwork(Contract.SlashIndicator.key()));
-    stakingContract = Staking(config.getAddressFromCurrentNetwork(Contract.Staking.key()));
-    stakingVestingContract = StakingVesting(config.getAddressFromCurrentNetwork(Contract.StakingVesting.key()));
-    validatorContract = RoninValidatorSet(config.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key()));
-
-    allDPoSContracts.push(payable(address(trustedOrgContract)));
-    allDPoSContracts.push(payable(address(fastFinalityTrackingContract)));
-    allDPoSContracts.push(payable(address(maintenanceContract)));
-    allDPoSContracts.push(payable(address(profileContract)));
-    allDPoSContracts.push(payable(address(slashIndicatorContract)));
-    allDPoSContracts.push(payable(address(stakingContract)));
-    allDPoSContracts.push(payable(address(stakingVestingContract)));
-    allDPoSContracts.push(payable(address(validatorContract)));
-  }
-
-  function _node__changeStorage() internal {
-    // Cheat storage slot of impl in Trusted Org Proxy
-    vm.store(address(trustedOrgContract), bytes32($_IMPL_SLOT), bytes32(uint256(uint160(TRUSTED_ORG_RECOVERY_LOGIC))));
   }
 
   function _ga__changeAdminBridgeTracking()
@@ -286,26 +205,6 @@ contract Proposal__20240220_MikoHardfork is MikoHelper {
         vm.toString(keccak256(vm.getDeployedCode(config.getContractAbsolutePath(contractTypesToUpgrade[i]))))
       );
     }
-  }
-
-  function _eoa__changeAdminToGA() internal {
-    bool shouldPrankOnly = CONFIG.isBroadcastDisable();
-
-    if (shouldPrankOnly) {
-      vm.prank(BAO_EOA);
-    } else {
-      vm.broadcast(BAO_EOA);
-    }
-    TransparentUpgradeableProxy(payable(address(profileContract))).changeAdmin(address(roninGovernanceAdmin));
-
-    if (shouldPrankOnly) {
-      vm.prank(BAO_EOA);
-    } else {
-      vm.broadcast(BAO_EOA);
-    }
-    TransparentUpgradeableProxy(payable(address(fastFinalityTrackingContract))).changeAdmin(
-      address(roninGovernanceAdmin)
-    );
   }
 
   function _ga__initContracts()
@@ -407,21 +306,8 @@ contract Proposal__20240220_MikoHardfork is MikoHelper {
   }
 
   function _migrator__migrateWasAdmin() internal view returns (bytes memory) {
-    (address[] memory poolIds, address[] memory admins, bool[] memory flags) = _parseMigrateData(MIGRATE_DATA_PATH);
+    (address[] memory poolIds, address[] memory admins, bool[] memory flags) = _sys__parseMigrateData(MIGRATE_DATA_PATH);
     return abi.encodeCall(Staking.migrateWasAdmin, (poolIds, admins, flags));
-  }
-
-  function _migrator__disableMigrate() internal {
-    vm.startPrank(STAKING_MIGRATOR);
-    stakingContract.disableMigrateWasAdmin();
-
-    address[] memory poolIds = new address[](1);
-    address[] memory admins = new address[](1);
-    bool[] memory flags = new bool[](1);
-
-    vm.expectRevert(abi.encodeWithSelector(IStaking.ErrMigrateWasAdminAlreadyDone.selector));
-    stakingContract.migrateWasAdmin(poolIds, admins, flags);
-    vm.stopPrank();
   }
 
   function _ga__changeAdminAllContracts()
@@ -478,16 +364,20 @@ contract Proposal__20240220_MikoHardfork is MikoHelper {
     console.log("Number contract to change default admin role:", contractsToChangeDefaultAdminRole.length);
 
     callDatas = new bytes[](innerCallCount);
-    targets = contractsToChangeAdmin;
+    targets = new address[](innerCallCount);
     values = new uint256[](innerCallCount);
 
     for (uint i; i < contractsToChangeAdmin.length; ++i) {
+      targets[i] = contractsToChangeAdmin[i];
       callDatas[i] = abi.encodeCall(TransparentUpgradeableProxy.changeAdmin, (_newGA));
     }
 
     for (uint i; i < contractsToChangeDefaultAdminRole.length; ++i) {
       uint j = contractsToChangeAdmin.length + i;
+      targets[j] = contractsToChangeDefaultAdminRole[i];
       callDatas[j] = abi.encodeCall(AccessControl.grantRole, (DEFAULT_ADMIN_ROLE, _newGA));
+
+      targets[j + 1] = contractsToChangeDefaultAdminRole[i];
       callDatas[j + 1] = abi.encodeCall(
         AccessControl.renounceRole,
         (DEFAULT_ADMIN_ROLE, address(roninGovernanceAdmin))
@@ -509,81 +399,5 @@ contract Proposal__20240220_MikoHardfork is MikoHelper {
 
     targets[1] = address(stakingContract);
     callDatas[1] = abi.encodeCall(AccessControl.renounceRole, (DEFAULT_ADMIN_ROLE, address(roninGovernanceAdmin)));
-  }
-
-  function _doctor__recoverFund() internal {
-    address doctor = ADMIN_TMP_BRIDGE_TRACKING;
-
-    // Step 3
-    bool shouldPrankOnly = CONFIG.isBroadcastDisable();
-
-    if (shouldPrankOnly) {
-      vm.prank(DEPLOYER);
-    } else {
-      vm.broadcast(DEPLOYER);
-    }
-    address logic = address(new BridgeTrackingRecoveryLogic());
-
-    if (shouldPrankOnly) {
-      vm.prank(doctor);
-    } else {
-      vm.broadcast(doctor);
-    }
-    TransparentUpgradeableProxyV2(payable((bridgeTracking))).upgradeTo(logic);
-
-    if (shouldPrankOnly) {
-      vm.prank(doctor);
-    } else {
-      vm.broadcast(doctor);
-    }
-    TransparentUpgradeableProxyV2(payable((bridgeTracking))).functionDelegateCall(
-      abi.encodeCall(BridgeTrackingRecoveryLogic.recoverFund, ())
-    );
-
-    uint256 balanceAfter = doctor.balance;
-    console.log("balanceBefore", balanceBefore);
-    console.log("balanceAfter", balanceAfter);
-    uint256 recoveredFund = balanceAfter - balanceBefore;
-    console.log("recoveredFund", recoveredFund);
-  }
-
-  function _doctor__rollbackBridgeTracking() internal {
-    address doctor = ADMIN_TMP_BRIDGE_TRACKING;
-    bool shouldPrankOnly = CONFIG.isBroadcastDisable();
-
-    if (shouldPrankOnly) {
-      vm.prank(DEPLOYER);
-    } else {
-      vm.broadcast(DEPLOYER);
-    }
-    address logic = address(new BridgeTracking());
-
-    if (shouldPrankOnly) {
-      vm.prank(doctor);
-    } else {
-      vm.broadcast(doctor);
-    }
-    TransparentUpgradeableProxyV2(payable((bridgeTracking))).upgradeTo(logic);
-
-    if (shouldPrankOnly) {
-      vm.prank(doctor);
-    } else {
-      vm.broadcast(doctor);
-    }
-    TransparentUpgradeableProxyV2(payable((bridgeTracking))).changeAdmin(roninBridgeManager);
-
-    uint256 andyBalanceBefore = ANDY_TREZOR.balance;
-
-    if (shouldPrankOnly) {
-      vm.prank(doctor);
-    } else {
-      vm.broadcast(doctor);
-    }
-    payable(ANDY_TREZOR).transfer(doctor.balance - 0.5 ether);
-
-    uint256 andyBalanceAfter = ANDY_TREZOR.balance;
-    console2.log("Andy's balance before:", andyBalanceBefore / 1e18, "RON");
-    console2.log("Andy's balance after:", andyBalanceAfter / 1e18, "RON");
-    console2.log("Andy's balance change: +", (andyBalanceAfter - andyBalanceBefore) / 1e18, "RON");
   }
 }
