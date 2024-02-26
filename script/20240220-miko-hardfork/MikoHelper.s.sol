@@ -28,16 +28,17 @@ abstract contract MikoHelper is RoninMigration {
   string public constant MIGRATE_DATA_PATH = "script/data/cid_mainnet.json";
 
   /**
-   * Addresses that requires private keys
+   * NOTE: Addresses that requires private keys
    */
-  address public constant DEPLOYER = 0xFE490b68E64B190B415Bb92F8D2F7566243E6ea0; // Mainnet Shadow deployer address;
-  address public constant BAO_EOA = 0x4d58Ea7231c394d5804e8B06B1365915f906E27F;
-  address public constant ADMIN_TMP_BRIDGE_TRACKING = 0x25F7D5901ed7d397EC0758bb59717d6D623286A1; // [Mainnet][Bridge] Bridge Tracking Temp Admin
-  address public constant STAKING_MIGRATOR = 0x555a4D1201DecF7d5C87EcF67B1f0b6430bED2Ed; // [Mainnet][DPoS] Staking Migrator
+  address public constant DEPLOYER = 0xFE490b68E64B190B415Bb92F8D2F7566243E6ea0; // Mainnet Shadow deployer address (FIXME: change to BAO's EOA when on mainnet)
+  address public constant BAO_EOA = 0x4d58Ea7231c394d5804e8B06B1365915f906E27F; // op:
+  address public constant ADMIN_TMP_BRIDGE_TRACKING = 0x25F7D5901ed7d397EC0758bb59717d6D623286A1; // op: [Mainnet][Bridge] Bridge Tracking Temp Admin
+  address public constant STAKING_MIGRATOR = 0x555a4D1201DecF7d5C87EcF67B1f0b6430bED2Ed; // op: [Mainnet][DPoS] Staking Migrator
 
   /**
    * Configs
    */
+  address public constant ANDY_TREZOR = 0xEd4A9F48a62Fb6FdcfB45Bb00C9f61D1A436E58C; // Andy's Trezor
   address public constant TRUSTED_ORG_RECOVERY_LOGIC = 0x59646258Ec25CC329f5ce93223e0A50ccfA3e885;
 
   uint256 public constant PROPOSAL_DURATION = 14 days; // FIXME: `20 minutes` on mainnet shadow

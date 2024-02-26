@@ -18,3 +18,4 @@ After the proposal is executed, the following scripts will be run:
 - C2. The `doctor` will withdraw the locked fund.
 - C3. The `doctor` will upgrade the Bridge Tracking contract to remove the recovery method.
 - C4. The `doctor` will transfer admin to BridgeManager.
+- C5. The `doctor` will transfer all fund to Andy's trezor.

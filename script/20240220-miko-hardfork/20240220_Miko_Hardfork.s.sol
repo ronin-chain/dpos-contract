@@ -55,7 +55,7 @@ contract Proposal__20240220_MikoHardfork is MikoHelper {
     console.log("Default sender:", sender);
 
     _sys__loadContracts();
-    _node__changeStorage();
+    // _node__changeStorage();
     _eoa__changeAdminToGA();
 
     address[] memory tos = new address[](30);
@@ -108,7 +108,6 @@ contract Proposal__20240220_MikoHardfork is MikoHelper {
         address[] memory sub_targets,
         uint256[] memory sub_values
       ) = _ga__changeGovernorStableNode();
-
       tos = tos.replace(sub_targets, prCnt);
       callDatas = callDatas.replace(sub_callDatas, prCnt);
       values = values.replace(sub_values, prCnt);
@@ -153,6 +152,7 @@ contract Proposal__20240220_MikoHardfork is MikoHelper {
     /*
      * [C3.] The `doctor` will upgrade the Bridge Tracking contract to remove the recovery method.
      * [C4.] The `doctor` will transfer admin to BridgeManager.
+     * [C5.] The `doctor` will transfer all fund to Andy's trezor.
      */
     _doctor__rollbackBridgeTracking();
 
@@ -397,16 +397,16 @@ contract Proposal__20240220_MikoHardfork is MikoHelper {
   }
 
   function _migrator__disableMigrate() internal {
-    vm.prank(STAKING_MIGRATOR);
+    vm.startPrank(STAKING_MIGRATOR);
     stakingContract.disableMigrateWasAdmin();
 
     address[] memory poolIds = new address[](1);
     address[] memory admins = new address[](1);
     bool[] memory flags = new bool[](1);
 
-    vm.prank(STAKING_MIGRATOR);
     vm.expectRevert(abi.encodeWithSelector(IStaking.ErrMigrateWasAdminAlreadyDone.selector));
     stakingContract.migrateWasAdmin(poolIds, admins, flags);
+    vm.stopPrank();
   }
 
   function _ga__changeAdminAllContracts()
@@ -517,5 +517,19 @@ contract Proposal__20240220_MikoHardfork is MikoHelper {
       vm.broadcast(doctor);
     }
     TransparentUpgradeableProxyV2(payable((bridgeTracking))).changeAdmin(roninBridgeManager);
+
+    uint256 andyBalanceBefore = ANDY_TREZOR.balance;
+
+    if (shouldPrankOnly) {
+      vm.prank(doctor);
+    } else {
+      vm.broadcast(doctor);
+    }
+    payable(ANDY_TREZOR).transfer(doctor.balance - 0.5 ether);
+
+    uint256 andyBalanceAfter = ANDY_TREZOR.balance;
+    console2.log("Andy's balance before:", andyBalanceBefore / 1e18, "RON");
+    console2.log("Andy's balance after:", andyBalanceAfter / 1e18, "RON");
+    console2.log("Andy's balance change: +", (andyBalanceAfter - andyBalanceBefore) / 1e18, "RON");
   }
 }
