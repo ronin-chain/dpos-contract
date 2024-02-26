@@ -10,6 +10,7 @@ import { LibProxy } from "foundry-deployment-kit/libraries/LibProxy.sol";
 import { BaseMigration } from "foundry-deployment-kit/BaseMigration.s.sol";
 import { Contract } from "../utils/Contract.sol";
 import { TransparentUpgradeableProxy } from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
+import { AccessControl } from "@openzeppelin/contracts/access/AccessControl.sol";
 
 import { ICandidateManager } from "@ronin/contracts/interfaces/validator/ICandidateManager.sol";
 import { ICandidateStaking } from "@ronin/contracts/interfaces/staking/ICandidateStaking.sol";
@@ -26,8 +27,13 @@ abstract contract PostChecker_GovernanceAdmin is BaseMigration, PostChecker_Help
   using LibProxy for *;
   using LibErrorHandler for bool;
 
+  bytes32 private constant DEFAULT_ADMIN_ROLE = 0x00;
+
   // @dev Array to store all proxy targets that share same proxy admin
   address[] private _proxyTargets;
+
+  /// @dev Array to store all proxy targets with access control
+  address[] private _proxyACTargets;
 
   address payable private __governanceAdmin;
   address private __trustedOrg;
@@ -36,6 +42,7 @@ abstract contract PostChecker_GovernanceAdmin is BaseMigration, PostChecker_Help
   modifier cleanUpProxyTargets() {
     _;
     delete _proxyTargets;
+    delete _proxyACTargets;
   }
 
   function _postCheck__GovernanceAdmin() internal {
@@ -90,10 +97,7 @@ abstract contract PostChecker_GovernanceAdmin is BaseMigration, PostChecker_Help
     // Identify proxy targets to change admin
     for (uint256 i; i < addrs.length; ++i) {
       try this.getProxyAdmin(addrs[i]) returns (address payable adminOfProxy) {
-        if (adminOfProxy == __governanceAdmin) {
-          console.log("Target Proxy to change admin with proposal", vm.getLabel(addrs[i]));
-          _proxyTargets.push(addrs[i]);
-        } else {
+        if (adminOfProxy != __governanceAdmin) {
           console.log(
             string.concat(
               StdStyle.yellow(unicode"⚠️ [WARNING] "),
@@ -103,20 +107,49 @@ abstract contract PostChecker_GovernanceAdmin is BaseMigration, PostChecker_Help
               vm.toString(adminOfProxy)
             )
           );
+
+          continue;
+        }
+
+        console.log("Target Proxy to change admin with proposal:", vm.getLabel(addrs[i]));
+        _proxyTargets.push(addrs[i]);
+
+        // Change default admin role if it exist in the proxy
+        (bool success, bytes memory returnData) = addrs[i].call(
+          abi.encodeCall(AccessControl.hasRole, (DEFAULT_ADMIN_ROLE, __governanceAdmin))
+        );
+
+        if (success && abi.decode(returnData, (bool))) {
+          console.log("Target Proxy to change default admin role:", vm.getLabel(addrs[i]));
+          _proxyACTargets.push(addrs[i]);
         }
       } catch {}
     }
 
     {
-      address[] memory targets = _proxyTargets;
-      uint256[] memory values = new uint256[](targets.length);
-      bytes[] memory callDatas = new bytes[](targets.length);
+      uint256 innerCallCount = _proxyTargets.length + _proxyACTargets.length * 2;
+      address[] memory targets = new address[](innerCallCount);
+      uint256[] memory values = new uint256[](innerCallCount);
+      bytes[] memory callDatas = new bytes[](innerCallCount);
 
       // Build `changeAdmin` calldata to migrate to new Ronin Governance Admin
-      for (uint256 i; i < targets.length; ++i) {
+      for (uint256 i; i < _proxyTargets.length; ++i) {
+        targets[i] = _proxyTargets[i];
         callDatas[i] = abi.encodeWithSelector(
           TransparentUpgradeableProxy.changeAdmin.selector,
           address(__newGovernanceAdmin)
+        );
+      }
+
+      for (uint i; i < _proxyACTargets.length; ++i) {
+        uint j = _proxyTargets.length + i;
+        targets[j] = _proxyACTargets[i];
+        callDatas[j] = abi.encodeCall(AccessControl.grantRole, (DEFAULT_ADMIN_ROLE, address(__newGovernanceAdmin)));
+
+        targets[j + 1] = _proxyACTargets[i];
+        callDatas[j + 1] = abi.encodeCall(
+          AccessControl.renounceRole,
+          (DEFAULT_ADMIN_ROLE, address(__governanceAdmin))
         );
       }
 
@@ -131,6 +164,7 @@ abstract contract PostChecker_GovernanceAdmin is BaseMigration, PostChecker_Help
       // // Execute the proposal
       _executeProposal(RoninGovernanceAdmin(__governanceAdmin), RoninTrustedOrganization(__trustedOrg), proposal);
       delete _proxyTargets;
+      delete _proxyACTargets;
     }
 
     // Change broken Ronin Governance Admin to new Ronin Governance Admin
