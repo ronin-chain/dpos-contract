@@ -160,22 +160,24 @@ contract RoninMigration is PostChecker, VoteStatusConsumer {
     }
   }
 
-  function _executeProposal(
+  function _proposeProposal(
     RoninGovernanceAdmin governanceAdmin,
     RoninTrustedOrganization roninTrustedOrg,
-    Proposal.ProposalDetail memory proposal
-  ) internal override {
-    Ballot.VoteType support = Ballot.VoteType.For;
-    IRoninTrustedOrganization.TrustedOrganization[] memory allTrustedOrgs = roninTrustedOrg
-      .getAllTrustedOrganizations();
+    Proposal.ProposalDetail memory proposal,
+    address proposer
+  ) internal {
+    if (proposer == address(0)) {
+      IRoninTrustedOrganization.TrustedOrganization[] memory allTrustedOrgs = roninTrustedOrg
+        .getAllTrustedOrganizations();
+
+      proposer = allTrustedOrgs[0].governor;
+    }
 
     bool shouldPrankOnly = CONFIG.isBroadcastDisable();
-    address trustedOrg0 = allTrustedOrgs[0].governor;
-
     if (shouldPrankOnly) {
-      vm.prank(trustedOrg0);
+      vm.prank(proposer);
     } else {
-      vm.broadcast(trustedOrg0);
+      vm.broadcast(proposer);
     }
     governanceAdmin.proposeProposalForCurrentNetwork(
       proposal.expiryTimestamp,
@@ -183,34 +185,70 @@ contract RoninMigration is PostChecker, VoteStatusConsumer {
       proposal.values,
       proposal.calldatas,
       proposal.gasAmounts,
-      support
+      Ballot.VoteType.For
     );
+  }
+
+  function _voteProposalUntilSuccess(
+    RoninGovernanceAdmin governanceAdmin,
+    RoninTrustedOrganization roninTrustedOrg,
+    Proposal.ProposalDetail memory proposal
+  ) internal {
+    Ballot.VoteType support = Ballot.VoteType.For;
+    IRoninTrustedOrganization.TrustedOrganization[] memory allTrustedOrgs = roninTrustedOrg
+      .getAllTrustedOrganizations();
+
+    bool shouldPrankOnly = CONFIG.isBroadcastDisable();
 
     uint256 totalGas;
     for (uint256 i; i < proposal.gasAmounts.length; ++i) {
       totalGas += proposal.gasAmounts[i];
     }
-    totalGas += totalGas * 20_00 / 100_00;
+    totalGas += (totalGas * 20_00) / 100_00;
 
     uint DEFAULT_PROPOSAL_GAS = 1_000_000;
     if (totalGas < DEFAULT_PROPOSAL_GAS) {
-      totalGas = DEFAULT_PROPOSAL_GAS * 120_00 / 100_00;
+      totalGas = (DEFAULT_PROPOSAL_GAS * 120_00) / 100_00;
     }
 
-    for (uint256 i = 1; i < allTrustedOrgs.length; ++i) {
+    for (uint256 i = 0; i < allTrustedOrgs.length; ++i) {
+      address iTrustedOrg = allTrustedOrgs[i].governor;
+
       (VoteStatus status, , , , ) = governanceAdmin.vote(block.chainid, proposal.nonce);
+      if (governanceAdmin.proposalVoted(block.chainid, proposal.nonce, iTrustedOrg)) {
+        continue;
+      }
+
       if (status != VoteStatus.Pending) {
         break;
       }
 
-      address iTrustedOrg = allTrustedOrgs[i].governor;
       if (shouldPrankOnly) {
         vm.prank(iTrustedOrg);
       } else {
         vm.broadcast(iTrustedOrg);
       }
-      governanceAdmin.castProposalVoteForCurrentNetwork{gas: totalGas}(proposal, support);
+      governanceAdmin.castProposalVoteForCurrentNetwork{ gas: totalGas }(proposal, support);
     }
+  }
+
+  function _executeProposal(
+    RoninGovernanceAdmin governanceAdmin,
+    RoninTrustedOrganization roninTrustedOrg,
+    Proposal.ProposalDetail memory proposal
+  ) internal override {
+    _proposeProposal(governanceAdmin, roninTrustedOrg, proposal, address(0));
+    _voteProposalUntilSuccess(governanceAdmin, roninTrustedOrg, proposal);
+  }
+
+  function _executeProposal(
+    RoninGovernanceAdmin governanceAdmin,
+    RoninTrustedOrganization roninTrustedOrg,
+    Proposal.ProposalDetail memory proposal,
+    address proposer
+  ) internal {
+    _proposeProposal(governanceAdmin, roninTrustedOrg, proposal, proposer);
+    _voteProposalUntilSuccess(governanceAdmin, roninTrustedOrg, proposal);
   }
 
   function _buildProposal(

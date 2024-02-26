@@ -24,6 +24,7 @@ abstract contract MikoHelper is RoninMigration {
 
   bytes32 public constant $_IMPL_SLOT = 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc;
   bytes32 public constant MIGRATOR_ROLE = keccak256("MIGRATOR_ROLE");
+  bytes32 public constant DEFAULT_ADMIN_ROLE = bytes32(0x00);
 
   string public constant MIGRATE_DATA_PATH = "script/data/cid_mainnet.json";
 
@@ -34,6 +35,7 @@ abstract contract MikoHelper is RoninMigration {
   address public constant BAO_EOA = 0x4d58Ea7231c394d5804e8B06B1365915f906E27F; // op:
   address public constant ADMIN_TMP_BRIDGE_TRACKING = 0x25F7D5901ed7d397EC0758bb59717d6D623286A1; // op: [Mainnet][Bridge] Bridge Tracking Temp Admin
   address public constant STAKING_MIGRATOR = 0x555a4D1201DecF7d5C87EcF67B1f0b6430bED2Ed; // op: [Mainnet][DPoS] Staking Migrator
+  address public constant SKY_MAVIS_GOVERNOR = 0xe880802580a1fbdeF67ACe39D1B21c5b2C74f059; // op:
 
   /**
    * Configs

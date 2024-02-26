@@ -32,6 +32,7 @@ contract Proposal__20240220_MikoHardfork is MikoHelper {
   address payable[] private allDPoSContracts;
   address[] private contractsToUpgrade;
   address[] private contractsToChangeAdmin;
+  address[] private contractsToChangeDefaultAdminRole;
   TContract[] private contractTypesToUpgrade;
 
   RoninGovernanceAdmin private roninGovernanceAdmin;
@@ -58,9 +59,9 @@ contract Proposal__20240220_MikoHardfork is MikoHelper {
     // _node__changeStorage();
     _eoa__changeAdminToGA();
 
-    address[] memory tos = new address[](30);
-    bytes[] memory callDatas = new bytes[](30);
-    uint256[] memory values = new uint256[](30);
+    address[] memory tos = new address[](40);
+    bytes[] memory callDatas = new bytes[](40);
+    uint256[] memory values = new uint256[](40);
     uint prCnt;
 
     // [B1.] Change admin of Bridge Tracking to doctor
@@ -128,6 +129,20 @@ contract Proposal__20240220_MikoHardfork is MikoHelper {
       prCnt += sub_callDatas.length;
     }
 
+    // [B5.] Change default admin role of Staking Contract
+    {
+      (
+        bytes[] memory sub_callDatas,
+        address[] memory sub_targets,
+        uint256[] memory sub_values
+      ) = _ga__changeDefaultAdminRoleOfStaking();
+
+      tos = tos.replace(sub_targets, prCnt);
+      callDatas = callDatas.replace(sub_callDatas, prCnt);
+      values = values.replace(sub_values, prCnt);
+      prCnt += sub_callDatas.length;
+    }
+
     // [Build proposal]
     assembly {
       mstore(tos, prCnt)
@@ -142,7 +157,7 @@ contract Proposal__20240220_MikoHardfork is MikoHelper {
       values,
       callDatas
     );
-    _executeProposal(roninGovernanceAdmin, trustedOrgContract, proposal);
+    _executeProposal(roninGovernanceAdmin, trustedOrgContract, proposal, SKY_MAVIS_GOVERNOR);
 
     CONFIG.setAddress(network(), Contract.RoninGovernanceAdmin.key(), address(_newGA));
 
@@ -428,6 +443,7 @@ contract Proposal__20240220_MikoHardfork is MikoHelper {
 
     for (uint256 i; i < allContracts.length; ++i) {
       address proxyAdmin = allContracts[i].getProxyAdmin(false);
+      // Skip if admin's of the proxy is not GA
       if (proxyAdmin != address(roninGovernanceAdmin)) {
         console.log(
           unicode"⚠ WARNING:".yellow(),
@@ -439,22 +455,60 @@ contract Proposal__20240220_MikoHardfork is MikoHelper {
             vm.toString(proxyAdmin)
           )
         );
-      } else {
-        console.log("Contract to change admin:".cyan(), vm.getLabel(allContracts[i]));
-        contractsToChangeAdmin.push(allContracts[i]);
+        continue;
+      }
+
+      // Change admin of the proxy
+      console.log("Contract to change admin:".cyan(), vm.getLabel(allContracts[i]));
+      contractsToChangeAdmin.push(allContracts[i]);
+
+      // Change default admin role if it exist in the proxy
+      (bool success, bytes memory returnData) = allContracts[i].call(
+        abi.encodeCall(AccessControl.hasRole, (DEFAULT_ADMIN_ROLE, proxyAdmin))
+      );
+      // AccessControl(allContracts[i]).hasRole(DEFAULT_ADMIN_ROLE, proxyAdmin);
+      if (success && abi.decode(returnData, (bool))) {
+        console.log("Contract to change default admin role:".cyan(), vm.getLabel(allContracts[i]));
+        contractsToChangeDefaultAdminRole.push(allContracts[i]);
       }
     }
 
-    uint256 innerCallCount = contractsToChangeAdmin.length;
-    console.log("Number contract to change admin:", innerCallCount);
+    uint256 innerCallCount = contractsToChangeAdmin.length + contractsToChangeDefaultAdminRole.length * 2;
+    console.log("Number contract to change admin:", contractsToChangeAdmin.length);
+    console.log("Number contract to change default admin role:", contractsToChangeDefaultAdminRole.length);
 
     callDatas = new bytes[](innerCallCount);
     targets = contractsToChangeAdmin;
     values = new uint256[](innerCallCount);
 
-    for (uint256 i; i < innerCallCount; ++i) {
+    for (uint i; i < contractsToChangeAdmin.length; ++i) {
       callDatas[i] = abi.encodeCall(TransparentUpgradeableProxy.changeAdmin, (_newGA));
     }
+
+    for (uint i; i < contractsToChangeDefaultAdminRole.length; ++i) {
+      uint j = contractsToChangeAdmin.length + i;
+      callDatas[j] = abi.encodeCall(AccessControl.grantRole, (DEFAULT_ADMIN_ROLE, _newGA));
+      callDatas[j + 1] = abi.encodeCall(
+        AccessControl.renounceRole,
+        (DEFAULT_ADMIN_ROLE, address(roninGovernanceAdmin))
+      );
+    }
+  }
+
+  function _ga__changeDefaultAdminRoleOfStaking()
+    internal
+    view
+    returns (bytes[] memory callDatas, address[] memory targets, uint256[] memory values)
+  {
+    callDatas = new bytes[](2);
+    targets = new address[](2);
+    values = new uint256[](2);
+
+    targets[0] = address(stakingContract);
+    callDatas[0] = abi.encodeCall(AccessControl.grantRole, (DEFAULT_ADMIN_ROLE, _newGA));
+
+    targets[1] = address(stakingContract);
+    callDatas[1] = abi.encodeCall(AccessControl.renounceRole, (DEFAULT_ADMIN_ROLE, address(roninGovernanceAdmin)));
   }
 
   function _doctor__recoverFund() internal {
