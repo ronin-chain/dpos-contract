@@ -31,10 +31,20 @@ contract Proposal__Full_20240220_MikoHardfork_ProposeProposal is
     onlyOn(DefaultNetwork.RoninMainnet.key())
   {
     Proposal__Base_20240220_MikoHardfork.run();
+
+    CONFIG.setBroadcastDisableStatus(false);
     Proposal__20240220_MikoHardfork_Before._run_unchained();
+
+    CONFIG.setBroadcastDisableStatus(false);
     Proposal__20240220_MikoHardfork_ProposeProposal._run_unchained();
+
+    CONFIG.setBroadcastDisableStatus(false);
     Proposal__20240220_MikoHardfork_After._run_unchained();
+
+    CONFIG.setBroadcastDisableStatus(false);
     Proposal__20240220_MikoHardfork_Stable._run_unchained();
+
+    CONFIG.setBroadcastDisableStatus(false);
   }
 
   function _run_unchained()
