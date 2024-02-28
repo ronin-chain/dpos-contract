@@ -114,7 +114,7 @@ contract Proposal__20240220_MikoHardfork_After is Proposal__Base_20240220_MikoHa
     } else {
       vm.broadcast(doctor);
     }
-    payable(ANDY_TREZOR).transfer(doctor.balance - 0.5 ether);
+    payable(ANDY_TREZOR).transfer(doctor.balance - 20 ether); // Excludes 20 RON of BAO_EOA
 
     uint256 andyBalanceAfter = ANDY_TREZOR.balance;
     console2.log("Andy's balance before:", andyBalanceBefore / 1e18, "RON");

@@ -16,6 +16,11 @@ contract Proposal__Full_20240220_MikoHardfork_ProposeProposal is
   using StdStyle for *;
   using ArrayReplaceLib for *;
 
+  modifier resetBroadcastStatus() {
+    _;
+    CONFIG.setBroadcastDisableStatus(false);
+  }
+
   /**
    * See `README.md`
    */
@@ -29,22 +34,21 @@ contract Proposal__Full_20240220_MikoHardfork_ProposeProposal is
       Proposal__20240220_MikoHardfork_Stable
     )
     onlyOn(DefaultNetwork.RoninMainnet.key())
+    resetBroadcastStatus
   {
     Proposal__Base_20240220_MikoHardfork.run();
 
     CONFIG.setBroadcastDisableStatus(false);
-    Proposal__20240220_MikoHardfork_Before._run_unchained();
+    Proposal__20240220_MikoHardfork_Before._run_unchained(); // BAO_EOA
 
-    CONFIG.setBroadcastDisableStatus(false);
-    Proposal__20240220_MikoHardfork_ProposeProposal._run_unchained();
+    CONFIG.setBroadcastDisableStatus(true);
+    Proposal__20240220_MikoHardfork_ProposeProposal._run_unchained(); // Governor
 
-    CONFIG.setBroadcastDisableStatus(false);
-    Proposal__20240220_MikoHardfork_After._run_unchained();
+    CONFIG.setBroadcastDisableStatus(true);
+    Proposal__20240220_MikoHardfork_After._run_unchained(); // DOCTOR
 
-    CONFIG.setBroadcastDisableStatus(false);
-    Proposal__20240220_MikoHardfork_Stable._run_unchained();
-
-    CONFIG.setBroadcastDisableStatus(false);
+    CONFIG.setBroadcastDisableStatus(true);
+    Proposal__20240220_MikoHardfork_Stable._run_unchained(); // MIGRATOR
   }
 
   function _run_unchained()
