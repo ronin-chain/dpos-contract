@@ -34,18 +34,24 @@ contract Proposal__20240220_MikoHardfork_Stable is Proposal__Base_20240220_MikoH
     _run_unchained();
   }
 
-  function _run_unchained() internal virtual{
+  function _run_unchained() internal virtual {
     _migrator__disableMigrate();
   }
 
   function _migrator__disableMigrate() internal {
-    vm.startPrank(STAKING_MIGRATOR);
+    bool shouldPrankOnly = CONFIG.isBroadcastDisable();
+    if (shouldPrankOnly) {
+      vm.prank(STAKING_MIGRATOR);
+    } else {
+      vm.broadcast(STAKING_MIGRATOR);
+    }
     stakingContract.disableMigrateWasAdmin();
 
     address[] memory poolIds = new address[](1);
     address[] memory admins = new address[](1);
     bool[] memory flags = new bool[](1);
 
+    vm.startPrank(STAKING_MIGRATOR);
     vm.expectRevert(abi.encodeWithSelector(IStaking.ErrMigrateWasAdminAlreadyDone.selector));
     stakingContract.migrateWasAdmin(poolIds, admins, flags);
     vm.stopPrank();

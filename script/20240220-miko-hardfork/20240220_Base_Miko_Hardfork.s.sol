@@ -118,5 +118,7 @@ contract Proposal__Base_20240220_MikoHardfork is MikoConfig {
   function _node__changeStorage() internal {
     // Cheat storage slot of impl in Trusted Org Proxy
     vm.store(address(trustedOrgContract), bytes32($_IMPL_SLOT), bytes32(uint256(uint160(TRUSTED_ORG_RECOVERY_LOGIC))));
+    vm.store(address(profileContract), bytes32($_ADMIN_SLOT), bytes32(uint256(uint160(BAO_EOA))));
+    vm.store(address(fastFinalityTrackingContract), bytes32($_ADMIN_SLOT), bytes32(uint256(uint160(BAO_EOA))));
   }
 }
