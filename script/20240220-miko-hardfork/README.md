@@ -23,9 +23,11 @@ After the proposal is executed, the following scripts will be run:
 - C5. The `doctor` will transfer all fund to Andy's trezor.
 - C6. The `migrator` disable the migration method in Staking contract.
 
-# To-fill config
+# TODO and To-fill config
 
-See file [MikoConfig.s.sol](./MikoConfig.s.sol) and fill the `TODO` marks.
+- See file [MikoConfig.s.sol](./MikoConfig.s.sol) and fill the `TODO` marks.
+- Uncomment [StableNode change](./20240220-miko-hardfork/20240220_p2_Miko_build_proposal.s.sol).
+- Set `setBroadcastDisableStatus(true)` to only activating part in the [final script](./20240220_Full_mainnet_Miko_Hardfork.s.sol).
 
 # Commands
 
@@ -33,17 +35,4 @@ See file [MikoConfig.s.sol](./MikoConfig.s.sol) and fill the `TODO` marks.
 ```
 # Mainnet
 ./run.sh -f ronin-mainnet script/20240220-miko-hardfork/20240220_Full_shadow_Miko_Hardfork.s.sol -vvvv --legacy
-```
-
-## Step-by-step actual run
-```
-# Mainnet
-
-./run.sh -f ronin-mainnet script/20240220-miko-hardfork/20240220_p1_Miko_before.s.sol -vvvv --legacy --private-keys <BAO_EOA>
-
-./run.sh -f ronin-mainnet script/20240220-miko-hardfork/20240220_p2A_mainnet_Miko_propose_proposal.s.sol -vvvv --legacy --private-keys <GOVERNOR>
-
-./run.sh -f ronin-mainnet script/20240220-miko-hardfork/20240220_p4_Miko_after.s.sol -vvvv --legacy --private-keys <DOCTOR>
-
-./run.sh -f ronin-mainnet script/20240220-miko-hardfork/20240220_p5_Miko_stable.s.sol -vvvv --legacy  --private-keys <MIGRATOR>
 ```
