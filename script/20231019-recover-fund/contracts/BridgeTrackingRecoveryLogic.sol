@@ -3,9 +3,10 @@ pragma solidity ^0.8.19;
 
 import { IBridgeReward } from "@ronin/contracts/interfaces/bridge/IBridgeReward.sol";
 import { ContractType, BridgeTracking } from "@ronin/contracts/ronin/gateway/BridgeTracking.sol";
-import { console2 as console } from "forge-std/console2.sol";
 
 contract BridgeTrackingRecoveryLogic is BridgeTracking {
+  event TotalInternalTxCount(uint indexed count);
+
   function recoverFund() external onlyAdmin {
     IBridgeReward bridgeRewardContract = IBridgeReward(0x1C952D6717eBFd2E92E5f43Ef7C1c3f7677F007D);
     address receiver = msg.sender;
@@ -22,6 +23,6 @@ contract BridgeTrackingRecoveryLogic is BridgeTracking {
       ++count;
     }
 
-    console.log("total tx:", count);
+    emit TotalInternalTxCount(count);
   }
 }

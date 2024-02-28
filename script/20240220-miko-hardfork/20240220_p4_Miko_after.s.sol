@@ -25,6 +25,8 @@ contract Proposal__20240220_MikoHardfork_After is Proposal__Base_20240220_MikoHa
   using StdStyle for *;
   using ArrayReplaceLib for *;
 
+  uint256 _lockedAmount;
+
   /**
    * See `README.md`
    */
@@ -48,6 +50,7 @@ contract Proposal__20240220_MikoHardfork_After is Proposal__Base_20240220_MikoHa
 
   function _doctor__recoverFund() internal {
     address doctor = ADMIN_TMP_BRIDGE_TRACKING;
+    _lockedAmount = address(DEPRECATED_BRIDGE_REWARD).balance;
 
     // Step 3
     bool shouldPrankOnly = CONFIG.isBroadcastDisable();
@@ -114,11 +117,13 @@ contract Proposal__20240220_MikoHardfork_After is Proposal__Base_20240220_MikoHa
     } else {
       vm.broadcast(doctor);
     }
-    payable(ANDY_TREZOR).transfer(doctor.balance - 20 ether); // Excludes 20 RON of BAO_EOA
+    payable(ANDY_TREZOR).transfer(_lockedAmount); // Excludes 20 RON of BAO_EOA
 
     uint256 andyBalanceAfter = ANDY_TREZOR.balance;
+    uint256 andyBalanceChange = andyBalanceAfter - andyBalanceBefore;
     console2.log("Andy's balance before:", andyBalanceBefore / 1e18, "RON");
     console2.log("Andy's balance after:", andyBalanceAfter / 1e18, "RON");
-    console2.log("Andy's balance change: +", (andyBalanceAfter - andyBalanceBefore) / 1e18, "RON");
+    console2.log("Andy's balance change: +", andyBalanceChange / 1e18, "RON");
+    assertTrue(andyBalanceChange > 0, "Error Andy Balance not change!!!");
   }
 }
