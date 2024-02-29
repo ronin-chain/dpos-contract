@@ -29,6 +29,8 @@ interface IProfile {
     uint256 profileLastChange;
     /// @dev Old public key for fast finality.
     bytes oldPubkey;
+    /// @dev Old consensus
+    TConsensus oldConsensus;
   }
 
   /// @dev Event emitted when a profile with `id` is added.

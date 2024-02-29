@@ -40,7 +40,8 @@ contract Profile_Unit_Test is Base_Test {
       __reservedGovernor: address(0),
       pubkey: '',
       profileLastChange: 0,
-      oldPubkey: ''
+      oldPubkey: '',
+      oldConsensus: TConsensus.wrap(address(0))
     })));
 
     vm.stopPrank();
