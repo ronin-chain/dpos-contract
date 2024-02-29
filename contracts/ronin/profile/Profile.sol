@@ -16,6 +16,11 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     _disableInitializers();
   }
 
+  // Pre-hook of `changeAdmin` method, where this method is revert on mainnet, until it fully integrated with other components.
+  modifier hookChangeAdmin() virtual {
+    _;
+  }
+
   function initialize(address validatorContract) external initializer {
     _setContract(ContractType.VALIDATOR, validatorContract);
   }
@@ -136,7 +141,7 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
    *
    * - See other side-effects for treasury in {requestChangeTreasuryAddr}, since treasury and admin must be identical.
    */
-  function requestChangeAdminAddress(address id, address newAdminAddr) external {
+  function requestChangeAdminAddress(address id, address newAdminAddr) external hookChangeAdmin {
     CandidateProfile storage _profile = _getId2ProfileHelper(id);
     _requireCandidateAdmin(_profile);
     _requireNonZeroAndNonDuplicated(RoleAccess.CANDIDATE_ADMIN, newAdminAddr);
