@@ -47,7 +47,7 @@ abstract contract MikoConfig is RoninMigration {
   uint256 public constant PROPOSAL_DURATION = 14 days; // FIXME: `20 minutes` on mainnet shadow
   BridgeReward public constant DEPRECATED_BRIDGE_REWARD = BridgeReward(0x1C952D6717eBFd2E92E5f43Ef7C1c3f7677F007D);
 
-  uint256 public constant PROFILE_PUBKEY_CHANGE_COOLDOWN = 1 days;
+  uint256 public constant PROFILE_PUBKEY_CHANGE_COOLDOWN = 7 days;
 
   TConsensus public constant STABLE_NODE_CONSENSUS = TConsensus.wrap(0x6E46924371d0e910769aaBE0d867590deAC20684);
   address public constant STABLE_NODE_GOVERNOR = 0x3C583c0c97646a73843aE57b93f33e1995C8DC80;
