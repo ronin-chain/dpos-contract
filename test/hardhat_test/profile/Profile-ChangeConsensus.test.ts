@@ -241,7 +241,7 @@ describe('Profile: change consensus', () => {
       it('Should the admin can change his consensus address', async () => {
         oldCssLst.push(validatorCandidates[0].consensusAddr);
         let newConsensus = signers[signers.length - 1];
-        let tx = await profileContract.connect(validatorCandidates[0].poolAdmin).requestChangeConsensusAddr(validatorCandidates[0].consensusAddr.address, newConsensus.address);
+        let tx = await profileContract.connect(validatorCandidates[0].poolAdmin).changeConsensusAddr(validatorCandidates[0].consensusAddr.address, newConsensus.address);
         await expect(tx).emit(profileContract, "ProfileAddressChanged").withArgs(validatorCandidates[0].consensusAddr.address, RoleAccess.CONSENSUS, newConsensus.address);
         validatorCandidates[0].consensusAddr = newConsensus;
       });
@@ -349,12 +349,12 @@ describe('Profile: change consensus', () => {
 
     it('Should the admin cannot change the consensus address back to C0', async () => {
       newConsensus2 = signers[signers.length - 2];
-      await expect(profileContract.connect(validatorCandidates[0].poolAdmin).requestChangeConsensusAddr(validatorCandidates[0].consensusAddr.address, oldCssLst[0].address)).revertedWithCustomError(profileContract, 'ErrUnauthorized');
+      await expect(profileContract.connect(validatorCandidates[0].poolAdmin).changeConsensusAddr(validatorCandidates[0].consensusAddr.address, oldCssLst[0].address)).revertedWithCustomError(profileContract, 'ErrUnauthorized');
     });
 
     it('Should the admin can change the consensus to C2 and returns correct info', async () => {
       oldCssLst.push(validatorCandidates[0].poolAdmin);
-      let tx = await profileContract.connect(validatorCandidates[0].poolAdmin).requestChangeConsensusAddr(validatorCandidates[0].consensusAddr.address, newConsensus2.address);
+      let tx = await profileContract.connect(validatorCandidates[0].poolAdmin).changeConsensusAddr(validatorCandidates[0].consensusAddr.address, newConsensus2.address);
       await expect(tx).emit(profileContract, "ProfileAddressChanged").withArgs(validatorCandidates[0].consensusAddr.address, RoleAccess.CONSENSUS, newConsensus2.address);
       validatorCandidates[0].consensusAddr = newConsensus2;
 

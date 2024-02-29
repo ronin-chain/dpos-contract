@@ -11,7 +11,7 @@ abstract contract StakingCallback is CandidateStaking, DelegatorStaking, IStakin
    * @dev Requirements:
    * - Only Profile contract can call this method.
    */
-  function execChangeAdminAddress(
+  function execChangeAdminAddr(
     address poolId,
     address currAdminAddr,
     address newAdminAddr

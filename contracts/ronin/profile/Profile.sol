@@ -139,9 +139,9 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
    * - Update Validator contract:
    *    + [x] Update (id => ValidatorCandidate) mapping
    *
-   * - See other side-effects for treasury in {requestChangeTreasuryAddr}, since treasury and admin must be identical.
+   * - See other side-effects for treasury in {changeTreasuryAddr}, since treasury and admin must be identical.
    */
-  function requestChangeAdminAddress(address id, address newAdminAddr) external {
+  function changeAdminAddr(address id, address newAdminAddr) external {
     CandidateProfile storage _profile = _getId2ProfileHelper(id);
     _requireCandidateAdmin(_profile);
     _requireNonZeroAndNonDuplicated(RoleAccess.CANDIDATE_ADMIN, newAdminAddr);
@@ -149,11 +149,11 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     _requireNotOnRenunciation(id);
 
     IStaking stakingContract = IStaking(getContract(ContractType.STAKING));
-    stakingContract.execChangeAdminAddress({ poolId: id, currAdminAddr: msg.sender, newAdminAddr: newAdminAddr });
+    stakingContract.execChangeAdminAddr({ poolId: id, currAdminAddr: msg.sender, newAdminAddr: newAdminAddr });
 
     IRoninValidatorSet validatorContract = IRoninValidatorSet(getContract(ContractType.VALIDATOR));
-    validatorContract.execChangeAdminAddress(id, newAdminAddr);
-    validatorContract.execChangeTreasuryAddress(id, payable(newAdminAddr));
+    validatorContract.execChangeAdminAddr(id, newAdminAddr);
+    validatorContract.execChangeTreasuryAddr(id, payable(newAdminAddr));
 
     _setAdmin(_profile, newAdminAddr);
     _setTreasury(_profile, payable(newAdminAddr));
@@ -184,7 +184,7 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
    *   + If the current consensus is not governor:
    *      - [x] Do nothing
    */
-  function requestChangeConsensusAddr(address id, TConsensus newConsensusAddr) external hookChangeConsensus {
+  function changeConsensusAddr(address id, TConsensus newConsensusAddr) external hookChangeConsensus {
     CandidateProfile storage _profile = _getId2ProfileHelper(id);
     _requireCandidateAdmin(_profile);
     _requireNonZeroAndNonDuplicated(RoleAccess.CONSENSUS, TConsensus.unwrap(newConsensusAddr));
@@ -193,7 +193,7 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     TConsensus oldConsensusAddr = _profile.consensus;
 
     IRoninValidatorSet validatorContract = IRoninValidatorSet(getContract(ContractType.VALIDATOR));
-    validatorContract.execChangeConsensusAddress(id, newConsensusAddr);
+    validatorContract.execChangeConsensusAddr(id, newConsensusAddr);
 
     address trustedOrgContractAddr = getContract(ContractType.RONIN_TRUSTED_ORGANIZATION);
     (bool success, ) = trustedOrgContractAddr.call(
@@ -214,7 +214,7 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
    * @inheritdoc IProfile
    *
    * @notice This method is not supported. Change treasury also requires changing the admin address.
-   * Using the {requestChangeAdminAddress} method instead
+   * Using the {changeAdminAddr} method instead
    *
    * @dev Side-effects on other contracts:
    * - Update Validator contract:
@@ -224,7 +224,7 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
    *          Cannot impl since we cannot cancel the previous the ballot and
    *          create a new ballot on behalf of the validator contract.
    */
-  function requestChangeTreasuryAddr(address /*id */, address payable /* newTreasury */) external pure {
+  function changeTreasuryAddr(address /*id */, address payable /* newTreasury */) external pure {
     revert("Not supported");
   }
 
