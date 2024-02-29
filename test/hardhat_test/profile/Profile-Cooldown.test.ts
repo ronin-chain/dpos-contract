@@ -238,14 +238,14 @@ describe('Profile: cooldown', () => {
       expect(profile.consensus).eq(validatorCandidates[0].consensusAddr.address);
 
       let newConsensus = signers[signers.length - 1];
-      let tx = await profileContract.connect(validatorCandidates[0].poolAdmin).requestChangeConsensusAddr(validatorCandidates[0].cid.address, newConsensus.address);
+      let tx = await profileContract.connect(validatorCandidates[0].poolAdmin).changeConsensusAddr(validatorCandidates[0].cid.address, newConsensus.address);
       await expect(tx).emit(profileContract, "ProfileAddressChanged").withArgs(validatorCandidates[0].consensusAddr.address, RoleAccess.CONSENSUS, newConsensus.address);
       validatorCandidates[0].consensusAddr = newConsensus;
     });
 
     it('Should the Profile cannot change C2 to C3 when in cooldown', async () => {
       let newConsensus = signers[signers.length - 2];
-      await expect(profileContract.connect(validatorCandidates[0].poolAdmin).requestChangeConsensusAddr(validatorCandidates[0].cid.address, newConsensus.address))
+      await expect(profileContract.connect(validatorCandidates[0].poolAdmin).changeConsensusAddr(validatorCandidates[0].cid.address, newConsensus.address))
         .revertedWithCustomError(profileContract, "ErrProfileChangeCooldownNotEnded");
     });
 
@@ -254,7 +254,7 @@ describe('Profile: cooldown', () => {
       await network.provider.send('evm_setNextBlockTimestamp', [latestTimestamp + profileChangeCooldown]);
 
       let newConsensus = signers[signers.length - 2];
-      let tx = await profileContract.connect(validatorCandidates[0].poolAdmin).requestChangeConsensusAddr(validatorCandidates[0].cid.address, newConsensus.address);
+      let tx = await profileContract.connect(validatorCandidates[0].poolAdmin).changeConsensusAddr(validatorCandidates[0].cid.address, newConsensus.address);
       await expect(tx).emit(profileContract, "ProfileAddressChanged").withArgs(validatorCandidates[0].cid.address, RoleAccess.CONSENSUS, newConsensus.address);
       validatorCandidates[0].consensusAddr = newConsensus;
     });
@@ -274,19 +274,19 @@ describe('Profile: cooldown', () => {
 
     it('Should the Profile can change A1 to A2', async () => {
       newAdmin = signers[signers.length - 3];
-      let tx = await profileContract.connect(validatorCandidates[0].poolAdmin).requestChangeAdminAddress(validatorCandidates[0].cid.address, newAdmin.address);
+      let tx = await profileContract.connect(validatorCandidates[0].poolAdmin).changeAdminAddr(validatorCandidates[0].cid.address, newAdmin.address);
       await expect(tx).emit(profileContract, "ProfileAddressChanged").withArgs(validatorCandidates[0].cid.address, RoleAccess.CANDIDATE_ADMIN, newAdmin.address);
       validatorCandidates[0].poolAdmin = newAdmin;
     });
 
     it('Should the Profile cannot change A2 to A3 when in cooldown', async () => {
       newAdmin = signers[signers.length - 4];
-      await expect(profileContract.connect(validatorCandidates[0].poolAdmin).requestChangeAdminAddress(validatorCandidates[0].cid.address, newAdmin.address))
+      await expect(profileContract.connect(validatorCandidates[0].poolAdmin).changeAdminAddr(validatorCandidates[0].cid.address, newAdmin.address))
         .revertedWithCustomError(profileContract, "ErrProfileChangeCooldownNotEnded");
     });
 
     it('Should the Profile cannot change C1 to C2 when in cooldown', async () => {
-      await expect(profileContract.connect(validatorCandidates[0].poolAdmin).requestChangeConsensusAddr(validatorCandidates[0].cid.address, newAdmin.address))
+      await expect(profileContract.connect(validatorCandidates[0].poolAdmin).changeConsensusAddr(validatorCandidates[0].cid.address, newAdmin.address))
         .revertedWithCustomError(profileContract, "ErrProfileChangeCooldownNotEnded");
     });
 
@@ -294,7 +294,7 @@ describe('Profile: cooldown', () => {
       const latestTimestamp = await getLastBlockTimestamp();
       await network.provider.send('evm_setNextBlockTimestamp', [latestTimestamp + profileChangeCooldown]);
 
-      let tx = await profileContract.connect(validatorCandidates[0].poolAdmin).requestChangeAdminAddress(validatorCandidates[0].cid.address, newAdmin.address);
+      let tx = await profileContract.connect(validatorCandidates[0].poolAdmin).changeAdminAddr(validatorCandidates[0].cid.address, newAdmin.address);
       await expect(tx).emit(profileContract, "ProfileAddressChanged").withArgs(validatorCandidates[0].cid.address, RoleAccess.CANDIDATE_ADMIN, newAdmin.address);
       validatorCandidates[0].poolAdmin = newAdmin;
     });

@@ -234,7 +234,7 @@ describe('Profile: change admin (staking reward on the changing day is splitted 
       it('Should the admin can change his admin address', async () => {
         oldAdmins.push(validatorCandidates[0].poolAdmin);
         let newAdmin = signers[signers.length - 1];
-        let tx = await profileContract.connect(validatorCandidates[0].poolAdmin).requestChangeAdminAddress(validatorCandidates[0].consensusAddr.address, newAdmin.address);
+        let tx = await profileContract.connect(validatorCandidates[0].poolAdmin).changeAdminAddr(validatorCandidates[0].consensusAddr.address, newAdmin.address);
         await expect(tx).emit(profileContract, "ProfileAddressChanged").withArgs(validatorCandidates[0].consensusAddr.address, RoleAccess.CANDIDATE_ADMIN, newAdmin.address);
         validatorCandidates[0].poolAdmin = newAdmin;
         validatorCandidates[0].candidateAdmin = newAdmin;
@@ -379,16 +379,16 @@ describe('Profile: change admin (staking reward on the changing day is splitted 
     let newAdmin2: SignerWithAddress;
     it('Should the old admin A0 cannot change the address', async () => {
       newAdmin2 = signers[signers.length - 2];
-      await expect(profileContract.connect(oldAdmins[0]).requestChangeAdminAddress(validatorCandidates[0].consensusAddr.address, newAdmin2.address)).revertedWithCustomError(profileContract, 'ErrUnauthorized');
+      await expect(profileContract.connect(oldAdmins[0]).changeAdminAddr(validatorCandidates[0].consensusAddr.address, newAdmin2.address)).revertedWithCustomError(profileContract, 'ErrUnauthorized');
     });
 
     it('Should the admin A1 cannot change the admin address back to A0', async () => {
-      await expect(profileContract.connect(validatorCandidates[0].poolAdmin).requestChangeAdminAddress(validatorCandidates[0].consensusAddr.address, oldAdmins[0].address)).revertedWithCustomError(profileContract, 'ErrDuplicatedInfo');
+      await expect(profileContract.connect(validatorCandidates[0].poolAdmin).changeAdminAddr(validatorCandidates[0].consensusAddr.address, oldAdmins[0].address)).revertedWithCustomError(profileContract, 'ErrDuplicatedInfo');
     });
 
     it('Should the admin A1 can change the admin to A2 and returns correct info', async () => {
       oldAdmins.push(validatorCandidates[0].poolAdmin);
-      let tx = await profileContract.connect(validatorCandidates[0].poolAdmin).requestChangeAdminAddress(validatorCandidates[0].consensusAddr.address, newAdmin2.address);
+      let tx = await profileContract.connect(validatorCandidates[0].poolAdmin).changeAdminAddr(validatorCandidates[0].consensusAddr.address, newAdmin2.address);
       await expect(tx).emit(profileContract, "ProfileAddressChanged").withArgs(validatorCandidates[0].consensusAddr.address, RoleAccess.CANDIDATE_ADMIN, newAdmin2.address);
       validatorCandidates[0].poolAdmin = newAdmin2;
       validatorCandidates[0].candidateAdmin = newAdmin2;
