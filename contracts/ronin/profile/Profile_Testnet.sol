@@ -5,6 +5,16 @@ import "./Profile.sol";
 pragma solidity ^0.8.9;
 
 contract Profile_Testnet is Profile {
+  function migrateOldConsensusList(address[] calldata lId, TConsensus[] calldata lCss) external onlyAdmin {
+    require(lId.length == lCss.length, "Invalid length");
+
+    CandidateProfile storage _profile;
+    for (uint i; i < lCss.length; ++i) {
+      _profile = _id2Profile[lId[i]];
+      _profile.oldConsensus = lCss[i];
+    }
+  }
+
   function migrateRenouncedCandidate() external onlyAdmin {
     __defaultMigrate();
   }

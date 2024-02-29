@@ -88,7 +88,7 @@ abstract contract CandidateManagerCallback is ICandidateManagerCallback, Candida
   /**
    * @inheritdoc ICandidateManagerCallback
    */
-  function execChangeConsensusAddress(
+  function execChangeConsensusAddr(
     address cid,
     TConsensus newConsensusAddr
   ) external override onlyContract(ContractType.PROFILE) {
@@ -98,14 +98,14 @@ abstract contract CandidateManagerCallback is ICandidateManagerCallback, Candida
   /**
    * @inheritdoc ICandidateManagerCallback
    */
-  function execChangeAdminAddress(address cid, address newAdmin) external onlyContract(ContractType.PROFILE) {
+  function execChangeAdminAddr(address cid, address newAdmin) external onlyContract(ContractType.PROFILE) {
     _candidateInfo[cid].__shadowedAdmin = newAdmin;
   }
 
   /**
    * @inheritdoc ICandidateManagerCallback
    */
-  function execChangeTreasuryAddress(
+  function execChangeTreasuryAddr(
     address cid,
     address payable newTreasury
   ) external onlyContract(ContractType.PROFILE) {

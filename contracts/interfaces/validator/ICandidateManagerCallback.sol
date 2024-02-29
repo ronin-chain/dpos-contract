@@ -57,29 +57,29 @@ interface ICandidateManagerCallback {
   function execRequestUpdateCommissionRate(address cid, uint256 effectiveTimestamp, uint256 rate) external;
 
   /**
-   * @dev Fallback function of `Profile-requestChangeAdminAddress`.
+   * @dev Fallback function of `Profile-changeAdminAddr`.
    * This updates the shadow storage slot of "shadowedAdmin" for candidate id `id` to `newAdmin`.
    *
    * Requirements:
    * - The caller must be the Profile contract.
    */
-  function execChangeAdminAddress(address cid, address newAdmin) external;
+  function execChangeAdminAddr(address cid, address newAdmin) external;
 
   /**
-   * @dev Fallback function of `Profile-requestChangeConsensusAddress`.
+   * @dev Fallback function of `Profile-changeConsensusAddr`.
    * This updates the shadow storage slot of "shadowedConsensus" for candidate id `id` to `newAdmin`.
    *
    * Requirements:
    * - The caller must be the Profile contract.
    */
-  function execChangeConsensusAddress(address cid, TConsensus newConsensus) external;
+  function execChangeConsensusAddr(address cid, TConsensus newConsensus) external;
 
   /**
-   * @dev Fallback function of `Profile-requestChangeTreasuryAddress`.
+   * @dev Fallback function of `Profile-changeTreasuryAddr`.
    * This updates the shadow storage slot of "shadowedTreasury" for candidate id `id` to `newAdmin`.
    *
    * Requirements:
    * - The caller must be the Profile contract.
    */
-  function execChangeTreasuryAddress(address cid, address payable newTreasury) external;
+  function execChangeTreasuryAddr(address cid, address payable newTreasury) external;
 }

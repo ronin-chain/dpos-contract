@@ -29,6 +29,8 @@ interface IProfile {
     uint256 profileLastChange;
     /// @dev Old public key for fast finality.
     bytes oldPubkey;
+    /// @dev Old consensus
+    TConsensus oldConsensus;
   }
 
   /// @dev Event emitted when a profile with `id` is added.
@@ -63,6 +65,7 @@ interface IProfile {
   error ErrZeroPubkey();
   error ErrInvalidProofOfPossession(bytes pubkey, bytes proofOfPossession);
   error ErrLookUpIdFailed(TConsensus consensus);
+  error ErrValidatorOnRenunciation(address cid);
 
   /// @dev Getter to query full `profile` from `id` address.
   function getId2Profile(address id) external view returns (CandidateProfile memory profile);
@@ -99,21 +102,21 @@ interface IProfile {
    *
    * Emit an {ProfileAddressChanged}.
    */
-  function requestChangeAdminAddress(address id, address newAdminAddr) external;
+  function changeAdminAddr(address id, address newAdminAddr) external;
 
   /**
    * @dev Updated the treasury address of candidate id `id` immediately without waiting time.
    *
    * Emit an {ProfileAddressChanged}.
    */
-  function requestChangeConsensusAddr(address id, TConsensus newConsensusAddr) external;
+  function changeConsensusAddr(address id, TConsensus newConsensusAddr) external;
 
   /**
    * @dev Updated the treasury address of candidate id `id` immediately without waiting time.
    *
    * Emit an {ProfileAddressChanged}.
    */
-  function requestChangeTreasuryAddr(address id, address payable newTreasury) external;
+  function changeTreasuryAddr(address id, address payable newTreasury) external;
 
   /**
    * @notice The candidate admin changes the public key.

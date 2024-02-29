@@ -30,7 +30,8 @@ abstract contract ProfileXComponents is IProfile, ProfileHandler {
       __reservedGovernor: address(0),
       pubkey: pubkey,
       profileLastChange: 0,
-      oldPubkey: ""
+      oldPubkey: "",
+      oldConsensus: TConsensus.wrap(address(0))
     });
     _requireNonDuplicatedInRegistry(profile);
     _verifyPubkey(pubkey, proofOfPossession);

@@ -129,6 +129,11 @@ interface ICandidateManager {
   function getCandidateInfo(TConsensus consensus) external view returns (ValidatorCandidate memory);
 
   /**
+   * @dev Returns the info of a candidate.
+   */
+  function getCandidateInfoById(address cid) external view returns (ValidatorCandidate memory);
+
+  /**
    * @dev Returns whether the address is the candidate admin.
    */
   function isCandidateAdmin(TConsensus consensus, address admin) external view returns (bool);

@@ -273,7 +273,7 @@ describe('Profile: change admin - delegator reward (staking reward on the changi
 
         oldAdmins.push(validatorCandidates[0].poolAdmin);
         let newAdmin = signers[signers.length - 1];
-        let tx = await profileContract.connect(validatorCandidates[0].poolAdmin).requestChangeAdminAddress(validatorCandidates[0].consensusAddr.address, newAdmin.address);
+        let tx = await profileContract.connect(validatorCandidates[0].poolAdmin).changeAdminAddr(validatorCandidates[0].consensusAddr.address, newAdmin.address);
         await expect(tx).emit(profileContract, "ProfileAddressChanged").withArgs(validatorCandidates[0].consensusAddr.address, RoleAccess.CANDIDATE_ADMIN, newAdmin.address);
         validatorCandidates[0].poolAdmin = newAdmin;
         validatorCandidates[0].candidateAdmin = newAdmin;
@@ -419,7 +419,7 @@ describe('Profile: change admin - delegator reward (staking reward on the changi
       it('Should the admin can change his admin address', async () => {
         oldAdmins.push(validatorCandidates[0].poolAdmin);
         let newAdmin = signers[signers.length - 2];
-        let tx = await profileContract.connect(validatorCandidates[0].poolAdmin).requestChangeAdminAddress(validatorCandidates[0].consensusAddr.address, newAdmin.address);
+        let tx = await profileContract.connect(validatorCandidates[0].poolAdmin).changeAdminAddr(validatorCandidates[0].consensusAddr.address, newAdmin.address);
         await expect(tx).emit(profileContract, "ProfileAddressChanged").withArgs(validatorCandidates[0].consensusAddr.address, RoleAccess.CANDIDATE_ADMIN, newAdmin.address);
         validatorCandidates[0].poolAdmin = newAdmin;
         validatorCandidates[0].candidateAdmin = newAdmin;
@@ -568,7 +568,7 @@ describe('Profile: change admin - delegator reward (staking reward on the changi
 
         oldAdmins.push(validatorCandidates[0].poolAdmin);
         let newAdmin = signers[signers.length - 3];
-        let tx = await profileContract.connect(validatorCandidates[0].poolAdmin).requestChangeAdminAddress(validatorCandidates[0].consensusAddr.address, newAdmin.address);
+        let tx = await profileContract.connect(validatorCandidates[0].poolAdmin).changeAdminAddr(validatorCandidates[0].consensusAddr.address, newAdmin.address);
         await expect(tx).emit(profileContract, "ProfileAddressChanged").withArgs(validatorCandidates[0].consensusAddr.address, RoleAccess.CANDIDATE_ADMIN, newAdmin.address);
         validatorCandidates[0].poolAdmin = newAdmin;
         validatorCandidates[0].candidateAdmin = newAdmin;
