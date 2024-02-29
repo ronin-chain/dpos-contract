@@ -53,11 +53,15 @@ abstract contract PostChecker_EmergencyExit is BaseMigration, PostChecker_Helper
     assertFalse(success);
     vm.stopPrank();
 
-    _fastForwardToNextDay();
-    _wrapUpEpoch();
-    // The exited candidate still in candidate list until the time of being revoked.
-    (, bytes memory returndata) = _validatorSet.staticcall(abi.encodeWithSelector(ICandidateManager.isValidatorCandidate.selector, _consensusAddr));
-    assertTrue(abi.decode(returndata, (bool)));
+    bytes memory returndata;
+    if (IStaking(_staking).waitingSecsToRevoke() > 1 days) {
+      _fastForwardToNextDay();
+      _wrapUpEpoch();
+
+      // The exited candidate still in candidate list until the time of being revoked.
+      (,  returndata) = _validatorSet.staticcall(abi.encodeWithSelector(ICandidateManager.isValidatorCandidate.selector, _consensusAddr));
+      assertTrue(abi.decode(returndata, (bool)));  
+    }
 
     vm.warp(block.timestamp + IStaking(_staking).waitingSecsToRevoke());
     _fastForwardToNextDay();

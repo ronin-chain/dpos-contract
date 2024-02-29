@@ -64,8 +64,8 @@ abstract contract SlashUnavailability is ISlashUnavailability, HasContracts, Has
       return;
     }
 
-    IRoninValidatorSet _validatorContract = IRoninValidatorSet(getContract(ContractType.VALIDATOR));
-    uint256 period = _validatorContract.currentPeriod();
+    IRoninValidatorSet validatorContract = IRoninValidatorSet(getContract(ContractType.VALIDATOR));
+    uint256 period = validatorContract.currentPeriod();
     uint256 count;
     unchecked {
       count = ++_unavailabilityIndicator[validatorId][period];
@@ -74,7 +74,7 @@ abstract contract SlashUnavailability is ISlashUnavailability, HasContracts, Has
 
     if (count == _unavailabilityTier2Threshold) {
       emit Slashed(validatorId, SlashType.UNAVAILABILITY_TIER_2, period);
-      _validatorContract.execSlash(
+      validatorContract.execSlash(
         validatorId,
         newJailedUntilBlock,
         _slashAmountForUnavailabilityTier2Threshold,
@@ -84,11 +84,11 @@ abstract contract SlashUnavailability is ISlashUnavailability, HasContracts, Has
       bool tier1SecondTime = _checkBailedOutAtPeriodById(validatorId, period);
       if (!tier1SecondTime) {
         emit Slashed(validatorId, SlashType.UNAVAILABILITY_TIER_1, period);
-        _validatorContract.execSlash(validatorId, 0, 0, false);
+        validatorContract.execSlash(validatorId, 0, 0, false);
       } else {
         /// Handles tier-3
         emit Slashed(validatorId, SlashType.UNAVAILABILITY_TIER_3, period);
-        _validatorContract.execSlash(
+        validatorContract.execSlash(
           validatorId,
           newJailedUntilBlock,
           _slashAmountForUnavailabilityTier2Threshold,
@@ -102,17 +102,17 @@ abstract contract SlashUnavailability is ISlashUnavailability, HasContracts, Has
    * @inheritdoc ISlashUnavailability
    */
   function setUnavailabilitySlashingConfigs(
-    uint256 _tier1Threshold,
-    uint256 _tier2Threshold,
-    uint256 _slashAmountForTier2Threshold,
-    uint256 _jailDurationForTier2Threshold
+    uint256 tier1Threshold,
+    uint256 tier2Threshold,
+    uint256 slashAmountForTier2,
+    uint256 jailDurationForTier2
   ) external override onlyAdmin {
-    _setUnavailabilitySlashingConfigs(
-      _tier1Threshold,
-      _tier2Threshold,
-      _slashAmountForTier2Threshold,
-      _jailDurationForTier2Threshold
-    );
+    _setUnavailabilitySlashingConfigs({
+      tier1Threshold: tier1Threshold,
+      tier2Threshold: tier2Threshold,
+      slashAmountForTier2: slashAmountForTier2,
+      jailDurationForTier2: jailDurationForTier2
+    });
   }
 
   /**
@@ -176,22 +176,22 @@ abstract contract SlashUnavailability is ISlashUnavailability, HasContracts, Has
    * @dev See `ISlashUnavailability-setUnavailabilitySlashingConfigs`.
    */
   function _setUnavailabilitySlashingConfigs(
-    uint256 _tier1Threshold,
-    uint256 _tier2Threshold,
-    uint256 _slashAmountForTier2Threshold,
-    uint256 _jailDurationForTier2Threshold
+    uint256 tier1Threshold,
+    uint256 tier2Threshold,
+    uint256 slashAmountForTier2,
+    uint256 jailDurationForTier2
   ) internal {
-    if (_unavailabilityTier1Threshold > _unavailabilityTier2Threshold) revert ErrInvalidThreshold(msg.sig);
+    if (tier1Threshold > tier2Threshold) revert ErrInvalidThreshold(msg.sig);
 
-    _unavailabilityTier1Threshold = _tier1Threshold;
-    _unavailabilityTier2Threshold = _tier2Threshold;
-    _slashAmountForUnavailabilityTier2Threshold = _slashAmountForTier2Threshold;
-    _jailDurationForUnavailabilityTier2Threshold = _jailDurationForTier2Threshold;
+    _unavailabilityTier1Threshold = tier1Threshold;
+    _unavailabilityTier2Threshold = tier2Threshold;
+    _slashAmountForUnavailabilityTier2Threshold = slashAmountForTier2;
+    _jailDurationForUnavailabilityTier2Threshold = jailDurationForTier2;
     emit UnavailabilitySlashingConfigsUpdated(
-      _tier1Threshold,
-      _tier2Threshold,
-      _slashAmountForTier2Threshold,
-      _jailDurationForTier2Threshold
+      tier1Threshold,
+      tier2Threshold,
+      slashAmountForTier2,
+      jailDurationForTier2
     );
   }
 
