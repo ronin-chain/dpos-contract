@@ -5,7 +5,7 @@ import "./Profile.sol";
 pragma solidity ^0.8.9;
 
 contract Profile_Mainnet is Profile {
-  modifier hookChangeAdmin() override {
+  modifier hookChangeConsensus() override {
     revert("Not supported");
     _;
   }

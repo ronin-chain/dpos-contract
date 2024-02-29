@@ -16,8 +16,8 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     _disableInitializers();
   }
 
-  // Pre-hook of `changeAdmin` method, where this method is revert on mainnet, until it fully integrated with other components.
-  modifier hookChangeAdmin() virtual {
+  // Pre-hook of `changeConsensusAddr` method, where this method is revert on mainnet, until it fully integrated with other components.
+  modifier hookChangeConsensus() virtual {
     _;
   }
 
@@ -141,7 +141,7 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
    *
    * - See other side-effects for treasury in {requestChangeTreasuryAddr}, since treasury and admin must be identical.
    */
-  function requestChangeAdminAddress(address id, address newAdminAddr) external hookChangeAdmin {
+  function requestChangeAdminAddress(address id, address newAdminAddr) external {
     CandidateProfile storage _profile = _getId2ProfileHelper(id);
     _requireCandidateAdmin(_profile);
     _requireNonZeroAndNonDuplicated(RoleAccess.CANDIDATE_ADMIN, newAdminAddr);
@@ -184,7 +184,7 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
    *   + If the current consensus is not governor:
    *      - [x] Do nothing
    */
-  function requestChangeConsensusAddr(address id, TConsensus newConsensusAddr) external {
+  function requestChangeConsensusAddr(address id, TConsensus newConsensusAddr) external hookChangeConsensus {
     CandidateProfile storage _profile = _getId2ProfileHelper(id);
     _requireCandidateAdmin(_profile);
     _requireNonZeroAndNonDuplicated(RoleAccess.CONSENSUS, TConsensus.unwrap(newConsensusAddr));
