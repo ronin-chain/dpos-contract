@@ -110,7 +110,7 @@ contract ChangeConsensusAddressForkTest is Test {
 
     // change admin of c1 -> a2
     vm.startPrank(a1);
-    _profile.requestChangeAdminAddress(c1, a2);
+    _profile.changeAdminAddr(c1, a2);
     vm.stopPrank();
 
     address coinbase = block.coinbase;
@@ -234,7 +234,7 @@ contract ChangeConsensusAddressForkTest is Test {
     address newConsensus = makeAddr("c2");
     address admin = makeAddr("candidate-admin");
     vm.startPrank(admin);
-    _profile.requestChangeConsensusAddr(consensus, TConsensus.wrap(newConsensus));
+    _profile.changeConsensusAddr(consensus, TConsensus.wrap(newConsensus));
     vm.expectRevert(ICandidateManagerCallback.ErrTrustedOrgCannotRenounce.selector);
     _staking.requestRenounce(TConsensus.wrap(newConsensus));
     vm.stopPrank();
@@ -304,14 +304,14 @@ contract ChangeConsensusAddressForkTest is Test {
     vm.startPrank(admin);
     {
       vm.warp(block.timestamp + _profileCooldownConfig);
-      _profile.requestChangeConsensusAddr(consensus, TConsensus.wrap(newConsensus));
+      _profile.changeConsensusAddr(consensus, TConsensus.wrap(newConsensus));
 
       vm.warp(block.timestamp + _profileCooldownConfig);
-      _profile.requestChangeAdminAddress(consensus, newAdmin);
+      _profile.changeAdminAddr(consensus, newAdmin);
 
       vm.warp(block.timestamp + _profileCooldownConfig);
       vm.expectRevert("Not supported");
-      _profile.requestChangeTreasuryAddr(consensus, payable(newDummyTreasury));
+      _profile.changeTreasuryAddr(consensus, payable(newDummyTreasury));
     }
     vm.stopPrank();
 
@@ -372,13 +372,13 @@ contract ChangeConsensusAddressForkTest is Test {
     vm.startPrank(admin);
     {
       vm.warp(block.timestamp + _profileCooldownConfig);
-      _profile.requestChangeConsensusAddr(consensus, TConsensus.wrap(newConsensus));
+      _profile.changeConsensusAddr(consensus, TConsensus.wrap(newConsensus));
       vm.warp(block.timestamp + _profileCooldownConfig);
-      _profile.requestChangeAdminAddress(consensus, newAdmin);
+      _profile.changeAdminAddr(consensus, newAdmin);
 
       vm.warp(block.timestamp + _profileCooldownConfig);
       vm.expectRevert("Not supported");
-      _profile.requestChangeTreasuryAddr(consensus, payable(newDummyTreasury));
+      _profile.changeTreasuryAddr(consensus, payable(newDummyTreasury));
     }
     vm.stopPrank();
 
@@ -466,13 +466,13 @@ contract ChangeConsensusAddressForkTest is Test {
     );
     _staking.requestEmergencyExit(validatorCandidate);
     vm.warp(block.timestamp + _profileCooldownConfig);
-    _profile.requestChangeConsensusAddr(TConsensus.unwrap(validatorCandidate), newConsensusAddr);
+    _profile.changeConsensusAddr(TConsensus.unwrap(validatorCandidate), newConsensusAddr);
     vm.warp(block.timestamp + _profileCooldownConfig);
-    _profile.requestChangeAdminAddress(TConsensus.unwrap(validatorCandidate), newAdmin);
+    _profile.changeAdminAddr(TConsensus.unwrap(validatorCandidate), newAdmin);
 
     vm.warp(block.timestamp + _profileCooldownConfig);
     vm.expectRevert("Not supported");
-    _profile.requestChangeTreasuryAddr(TConsensus.unwrap(validatorCandidate), newDummyTreasury);
+    _profile.changeTreasuryAddr(TConsensus.unwrap(validatorCandidate), newDummyTreasury);
     vm.stopPrank();
 
     // NOTE: locked fund refunded to the old treasury
@@ -508,7 +508,7 @@ contract ChangeConsensusAddressForkTest is Test {
 
     TConsensus newConsensus = TConsensus.wrap(makeAddr("new-consensus"));
     vm.prank(admin);
-    _profile.requestChangeConsensusAddr(TConsensus.unwrap(trustedOrg), newConsensus);
+    _profile.changeConsensusAddr(TConsensus.unwrap(trustedOrg), newConsensus);
 
     (address poolAdmin, , ) = _staking.getPoolDetail(newConsensus);
     console2.log("poolAdmin", poolAdmin);
@@ -525,7 +525,7 @@ contract ChangeConsensusAddressForkTest is Test {
 
     TConsensus newConsensus = TConsensus.wrap(makeAddr("new-consensus"));
     vm.prank(admin);
-    _profile.requestChangeConsensusAddr(TConsensus.unwrap(trustedOrg), newConsensus);
+    _profile.changeConsensusAddr(TConsensus.unwrap(trustedOrg), newConsensus);
 
     (address poolAdmin, , ) = _staking.getPoolDetail(newConsensus);
     console2.log("poolAdmin", poolAdmin);
@@ -672,7 +672,7 @@ contract ChangeConsensusAddressForkTest is Test {
     TConsensus newConsensus = TConsensus.wrap(makeAddr("new-consensus-0"));
 
     vm.prank(candidateAdmin);
-    _profile.requestChangeConsensusAddr(cid, newConsensus);
+    _profile.changeConsensusAddr(cid, newConsensus);
 
     _bulkWrapUpEpoch(1);
 
@@ -681,7 +681,7 @@ contract ChangeConsensusAddressForkTest is Test {
     candidateAdmin = _validator.getCandidateInfo(validatorCandidate).__shadowedAdmin;
     newConsensus = TConsensus.wrap(makeAddr("new-consensus-1"));
     vm.prank(candidateAdmin);
-    _profile.requestChangeConsensusAddr(cid, newConsensus);
+    _profile.changeConsensusAddr(cid, newConsensus);
 
     _bulkWrapUpEpoch(1);
   }
@@ -701,11 +701,11 @@ contract ChangeConsensusAddressForkTest is Test {
     address payable newDummyTreasury = payable(makeAddr("new-dummy-treasury"));
 
     vm.startPrank(candidateAdmin);
-    _profile.requestChangeConsensusAddr(cid, TConsensus.wrap(newConsensus));
-    _profile.requestChangeAdminAddress(cid, newAdmin);
+    _profile.changeConsensusAddr(cid, TConsensus.wrap(newConsensus));
+    _profile.changeAdminAddr(cid, newAdmin);
 
     vm.expectRevert("Not supported");
-    _profile.requestChangeTreasuryAddr(cid, newDummyTreasury);
+    _profile.changeTreasuryAddr(cid, newDummyTreasury);
     vm.stopPrank();
 
     // store snapshot state
@@ -774,7 +774,7 @@ contract ChangeConsensusAddressForkTest is Test {
     _upgradeContracts();
     TConsensus newConsensus = TConsensus.wrap(makeAddr("consensus"));
     vm.prank(candidateAdmin);
-    _profile.requestChangeConsensusAddr(cid, newConsensus);
+    _profile.changeConsensusAddr(cid, newConsensus);
 
     _bulkSubmitBlockReward(1);
     _bulkSlashIndicator(newConsensus, 150);
@@ -840,7 +840,7 @@ contract ChangeConsensusAddressForkTest is Test {
     // change consensus address
     TConsensus newConsensus = TConsensus.wrap(makeAddr("consensus"));
     vm.prank(candidateAdmin);
-    _profile.requestChangeConsensusAddr(cid, newConsensus);
+    _profile.changeConsensusAddr(cid, newConsensus);
 
     recipient = _validator.getCandidateInfo(newConsensus).__shadowedTreasury;
     console2.log("after-upgrade:recipient", recipient);
@@ -896,7 +896,7 @@ contract ChangeConsensusAddressForkTest is Test {
     _upgradeContracts();
     TConsensus newConsensus = TConsensus.wrap(makeAddr("consensus"));
     vm.prank(candidateAdmin);
-    _profile.requestChangeConsensusAddr(cid, newConsensus);
+    _profile.changeConsensusAddr(cid, newConsensus);
 
     console2.log("new-consensus", TConsensus.unwrap(newConsensus));
 
@@ -924,7 +924,7 @@ contract ChangeConsensusAddressForkTest is Test {
     address candidateAdmin = _validator.getCandidateInfo(validatorCandidate).__shadowedAdmin;
     TConsensus newConsensus = TConsensus.wrap(makeAddr("same-consensus"));
     vm.prank(candidateAdmin);
-    _profile.requestChangeConsensusAddr(cid, newConsensus);
+    _profile.changeConsensusAddr(cid, newConsensus);
 
     _bulkWrapUpEpoch(1);
 
@@ -932,7 +932,7 @@ contract ChangeConsensusAddressForkTest is Test {
     candidateAdmin = _validator.getCandidateInfo(validatorCandidate).__shadowedAdmin;
     newConsensus = TConsensus.wrap(makeAddr("same-consensus"));
     vm.prank(candidateAdmin);
-    _profile.requestChangeConsensusAddr(cid, newConsensus);
+    _profile.changeConsensusAddr(cid, newConsensus);
 
     _bulkWrapUpEpoch(1);
   }

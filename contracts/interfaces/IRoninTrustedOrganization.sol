@@ -94,7 +94,7 @@ interface IRoninTrustedOrganization is IQuorum {
   function removeTrustedOrganizations(TConsensus[] calldata consensusAddrs) external;
 
   /**
-   * @dev Fallback function of `Profile-requestChangeConsensusAddress`.
+   * @dev Fallback function of `Profile-changeConsensusAddr`.
    *
    * Requirements:
    * - The caller must be the Profile contract.

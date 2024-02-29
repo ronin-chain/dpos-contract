@@ -102,21 +102,21 @@ interface IProfile {
    *
    * Emit an {ProfileAddressChanged}.
    */
-  function requestChangeAdminAddress(address id, address newAdminAddr) external;
+  function changeAdminAddr(address id, address newAdminAddr) external;
 
   /**
    * @dev Updated the treasury address of candidate id `id` immediately without waiting time.
    *
    * Emit an {ProfileAddressChanged}.
    */
-  function requestChangeConsensusAddr(address id, TConsensus newConsensusAddr) external;
+  function changeConsensusAddr(address id, TConsensus newConsensusAddr) external;
 
   /**
    * @dev Updated the treasury address of candidate id `id` immediately without waiting time.
    *
    * Emit an {ProfileAddressChanged}.
    */
-  function requestChangeTreasuryAddr(address id, address payable newTreasury) external;
+  function changeTreasuryAddr(address id, address payable newTreasury) external;
 
   /**
    * @notice The candidate admin changes the public key.
