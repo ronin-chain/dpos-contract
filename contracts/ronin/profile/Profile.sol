@@ -141,6 +141,7 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     _requireCandidateAdmin(_profile);
     _requireNonZeroAndNonDuplicated(RoleAccess.CANDIDATE_ADMIN, newAdminAddr);
     _requireCooldownPassedAndStartCooldown(_profile);
+    _requireNotOnRenunciation(id);
 
     IStaking stakingContract = IStaking(getContract(ContractType.STAKING));
     stakingContract.execChangeAdminAddress({ poolId: id, currAdminAddr: msg.sender, newAdminAddr: newAdminAddr });
@@ -239,6 +240,11 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
       msg.sender != sProfile.admin ||
       !IRoninValidatorSet(getContract(ContractType.VALIDATOR)).isCandidateAdminById(sProfile.id, msg.sender)
     ) revert ErrUnauthorized(msg.sig, RoleAccess.CANDIDATE_ADMIN);
+  }
+
+  function _requireNotOnRenunciation(address id) internal view {
+    IRoninValidatorSet validatorContract = IRoninValidatorSet(getContract(ContractType.VALIDATOR));
+    if (validatorContract.getCandidateInfoById(id).revokingTimestamp > 0) revert ErrValidatorOnRenunciation(id);
   }
 
   /**

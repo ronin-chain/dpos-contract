@@ -63,6 +63,7 @@ interface IProfile {
   error ErrZeroPubkey();
   error ErrInvalidProofOfPossession(bytes pubkey, bytes proofOfPossession);
   error ErrLookUpIdFailed(TConsensus consensus);
+  error ErrValidatorOnRenunciation(address cid);
 
   /// @dev Getter to query full `profile` from `id` address.
   function getId2Profile(address id) external view returns (CandidateProfile memory profile);

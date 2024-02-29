@@ -99,8 +99,15 @@ abstract contract CandidateManager is
    */
   function getCandidateInfo(TConsensus consensus) external view override returns (ValidatorCandidate memory) {
     address validatorId = __css2cid(consensus);
-    if (!_isValidatorCandidateById(validatorId)) revert ErrNonExistentCandidate();
-    return _candidateInfo[validatorId];
+    return getCandidateInfoById(validatorId);
+  }
+
+  /**
+   * @inheritdoc ICandidateManager
+   */
+  function getCandidateInfoById(address cid) public view override returns (ValidatorCandidate memory) {
+    if (!_isValidatorCandidateById(cid)) revert ErrNonExistentCandidate();
+    return _candidateInfo[cid];
   }
 
   /**
