@@ -152,7 +152,7 @@ abstract contract CoinbaseExecution is
    */
   function _syncFastFinalityReward(uint256 epoch, address[] memory validatorIds) private {
     uint256[] memory voteCounts = IFastFinalityTracking(getContract(ContractType.FAST_FINALITY_TRACKING))
-      .getManyFinalityVoteCounts(epoch, validatorIds);
+      .getManyFinalityVoteCountsById(epoch, validatorIds);
     uint256 divisor = _numberOfBlocksInEpoch * validatorIds.length;
     uint256 iReward;
     uint256 totalReward = _totalFastFinalityReward;

@@ -15,6 +15,8 @@ import {
   Profile__factory,
   RoninTrustedOrganization,
   RoninTrustedOrganization__factory,
+  FastFinalityTracking,
+  FastFinalityTracking__factory,
 } from '../../../src/types';
 import { ProfileArguments, StakingVestingArguments } from '../../../src/utils';
 import { defaultTestConfig } from './fixture';
@@ -26,6 +28,7 @@ let slashContract: SlashIndicator | undefined;
 let stakingVestingContract: StakingVesting | undefined;
 let profileContract: Profile | undefined;
 let roninTrustedOrgContract: RoninTrustedOrganization | undefined;
+let fastFinalityTrackingContract: FastFinalityTracking | undefined;
 
 export interface InitializeTestSuiteInput {
   deployer: SignerWithAddress;
@@ -61,6 +64,7 @@ interface InitREP4Input {
   profileContract?: Profile;
   stakingContract?: Staking;
   roninTrustedOrgContract?: RoninTrustedOrganization;
+  fastFinalityTrackingContract?: FastFinalityTracking;
   profileArgs?: ProfileArguments;
 }
 
@@ -92,6 +96,8 @@ export const initializeTestSuite = async (input: InitializeTestSuiteInput) => {
     ? RoninTrustedOrganization__factory.connect(input.roninTrustedOrganizationAddress!, input.deployer)
     : undefined;
 
+  fastFinalityTrackingContract = input.fastFinalityTrackingAddress ? FastFinalityTracking__factory.connect(input.fastFinalityTrackingAddress!, input.deployer) : undefined;
+
   await upgradeRep2({
     fastFinalityTrackingAddress: input.fastFinalityTrackingAddress,
     profileAddress: input.profileAddress,
@@ -112,6 +118,7 @@ export const initializeTestSuite = async (input: InitializeTestSuiteInput) => {
     profileContract,
     stakingContract,
     roninTrustedOrgContract,
+    fastFinalityTrackingContract,
     profileArgs: input.profileArgs
   });
 };
@@ -158,5 +165,9 @@ const upgradeRep4 = async (input: InitREP4Input) => {
 
   if (input.roninTrustedOrgContract) {
     await input.roninTrustedOrgContract.initializeV2(input.profileContract?.address!);
+  }
+
+  if (input.fastFinalityTrackingContract) {
+    await input.fastFinalityTrackingContract.initializeV2(input.profileContract?.address!);
   }
 };
