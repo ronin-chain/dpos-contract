@@ -213,9 +213,9 @@ abstract contract Proposal__20240220_MikoHardfork_BuildProposal is Proposal__Bas
     returns (bytes[] memory callDatas, address[] memory targets, uint256[] memory values)
   {
     // See https://www.notion.so/skymavis/DPoS-Gateway-Contract-list-58e189d5feab435d9b78b04a3012155c?pvs=4#67e1c4291c834c5980a6915fc5489865
-    targets = new address[](9);
-    callDatas = new bytes[](9);
-    values = new uint256[](9);
+    targets = new address[](10);
+    callDatas = new bytes[](10);
+    values = new uint256[](10);
 
     targets[0] = address(maintenanceContract);
     callDatas[0] = abi.encodeCall(
@@ -259,16 +259,22 @@ abstract contract Proposal__20240220_MikoHardfork_BuildProposal is Proposal__Bas
       abi.encodeCall(Staking.initializeV4, (address(roninGovernanceAdmin), STAKING_MIGRATOR))
     );
 
+    targets[7] = address(fastFinalityTrackingContract);
+    callDatas[7] = abi.encodeCall(
+      TransparentUpgradeableProxyV2.functionDelegateCall,
+      abi.encodeCall(FastFinalityTracking.initializeV2, (address(profileContract)))
+    );
+
     // [C1.] The `MIGRATOR_ROLE` in the Staking will migrate the list of `wasAdmin`.
     {
-      targets[7] = address(stakingContract);
-      callDatas[7] = abi.encodeCall(
+      targets[8] = address(stakingContract);
+      callDatas[8] = abi.encodeCall(
         TransparentUpgradeableProxyV2.functionDelegateCall,
         abi.encodeCall(AccessControl.grantRole, (MIGRATOR_ROLE, address(roninGovernanceAdmin)))
       );
 
-      targets[8] = address(stakingContract);
-      callDatas[8] = abi.encodeCall(TransparentUpgradeableProxyV2.functionDelegateCall, _migrator__migrateWasAdmin());
+      targets[9] = address(stakingContract);
+      callDatas[9] = abi.encodeCall(TransparentUpgradeableProxyV2.functionDelegateCall, _migrator__migrateWasAdmin());
     }
   }
 
