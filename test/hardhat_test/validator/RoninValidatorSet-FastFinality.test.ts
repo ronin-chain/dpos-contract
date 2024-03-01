@@ -17,6 +17,8 @@ import {
   FastFinalityTracking__factory,
   FastFinalityTracking,
   MockProfile__factory,
+  Profile,
+  Profile__factory,
 } from '../../../src/types';
 import { EpochController } from '../helpers/ronin-validator-set';
 import { deployTestSuite } from '../helpers/fixture';
@@ -40,6 +42,7 @@ let slashIndicator: MockSlashIndicatorExtended;
 let fastFinalityTracking: FastFinalityTracking;
 let governanceAdmin: RoninGovernanceAdmin;
 let governanceAdminInterface: GovernanceAdminInterface;
+let profileContract: Profile;
 
 let coinbase: SignerWithAddress;
 let deployer: SignerWithAddress;
@@ -127,6 +130,7 @@ describe('Ronin Validator Set: Fast Finality test', () => {
       fastFinalityTrackingAddress,
       validatorCandidates[0].consensusAddr
     );
+    profileContract = Profile__factory.connect(profileAddress, deployer);
     governanceAdmin = RoninGovernanceAdmin__factory.connect(roninGovernanceAdminAddress, deployer);
     governanceAdminInterface = new GovernanceAdminInterface(
       governanceAdmin,
@@ -444,6 +448,92 @@ describe('Ronin Validator Set: Fast Finality test', () => {
         await expect(tx)
           .emit(validatorContract, 'DeprecatedRewardRecycled')
           .withArgs(anyValue, leftoverFastFinalityReward);
+      });
+    });
+
+    describe('Record QC vote for all validators in all blocks of epoch with consensus change', async () => {
+      let tx: Transaction;
+      let midEpoch = numberOfBlocksInEpoch / 2;
+
+      it('Should all validators record finality til mid epoch', async () => {
+        epoch = await validatorContract.epochOf(await ethers.provider.getBlockNumber());
+        // Record for all blocks except the last block
+        for (let i = 0; i < midEpoch; i++) {
+          await fastFinalityTracking.recordFinality(validatorCandidates.map((_) => _.consensusAddr.address));
+          await validatorContract.connect(validatorCandidates[0].consensusAddr).submitBlockReward();
+        }
+      })
+
+      it('Should one validator change his consensus' , async() => {
+        let newConsensus = signers[signers.length - 1];
+        await profileContract.connect(validatorCandidates[0].candidateAdmin).changeConsensusAddr(validatorCandidates[0].cid.address, newConsensus.address);
+        validatorCandidates[0].consensusAddr = newConsensus;
+        await network.provider.send('hardhat_setCoinbase', [validatorCandidates[0].consensusAddr.address]);
+
+        fastFinalityTracking = FastFinalityTracking__factory.connect(fastFinalityTracking.address, newConsensus);
+      })
+
+      it('Should all validators continue record finality til end of epoch', async () => {
+        epoch = await validatorContract.epochOf(await ethers.provider.getBlockNumber());
+        // Record for all blocks except the last block
+        for (let i = midEpoch; i < numberOfBlocksInEpoch -1 ; i++) {
+          await fastFinalityTracking.recordFinality(validatorCandidates.map((_) => _.consensusAddr.address));
+          await validatorContract.connect(validatorCandidates[0].consensusAddr).submitBlockReward();
+        }
+      })
+
+      it('Should equally dispense fast finality voting reward', async () => {
+        await EpochController.setTimestampToPeriodEnding();
+        await mineBatchTxs(async () => {
+          await validatorContract.endEpoch();
+          // Record for the last block
+          await fastFinalityTracking.recordFinality(validatorCandidates.map((_) => _.consensusAddr.address));
+          await validatorContract.connect(validatorCandidates[0].consensusAddr).submitBlockReward();
+          tx = await validatorContract.connect(validatorCandidates[0].consensusAddr).wrapUpEpoch();
+        });
+
+        expect(validatorCandidates.map((_) => _.cid.address)).not.deep.equal(validatorCandidates.map((_) => _.consensusAddr.address));
+
+        expect(
+          await fastFinalityTracking.getManyFinalityVoteCountsById(
+            epoch,
+            validatorCandidates.map((_) => _.cid.address)
+          )
+        ).deep.equal(validatorCandidates.map((_) => numberOfBlocksInEpoch));
+
+        expect(
+          await fastFinalityTracking.getManyFinalityVoteCounts(
+            epoch,
+            validatorCandidates.map((_) => _.consensusAddr.address)
+          )
+        ).deep.equal(validatorCandidates.map((_) => numberOfBlocksInEpoch));
+
+        let rewardEach = blockProducerBonusPerBlock
+          .mul(numberOfBlocksInEpoch)
+          .mul(fastFinalityRewardPercent)
+          .div(100_00)
+          .div(4);
+
+        await expect(tx).emit(validatorContract, 'WrappedUpEpoch').withArgs(anyValue, epoch, true);
+
+        let totalMiningReward = blockProducerBonusPerBlock
+          .mul(numberOfBlocksInEpoch)
+          .mul(BigNumber.from(100_00).sub(fastFinalityRewardPercent))
+          .div(100_00);
+
+        await expect(tx)
+          .emit(validatorContract, 'MiningRewardDistributed')
+          .withArgs(validatorCandidates[0].cid.address, anyValue, totalMiningReward);
+
+        for (let i = 0; i < validatorCandidates.length; i++) {
+          await expect(tx)
+            .emit(validatorContract, 'FastFinalityRewardDistributed')
+            .withArgs(validatorCandidates[i].cid.address, anyValue, rewardEach);
+        }
+      });
+
+      it('Should no reward get recycled', async () => {
+        await expect(tx).not.emit(validatorContract, 'DeprecatedRewardRecycled');
       });
     });
   });

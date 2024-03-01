@@ -89,7 +89,8 @@ const sortArrayByBoolean = (indexes: number[], statuses: boolean[]) => {
   });
 };
 
-describe('Arrange validators', () => {
+// Skip this test is because testing time is too long and these logic is on pre-compiled
+describe.skip('Arrange validators', () => {
   before(async () => {
     [deployer, governor, ...signers] = await ethers.getSigners();
     trustedOrgs = createManyTrustedOrganizationAddressSets(signers.splice(0, 3));
