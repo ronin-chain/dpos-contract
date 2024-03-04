@@ -37,7 +37,7 @@ contract Proposal__Full_20240220_MikoHardfork_ProposeProposal is
     // CONFIG.setBroadcastDisableStatus(true);
     // Proposal__20240220_MikoHardfork_Before._run_unchained(); // BAO_EOA
 
-    CONFIG.setBroadcastDisableStatus(true);
+    CONFIG.setBroadcastDisableStatus(false);
     Proposal__20240220_MikoHardfork_ProposeProposal._run_unchained(); // Governor
 
     CONFIG.setBroadcastDisableStatus(true);
