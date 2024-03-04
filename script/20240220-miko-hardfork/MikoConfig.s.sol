@@ -32,11 +32,11 @@ abstract contract MikoConfig is RoninMigration {
    */
   address public constant BAO_EOA_MAINNET = 0x4d58Ea7231c394d5804e8B06B1365915f906E27F; // op:
 
-  address public constant DEPLOYER = 0xFE490b68E64B190B415Bb92F8D2F7566243E6ea0; // Mainnet Shadow deployer address (FIXME: change to BAO's EOA when on mainnet)
-  address public constant BAO_EOA = 0x34825ac407c9817278629fdA290C85a82A753B03; // Mainnet Shadow Bao's EOA (FIXME: change to BAO's EOA when on mainnet)
+  // address public constant DEPLOYER = 0xFE490b68E64B190B415Bb92F8D2F7566243E6ea0; // Mainnet Shadow deployer address (FIXME: change to BAO's EOA when on mainnet)
+  // address public constant BAO_EOA = 0x34825ac407c9817278629fdA290C85a82A753B03; // Mainnet Shadow Bao's EOA (FIXME: change to BAO's EOA when on mainnet)
 
-  // address public constant DEPLOYER = BAO_EOA_MAINNET; // Mainnet Shadow deployer address (FIXME: change to BAO's EOA when on mainnet)
-  // address public constant BAO_EOA = BAO_EOA_MAINNET; // Mainnet Shadow Bao's EOA (FIXME: change to BAO's EOA when on mainnet)
+  address public constant DEPLOYER = BAO_EOA_MAINNET; // Mainnet Shadow deployer address (FIXME: change to BAO's EOA when on mainnet)
+  address public constant BAO_EOA = BAO_EOA_MAINNET; // Mainnet Shadow Bao's EOA (FIXME: change to BAO's EOA when on mainnet)
   address public constant ADMIN_TMP_BRIDGE_TRACKING = 0x25F7D5901ed7d397EC0758bb59717d6D623286A1; // op: [Mainnet][Bridge] Bridge Tracking Temp Admin (Doctor)
   address public constant STAKING_MIGRATOR = 0x555a4D1201DecF7d5C87EcF67B1f0b6430bED2Ed; // op: [Mainnet][DPoS] Staking Migrator
   address public constant SKY_MAVIS_GOVERNOR = 0xe880802580a1fbdeF67ACe39D1B21c5b2C74f059; // op:

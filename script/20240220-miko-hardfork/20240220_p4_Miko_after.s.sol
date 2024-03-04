@@ -5,7 +5,10 @@ import { TContract } from "foundry-deployment-kit/types/Types.sol";
 import { LibProxy } from "foundry-deployment-kit/libraries/LibProxy.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
 
-import { BridgeTrackingRecoveryLogic, BridgeTracking } from "../20231019-recover-fund/contracts/BridgeTrackingRecoveryLogic.sol";
+import {
+  BridgeTrackingRecoveryLogic,
+  BridgeTracking
+} from "../20231019-recover-fund/contracts/BridgeTrackingRecoveryLogic.sol";
 
 import { SlashIndicator } from "@ronin/contracts/ronin/slash-indicator/SlashIndicator.sol";
 import { Staking, IStaking } from "@ronin/contracts/ronin/staking/Staking.sol";
@@ -26,6 +29,7 @@ contract Proposal__20240220_MikoHardfork_After is Proposal__Base_20240220_MikoHa
   using ArrayReplaceLib for *;
 
   uint256 _lockedAmount;
+  uint256 _recoveredFund;
 
   /**
    * See `README.md`
@@ -36,7 +40,7 @@ contract Proposal__20240220_MikoHardfork_After is Proposal__Base_20240220_MikoHa
     _run_unchained();
   }
 
-  function _run_unchained() internal virtual{
+  function _run_unchained() internal virtual {
     // [C2.] The `doctor` will withdraw the locked fund.
     _doctor__recoverFund();
 
@@ -49,6 +53,8 @@ contract Proposal__20240220_MikoHardfork_After is Proposal__Base_20240220_MikoHa
   }
 
   function _doctor__recoverFund() internal {
+    console2.log("\n---- Recover fund to doctor's account ---".magenta());
+
     address doctor = ADMIN_TMP_BRIDGE_TRACKING;
     _lockedAmount = address(DEPRECATED_BRIDGE_REWARD).balance;
 
@@ -79,13 +85,16 @@ contract Proposal__20240220_MikoHardfork_After is Proposal__Base_20240220_MikoHa
     );
 
     uint256 balanceAfter = doctor.balance;
-    console.log("balanceBefore", balanceBefore);
-    console.log("balanceAfter", balanceAfter);
-    uint256 recoveredFund = balanceAfter - balanceBefore;
-    console.log("recoveredFund", recoveredFund);
+    console.log("Doctor's balance before:", balanceBefore);
+    console.log("Doctor's balance after: ", balanceAfter);
+    _recoveredFund = balanceAfter - balanceBefore;
+    console.log("recoveredFund:          ".green().bold(), _recoveredFund);
+    console.log("stuckFund    :          ".red().bold(), _lockedAmount - _recoveredFund);
   }
 
   function _doctor__rollbackBridgeTracking() internal {
+    console2.log("\n---- Transfer to Andy's account ---".magenta());
+
     address doctor = ADMIN_TMP_BRIDGE_TRACKING;
     bool shouldPrankOnly = CONFIG.isBroadcastDisable();
 
@@ -117,13 +126,15 @@ contract Proposal__20240220_MikoHardfork_After is Proposal__Base_20240220_MikoHa
     } else {
       vm.broadcast(doctor);
     }
-    payable(ANDY_TREZOR).transfer(_lockedAmount); // Excludes 20 RON of BAO_EOA
+    payable(ANDY_TREZOR).transfer(_recoveredFund); // Excludes 20 RON of BAO_EOA
 
     uint256 andyBalanceAfter = ANDY_TREZOR.balance;
     uint256 andyBalanceChange = andyBalanceAfter - andyBalanceBefore;
-    console2.log("Andy's balance before:", andyBalanceBefore / 1e18, "RON");
-    console2.log("Andy's balance after:", andyBalanceAfter / 1e18, "RON");
-    console2.log("Andy's balance change: +", andyBalanceChange / 1e18, "RON");
+    console2.log("Recovered fund:         ".green().bold(), _recoveredFund, "wei");
+    console2.log("Andy's balance change: +", andyBalanceChange, "wei");
+    console2.log("Andy's balance before:  ", andyBalanceBefore, "wei");
+    console2.log("Andy's balance after:   ", andyBalanceAfter, "wei");
     assertTrue(andyBalanceChange > 0, "Error Andy Balance not change!!!");
+    assertTrue(andyBalanceChange == _recoveredFund, "Error Andy Balance not equal recovered fund!!!");
   }
 }
