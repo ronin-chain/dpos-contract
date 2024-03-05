@@ -98,7 +98,7 @@ contract Proposal__Base_20240220_MikoHardfork is MikoConfig {
     string memory raw = vm.readFile(path);
     JSONParserLib.Item memory data = raw.parse();
     uint256 size = data.size();
-    console.log("size", size);
+    console.log("data size", size);
 
     poolIds = new address[](size);
     admins = new address[](size);
