@@ -56,6 +56,7 @@ contract Proposal__20240220_MikoHardfork_After is Proposal__Base_20240220_MikoHa
     console2.log("\n---- Recover fund to doctor's account ---".magenta());
 
     address doctor = ADMIN_TMP_BRIDGE_TRACKING;
+    balanceBefore = doctor.balance;
     _lockedAmount = address(DEPRECATED_BRIDGE_REWARD).balance;
 
     // Step 3
@@ -85,15 +86,25 @@ contract Proposal__20240220_MikoHardfork_After is Proposal__Base_20240220_MikoHa
     );
 
     uint256 balanceAfter = doctor.balance;
+    console.log("Doctor", doctor);
     console.log("Doctor's balance before:", balanceBefore);
     console.log("Doctor's balance after: ", balanceAfter);
     _recoveredFund = balanceAfter - balanceBefore;
+    console.log("lockedAmount:           ".green().bold(), _lockedAmount);
     console.log("recoveredFund:          ".green().bold(), _recoveredFund);
-    console.log("stuckFund    :          ".red().bold(), _lockedAmount - _recoveredFund);
+
+    if (_lockedAmount > _recoveredFund) {
+      console.log("stuckFund    :          ".red().bold(), _lockedAmount - _recoveredFund);
+    }
+
+    if (_lockedAmount <= _recoveredFund) {
+      console.log("stuckFund  ??:          ".red().bold(), _recoveredFund - _lockedAmount);
+    }
   }
 
   function _doctor__rollbackBridgeTracking() internal {
     console2.log("\n---- Transfer to Andy's account ---".magenta());
+    console.log("Andy", ANDY_TREZOR);
 
     address doctor = ADMIN_TMP_BRIDGE_TRACKING;
     bool shouldPrankOnly = CONFIG.isBroadcastDisable();
