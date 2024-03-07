@@ -3,13 +3,29 @@
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 import "../../libraries/Math.sol";
 import "../../interfaces/staking/IStaking.sol";
 import "../../interfaces/validator/IRoninValidatorSet.sol";
-import "./CandidateStaking.sol";
-import "./DelegatorStaking.sol";
+import "../../utils/CommonErrors.sol";
+import "./StakingCallback.sol";
 
-contract Staking is IStaking, CandidateStaking, DelegatorStaking, Initializable {
+contract Staking is IStaking, StakingCallback, Initializable, AccessControlEnumerable {
+  bytes32 public constant MIGRATOR_ROLE = keccak256("MIGRATOR_ROLE");
+
+  // keccak256(abi.encode(uint256(keccak256("ronin.storage.StakingRep4MigratedStorageLocation")) - 1)) & ~bytes32(uint256(0xff))
+  bytes32 private constant $_StakingRep4MigratedStorageLocation = 0x02b7258856b9f6bdff23dae2002215e15e9b3a0101a83005baf0725f1e37df00;
+
+  modifier onRep4Migration {
+    uint256 val;
+    assembly ("memory-safe") {
+      val := sload($_StakingRep4MigratedStorageLocation)
+    }
+
+    if (val > 0) revert ErrMigrateWasAdminAlreadyDone();
+    _;
+  }
+
   constructor() {
     _disableInitializers();
   }
@@ -35,59 +51,78 @@ contract Staking is IStaking, CandidateStaking, DelegatorStaking, Initializable 
     _setWaitingSecsToRevoke(__waitingSecsToRevoke);
   }
 
+  /**
+   * @dev Initializes the contract storage V2.
+   */
   function initializeV2() external reinitializer(2) {
     _setContract(ContractType.VALIDATOR, ______deprecatedValidator);
     delete ______deprecatedValidator;
   }
 
   /**
-   * @dev This method only work on testnet, to hotfix the applied validator candidate that is failed.
-   * TODO: Should remove this method before deploying it on mainnet.
+   * @dev Initializes the contract storage V3.
    */
-  function tmp_re_applyValidatorCandidate(
-    address _candidateAdmin,
-    address _consensusAddr,
-    address payable _treasuryAddr,
-    uint256 _commissionRate
-  ) external {
-    require(block.chainid == 2021, "E1");
-    require(msg.sender == 0x57832A94810E18c84a5A5E2c4dD67D012ade574F, "E2");
+  function initializeV3(address __profileContract) external reinitializer(3) {
+    _setContract(ContractType.PROFILE, __profileContract);
+  }
 
-    IRoninValidatorSet(getContract(ContractType.VALIDATOR)).execApplyValidatorCandidate(
-      _candidateAdmin,
-      _consensusAddr,
-      _treasuryAddr,
-      _commissionRate
-    );
+  function initializeV4(address admin, address migrator) external reinitializer(4) {
+    _grantRole(DEFAULT_ADMIN_ROLE, admin);
+    _grantRole(MIGRATOR_ROLE, migrator);
+  }
+
+  /**
+   * @dev Migrate REP-4
+   */
+  function migrateWasAdmin(
+    address[] calldata poolIds,
+    address[] calldata admins,
+    bool[] calldata flags
+  ) external onRep4Migration onlyRole(MIGRATOR_ROLE) {
+    if (poolIds.length != admins.length || poolIds.length != flags.length) {
+      revert ErrInvalidArguments(msg.sig);
+    }
+
+    for (uint i; i < poolIds.length; ++i) {
+      _poolDetail[poolIds[i]].wasAdmin[admins[i]] = flags[i];
+    }
+
+    emit MigrateWasAdminFinished();
+  }
+
+  /**
+   * @dev Mark the REP-4 migration is finished. Disable the `migrateWasAdmin` method.
+   */
+  function disableMigrateWasAdmin() external onRep4Migration onlyRole(MIGRATOR_ROLE) {
+    assembly {
+      sstore($_StakingRep4MigratedStorageLocation, 0x01)
+    }
+
+    emit MigrateWasAdminDisabled();
   }
 
   /**
    * @inheritdoc IStaking
    */
   function execRecordRewards(
-    address[] calldata _consensusAddrs,
-    uint256[] calldata _rewards,
-    uint256 _period
+    address[] calldata poolIds,
+    uint256[] calldata rewards,
+    uint256 period
   ) external payable override onlyContract(ContractType.VALIDATOR) {
-    _recordRewards(_consensusAddrs, _rewards, _period);
+    _recordRewards(poolIds, rewards, period);
   }
 
   /**
    * @inheritdoc IStaking
    */
   function execDeductStakingAmount(
-    address _consensusAddr,
-    uint256 _amount
-  ) external override onlyContract(ContractType.VALIDATOR) returns (uint256 _actualDeductingAmount) {
-    _actualDeductingAmount = _deductStakingAmount(_stakingPool[_consensusAddr], _amount);
-    address payable _validatorContractAddr = payable(msg.sender);
-    if (!_unsafeSendRON(_validatorContractAddr, _actualDeductingAmount)) {
-      emit StakingAmountDeductFailed(
-        _consensusAddr,
-        _validatorContractAddr,
-        _actualDeductingAmount,
-        address(this).balance
-      );
+    address poolId,
+    uint256 amount
+  ) external override onlyContract(ContractType.VALIDATOR) returns (uint256 actualDeductingAmount_) {
+    actualDeductingAmount_ = _deductStakingAmount(_poolDetail[poolId], amount);
+    address payable validatorContractAddr = payable(msg.sender);
+    if (!_unsafeSendRON(validatorContractAddr, actualDeductingAmount_)) {
+      emit StakingAmountDeductFailed(poolId, validatorContractAddr, actualDeductingAmount_, address(this).balance);
     }
   }
 
@@ -103,17 +138,17 @@ contract Staking is IStaking, CandidateStaking, DelegatorStaking, Initializable 
    */
   function _deductStakingAmount(
     PoolDetail storage _pool,
-    uint256 _amount
-  ) internal override returns (uint256 _actualDeductingAmount) {
-    _actualDeductingAmount = Math.min(_pool.stakingAmount, _amount);
+    uint256 amount
+  ) internal override returns (uint256 actualDeductingAmount_) {
+    actualDeductingAmount_ = Math.min(_pool.stakingAmount, amount);
 
-    _pool.stakingAmount -= _actualDeductingAmount;
+    _pool.stakingAmount -= actualDeductingAmount_;
     _changeDelegatingAmount(
       _pool,
-      _pool.admin,
+      _pool.__shadowedPoolAdmin,
       _pool.stakingAmount,
-      Math.subNonNegative(_pool.stakingTotal, _actualDeductingAmount)
+      Math.subNonNegative(_pool.stakingTotal, actualDeductingAmount_)
     );
-    emit Unstaked(_pool.addr, _actualDeductingAmount);
+    emit Unstaked(_pool.pid, actualDeductingAmount_);
   }
 }

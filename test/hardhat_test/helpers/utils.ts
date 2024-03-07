@@ -3,6 +3,7 @@ import { BigNumber, ContractTransaction } from 'ethers';
 import { Interface, LogDescription } from 'ethers/lib/utils';
 import { ethers, network } from 'hardhat';
 import { Address } from 'hardhat-deploy/dist/types';
+import { randomAddress } from '../../../src/utils';
 
 export const expectEvent = async (
   contractInterface: Interface,
@@ -76,6 +77,21 @@ export enum ContractType {
   /* 15 */ PROFILE,
 }
 
+export  enum RoleAccess {
+  /* 0 */ UNKNOWN,
+  /* 1 */ ADMIN,
+  /* 2 */ COINBASE,
+  /* 3 */ GOVERNOR,
+  /* 4 */ CANDIDATE_ADMIN,
+  /* 5 */ WITHDRAWAL_MIGRATOR,
+  /* 6 */ __DEPRECATED_BRIDGE_OPERATOR,
+  /* 7 */ BLOCK_PRODUCER,
+  /* 8 */ VALIDATOR_CANDIDATE,
+  /* 9 */ CONSENSUS,
+  /* 10 */ TREASURY
+}
+
+
 export const getProxyImplementation = async (proxy: string): Promise<string> =>
   '0x' +
   (
@@ -100,4 +116,10 @@ export const checkArraysHaveSameSize = (arrays: Array<any>[]) => {
   let lengths = arrays.map((_) => _.length);
   let uniqueLengths = [...new Set(lengths)];
   return uniqueLengths.length == 1 && uniqueLengths[0] != 0;
+};
+
+export const generateSamplePubkey = (consensusAddr?: Address, candidateAdminAddr?: Address): Uint8Array => {
+  consensusAddr ??= randomAddress();
+  candidateAdminAddr ??= randomAddress();
+  return ethers.utils.toUtf8Bytes(consensusAddr + '-' + candidateAdminAddr);
 };

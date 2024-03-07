@@ -2,20 +2,30 @@
 
 pragma solidity ^0.8.9;
 
+import "../../udvts/Types.sol";
 import "../../extensions/collections/HasContracts.sol";
+import "../../utils/RoleAccess.sol";
 import { IProfile } from "../../interfaces/IProfile.sol";
 
 abstract contract ProfileStorage is IProfile, HasContracts {
   /// @dev Mapping from id address => candidate profile.
   mapping(address => CandidateProfile) internal _id2Profile;
+
   /**
    * @dev Mapping from any address or keccak256(pubkey) => whether it is already registered.
    * This registry can only be toggled to `true` and NOT vice versa. All registered values
    * cannot be reused.
    */
   mapping(uint256 => bool) internal _registry;
+
+  /// @dev Mapping from consensus address => id address.
+  mapping(TConsensus => address) internal _consensus2Id;
+
+  /// @dev The cooldown time to change any info in the profile.
+  uint256 internal _profileChangeCooldown;
+
   /// @dev Upgradeable gap.
-  bytes32[49] __gap;
+  bytes32[47] __gap;
 
   /**
    * @dev Add a profile from memory to storage.
@@ -26,40 +36,64 @@ abstract contract ProfileStorage is IProfile, HasContracts {
     _setConsensus(_profile, newProfile.consensus);
     _setAdmin(_profile, newProfile.admin);
     _setTreasury(_profile, newProfile.treasury);
-    _setGovernor(_profile, newProfile.governor);
+    _setGovernor(_profile, newProfile.__reservedGovernor);
     _setPubkey(_profile, newProfile.pubkey);
 
     emit ProfileAdded(newProfile.id);
   }
 
-  function _setConsensus(CandidateProfile storage _profile, address consensus) internal {
+  function _setConsensus(CandidateProfile storage _profile, TConsensus consensus) internal {
+    // Backup old consensus
+    _profile.oldConsensus = _profile.consensus;
+
+    // Delete old consensus in mapping
+    delete _consensus2Id[_profile.consensus];
+    _consensus2Id[consensus] = _profile.id;
+
+    // Set new consensus
     _profile.consensus = consensus;
-    _registry[uint256(uint160(consensus))] = true;
+    _registry[uint256(uint160(TConsensus.unwrap(consensus)))] = true;
+
+    emit ProfileAddressChanged(_profile.id, RoleAccess.CONSENSUS, TConsensus.unwrap(consensus));
   }
 
   function _setAdmin(CandidateProfile storage _profile, address admin) internal {
     _profile.admin = admin;
     _registry[uint256(uint160(admin))] = true;
+
+    emit ProfileAddressChanged(_profile.id, RoleAccess.CANDIDATE_ADMIN, admin);
   }
 
   function _setTreasury(CandidateProfile storage _profile, address payable treasury) internal {
     _profile.treasury = treasury;
     _registry[uint256(uint160(address(treasury)))] = true;
+
+    emit ProfileAddressChanged(_profile.id, RoleAccess.TREASURY, treasury);
   }
 
   /**
    * @dev Allow to registry a profile without governor address since not all validators are governing validators.
    */
   function _setGovernor(CandidateProfile storage _profile, address governor) internal {
-    _profile.governor = governor;
+    _profile.__reservedGovernor = governor;
     if (governor != address(0)) {
       _registry[uint256(uint160(governor))] = true;
     }
   }
 
   function _setPubkey(CandidateProfile storage _profile, bytes memory pubkey) internal {
+    if (_profile.pubkey.length != 0) {
+      _profile.oldPubkey = _profile.pubkey;
+    }
+
     _profile.pubkey = pubkey;
     _registry[_hashPubkey(pubkey)] = true;
+
+    emit PubkeyChanged(_profile.id, pubkey);
+  }
+
+  function _startCooldown(CandidateProfile storage _profile) internal {
+    _profile.profileLastChange = block.timestamp;
   }
 
   /**
@@ -75,5 +109,9 @@ abstract contract ProfileStorage is IProfile, HasContracts {
    */
   function _hashPubkey(bytes memory pubkey) internal pure returns (uint256) {
     return uint256(keccak256(pubkey));
+  }
+
+  function _setCooldownConfig(uint256 cooldown) internal {
+    _profileChangeCooldown = cooldown;
   }
 }

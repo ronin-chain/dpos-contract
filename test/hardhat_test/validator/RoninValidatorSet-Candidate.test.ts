@@ -15,10 +15,11 @@ import {
   StakingVesting__factory,
   StakingVesting,
   TransparentUpgradeableProxyV2__factory,
+  MockProfile__factory,
 } from '../../../src/types';
 import * as RoninValidatorSet from '../helpers/ronin-validator-set';
-import { getLastBlockTimestamp, mineBatchTxs } from '../helpers/utils';
-import { defaultTestConfig, initTest } from '../helpers/fixture';
+import { generateSamplePubkey, getLastBlockTimestamp, mineBatchTxs } from '../helpers/utils';
+import { defaultTestConfig, deployTestSuite } from '../helpers/fixture';
 import { GovernanceAdminInterface } from '../../../src/script/governance-admin-interface';
 import { Address } from 'hardhat-deploy/dist/types';
 import {
@@ -35,6 +36,7 @@ import {
   WhitelistedCandidateAddressSet,
   mergeToManyWhitelistedCandidateAddressSets,
 } from '../helpers/address-set-types/whitelisted-candidate-set-type';
+import { initializeTestSuite } from '../helpers/initializer';
 
 let roninValidatorSet: MockRoninValidatorSetExtended;
 let stakingVesting: StakingVesting;
@@ -94,8 +96,10 @@ describe('Ronin Validator Set: candidate test', () => {
       stakingContractAddress,
       roninGovernanceAdminAddress,
       stakingVestingContractAddress,
+      profileAddress,
       fastFinalityTrackingAddress,
-    } = await initTest('RoninValidatorSet-Candidate')({
+      roninTrustedOrganizationAddress,
+    } = await deployTestSuite('RoninValidatorSet-Candidate')({
       slashIndicatorArguments: {
         doubleSignSlashing: {
           slashDoubleSignAmount,
@@ -122,11 +126,22 @@ describe('Ronin Validator Set: candidate test', () => {
         trustedOrganizations: trustedOrgs.map((v) => ({
           consensusAddr: v.consensusAddr.address,
           governor: v.governor.address,
-          bridgeVoter: v.bridgeVoter.address,
+          __deprecatedBridgeVoter: v.__deprecatedBridgeVoter.address,
           weight: 100,
           addedBlock: 0,
         })),
       },
+    });
+
+    await initializeTestSuite({
+      deployer,
+      fastFinalityTrackingAddress,
+      profileAddress,
+      slashContractAddress,
+      stakingContractAddress,
+      validatorContractAddress,
+      roninTrustedOrganizationAddress,
+      maintenanceContractAddress: undefined,
     });
 
     roninValidatorSet = MockRoninValidatorSetExtended__factory.connect(validatorContractAddress, deployer);
@@ -141,11 +156,14 @@ describe('Ronin Validator Set: candidate test', () => {
       ...trustedOrgs.map((_) => _.governor)
     );
 
+    const mockProfileLogic = await new MockProfile__factory(deployer).deploy();
+    await mockProfileLogic.deployed();
+    await governanceAdminInterface.upgrade(profileAddress, mockProfileLogic.address);
+
     const mockValidatorLogic = await new MockRoninValidatorSetExtended__factory(deployer).deploy();
     await mockValidatorLogic.deployed();
     await governanceAdminInterface.upgrade(roninValidatorSet.address, mockValidatorLogic.address);
     await roninValidatorSet.initEpoch();
-    await roninValidatorSet.initializeV3(fastFinalityTrackingAddress);
 
     const mockSlashIndicator = await new MockSlashIndicatorExtended__factory(deployer).deploy();
     await mockSlashIndicator.deployed();
@@ -167,6 +185,8 @@ describe('Ronin Validator Set: candidate test', () => {
             validatorCandidates[i].consensusAddr.address,
             validatorCandidates[i].treasuryAddr.address,
             2_00,
+            generateSamplePubkey(),
+            '0x',
             {
               value: minValidatorStakingAmount.add(i),
             }
@@ -203,6 +223,8 @@ describe('Ronin Validator Set: candidate test', () => {
             whitelistedCandidates[i].consensusAddr.address,
             whitelistedCandidates[i].treasuryAddr.address,
             2_00,
+            generateSamplePubkey(),
+            '0x',
             {
               value: minValidatorStakingAmount.add(i),
             }
@@ -241,6 +263,8 @@ describe('Ronin Validator Set: candidate test', () => {
           validatorCandidates[4].consensusAddr.address,
           validatorCandidates[4].treasuryAddr.address,
           2_00,
+          generateSamplePubkey(),
+          '0x',
           {
             value: minValidatorStakingAmount,
           }
@@ -259,6 +283,8 @@ describe('Ronin Validator Set: candidate test', () => {
           validatorCandidates[5].consensusAddr.address,
           validatorCandidates[5].treasuryAddr.address,
           2_00,
+          generateSamplePubkey(),
+          '0x',
           {
             value: minValidatorStakingAmount,
           }
@@ -275,6 +301,8 @@ describe('Ronin Validator Set: candidate test', () => {
           validatorCandidates[5].consensusAddr.address,
           validatorCandidates[0].treasuryAddr.address,
           2_00,
+          generateSamplePubkey(),
+          '0x',
           {
             value: minValidatorStakingAmount,
           }
@@ -291,6 +319,8 @@ describe('Ronin Validator Set: candidate test', () => {
           validatorCandidates[5].consensusAddr.address,
           validatorCandidates[5].treasuryAddr.address,
           maxCommissionRate + 1,
+          generateSamplePubkey(),
+          '0x',
           {
             value: minValidatorStakingAmount,
           }
@@ -325,6 +355,8 @@ describe('Ronin Validator Set: candidate test', () => {
           validatorCandidates[5].consensusAddr.address,
           validatorCandidates[5].treasuryAddr.address,
           minCommissionRate - 1,
+          generateSamplePubkey(),
+          '0x',
           {
             value: minValidatorStakingAmount,
           }

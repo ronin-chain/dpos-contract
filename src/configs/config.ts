@@ -21,6 +21,7 @@ import {
   StakingVestingArguments,
   StakingVestingConfig,
   VaultForwarderConfig,
+  ProfileConfig,
 } from '../utils';
 import { trustedOrgSet } from './addresses';
 
@@ -260,7 +261,7 @@ const defaultRoninTrustedOrganizationConf: RoninTrustedOrganizationArguments = {
   trustedOrganizations: ['0x93b8eed0a1e082ae2f478fd7f8c14b1fc0261bb1'].map((addr) => ({
     consensusAddr: addr,
     governor: addr,
-    bridgeVoter: addr,
+    __deprecatedBridgeVoter: addr,
     weight: 100,
     addedBlock: 0,
   })),
@@ -359,4 +360,10 @@ export const vaultForwarderConf: VaultForwarderConfig = {
       moderator: '0x8643c5d7048d149297229ded82fd7ac1ec099999',
     },
   ],
+};
+
+// TODO: Fill this configuration
+export const profileConf: ProfileConfig = {
+  [Network.Mainnet]: undefined,
+  [Network.Testnet]: undefined,
 };

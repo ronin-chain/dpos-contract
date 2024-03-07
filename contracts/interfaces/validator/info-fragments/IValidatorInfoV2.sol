@@ -3,13 +3,11 @@
 pragma solidity ^0.8.9;
 
 import "../../../libraries/EnumFlags.sol";
+import { TConsensus } from "../../../udvts/Types.sol";
 
 interface IValidatorInfoV2 {
-  /**
-   * @dev Error thrown when an invalid maximum prioritized validator number is provided.
-   */
+  /// @dev Error thrown when an invalid maximum prioritized validator number is provided.
   error ErrInvalidMaxPrioritizedValidatorNumber();
-
   /// @dev Emitted when the number of max validator is updated.
   event MaxValidatorNumberUpdated(uint256);
   /// @dev Emitted when the number of reserved slots for prioritized validators is updated.
@@ -28,17 +26,32 @@ interface IValidatorInfoV2 {
   /**
    * @dev Returns the current validator list.
    */
-  function getValidators() external view returns (address[] memory _validatorList);
+  function getValidators() external view returns (TConsensus[] memory validatorList);
+
+  /**
+   * @dev Returns the ids of current validator list.
+   */
+  function getValidatorIds() external view returns (address[] memory cids);
 
   /**
    * @dev Returns the current block producer list.
    */
-  function getBlockProducers() external view returns (address[] memory);
+  function getBlockProducers() external view returns (TConsensus[] memory consensusList);
 
   /**
-   * @dev Returns whether the address is block producer or not.
+   * @dev Returns the ids current block producer list.
    */
-  function isBlockProducer(address _addr) external view returns (bool);
+  function getBlockProducerIds() external view returns (address[] memory cids);
+
+  /**
+   * @dev Returns whether the consensus address is block producer or not.
+   */
+  function isBlockProducer(TConsensus consensusAddr) external view returns (bool);
+
+  /**
+   * @dev Returns whether the id is block producer or not.
+   */
+  function isBlockProducerById(address id) external view returns (bool);
 
   /**
    * @dev Returns total numbers of the block producers.

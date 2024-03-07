@@ -16,9 +16,12 @@ import {
   StakingVesting,
   FastFinalityTracking__factory,
   FastFinalityTracking,
+  MockProfile__factory,
+  Profile,
+  Profile__factory,
 } from '../../../src/types';
 import { EpochController } from '../helpers/ronin-validator-set';
-import { initTest } from '../helpers/fixture';
+import { deployTestSuite } from '../helpers/fixture';
 import { GovernanceAdminInterface } from '../../../src/script/governance-admin-interface';
 import {
   createManyTrustedOrganizationAddressSets,
@@ -29,7 +32,8 @@ import {
   ValidatorCandidateAddressSet,
 } from '../helpers/address-set-types/validator-candidate-set-type';
 import { anyValue } from '@nomicfoundation/hardhat-chai-matchers/withArgs';
-import { mineBatchTxs } from '../helpers/utils';
+import { generateSamplePubkey, mineBatchTxs } from '../helpers/utils';
+import { initializeTestSuite } from '../helpers/initializer';
 
 let validatorContract: MockRoninValidatorSetExtended;
 let stakingVesting: StakingVesting;
@@ -38,6 +42,7 @@ let slashIndicator: MockSlashIndicatorExtended;
 let fastFinalityTracking: FastFinalityTracking;
 let governanceAdmin: RoninGovernanceAdmin;
 let governanceAdminInterface: GovernanceAdminInterface;
+let profileContract: Profile;
 
 let coinbase: SignerWithAddress;
 let deployer: SignerWithAddress;
@@ -76,8 +81,10 @@ describe('Ronin Validator Set: Fast Finality test', () => {
       stakingContractAddress,
       roninGovernanceAdminAddress,
       stakingVestingContractAddress,
+      profileAddress,
       fastFinalityTrackingAddress,
-    } = await initTest('RoninValidatorSet-FastFinality')({
+      roninTrustedOrganizationAddress,
+    } = await deployTestSuite('RoninValidatorSet-FastFinality')({
       slashIndicatorArguments: {
         doubleSignSlashing: {
           slashDoubleSignAmount,
@@ -105,7 +112,7 @@ describe('Ronin Validator Set: Fast Finality test', () => {
         trustedOrganizations: trustedOrgs.map((v) => ({
           consensusAddr: v.consensusAddr.address,
           governor: v.governor.address,
-          bridgeVoter: v.bridgeVoter.address,
+          __deprecatedBridgeVoter: v.__deprecatedBridgeVoter.address,
           weight: 100,
           addedBlock: 0,
         })),
@@ -123,6 +130,7 @@ describe('Ronin Validator Set: Fast Finality test', () => {
       fastFinalityTrackingAddress,
       validatorCandidates[0].consensusAddr
     );
+    profileContract = Profile__factory.connect(profileAddress, deployer);
     governanceAdmin = RoninGovernanceAdmin__factory.connect(roninGovernanceAdminAddress, deployer);
     governanceAdminInterface = new GovernanceAdminInterface(
       governanceAdmin,
@@ -130,6 +138,25 @@ describe('Ronin Validator Set: Fast Finality test', () => {
       { proposalExpiryDuration },
       ...trustedOrgs.map((_) => _.governor)
     );
+
+    await initializeTestSuite({
+      deployer,
+      fastFinalityTrackingAddress,
+      profileAddress,
+      slashContractAddress,
+      stakingContractAddress,
+      validatorContractAddress,
+      maintenanceContractAddress: undefined,
+      stakingVestingAddress: stakingVestingContractAddress,
+      stakingVestingArgs: {
+        fastFinalityRewardPercent,
+      },
+      roninTrustedOrganizationAddress,
+    });
+
+    const mockProfileLogic = await new MockProfile__factory(deployer).deploy();
+    await mockProfileLogic.deployed();
+    await governanceAdminInterface.upgrade(profileAddress, mockProfileLogic.address);
 
     const mockValidatorLogic = await new MockRoninValidatorSetExtended__factory(deployer).deploy();
     await mockValidatorLogic.deployed();
@@ -140,9 +167,6 @@ describe('Ronin Validator Set: Fast Finality test', () => {
     await mockSlashIndicator.deployed();
     await governanceAdminInterface.upgrade(slashIndicator.address, mockSlashIndicator.address);
 
-    await validatorContract.initializeV3(fastFinalityTrackingAddress);
-    await stakingVesting.initializeV3(fastFinalityRewardPercent);
-
     validatorCandidates = validatorCandidates.slice(0, maxValidatorNumber);
     for (let i = 0; i < maxValidatorNumber; i++) {
       await stakingContract
@@ -152,6 +176,8 @@ describe('Ronin Validator Set: Fast Finality test', () => {
           validatorCandidates[i].consensusAddr.address,
           validatorCandidates[i].treasuryAddr.address,
           100_00,
+          generateSamplePubkey(),
+          '0x',
           { value: minValidatorStakingAmount.mul(2).add(maxValidatorNumber).sub(i) }
         );
     }
@@ -422,6 +448,92 @@ describe('Ronin Validator Set: Fast Finality test', () => {
         await expect(tx)
           .emit(validatorContract, 'DeprecatedRewardRecycled')
           .withArgs(anyValue, leftoverFastFinalityReward);
+      });
+    });
+
+    describe('Record QC vote for all validators in all blocks of epoch with consensus change', async () => {
+      let tx: Transaction;
+      let midEpoch = numberOfBlocksInEpoch / 2;
+
+      it('Should all validators record finality til mid epoch', async () => {
+        epoch = await validatorContract.epochOf(await ethers.provider.getBlockNumber());
+        // Record for all blocks except the last block
+        for (let i = 0; i < midEpoch; i++) {
+          await fastFinalityTracking.recordFinality(validatorCandidates.map((_) => _.consensusAddr.address));
+          await validatorContract.connect(validatorCandidates[0].consensusAddr).submitBlockReward();
+        }
+      })
+
+      it('Should one validator change his consensus' , async() => {
+        let newConsensus = signers[signers.length - 1];
+        await profileContract.connect(validatorCandidates[0].candidateAdmin).changeConsensusAddr(validatorCandidates[0].cid.address, newConsensus.address);
+        validatorCandidates[0].consensusAddr = newConsensus;
+        await network.provider.send('hardhat_setCoinbase', [validatorCandidates[0].consensusAddr.address]);
+
+        fastFinalityTracking = FastFinalityTracking__factory.connect(fastFinalityTracking.address, newConsensus);
+      })
+
+      it('Should all validators continue record finality til end of epoch', async () => {
+        epoch = await validatorContract.epochOf(await ethers.provider.getBlockNumber());
+        // Record for all blocks except the last block
+        for (let i = midEpoch; i < numberOfBlocksInEpoch -1 ; i++) {
+          await fastFinalityTracking.recordFinality(validatorCandidates.map((_) => _.consensusAddr.address));
+          await validatorContract.connect(validatorCandidates[0].consensusAddr).submitBlockReward();
+        }
+      })
+
+      it('Should equally dispense fast finality voting reward', async () => {
+        await EpochController.setTimestampToPeriodEnding();
+        await mineBatchTxs(async () => {
+          await validatorContract.endEpoch();
+          // Record for the last block
+          await fastFinalityTracking.recordFinality(validatorCandidates.map((_) => _.consensusAddr.address));
+          await validatorContract.connect(validatorCandidates[0].consensusAddr).submitBlockReward();
+          tx = await validatorContract.connect(validatorCandidates[0].consensusAddr).wrapUpEpoch();
+        });
+
+        expect(validatorCandidates.map((_) => _.cid.address)).not.deep.equal(validatorCandidates.map((_) => _.consensusAddr.address));
+
+        expect(
+          await fastFinalityTracking.getManyFinalityVoteCountsById(
+            epoch,
+            validatorCandidates.map((_) => _.cid.address)
+          )
+        ).deep.equal(validatorCandidates.map((_) => numberOfBlocksInEpoch));
+
+        expect(
+          await fastFinalityTracking.getManyFinalityVoteCounts(
+            epoch,
+            validatorCandidates.map((_) => _.consensusAddr.address)
+          )
+        ).deep.equal(validatorCandidates.map((_) => numberOfBlocksInEpoch));
+
+        let rewardEach = blockProducerBonusPerBlock
+          .mul(numberOfBlocksInEpoch)
+          .mul(fastFinalityRewardPercent)
+          .div(100_00)
+          .div(4);
+
+        await expect(tx).emit(validatorContract, 'WrappedUpEpoch').withArgs(anyValue, epoch, true);
+
+        let totalMiningReward = blockProducerBonusPerBlock
+          .mul(numberOfBlocksInEpoch)
+          .mul(BigNumber.from(100_00).sub(fastFinalityRewardPercent))
+          .div(100_00);
+
+        await expect(tx)
+          .emit(validatorContract, 'MiningRewardDistributed')
+          .withArgs(validatorCandidates[0].cid.address, anyValue, totalMiningReward);
+
+        for (let i = 0; i < validatorCandidates.length; i++) {
+          await expect(tx)
+            .emit(validatorContract, 'FastFinalityRewardDistributed')
+            .withArgs(validatorCandidates[i].cid.address, anyValue, rewardEach);
+        }
+      });
+
+      it('Should no reward get recycled', async () => {
+        await expect(tx).not.emit(validatorContract, 'DeprecatedRewardRecycled');
       });
     });
   });

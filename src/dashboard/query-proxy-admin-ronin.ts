@@ -14,6 +14,7 @@ const BridgeProxyName = {
 
 const DPoSProxyName = {
   Maintenance: 'MaintenanceProxy',
+  Profile: 'ProfileProxy',
   RoninGatewayPauseEnforcer: 'RoninGatewayPauseEnforcerProxy',
   RoninTrustedOrganization: 'RoninTrustedOrganizationProxy',
   RoninValidatorSet: 'RoninValidatorSetProxy',

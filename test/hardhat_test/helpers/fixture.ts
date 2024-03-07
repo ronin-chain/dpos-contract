@@ -23,6 +23,7 @@ import {
   SlashIndicatorArguments,
   StakingArguments,
   StakingVestingArguments,
+  ProfileArguments,
 } from '../../../src/utils';
 import {
   BridgeManagerArguments,
@@ -30,8 +31,9 @@ import {
   bridgeManagerConf,
   bridgeRewardConf,
 } from '../../../src/configs/bridge-manager';
+import { MockProfile__factory } from '../../../src/types';
 
-export interface InitTestOutput {
+export interface DeployTestSuiteOutput {
   roninGovernanceAdminAddress: Address;
   maintenanceContractAddress: Address;
   roninTrustedOrganizationAddress: Address;
@@ -41,13 +43,14 @@ export interface InitTestOutput {
   stakingVestingContractAddress: Address;
   validatorContractAddress: Address;
   bridgeTrackingAddress: Address;
+  profileAddress: Address;
   bridgeSlashAddress: Address;
   bridgeRewardAddress: Address;
   roninBridgeManagerAddress: Address;
   mainchainBridgeManagerAddress: Address;
 }
 
-export interface InitTestInput {
+export interface DeployTestSuiteInput {
   roninChainId?: BigNumberish;
   bridgeContract?: Address;
   startedAtBlock?: BigNumberish;
@@ -60,9 +63,10 @@ export interface InitTestInput {
   governanceAdminArguments?: RoninGovernanceAdminArguments;
   bridgeManagerArguments?: BridgeManagerArguments;
   bridgeRewardArguments?: BridgeRewardArguments;
+  profileArguments?: ProfileArguments;
 }
 
-export const defaultTestConfig: InitTestInput = {
+export const defaultTestConfig: DeployTestSuiteInput = {
   bridgeContract: ethers.constants.AddressZero,
   startedAtBlock: 0,
 
@@ -150,10 +154,14 @@ export const defaultTestConfig: InitTestInput = {
     rewardPerPeriod: 5_000,
     topupAmount: BigNumber.from(100_000_000_000),
   },
+
+  profileArguments: {
+    profileChangeCooldown: 60 // 1 mintues
+  }
 };
 
-export const initTest = (id: string) =>
-  deployments.createFixture<InitTestOutput, InitTestInput>(async ({ deployments }, options) => {
+export const deployTestSuite = (id: string) =>
+  deployments.createFixture<DeployTestSuiteOutput, DeployTestSuiteInput>(async ({ deployments }, options) => {
     if (network.name == Network.Hardhat) {
       generalRoninConf[network.name] = {
         ...generalRoninConf[network.name],
@@ -232,6 +240,7 @@ export const initTest = (id: string) =>
       'StakingProxy',
       'MaintenanceProxy',
       'StakingVestingProxy',
+      'ProfileProxy',
       id,
     ]);
 
@@ -243,6 +252,7 @@ export const initTest = (id: string) =>
     const stakingContractDeployment = await deployments.get('StakingProxy');
     const stakingVestingContractDeployment = await deployments.get('StakingVestingProxy');
     const validatorContractDeployment = await deployments.get('RoninValidatorSetProxy');
+    const profileDeployment = await deployments.get('ProfileProxy');
 
     await deployments.fixture([
       '_HelperBridgeCalculate',
@@ -269,6 +279,7 @@ export const initTest = (id: string) =>
       stakingVestingContractAddress: stakingVestingContractDeployment.address,
       validatorContractAddress: validatorContractDeployment.address,
       bridgeTrackingAddress: bridgeTrackingDeployment.address,
+      profileAddress: profileDeployment.address,
       bridgeSlashAddress: bridgeSlashDeployment.address,
       bridgeRewardAddress: bridgeRewardDeployment.address,
       roninBridgeManagerAddress: roninBridgeManagerDeployment.address,

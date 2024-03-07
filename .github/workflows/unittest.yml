@@ -7,9 +7,10 @@ on:
       - "release/**"
   pull_request:
     branches:
-      - main
+      - mainnet
       - testnet
       - "release/**"
+      - "feat/**"
 
 permissions:
   packages: read
@@ -20,12 +21,19 @@ concurrency:
 
 jobs:
   nodejs:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, dockerize]
     steps:
-      - name: "Checkout Repo"
-        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 #v3.0.2
+      - id: 'gh-app'
+        name: 'Get Token'
+        uses: 'tibdex/github-app-token@3beb63f4bd073e61482598c45c71c1019b59b73a' #v1.7.0
+        with:
+          app_id: ${{ secrets.GH_APP_ID }}
+          private_key: ${{ secrets.GH_PRIVATE_KEY }}
+
+      - uses: actions/checkout@v4.1.1
         with:
           submodules: recursive
+          token: ${{ steps.gh-app.outputs.token }}
 
       - name: "Setup Node"
         uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 #v3.4.1

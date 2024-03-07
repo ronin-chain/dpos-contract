@@ -18,6 +18,9 @@ interface IBaseSlash {
   /// @dev Error thrown when evidence has already been submitted.
   error ErrEvidenceAlreadySubmitted();
 
+  /// @dev Error thrown when public key in evidence is not registered.
+  error ErrUnregisteredPublicKey();
+
   /// @dev Emitted when the validator is slashed.
-  event Slashed(address indexed validator, SlashType slashType, uint256 period);
+  event Slashed(address indexed cid, SlashType slashType, uint256 period);
 }

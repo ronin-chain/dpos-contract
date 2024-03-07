@@ -69,6 +69,7 @@ export interface GeneralConfig {
     stakingContract?: AddressExtended;
     validatorContract?: AddressExtended;
     roninTrustedOrganizationContract?: AddressExtended;
+    profileContract?: AddressExtended;
     bridgeTrackingContract?: AddressExtended;
     bridgeManagerContract?: AddressExtended;
     bridgeSlashContract?: AddressExtended;
@@ -217,4 +218,12 @@ export interface GatewayPauseEnforcerArguments {
 
 export interface GatewayPauseEnforcerConfig {
   [network: LiteralNetwork]: GatewayPauseEnforcerArguments | undefined;
+}
+
+export interface ProfileArguments {
+  profileChangeCooldown?: BigNumberish;
+}
+
+export interface ProfileConfig {
+  [network: LiteralNetwork]: ProfileArguments | undefined;
 }

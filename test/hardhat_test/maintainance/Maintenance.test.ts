@@ -14,8 +14,11 @@ import {
   MockRoninValidatorSetOverridePrecompile__factory,
   RoninGovernanceAdmin,
   RoninGovernanceAdmin__factory,
+  MockProfile__factory,
+  Profile__factory,
+  Profile,
 } from '../../../src/types';
-import { initTest } from '../helpers/fixture';
+import { deployTestSuite } from '../helpers/fixture';
 import { EpochController, expects as ValidatorSetExpects } from '../helpers/ronin-validator-set';
 import { GovernanceAdminInterface } from '../../../src/script/governance-admin-interface';
 import {
@@ -26,6 +29,8 @@ import {
   createManyValidatorCandidateAddressSets,
   ValidatorCandidateAddressSet,
 } from '../helpers/address-set-types/validator-candidate-set-type';
+import { initializeTestSuite } from '../helpers/initializer';
+import { generateSamplePubkey } from '../helpers/utils';
 
 let coinbase: SignerWithAddress;
 let deployer: SignerWithAddress;
@@ -37,6 +42,7 @@ let maintenanceContract: Maintenance;
 let slashContract: SlashIndicator;
 let stakingContract: Staking;
 let validatorContract: RoninValidatorSet;
+let profileContract: Profile;
 let governanceAdmin: RoninGovernanceAdmin;
 let governanceAdminInterface: GovernanceAdminInterface;
 
@@ -71,8 +77,10 @@ describe('Maintenance test', () => {
       stakingContractAddress,
       validatorContractAddress,
       roninGovernanceAdminAddress,
+      profileAddress,
       fastFinalityTrackingAddress,
-    } = await initTest('Maintenance')({
+      roninTrustedOrganizationAddress,
+    } = await deployTestSuite('Maintenance')({
       slashIndicatorArguments: {
         unavailabilitySlashing: {
           unavailabilityTier1Threshold,
@@ -97,7 +105,7 @@ describe('Maintenance test', () => {
         trustedOrganizations: trustedOrgs.map((v) => ({
           consensusAddr: v.consensusAddr.address,
           governor: v.governor.address,
-          bridgeVoter: v.bridgeVoter.address,
+          __deprecatedBridgeVoter: v.__deprecatedBridgeVoter.address,
           weight: 100,
           addedBlock: 0,
         })),
@@ -107,6 +115,7 @@ describe('Maintenance test', () => {
     slashContract = SlashIndicator__factory.connect(slashContractAddress, deployer);
     stakingContract = Staking__factory.connect(stakingContractAddress, deployer);
     validatorContract = MockRoninValidatorSetOverridePrecompile__factory.connect(validatorContractAddress, deployer);
+    profileContract = Profile__factory.connect(profileAddress, deployer);
     governanceAdmin = RoninGovernanceAdmin__factory.connect(roninGovernanceAdminAddress, deployer);
     governanceAdminInterface = new GovernanceAdminInterface(
       governanceAdmin,
@@ -114,6 +123,21 @@ describe('Maintenance test', () => {
       undefined,
       ...trustedOrgs.map((_) => _.governor)
     );
+
+    await initializeTestSuite({
+      deployer,
+      fastFinalityTrackingAddress,
+      profileAddress,
+      maintenanceContractAddress,
+      slashContractAddress,
+      stakingContractAddress,
+      validatorContractAddress,
+      roninTrustedOrganizationAddress,
+    });
+
+    const mockProfileLogic = await new MockProfile__factory(deployer).deploy();
+    await mockProfileLogic.deployed();
+    await governanceAdminInterface.upgrade(profileAddress, mockProfileLogic.address);
 
     const mockValidatorLogic = await new MockRoninValidatorSetOverridePrecompile__factory(deployer).deploy();
     await mockValidatorLogic.deployed();
@@ -128,10 +152,11 @@ describe('Maintenance test', () => {
           validatorCandidates[i].consensusAddr.address,
           validatorCandidates[i].treasuryAddr.address,
           1,
+          generateSamplePubkey(),
+          '0x',
           { value: minValidatorStakingAmount.add(maxValidatorNumber).sub(i) }
         );
     }
-    await validatorContract.initializeV3(fastFinalityTrackingAddress);
 
     await network.provider.send('hardhat_setCoinbase', [coinbase.address]);
 
@@ -263,7 +288,7 @@ describe('Maintenance test', () => {
     it('Should not be able to schedule maintenance for non-validator address', async () => {
       await expect(
         maintenanceContract.connect(validatorCandidates[0].candidateAdmin).schedule(deployer.address, 0, 100)
-      ).revertedWithCustomError(maintenanceContract, 'ErrUnauthorized');
+      ).revertedWithCustomError(profileContract, 'ErrLookUpIdFailed').withArgs(deployer.address);
     });
 
     it('Should be able to schedule maintenance using validator admin account', async () => {

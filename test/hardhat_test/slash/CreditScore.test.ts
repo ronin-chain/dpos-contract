@@ -15,8 +15,11 @@ import {
   RoninValidatorSet,
   Staking,
   Staking__factory,
+  MockProfile__factory,
+  Profile__factory,
+  Profile,
 } from '../../../src/types';
-import { initTest } from '../helpers/fixture';
+import { deployTestSuite } from '../helpers/fixture';
 import { EpochController, expects as RoninValidatorSetExpects } from '../helpers/ronin-validator-set';
 import { expects as CandidateManagerExpects } from '../helpers/candidate-manager';
 import { IndicatorController, ScoreController } from '../helpers/slash';
@@ -31,11 +34,14 @@ import {
   createManyValidatorCandidateAddressSets,
   ValidatorCandidateAddressSet,
 } from '../helpers/address-set-types/validator-candidate-set-type';
+import { initializeTestSuite } from '../helpers/initializer';
+import { generateSamplePubkey } from '../helpers/utils';
 
 let maintenanceContract: Maintenance;
 let slashContract: MockSlashIndicatorExtended;
 let mockSlashLogic: MockSlashIndicatorExtended;
 let stakingContract: Staking;
+let profileContract: Profile;
 let governanceAdmin: RoninGovernanceAdmin;
 let governanceAdminInterface: GovernanceAdminInterface;
 
@@ -158,8 +164,10 @@ describe('Credit score and bail out test', () => {
       validatorContractAddress,
       roninGovernanceAdminAddress,
       maintenanceContractAddress,
-      fastFinalityTrackingAddress
-    } = await initTest('CreditScore')({
+      profileAddress,
+      fastFinalityTrackingAddress,
+      roninTrustedOrganizationAddress,
+    } = await deployTestSuite('CreditScore')({
       slashIndicatorArguments: {
         unavailabilitySlashing: {
           unavailabilityTier1Threshold,
@@ -191,7 +199,7 @@ describe('Credit score and bail out test', () => {
         trustedOrganizations: trustedOrgs.map((v) => ({
           consensusAddr: v.consensusAddr.address,
           governor: v.governor.address,
-          bridgeVoter: v.bridgeVoter.address,
+          __deprecatedBridgeVoter: v.__deprecatedBridgeVoter.address,
           weight: 100,
           addedBlock: 0,
         })),
@@ -202,6 +210,7 @@ describe('Credit score and bail out test', () => {
     stakingContract = Staking__factory.connect(stakingContractAddress, deployer);
     validatorContract = MockRoninValidatorSetOverridePrecompile__factory.connect(validatorContractAddress, deployer);
     slashContract = MockSlashIndicatorExtended__factory.connect(slashContractAddress, deployer);
+    profileContract = Profile__factory.connect(profileAddress, deployer);
     governanceAdmin = RoninGovernanceAdmin__factory.connect(roninGovernanceAdminAddress, deployer);
     governanceAdminInterface = new GovernanceAdminInterface(
       governanceAdmin,
@@ -210,14 +219,27 @@ describe('Credit score and bail out test', () => {
       ...trustedOrgs.map((_) => _.governor)
     );
 
+    const mockProfileLogic = await new MockProfile__factory(deployer).deploy();
+    await mockProfileLogic.deployed();
+    await governanceAdminInterface.upgrade(profileAddress, mockProfileLogic.address);
+
     const mockValidatorLogic = await new MockRoninValidatorSetOverridePrecompile__factory(deployer).deploy();
     await mockValidatorLogic.deployed();
     await governanceAdminInterface.upgrade(validatorContract.address, mockValidatorLogic.address);
-    await validatorContract.initializeV3(fastFinalityTrackingAddress);
-
     mockSlashLogic = await new MockSlashIndicatorExtended__factory(deployer).deploy();
     await mockSlashLogic.deployed();
     await governanceAdminInterface.upgrade(slashContractAddress, mockSlashLogic.address);
+
+    await initializeTestSuite({
+      deployer,
+      fastFinalityTrackingAddress,
+      profileAddress,
+      maintenanceContractAddress,
+      slashContractAddress,
+      stakingContractAddress,
+      validatorContractAddress,
+      roninTrustedOrganizationAddress,
+    });
 
     for (let i = 0; i < maxValidatorNumber; i++) {
       await stakingContract
@@ -227,6 +249,8 @@ describe('Credit score and bail out test', () => {
           validatorCandidates[i].consensusAddr.address,
           validatorCandidates[i].treasuryAddr.address,
           100_00,
+          generateSamplePubkey(),
+          '0x',
           { value: minValidatorStakingAmount.mul(2).sub(i) }
         );
     }
@@ -248,6 +272,14 @@ describe('Credit score and bail out test', () => {
   });
 
   describe('Counting credit score after each period', async () => {
+    before(async () => {
+      snapshotId = await network.provider.send('evm_snapshot');
+    });
+
+    after(async () => {
+      await network.provider.send('evm_revert', [snapshotId]);
+    });
+
     it('Should the score updated correctly, case: max score (N), in jail (N), unavailability (N)', async () => {
       await endPeriodAndWrapUpAndResetIndicators();
       localScoreController.increaseAtWithUpperbound(0, maxCreditScore, gainCreditScore);
@@ -294,18 +326,6 @@ describe('Credit score and bail out test', () => {
 
       localScoreController.resetAt(0);
       await validateScoreAt(0);
-
-      await stakingContract
-        .connect(validatorCandidates[0].poolAdmin)
-        .applyValidatorCandidate(
-          validatorCandidates[0].candidateAdmin.address,
-          validatorCandidates[0].consensusAddr.address,
-          validatorCandidates[0].treasuryAddr.address,
-          100_00,
-          { value: minValidatorStakingAmount.mul(2) }
-        );
-
-      await endPeriodAndWrapUpAndResetIndicators();
     });
   });
 
@@ -360,7 +380,7 @@ describe('Credit score and bail out test', () => {
           slashContract
             .connect(validatorCandidates[0].candidateAdmin)
             .bailOut(validatorCandidates[2].consensusAddr.address)
-        ).revertedWithCustomError(slashContract, 'ErrUnauthorized');
+        ).revertedWithCustomError(profileContract, 'ErrLookUpIdFailed').withArgs(validatorCandidates[2].consensusAddr.address);
       });
     });
 

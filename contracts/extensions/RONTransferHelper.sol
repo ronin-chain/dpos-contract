@@ -51,6 +51,12 @@ abstract contract RONTransferHelper {
     uint256 amount,
     uint256 gas
   ) internal returns (bool success) {
+    // When msg.value = 0, the forwarding gas will not be auto-added 2300.
+    // We add an extra 2300 to make sure all calls will have the same amount of gas.
+    if (amount == 0) {
+      gas += 2300;
+    }
+
     (success, ) = recipient.call{ value: amount, gas: gas }("");
   }
 }
