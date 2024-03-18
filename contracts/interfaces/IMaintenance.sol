@@ -6,6 +6,10 @@ import { TConsensus } from "../udvts/Types.sol";
 
 interface IMaintenance {
   /**
+   * @dev Error thrown when attempting to exit maintenance status while not in maintenance duration.
+   */
+  error ErrNotOnMaintenance();
+  /**
    * @dev Error thrown when attempting to schedule an already scheduled event.
    */
   error ErrAlreadyScheduled();
@@ -61,7 +65,9 @@ interface IMaintenance {
     uint256 lastUpdatedBlock;
     uint256 requestTimestamp;
   }
-
+  
+  /// @dev Emitted when a maintenance is early exit in maintenance duration.
+  event MaintenanceExited(address indexed cid);
   /// @dev Emitted when a maintenance is scheduled.
   event MaintenanceScheduled(address indexed cid, Schedule);
   /// @dev Emitted when a schedule of maintenance is cancelled.
@@ -75,6 +81,12 @@ interface IMaintenance {
     uint256 maxSchedules,
     uint256 cooldownSecsToMaintain
   );
+
+  /**
+   * @dev Exits the maintenance status.
+   * @param consensusAddr The address of the consensus to exit maintenance status for.
+   */
+  function exitMaintenance(TConsensus consensusAddr) external;
 
   /**
    * @dev Returns whether the validator `consensusAddr` maintained at the block number `_block`.

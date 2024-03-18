@@ -186,6 +186,25 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
   /**
    * @inheritdoc IMaintenance
    */
+  function exitMaintenance(TConsensus consensusAddr) external {
+    address candidateId = __css2cid(consensusAddr);
+
+    if (!IRoninValidatorSet(getContract(ContractType.VALIDATOR)).isCandidateAdminById(candidateId, msg.sender)) {
+      revert ErrUnauthorized(msg.sig, RoleAccess.CANDIDATE_ADMIN);
+    }
+
+    if (!_checkMaintainedById(candidateId, block.number)) revert ErrNotOnMaintenance();
+
+    Schedule storage _sSchedule = _schedule[candidateId];
+    _sSchedule.to = block.number;
+    _sSchedule.lastUpdatedBlock = block.number;
+
+    emit MaintenanceExited(candidateId);
+  }
+
+  /**
+   * @inheritdoc IMaintenance
+   */
   function getSchedule(TConsensus consensusAddr) external view override returns (Schedule memory) {
     return _schedule[__css2cid(consensusAddr)];
   }
