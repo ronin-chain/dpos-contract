@@ -3,6 +3,7 @@
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "../interfaces/IMaintenance.sol";
 import "../interfaces/IProfile.sol";
 import "../interfaces/validator/IRoninValidatorSet.sol";
@@ -13,6 +14,7 @@ import { ErrUnauthorized, RoleAccess } from "../utils/CommonErrors.sol";
 
 contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Initializable {
   using Math for uint256;
+  using EnumerableSet for EnumerableSet.AddressSet;
 
   /// @dev Mapping from candidate id => maintenance schedule.
   mapping(address => Schedule) internal _schedule;
@@ -29,8 +31,8 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
   uint256 internal _maxSchedule;
   /// @dev The cooldown time to request new schedule.
   uint256 internal _cooldownSecsToMaintain;
-  /// @dev The number of active schedules.
-  uint256 internal _numActiveSchedule;
+  /// @dev The set of scheduled candidates.
+  EnumerableSet.AddressSet internal _scheduledCandidates;
 
   constructor() {
     _disableInitializers();
@@ -70,15 +72,12 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
 
   function initializeV4() external reinitializer(4) {
     unchecked {
-      uint256 count;
       address[] memory validatorIds = IRoninValidatorSet(getContract(ContractType.VALIDATOR)).getValidatorIds();
       uint256 length = validatorIds.length;
 
       for (uint256 i; i < length; ++i) {
-        if (_checkScheduledById(validatorIds[i])) ++count;
+        if (_checkScheduledById(validatorIds[i])) _scheduledCandidates.add(validatorIds[i]);
       }
-
-      _numActiveSchedule = count;
     }
   }
 
@@ -172,12 +171,12 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
     if (!validatorContract.epochEndingAt(startedAtBlock - 1)) revert ErrStartBlockOutOfRange();
     if (!validatorContract.epochEndingAt(endedAtBlock)) revert ErrEndBlockOutOfRange();
 
-    ++_numActiveSchedule;
     Schedule storage _sSchedule = _schedule[candidateId];
     _sSchedule.from = startedAtBlock;
     _sSchedule.to = endedAtBlock;
     _sSchedule.lastUpdatedBlock = block.number;
     _sSchedule.requestTimestamp = block.timestamp;
+    _scheduledCandidates.add(candidateId);
     emit MaintenanceScheduled(candidateId, _sSchedule);
   }
 
@@ -194,11 +193,11 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
     if (!_checkScheduledById(candidateId)) revert ErrUnexistedSchedule();
     if (_checkMaintainedById(candidateId, block.number)) revert ErrAlreadyOnMaintenance();
 
-    --_numActiveSchedule;
     Schedule storage _sSchedule = _schedule[candidateId];
     delete _sSchedule.from;
     delete _sSchedule.to;
     _sSchedule.lastUpdatedBlock = block.number;
+    _scheduledCandidates.remove(candidateId);
     emit MaintenanceScheduleCancelled(candidateId);
   }
 
@@ -214,10 +213,10 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
 
     if (!_checkMaintainedById(candidateId, block.number)) revert ErrNotOnMaintenance();
 
-    --_numActiveSchedule;
     Schedule storage _sSchedule = _schedule[candidateId];
     _sSchedule.to = block.number;
     _sSchedule.lastUpdatedBlock = block.number;
+    _scheduledCandidates.remove(candidateId);
 
     emit MaintenanceExited(candidateId);
   }
@@ -313,7 +312,12 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
    * @inheritdoc IMaintenance
    */
   function totalSchedule() public view override returns (uint256 count) {
-    count = _numActiveSchedule;
+    unchecked {
+      uint256 length = _scheduledCandidates.length();
+      for (uint256 i; i < length; ++i) {
+        if (_checkScheduledById(_scheduledCandidates.at(i))) ++count;
+      }
+    }
   }
 
   /**
