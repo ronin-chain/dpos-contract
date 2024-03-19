@@ -69,18 +69,17 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
   }
 
   function initializeV4() external reinitializer(4) {
-    address[] memory validatorIds = IRoninValidatorSet(getContract(ContractType.VALIDATOR)).getValidatorIds();
-    uint256 count;
-
     unchecked {
-      for (uint i = 0; i < validatorIds.length; i++) {
-        if (_checkScheduledById(validatorIds[i])) {
-          count++;
-        }
-      }
-    }
+      uint256 count;
+      address[] memory validatorIds = IRoninValidatorSet(getContract(ContractType.VALIDATOR)).getValidatorIds();
+      uint256 length = validatorIds.length;
 
-    _numActiveSchedule = count;
+      for (uint256 i; i < length; ++i) {
+        if (_checkScheduledById(validatorIds[i])) ++count;
+      }
+
+      _numActiveSchedule = count;
+    }
   }
 
   /**
