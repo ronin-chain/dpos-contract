@@ -313,9 +313,10 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
    */
   function totalSchedule() public view override returns (uint256 count) {
     unchecked {
-      uint256 length = _scheduledCandidates.length();
+      address[] memory scheduledCandidates = _scheduledCandidates.values();
+      uint256 length = scheduledCandidates.length;
       for (uint256 i; i < length; ++i) {
-        if (_checkScheduledById(_scheduledCandidates.at(i))) ++count;
+        if (_checkScheduledById(scheduledCandidates[i])) ++count;
       }
     }
   }
