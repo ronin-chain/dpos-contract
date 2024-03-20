@@ -112,7 +112,6 @@ contract MaintenanceTest is Test {
   }
 
   function testFuzz_exitMaintenance(uint256 index) external {
-    _applyValidatorCandidate();
     address[] memory validatorIds = validatorSet.getValidatorIds();
     console.log("validatorIds.length", validatorIds.length);
     address validatorId = validatorIds[index == 0 ? 0 : index % validatorIds.length];
