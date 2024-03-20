@@ -204,14 +204,15 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
    */
   function exitMaintenance(TConsensus consensusAddr) external {
     address candidateId = __css2cid(consensusAddr);
+    uint256 currentBlock = block.number;
 
     _requireCandidateAdmin(candidateId);
 
-    if (!_checkMaintainedById(candidateId, block.number)) revert ErrNotOnMaintenance();
+    if (!_checkMaintainedById(candidateId, currentBlock)) revert ErrNotOnMaintenance();
 
     Schedule storage _sSchedule = _schedule[candidateId];
-    _sSchedule.to = block.number;
-    _sSchedule.lastUpdatedBlock = block.number;
+    _sSchedule.to = currentBlock;
+    _sSchedule.lastUpdatedBlock = currentBlock;
     _scheduledCandidates.remove(candidateId);
 
     emit MaintenanceExited(candidateId);
