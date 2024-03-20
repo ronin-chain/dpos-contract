@@ -5,13 +5,9 @@ script = 'script'
 out = 'out'
 optimizer = true
 optimizer_runs = 1_000
-ffi=true
+ffi = true
 
-libs = [
-  'lib',
-  'node_modules/@openzeppelin',
-  'node_modules/hardhat',
-]
+libs = ['lib', 'node_modules/@openzeppelin', 'node_modules/hardhat']
 
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config
 
@@ -27,6 +23,7 @@ line_length = 120
 tab_width = 2
 bracket_spacing = true
 int_types = 'preserve'
+multiline_func_header = 'params_first'
 
 [profile.ci]
 verbosity = 4
