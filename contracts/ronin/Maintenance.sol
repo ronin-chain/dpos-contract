@@ -262,7 +262,7 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
   {
     uint256 length = idList.length;
     resList = new bool[](length);
-    for (uint i = 0; i < idList.length;) {
+    for (uint i; i < length;) {
       resList[i] = _checkMaintainedById(idList[i], atBlock);
 
       unchecked {
