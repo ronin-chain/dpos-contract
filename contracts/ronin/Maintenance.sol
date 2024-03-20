@@ -260,7 +260,8 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
     view
     returns (bool[] memory resList)
   {
-    resList = new bool[](idList.length);
+    uint256 length = idList.length;
+    resList = new bool[](length);
     for (uint i = 0; i < idList.length;) {
       resList[i] = _checkMaintainedById(idList[i], atBlock);
 
