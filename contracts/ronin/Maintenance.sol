@@ -137,8 +137,9 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
     address candidateId = __css2cid(consensusAddr);
 
     if (!validatorContract.isBlockProducerById(candidateId)) revert ErrUnauthorized(msg.sig, RoleAccess.BLOCK_PRODUCER);
-    if (!validatorContract.isCandidateAdminById(candidateId, msg.sender))
+    if (!validatorContract.isCandidateAdminById(candidateId, msg.sender)) {
       revert ErrUnauthorized(msg.sig, RoleAccess.CANDIDATE_ADMIN);
+    }
     if (_checkScheduledById(candidateId)) revert ErrAlreadyScheduled();
     if (!_checkCooldownEndedById(candidateId)) revert ErrCooldownTimeNotYetEnded();
     if (totalSchedule() >= _maxSchedule) revert ErrTotalOfSchedulesExceeded();
@@ -201,6 +202,9 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
     return _checkManyMaintainedById(idList, atBlock);
   }
 
+  /**
+   * @inheritdoc IMaintenance
+   */
   function checkManyMaintainedById(
     address[] calldata idList,
     uint256 atBlock
@@ -213,7 +217,7 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
     uint256 atBlock
   ) internal view returns (bool[] memory resList) {
     resList = new bool[](idList.length);
-    for (uint i = 0; i < idList.length; ) {
+    for (uint i = 0; i < idList.length;) {
       resList[i] = _checkMaintainedById(idList[i], atBlock);
 
       unchecked {
@@ -234,6 +238,9 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
     return _checkManyMaintainedInBlockRangeById(idList, fromBlock, toBlock);
   }
 
+  /**
+   * @inheritdoc IMaintenance
+   */
   function checkManyMaintainedInBlockRangeById(
     address[] calldata idList,
     uint256 fromBlock,
@@ -248,7 +255,7 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
     uint256 toBlock
   ) internal view returns (bool[] memory resList) {
     resList = new bool[](idList.length);
-    for (uint i = 0; i < idList.length; ) {
+    for (uint i = 0; i < idList.length;) {
       resList[i] = _maintainingInBlockRange(idList[i], fromBlock, toBlock);
 
       unchecked {

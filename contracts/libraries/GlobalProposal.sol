@@ -10,11 +10,16 @@ library GlobalProposal {
   error ErrUnsupportedTarget(bytes32 proposalHash, uint256 targetNumber);
 
   enum TargetOption {
-    /* 0 */ BridgeManager,
-    /* 1 */ GatewayContract,
-    /* 2 */ BridgeReward,
-    /* 3 */ BridgeSlash,
-    /* 4 */ BridgeTracking
+    /* 0 */
+    BridgeManager,
+    /* 1 */
+    GatewayContract,
+    /* 2 */
+    BridgeReward,
+    /* 3 */
+    BridgeSlash,
+    /* 4 */
+    BridgeTracking
   }
 
   struct GlobalProposalDetail {
@@ -39,7 +44,7 @@ library GlobalProposal {
     bytes32[] memory calldataHashList = new bytes32[](self.calldatas.length);
     uint256[] memory gasAmounts = self.gasAmounts;
 
-    for (uint256 i; i < calldataHashList.length; ) {
+    for (uint256 i; i < calldataHashList.length;) {
       calldataHashList[i] = keccak256(self.calldatas[i]);
 
       unchecked {
@@ -95,7 +100,7 @@ library GlobalProposal {
     detail_.calldatas = self.calldatas;
     detail_.gasAmounts = self.gasAmounts;
 
-    for (uint256 i; i < self.targetOptions.length; ) {
+    for (uint256 i; i < self.targetOptions.length;) {
       detail_.targets[i] = targets[i];
       unchecked {
         ++i;

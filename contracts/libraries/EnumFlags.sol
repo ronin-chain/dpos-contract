@@ -12,6 +12,7 @@ library EnumFlags {
     BlockProducer, // bit(01)
     DeprecatedBridgeOperator, // bit(10)
     Both // bit(11)
+
   }
 
   function isNone(ValidatorFlag _value) internal pure returns (bool) {

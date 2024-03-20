@@ -34,9 +34,8 @@ abstract contract PostChecker_Staking is BaseMigration, PostChecker_Helper {
     _validatorSet = CONFIG.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key());
     _staking = CONFIG.getAddressFromCurrentNetwork(Contract.Staking.key());
 
-    (, bytes memory returnedData) = _validatorSet.staticcall(
-      abi.encodeWithSelector(IValidatorInfoV2.getValidators.selector)
-    );
+    (, bytes memory returnedData) =
+      _validatorSet.staticcall(abi.encodeWithSelector(IValidatorInfoV2.getValidators.selector));
     address[] memory consensusList_AddrArrCasted = abi.decode(returnedData, (address[]));
 
     _consensusAddr = consensusList_AddrArrCasted[0];
@@ -72,7 +71,7 @@ abstract contract PostChecker_Staking is BaseMigration, PostChecker_Helper {
     consensusList[0] = _consensusAddr;
 
     vm.startPrank(_delegator);
-    (bool success, ) = _staking.call(abi.encodeWithSelector(IDelegatorStaking.claimRewards.selector, consensusList));
+    (bool success,) = _staking.call(abi.encodeWithSelector(IDelegatorStaking.claimRewards.selector, consensusList));
     assertEq(success, true);
 
     vm.stopPrank();
@@ -85,14 +84,12 @@ abstract contract PostChecker_Staking is BaseMigration, PostChecker_Helper {
     _wrapUpEpoch();
 
     vm.startPrank(_delegator);
-    (bool success, bytes memory returnData) = _staking.call(
-      abi.encodeWithSelector(IDelegatorStaking.undelegate.selector, _consensusAddr, _delegatingValue + 1)
-    );
+    (bool success, bytes memory returnData) =
+      _staking.call(abi.encodeWithSelector(IDelegatorStaking.undelegate.selector, _consensusAddr, _delegatingValue + 1));
     assertFalse(success);
 
-    (success, returnData) = _staking.call(
-      abi.encodeWithSelector(IDelegatorStaking.undelegate.selector, _consensusAddr, _delegatingValue)
-    );
+    (success, returnData) =
+      _staking.call(abi.encodeWithSelector(IDelegatorStaking.undelegate.selector, _consensusAddr, _delegatingValue));
     assertTrue(success);
 
     vm.stopPrank();
@@ -103,7 +100,7 @@ abstract contract PostChecker_Staking is BaseMigration, PostChecker_Helper {
     vm.warp(block.timestamp + IStaking(_staking).cooldownSecsToUndelegate() + 1);
 
     vm.startPrank(_delegator);
-    (bool success, ) = _staking.call(
+    (bool success,) = _staking.call(
       abi.encodeWithSelector(IDelegatorStaking.redelegate.selector, _consensusAddr, _consensusAddr2, _delegatingValue)
     );
     assertTrue(success);

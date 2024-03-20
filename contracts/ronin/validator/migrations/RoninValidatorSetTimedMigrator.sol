@@ -1,7 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import { IdentityGuard, IConditionalImplementControl, ConditionalImplementControl } from "../../../extensions/version-control/ConditionalImplementControl.sol";
+import {
+  IdentityGuard,
+  IConditionalImplementControl,
+  ConditionalImplementControl
+} from "../../../extensions/version-control/ConditionalImplementControl.sol";
 import { ITimingInfo } from "../../../interfaces/validator/info-fragments/ITimingInfo.sol";
 import { ICoinbaseExecution } from "../../../interfaces/validator/ICoinbaseExecution.sol";
 import { TransparentUpgradeableProxyV2 } from "../../../extensions/TransparentUpgradeableProxyV2.sol";
@@ -40,7 +44,7 @@ contract RoninValidatorSetTimedMigrator is ConditionalImplementControl {
     address proxyStorage,
     address prevImpl,
     address newImpl
-  ) ConditionalImplementControl(proxyStorage, prevImpl, newImpl) {}
+  ) ConditionalImplementControl(proxyStorage, prevImpl, newImpl) { }
 
   function selfUpgrade() external override onlyDelegateFromProxyStorage onlySelfCall {
     _upgradeTo(NEW_IMPL);

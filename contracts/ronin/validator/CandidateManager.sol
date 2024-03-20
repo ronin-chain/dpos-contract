@@ -30,7 +30,8 @@ abstract contract CandidateManager is
   /**
    * @dev The minimum offset in day from current date to the effective date of a new commission schedule.
    * Value of 1 means the change gets affected at the beginning of the following day.
-   **/
+   *
+   */
   uint256 internal _minEffectiveDaysOnwards;
   /// @dev Mapping from candidate consensus id => schedule commission change.
   mapping(address => CommissionSchedule) internal _candidateCommissionChangeSchedule;
@@ -85,7 +86,7 @@ abstract contract CandidateManager is
    */
   function getCandidateInfos() external view override returns (ValidatorCandidate[] memory list) {
     list = new ValidatorCandidate[](_candidateIds.length);
-    for (uint i; i < list.length; ) {
+    for (uint i; i < list.length;) {
       list[i] = _candidateInfo[_candidateIds[i]];
 
       unchecked {
@@ -127,9 +128,7 @@ abstract contract CandidateManager is
   /**
    * @inheritdoc ICandidateManager
    */
-  function getCommissionChangeSchedule(
-    TConsensus consensus
-  ) external view override returns (CommissionSchedule memory) {
+  function getCommissionChangeSchedule(TConsensus consensus) external view override returns (CommissionSchedule memory) {
     return _candidateCommissionChangeSchedule[__css2cid(consensus)];
   }
 
@@ -174,8 +173,8 @@ abstract contract CandidateManager is
         }
 
         // Removes unsatisfied candidates
-        bool _revokingActivated = (_info.revokingTimestamp != 0 && _info.revokingTimestamp <= block.timestamp) ||
-          _emergencyExitLockedFundReleased(cid);
+        bool _revokingActivated = (_info.revokingTimestamp != 0 && _info.revokingTimestamp <= block.timestamp)
+          || _emergencyExitLockedFundReleased(cid);
         bool _topupDeadlineMissed = _info.topupDeadline != 0 && _info.topupDeadline <= block.timestamp;
         if (_revokingActivated || _topupDeadlineMissed) {
           _selfStakings[_i] = _selfStakings[--_length];

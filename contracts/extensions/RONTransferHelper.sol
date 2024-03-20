@@ -40,7 +40,7 @@ abstract contract RONTransferHelper {
    *
    */
   function _unsafeSendRON(address payable recipient, uint256 amount) internal returns (bool success) {
-    (success, ) = recipient.call{ value: amount }("");
+    (success,) = recipient.call{ value: amount }("");
   }
 
   /**
@@ -57,6 +57,6 @@ abstract contract RONTransferHelper {
       gas += 2300;
     }
 
-    (success, ) = recipient.call{ value: amount, gas: gas }("");
+    (success,) = recipient.call{ value: amount, gas: gas }("");
   }
 }

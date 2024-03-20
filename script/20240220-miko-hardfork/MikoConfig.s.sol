@@ -12,9 +12,15 @@ import { DefaultContract } from "foundry-deployment-kit/utils/DefaultContract.so
 import { BridgeTracking } from "@ronin/contracts/ronin/gateway/BridgeTracking.sol";
 import { RoninTrustedOrganization } from "@ronin/contracts/multi-chains/RoninTrustedOrganization.sol";
 import { BridgeReward } from "@ronin/contracts/ronin/gateway/BridgeReward.sol";
-import { TransparentUpgradeableProxy, TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
+import {
+  TransparentUpgradeableProxy,
+  TransparentUpgradeableProxyV2
+} from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
 
-import { IRoninTrustedOrganization, RoninTrustedOrganization } from "@ronin/contracts/multi-chains/RoninTrustedOrganization.sol";
+import {
+  IRoninTrustedOrganization,
+  RoninTrustedOrganization
+} from "@ronin/contracts/multi-chains/RoninTrustedOrganization.sol";
 import { GovernanceAdmin, RoninGovernanceAdmin } from "@ronin/contracts/ronin/RoninGovernanceAdmin.sol";
 
 abstract contract MikoConfig is RoninMigration {

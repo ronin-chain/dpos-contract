@@ -11,25 +11,19 @@ interface IBaseStaking {
      * @custom non-volatile-storage Permanently set to the first consensus address of the candidate.
      */
     address pid;
-
     /**
      * @dev The address of the pool admin.
      * @custom shadowed-storage This storage slot is always kept in sync with the admin in `Profile-CandidateProfile`.
      */
     address __shadowedPoolAdmin;
-
     /// @dev Self-staking amount
     uint256 stakingAmount;
-
     /// @dev Total number of RON staking for the pool
     uint256 stakingTotal;
-
     /// @dev Mapping from delegator => delegating amount
     mapping(address => uint256) delegatingAmount;
-
     /// @dev Mapping from delegator => the last timestamp that delegator staked
     mapping(address => uint256) lastDelegatingTimestamp;
-
     /// @dev Mapping that indicate an admin was either current or previous admin of this pool
     mapping(address => bool) wasAdmin;
   }
@@ -67,13 +61,15 @@ interface IBaseStaking {
   /**
    * @dev Returns the staking pool details.
    */
-  function getPoolDetail(
-    TConsensus consensusAddr
-  ) external view returns (address admin, uint256 stakingAmount, uint256 stakingTotal);
+  function getPoolDetail(TConsensus consensusAddr)
+    external
+    view
+    returns (address admin, uint256 stakingAmount, uint256 stakingTotal);
 
-  function getPoolDetailById(
-    address poolId
-  ) external view returns (address admin, uint256 stakingAmount, uint256 stakingTotal);
+  function getPoolDetailById(address poolId)
+    external
+    view
+    returns (address admin, uint256 stakingAmount, uint256 stakingTotal);
 
   /**
    * @dev Returns the self-staking amounts of the pools.

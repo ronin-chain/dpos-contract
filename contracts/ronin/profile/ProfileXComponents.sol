@@ -42,8 +42,8 @@ abstract contract ProfileXComponents is IProfile, ProfileHandler {
    * @inheritdoc IProfile
    */
   function arePublicKeysRegistered(bytes[][2] calldata listOfPublicKey) external view returns (bool) {
-    for (uint i; i < listOfPublicKey.length; ) {
-      for (uint j; j < listOfPublicKey[i].length; ) {
+    for (uint i; i < listOfPublicKey.length;) {
+      for (uint j; j < listOfPublicKey[i].length;) {
         if (!_isRegisteredPubkey(listOfPublicKey[i][j])) {
           return false;
         }

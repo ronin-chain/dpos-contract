@@ -16,12 +16,8 @@ contract DebugTx is RoninTest {
   }
 
   function _setUp() internal override {
-    address mockPrecompile = deployImmutable(
-      type(MockPrecompile).name,
-      type(MockPrecompile).creationCode,
-      EMPTY_PARAM,
-      ZERO_VALUE
-    );
+    address mockPrecompile =
+      deployImmutable(type(MockPrecompile).name, type(MockPrecompile).creationCode, EMPTY_PARAM, ZERO_VALUE);
     vm.etch(address(0x68), mockPrecompile.code);
   }
 
@@ -29,9 +25,7 @@ contract DebugTx is RoninTest {
     address coinbase = block.coinbase;
     uint256 numberOfBlocksInEpoch = ITimingInfo(address(RONIN_VALIDATOR_SET_CONTRACT)).numberOfBlocksInEpoch();
 
-    uint256 epochEndingBlockNumber = block.number +
-      (numberOfBlocksInEpoch - 1) -
-      (block.number % numberOfBlocksInEpoch);
+    uint256 epochEndingBlockNumber = block.number + (numberOfBlocksInEpoch - 1) - (block.number % numberOfBlocksInEpoch);
     uint256 nextDayTimestamp = block.timestamp + 1 days;
 
     console.log(_getProxyImplementation(RONIN_VALIDATOR_SET_CONTRACT));

@@ -28,11 +28,7 @@ library ArrayReplaceLib {
     }
   }
 
-  function replace(
-    address[] memory src,
-    address[] memory dst,
-    uint where
-  ) internal pure returns (address[] memory out) {
+  function replace(address[] memory src, address[] memory dst, uint where) internal pure returns (address[] memory out) {
     require(dst.length + where <= src.length, "ArrayReplaceLib: invalid input");
 
     out = new address[](src.length);

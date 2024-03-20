@@ -21,7 +21,7 @@ contract MockProfile is Profile {
   }
 
   function _pcVerifyBLSPublicKey(
-    bytes calldata /*publicKey*/,
+    bytes calldata, /*publicKey*/
     bytes calldata /*proofOfPossession*/
   ) internal view override returns (bool) {
     return !_verificationFailed;

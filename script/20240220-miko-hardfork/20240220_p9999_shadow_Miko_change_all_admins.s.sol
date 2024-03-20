@@ -33,11 +33,8 @@ contract Proposal__20240220_MikoHardfork_ChangeAllAdmins is Proposal__20240220_M
 
     // [B5.] Change admin of all contracts
     {
-      (
-        bytes[] memory sub_callDatas,
-        address[] memory sub_targets,
-        uint256[] memory sub_values
-      ) = _ga__changeAdminAllContracts();
+      (bytes[] memory sub_callDatas, address[] memory sub_targets, uint256[] memory sub_values) =
+        _ga__changeAdminAllContracts();
 
       tos = tos.replace(sub_targets, prCnt);
       callDatas = callDatas.replace(sub_callDatas, prCnt);
@@ -52,12 +49,6 @@ contract Proposal__20240220_MikoHardfork_ChangeAllAdmins is Proposal__20240220_M
       mstore(values, prCnt)
     }
 
-    proposal = _buildProposal(
-      roninGovernanceAdmin,
-      block.timestamp + PROPOSAL_DURATION,
-      tos,
-      values,
-      callDatas
-    );
+    proposal = _buildProposal(roninGovernanceAdmin, block.timestamp + PROPOSAL_DURATION, tos, values, callDatas);
   }
 }

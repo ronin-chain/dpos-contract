@@ -14,9 +14,10 @@ contract Staking is IStaking, StakingCallback, Initializable, AccessControlEnume
   bytes32 public constant MIGRATOR_ROLE = keccak256("MIGRATOR_ROLE");
 
   // keccak256(abi.encode(uint256(keccak256("ronin.storage.StakingRep4MigratedStorageLocation")) - 1)) & ~bytes32(uint256(0xff))
-  bytes32 private constant $_StakingRep4MigratedStorageLocation = 0x02b7258856b9f6bdff23dae2002215e15e9b3a0101a83005baf0725f1e37df00;
+  bytes32 private constant $_StakingRep4MigratedStorageLocation =
+    0x02b7258856b9f6bdff23dae2002215e15e9b3a0101a83005baf0725f1e37df00;
 
-  modifier onRep4Migration {
+  modifier onRep4Migration() {
     uint256 val;
     assembly ("memory-safe") {
       val := sload($_StakingRep4MigratedStorageLocation)
@@ -30,9 +31,9 @@ contract Staking is IStaking, StakingCallback, Initializable, AccessControlEnume
     _disableInitializers();
   }
 
-  receive() external payable onlyContract(ContractType.VALIDATOR) {}
+  receive() external payable onlyContract(ContractType.VALIDATOR) { }
 
-  fallback() external payable onlyContract(ContractType.VALIDATOR) {}
+  fallback() external payable onlyContract(ContractType.VALIDATOR) { }
 
   /**
    * @dev Initializes the contract storage.

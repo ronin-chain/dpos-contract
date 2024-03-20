@@ -209,9 +209,7 @@ contract Migration__20231130_DeployDevnet is DevnetMigration {
   function _initStakingVesting(ISharedArgument.SharedParameter memory param) internal logFn("_initStakingVesting") {
     vm.startBroadcast(sender());
     stakingVesting.initialize(
-      address(validatorSet),
-      param.blockProducerBonusPerBlock,
-      param.bridgeOperatorBonusPerBlock
+      address(validatorSet), param.blockProducerBonusPerBlock, param.bridgeOperatorBonusPerBlock
     );
     // stakingVesting.initializeV2();
     stakingVesting.initializeV3(param.fastFinalityRewardPercent);

@@ -45,10 +45,7 @@ abstract contract SlashFastFinality is ISlashFastFinality, HasContracts, PCUVali
 
     IProfile.CandidateProfile memory profile = profileContract.getId2Profile(validatorId);
     bytes32 voterPublicKeyHash = keccak256(voterPublicKey);
-    if (
-      (voterPublicKeyHash != keccak256(profile.pubkey)) &&
-      (voterPublicKeyHash != keccak256(profile.oldPubkey))
-    ) {
+    if ((voterPublicKeyHash != keccak256(profile.pubkey)) && (voterPublicKeyHash != keccak256(profile.oldPubkey))) {
       revert ErrInvalidArguments(msg.sig);
     }
 
@@ -61,11 +58,7 @@ abstract contract SlashFastFinality is ISlashFastFinality, HasContracts, PCUVali
 
     if (
       _pcValidateFastFinalityEvidence(
-        voterPublicKey,
-        targetBlockNumber,
-        targetBlockHash,
-        listOfPublicKey,
-        aggregatedSignature
+        voterPublicKey, targetBlockNumber, targetBlockHash, listOfPublicKey, aggregatedSignature
       )
     ) {
       _processedEvidence[evidenceHash] = true;

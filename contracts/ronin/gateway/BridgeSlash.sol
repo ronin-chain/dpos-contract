@@ -104,7 +104,7 @@ contract BridgeSlash is
     mapping(address => BridgeSlashInfo) storage _bridgeSlashInfos = _getBridgeSlashInfos();
     uint256 currentPeriod = IRoninValidatorSet(getContract(ContractType.VALIDATOR)).currentPeriod();
 
-    for (uint256 i; i < length; ) {
+    for (uint256 i; i < length;) {
       unchecked {
         if (addeds[i]) {
           _bridgeSlashInfos[bridgeOperators[i]].newlyAddedAtPeriod = uint128(currentPeriod);
@@ -160,7 +160,7 @@ contract BridgeSlash is
     address bridgeOperator;
     Tier tier;
 
-    for (uint256 i; i < operators.length; ) {
+    for (uint256 i; i < operators.length;) {
       bridgeOperator = operators[i];
       status = _bridgeSlashInfos[bridgeOperator];
 
@@ -216,14 +216,16 @@ contract BridgeSlash is
   /**
    * @inheritdoc IBridgeSlash
    */
-  function getSlashUntilPeriodOf(
-    address[] calldata bridgeOperators
-  ) external view returns (uint256[] memory untilPeriods) {
+  function getSlashUntilPeriodOf(address[] calldata bridgeOperators)
+    external
+    view
+    returns (uint256[] memory untilPeriods)
+  {
     uint256 length = bridgeOperators.length;
     untilPeriods = new uint256[](length);
     mapping(address => BridgeSlashInfo) storage _bridgeSlashInfos = _getBridgeSlashInfos();
 
-    for (uint256 i; i < length; ) {
+    for (uint256 i; i < length;) {
       untilPeriods[i] = _bridgeSlashInfos[bridgeOperators[i]].slashUntilPeriod;
       unchecked {
         ++i;
@@ -239,7 +241,7 @@ contract BridgeSlash is
     addedPeriods = new uint256[](length);
     mapping(address => BridgeSlashInfo) storage _bridgeSlashInfos = _getBridgeSlashInfos();
 
-    for (uint256 i; i < length; ) {
+    for (uint256 i; i < length;) {
       addedPeriods[i] = _bridgeSlashInfos[bridgeOperators[i]].newlyAddedAtPeriod;
       unchecked {
         ++i;

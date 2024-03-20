@@ -1,9 +1,23 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import { ContractType, RoleAccess, ErrUnauthorized, BridgeManager } from "../../extensions/bridge-operator-governance/BridgeManager.sol";
-import { Ballot, GlobalProposal, Proposal, GovernanceProposal } from "../../extensions/sequential-governance/governance-proposal/GovernanceProposal.sol";
-import { CoreGovernance, GlobalCoreGovernance, GlobalGovernanceProposal } from "../../extensions/sequential-governance/governance-proposal/GlobalGovernanceProposal.sol";
+import {
+  ContractType,
+  RoleAccess,
+  ErrUnauthorized,
+  BridgeManager
+} from "../../extensions/bridge-operator-governance/BridgeManager.sol";
+import {
+  Ballot,
+  GlobalProposal,
+  Proposal,
+  GovernanceProposal
+} from "../../extensions/sequential-governance/governance-proposal/GovernanceProposal.sol";
+import {
+  CoreGovernance,
+  GlobalCoreGovernance,
+  GlobalGovernanceProposal
+} from "../../extensions/sequential-governance/governance-proposal/GlobalGovernanceProposal.sol";
 import { VoteStatusConsumer } from "../../interfaces/consumers/VoteStatusConsumer.sol";
 import { ErrQueryForEmptyVote } from "../../utils/CommonErrors.sol";
 
@@ -25,7 +39,7 @@ contract RoninBridgeManager is BridgeManager, GovernanceProposal, GlobalGovernan
     CoreGovernance(expiryDuration)
     GlobalCoreGovernance(targetOptions, targets)
     BridgeManager(num, denom, roninChainId, bridgeContract, callbackRegisters, bridgeOperators, governors, voteWeights)
-  {}
+  { }
 
   /**
    * CURRENT NETWORK

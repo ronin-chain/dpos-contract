@@ -33,7 +33,7 @@ abstract contract CommonGovernanceRelay is CoreGovernance {
       Ballot.VoteType _support;
       Signature calldata _sig;
 
-      for (uint256 _i; _i < _signatures.length; ) {
+      for (uint256 _i; _i < _signatures.length;) {
         _sig = _signatures[_i];
         _support = _supports[_i];
 
@@ -43,7 +43,9 @@ abstract contract CommonGovernanceRelay is CoreGovernance {
         } else if (_support == Ballot.VoteType.Against) {
           _signer = ECDSA.recover(_againstDigest, _sig.v, _sig.r, _sig.s);
           _againstVoteSigners[_againstVoteCount++] = _signer;
-        } else revert ErrUnsupportedVoteType(msg.sig);
+        } else {
+          revert ErrUnsupportedVoteType(msg.sig);
+        }
 
         if (_lastSigner >= _signer) revert ErrInvalidOrder(msg.sig);
         _lastSigner = _signer;

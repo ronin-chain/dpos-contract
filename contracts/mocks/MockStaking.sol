@@ -84,12 +84,12 @@ contract MockStaking is RewardCalculation, GlobalConfigConsumer {
   function getManyStakingAmounts(
     TConsensus[] calldata consensusAddrs,
     address[] calldata userList
-  ) external view override returns (uint256[] memory) {}
+  ) external view override returns (uint256[] memory) { }
 
   function getManyStakingAmountsById(
     address[] calldata poolIds,
     address[] calldata userList
-  ) external view override returns (uint256[] memory) {}
+  ) external view override returns (uint256[] memory) { }
 
   function _getStakingAmount(address, address _user) internal view override returns (uint256) {
     return _stakingAmount[_user];
@@ -107,11 +107,13 @@ contract MockStaking is RewardCalculation, GlobalConfigConsumer {
     return lastUpdatedPeriod;
   }
 
-  function getManyStakingTotals(TConsensus[] calldata _poolAddr) external view override returns (uint256[] memory) {}
+  function getManyStakingTotals(TConsensus[] calldata _poolAddr) external view override returns (uint256[] memory) { }
 
-  function getManyStakingTotalsById(
-    address[] calldata poolIds
-  ) external view returns (uint256[] memory stakingAmounts_) {}
+  function getManyStakingTotalsById(address[] calldata poolIds)
+    external
+    view
+    returns (uint256[] memory stakingAmounts_)
+  { }
 
-  function __css2cid(TConsensus consensusAddr) internal view virtual override returns (address)  {}
+  function __css2cid(TConsensus consensusAddr) internal view virtual override returns (address) { }
 }

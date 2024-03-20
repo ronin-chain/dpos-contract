@@ -2,6 +2,7 @@
 pragma solidity ^0.8.19;
 
 type TPoolId is address;
+
 type TConsensus is address;
 
 using { TPoolIdEq as == } for TPoolId global;

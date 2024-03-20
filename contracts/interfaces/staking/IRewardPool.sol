@@ -78,7 +78,8 @@ interface IRewardPool is PeriodWrapperConsumer {
   /**
    * @dev Returns the total staking amounts of all users for the pools `poolIds`.
    */
-  function getManyStakingTotalsById(
-    address[] calldata poolIds
-  ) external view returns (uint256[] memory stakingAmounts_);
+  function getManyStakingTotalsById(address[] calldata poolIds)
+    external
+    view
+    returns (uint256[] memory stakingAmounts_);
 }

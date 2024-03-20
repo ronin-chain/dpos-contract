@@ -11,9 +11,7 @@ interface ISlashDoubleSign is IBaseSlash {
    * for param details.
    */
   event DoubleSignSlashingConfigsUpdated(
-    uint256 slashDoubleSignAmount,
-    uint256 doubleSigningJailUntilBlock,
-    uint256 doubleSigningOffsetLimitBlock
+    uint256 slashDoubleSignAmount, uint256 doubleSigningJailUntilBlock, uint256 doubleSigningOffsetLimitBlock
   );
 
   /**

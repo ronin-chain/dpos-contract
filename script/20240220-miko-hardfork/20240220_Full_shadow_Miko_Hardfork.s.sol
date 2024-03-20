@@ -20,7 +20,7 @@ contract Proposal__Full_20240220_MikoHardfork_ProposeProposal is
 
   modifier resetBroadcastStatus() {
     _;
-    CONFIG.setBroadcastDisableStatus(false);
+    CONFIG.setPostCheckingStatus(false);
   }
 
   /**
@@ -59,7 +59,7 @@ contract Proposal__Full_20240220_MikoHardfork_ProposeProposal is
     // CONFIG.setBroadcastDisableStatus(false);
     // Proposal__20240220_MikoHardfork_After._run_unchained(); // DOCTOR
 
-    CONFIG.setBroadcastDisableStatus(false);
+    CONFIG.setPostCheckingStatus(false);
     Proposal__20240220_MikoHardfork_Stable._run_unchained(); // MIGRATOR
 
     Proposal__20240220_PostCheck._run_unchained();

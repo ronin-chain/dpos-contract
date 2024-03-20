@@ -2,7 +2,11 @@
 
 pragma solidity ^0.8.9;
 
-import { HasValidatorDeprecated, HasTrustedOrgDeprecated, HasGovernanceAdminDeprecated } from "../../utils/DeprecatedSlots.sol";
+import {
+  HasValidatorDeprecated,
+  HasTrustedOrgDeprecated,
+  HasGovernanceAdminDeprecated
+} from "../../utils/DeprecatedSlots.sol";
 import "../../extensions/collections/HasContracts.sol";
 
 // TODO: remove this from slashing logic of consensus contract

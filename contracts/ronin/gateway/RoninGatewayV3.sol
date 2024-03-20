@@ -76,8 +76,9 @@ contract RoninGatewayV3 is
    * @dev Reverts if the method caller is not bridge operator.
    */
   function _requireBridgeOperator() internal view {
-    if (!IBridgeManager(getContract(ContractType.BRIDGE_MANAGER)).isBridgeOperator(msg.sender))
+    if (!IBridgeManager(getContract(ContractType.BRIDGE_MANAGER)).isBridgeOperator(msg.sender)) {
       revert ErrUnauthorized(msg.sig, RoleAccess.__DEPRECATED_BRIDGE_OPERATOR);
+    }
   }
 
   /**
@@ -89,7 +90,7 @@ contract RoninGatewayV3 is
     uint256 _denominator,
     uint256 _trustedNumerator,
     uint256 _trustedDenominator,
-    address[] calldata /* _withdrawalMigrators */,
+    address[] calldata, /* _withdrawalMigrators */
     // _packedAddresses[0]: roninTokens
     // _packedAddresses[1]: mainchainTokens
     address[][2] calldata _packedAddresses,
@@ -128,7 +129,7 @@ contract RoninGatewayV3 is
     address[] calldata operators
   ) external view returns (bytes[] memory _signatures) {
     _signatures = new bytes[](operators.length);
-    for (uint256 _i = 0; _i < operators.length; ) {
+    for (uint256 _i = 0; _i < operators.length;) {
       _signatures[_i] = _withdrawalSig[withdrawalId][operators[_i]];
 
       unchecked {
@@ -144,25 +145,25 @@ contract RoninGatewayV3 is
     address _sender = msg.sender;
     _depositFor(_receipt, _sender, minimumVoteWeight());
     IBridgeTracking(getContract(ContractType.BRIDGE_TRACKING)).recordVote(
-      IBridgeTracking.VoteKind.Deposit,
-      _receipt.id,
-      _sender
+      IBridgeTracking.VoteKind.Deposit, _receipt.id, _sender
     );
   }
 
   /**
    * @inheritdoc IRoninGatewayV3
    */
-  function tryBulkAcknowledgeMainchainWithdrew(
-    uint256[] calldata _withdrawalIds
-  ) external onlyBridgeOperator returns (bool[] memory _executedReceipts) {
+  function tryBulkAcknowledgeMainchainWithdrew(uint256[] calldata _withdrawalIds)
+    external
+    onlyBridgeOperator
+    returns (bool[] memory _executedReceipts)
+  {
     address _governor = msg.sender;
     uint256 _minVoteWeight = minimumVoteWeight();
 
     uint256 _withdrawalId;
     _executedReceipts = new bool[](_withdrawalIds.length);
     IBridgeTracking _bridgeTrackingContract = IBridgeTracking(getContract(ContractType.BRIDGE_TRACKING));
-    for (uint256 _i; _i < _withdrawalIds.length; ) {
+    for (uint256 _i; _i < _withdrawalIds.length;) {
       _withdrawalId = _withdrawalIds[_i];
       _bridgeTrackingContract.recordVote(IBridgeTracking.VoteKind.MainchainWithdrawal, _withdrawalId, _governor);
       if (mainchainWithdrew(_withdrawalId)) {
@@ -188,16 +189,19 @@ contract RoninGatewayV3 is
   /**
    * @inheritdoc IRoninGatewayV3
    */
-  function tryBulkDepositFor(
-    Transfer.Receipt[] calldata _receipts
-  ) external whenNotPaused onlyBridgeOperator returns (bool[] memory _executedReceipts) {
+  function tryBulkDepositFor(Transfer.Receipt[] calldata _receipts)
+    external
+    whenNotPaused
+    onlyBridgeOperator
+    returns (bool[] memory _executedReceipts)
+  {
     address _sender = msg.sender;
 
     Transfer.Receipt memory _receipt;
     _executedReceipts = new bool[](_receipts.length);
     uint256 _minVoteWeight = minimumVoteWeight();
     IBridgeTracking _bridgeTrackingContract = IBridgeTracking(getContract(ContractType.BRIDGE_TRACKING));
-    for (uint256 _i; _i < _receipts.length; ) {
+    for (uint256 _i; _i < _receipts.length;) {
       _receipt = _receipts[_i];
       _bridgeTrackingContract.recordVote(IBridgeTracking.VoteKind.Deposit, _receipt.id, _sender);
       if (depositVote[_receipt.mainchain.chainId][_receipt.id].status == VoteStatus.Executed) {
@@ -225,7 +229,7 @@ contract RoninGatewayV3 is
   function bulkRequestWithdrawalFor(Transfer.Request[] calldata _requests, uint256 _chainId) external whenNotPaused {
     if (_requests.length == 0) revert ErrEmptyArray();
 
-    for (uint256 _i; _i < _requests.length; ) {
+    for (uint256 _i; _i < _requests.length;) {
       _requestWithdrawalFor(_requests[_i], msg.sender, _chainId);
       unchecked {
         ++_i;
@@ -264,7 +268,7 @@ contract RoninGatewayV3 is
 
     uint256 id;
     IBridgeTracking _bridgeTrackingContract = IBridgeTracking(getContract(ContractType.BRIDGE_TRACKING));
-    for (uint256 _i; _i < withdrawals.length; ) {
+    for (uint256 _i; _i < withdrawals.length;) {
       id = withdrawals[_i];
       _withdrawalSig[id][operator] = signatures[_i];
       _bridgeTrackingContract.recordVote(IBridgeTracking.VoteKind.Withdrawal, id, operator);
@@ -339,10 +343,11 @@ contract RoninGatewayV3 is
     uint256[] calldata _chainIds,
     Token.Standard[] calldata _standards
   ) internal {
-    if (!(_roninTokens.length == _mainchainTokens.length && _roninTokens.length == _chainIds.length))
+    if (!(_roninTokens.length == _mainchainTokens.length && _roninTokens.length == _chainIds.length)) {
       revert ErrLengthMismatch(msg.sig);
+    }
 
-    for (uint256 _i; _i < _roninTokens.length; ) {
+    for (uint256 _i; _i < _roninTokens.length;) {
       _mainchainToken[_roninTokens[_i]][_chainIds[_i]].tokenAddr = _mainchainTokens[_i];
       _mainchainToken[_roninTokens[_i]][_chainIds[_i]].erc = _standards[_i];
 
@@ -369,8 +374,9 @@ contract RoninGatewayV3 is
 
     MappedToken memory _token = getMainchainToken(receipt.ronin.tokenAddr, receipt.mainchain.chainId);
 
-    if (!(_token.erc == receipt.info.erc && _token.tokenAddr == receipt.mainchain.tokenAddr))
+    if (!(_token.erc == receipt.info.erc && _token.tokenAddr == receipt.mainchain.tokenAddr)) {
       revert ErrInvalidReceipt();
+    }
 
     IsolatedGovernance.Vote storage _proposal = depositVote[receipt.mainchain.chainId][id];
     bytes32 _receiptHash = receipt.hash();
@@ -380,8 +386,7 @@ contract RoninGatewayV3 is
       _proposal.status = VoteStatus.Executed;
       receipt.info.handleAssetTransfer(payable(receipt.ronin.addr), receipt.ronin.tokenAddr, IWETH(address(0)));
       IBridgeTracking(getContract(ContractType.BRIDGE_TRACKING)).handleVoteApproved(
-        IBridgeTracking.VoteKind.Deposit,
-        receipt.id
+        IBridgeTracking.VoteKind.Deposit, receipt.id
       );
       emit Deposited(_receiptHash, receipt);
     }
@@ -419,12 +424,8 @@ contract RoninGatewayV3 is
     address _mainchainTokenAddr
   ) internal returns (uint256 _withdrawalId) {
     _withdrawalId = withdrawalCount++;
-    Transfer.Receipt memory _receipt = _request.into_withdrawal_receipt(
-      _requester,
-      _withdrawalId,
-      _mainchainTokenAddr,
-      _chainId
-    );
+    Transfer.Receipt memory _receipt =
+      _request.into_withdrawal_receipt(_requester, _withdrawalId, _mainchainTokenAddr, _chainId);
     withdrawal[_withdrawalId] = _receipt;
     emit WithdrawalRequested(_receipt.hash(), _receipt);
   }
@@ -469,9 +470,8 @@ contract RoninGatewayV3 is
     IsolatedGovernance.Vote storage _v,
     bytes32 _hash
   ) internal view returns (uint256 _totalWeight) {
-    (, address[] memory bridgeOperators, uint96[] memory weights) = IBridgeManager(
-      getContract(ContractType.BRIDGE_MANAGER)
-    ).getFullBridgeOperatorInfos();
+    (, address[] memory bridgeOperators, uint96[] memory weights) =
+      IBridgeManager(getContract(ContractType.BRIDGE_MANAGER)).getFullBridgeOperatorInfos();
     uint256 length = bridgeOperators.length;
     unchecked {
       for (uint _i; _i < length; ++_i) {
@@ -514,11 +514,7 @@ contract RoninGatewayV3 is
     _trustedDenom = _trustedDenominator;
     unchecked {
       emit TrustedThresholdUpdated(
-        nonce++,
-        _trustedNumerator,
-        _trustedDenominator,
-        _previousTrustedNum,
-        _previousTrustedDenom
+        nonce++, _trustedNumerator, _trustedDenominator, _previousTrustedNum, _previousTrustedDenom
       );
     }
   }

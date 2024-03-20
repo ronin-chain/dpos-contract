@@ -52,13 +52,13 @@ library AddressArrayUtils {
       c = new address[](lengthA + lengthB);
     }
     uint256 i;
-    for (; i < lengthA; ) {
+    for (; i < lengthA;) {
       c[i] = a[i];
       unchecked {
         ++i;
       }
     }
-    for (uint256 j; j < lengthB; ) {
+    for (uint256 j; j < lengthB;) {
       c[i] = b[j];
       unchecked {
         ++i;

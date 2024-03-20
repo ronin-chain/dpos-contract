@@ -14,8 +14,8 @@ contract MockPrecompile {
   }
 
   function validatingDoubleSignProof(
-    address /*consensusAddr*/,
-    bytes calldata /*_header1*/,
+    address, /*consensusAddr*/
+    bytes calldata, /*_header1*/
     bytes calldata /*_header2*/
   ) public pure returns (bool _validEvidence) {
     return true;
@@ -44,7 +44,7 @@ contract MockPrecompile {
   }
 
   function validateProofOfPossession(
-    bytes calldata /*publicKey*/,
+    bytes calldata, /*publicKey*/
     bytes calldata /*proofOfPossession*/
   ) public pure returns (bool) {
     return true;
