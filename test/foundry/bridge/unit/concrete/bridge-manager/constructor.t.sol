@@ -44,11 +44,8 @@ contract Constructor_BridgeManager_Unit_Concrete_Test is BridgeManager_Unit_Conc
       uint96[] memory expectingVoteWeights
     ) = _getBridgeMembers();
 
-    (
-      address[] memory returnedGovernors,
-      address[] memory returnedBridgeOperators,
-      uint96[] memory returnedVoteWeights
-    ) = _bridgeManager.getFullBridgeOperatorInfos();
+    (address[] memory returnedGovernors, address[] memory returnedBridgeOperators, uint96[] memory returnedVoteWeights)
+    = _bridgeManager.getFullBridgeOperatorInfos();
 
     _assertBridgeMembers({
       comparingOperators: returnedBridgeOperators,

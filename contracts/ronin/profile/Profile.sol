@@ -29,8 +29,8 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     _setContract(ContractType.STAKING, stakingContract);
     _setContract(ContractType.RONIN_TRUSTED_ORGANIZATION, trustedOrgContract);
 
-    TConsensus[] memory validatorCandidates = IRoninValidatorSet(getContract(ContractType.VALIDATOR))
-      .getValidatorCandidates();
+    TConsensus[] memory validatorCandidates =
+      IRoninValidatorSet(getContract(ContractType.VALIDATOR)).getValidatorCandidates();
 
     for (uint256 i; i < validatorCandidates.length; ++i) {
       TConsensus consensus = validatorCandidates[i];
@@ -48,7 +48,7 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
   /**
    * @dev Add addresses of renounced candidates into registry. Only called during {initializeV2}.
    */
-  function __migrationRenouncedCandidates() internal virtual {}
+  function __migrationRenouncedCandidates() internal virtual { }
 
   /**
    * @dev This method is used in REP-4 migration, which creates profile for all community-validators and renounced validators.
@@ -196,10 +196,9 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     validatorContract.execChangeConsensusAddr(id, newConsensusAddr);
 
     address trustedOrgContractAddr = getContract(ContractType.RONIN_TRUSTED_ORGANIZATION);
-    (bool success, ) = trustedOrgContractAddr.call(
+    (bool success,) = trustedOrgContractAddr.call(
       abi.encodeCall(
-        IRoninTrustedOrganization.execChangeConsensusAddressForTrustedOrg,
-        (oldConsensusAddr, newConsensusAddr)
+        IRoninTrustedOrganization.execChangeConsensusAddressForTrustedOrg, (oldConsensusAddr, newConsensusAddr)
       )
     );
 
@@ -224,7 +223,7 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
    *          Cannot impl since we cannot cancel the previous the ballot and
    *          create a new ballot on behalf of the validator contract.
    */
-  function changeTreasuryAddr(address /*id */, address payable /* newTreasury */) external pure {
+  function changeTreasuryAddr(address, /*id */ address payable /* newTreasury */ ) external pure {
     revert("Not supported");
   }
 
@@ -242,8 +241,8 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
 
   function _requireCandidateAdmin(CandidateProfile storage sProfile) internal view {
     if (
-      msg.sender != sProfile.admin ||
-      !IRoninValidatorSet(getContract(ContractType.VALIDATOR)).isCandidateAdminById(sProfile.id, msg.sender)
+      msg.sender != sProfile.admin
+        || !IRoninValidatorSet(getContract(ContractType.VALIDATOR)).isCandidateAdminById(sProfile.id, msg.sender)
     ) revert ErrUnauthorized(msg.sig, RoleAccess.CANDIDATE_ADMIN);
   }
 

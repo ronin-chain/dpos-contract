@@ -24,24 +24,16 @@ abstract contract PCUValidateDoubleSign is PrecompiledUsage {
     address _smc = precompileValidateDoubleSignAddress();
     bool _success = true;
 
-    bytes memory _payload = abi.encodeWithSignature(
-      "validatingDoubleSignProof(address,bytes,bytes)",
-      _consensusAddr,
-      _header1,
-      _header2
-    );
+    bytes memory _payload =
+      abi.encodeWithSignature("validatingDoubleSignProof(address,bytes,bytes)", _consensusAddr, _header1, _header2);
     uint _payloadLength = _payload.length;
     uint[1] memory _output;
 
     assembly {
       let _payloadStart := add(_payload, 0x20)
-      if iszero(staticcall(gas(), _smc, _payloadStart, _payloadLength, _output, 0x20)) {
-        _success := 0
-      }
+      if iszero(staticcall(gas(), _smc, _payloadStart, _payloadLength, _output, 0x20)) { _success := 0 }
 
-      if iszero(returndatasize()) {
-        _success := 0
-      }
+      if iszero(returndatasize()) { _success := 0 }
     }
 
     if (!_success) revert ErrCallPrecompiled();

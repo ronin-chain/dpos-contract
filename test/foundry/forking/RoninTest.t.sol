@@ -5,7 +5,10 @@ import { console } from "forge-std/console.sol";
 
 import { Base_Test } from "@ronin/test/Base.t.sol";
 
-import { ITransparentUpgradeableProxyDeployer, TransparentUpgradeableProxyV3 } from "./extensions/TransparentUpgradeableProxyV3.sol";
+import {
+  ITransparentUpgradeableProxyDeployer,
+  TransparentUpgradeableProxyV3
+} from "./extensions/TransparentUpgradeableProxyV3.sol";
 import { TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
 
 import { BridgeTracking } from "@ronin/contracts/ronin/gateway/BridgeTracking.sol";
@@ -36,11 +39,7 @@ abstract contract RoninTest is Base_Test, ITransparentUpgradeableProxyDeployer {
   address internal _defaultAdmin;
   TransparentUpgradeableProxyParams private _params;
 
-  modifier whenDeployProxy(
-    address proxyAdmin,
-    address impl,
-    bytes memory data
-  ) {
+  modifier whenDeployProxy(address proxyAdmin, address impl, bytes memory data) {
     _params = TransparentUpgradeableProxyParams({ admin: proxyAdmin, implement: impl, data: data });
     _;
     delete _params;
@@ -86,11 +85,11 @@ abstract contract RoninTest is Base_Test, ITransparentUpgradeableProxyDeployer {
     _label();
   }
 
-  function _createFork() internal virtual {}
+  function _createFork() internal virtual { }
 
   function _setUp() internal virtual;
 
-  function _label() internal virtual {}
+  function _label() internal virtual { }
 
   function deployImmutable(
     string memory contractName,
@@ -139,12 +138,8 @@ abstract contract RoninTest is Base_Test, ITransparentUpgradeableProxyDeployer {
     )
     returns (TransparentUpgradeableProxyV2 proxy, address impl)
   {
-    impl = deployImmutable({
-      contractName: _getLogicLabel(contractName),
-      creationCode: logicCode,
-      params: "",
-      value: 0
-    });
+    impl =
+      deployImmutable({ contractName: _getLogicLabel(contractName), creationCode: logicCode, params: "", value: 0 });
 
     string memory proxyContractName = _getProxyLabel(contractName);
     proxy = TransparentUpgradeableProxyV2(

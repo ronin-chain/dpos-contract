@@ -57,6 +57,7 @@ interface ICandidateManager {
   /// @dev Emitted when the commission rate of a validator is updated.
   event CommissionRateUpdated(address indexed cid, uint256 rate);
   /// @dev Error of exceeding maximum number of candidates.
+
   error ErrExceedsMaxNumberOfCandidate();
   /// @dev Error of querying for already existent candidate.
   error ErrExistentCandidate();

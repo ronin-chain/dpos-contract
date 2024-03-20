@@ -11,7 +11,7 @@ abstract contract Randomizer is Base_Test {
   function _createRandomAddresses(uint256 seed, uint256 amount) internal returns (address[] memory addrs) {
     addrs = new address[](amount);
 
-    for (uint256 i; i < amount; ) {
+    for (uint256 i; i < amount;) {
       seed = uint256(keccak256(abi.encode(seed)));
       addrs[i] = vm.addr(seed);
       vm.etch(addrs[i], abi.encode());
@@ -32,7 +32,7 @@ abstract contract Randomizer is Base_Test {
     uint256 r;
     nums = new uint256[](amount);
 
-    for (uint256 i; i < amount; ) {
+    for (uint256 i; i < amount;) {
       r = _randomize(seed, min, max);
       nums[i] = r;
       seed = r;

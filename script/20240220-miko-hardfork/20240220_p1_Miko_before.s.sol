@@ -5,7 +5,10 @@ import { TContract } from "foundry-deployment-kit/types/Types.sol";
 import { LibProxy } from "foundry-deployment-kit/libraries/LibProxy.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
 
-import { BridgeTrackingRecoveryLogic, BridgeTracking } from "../20231019-recover-fund/contracts/BridgeTrackingRecoveryLogic.sol";
+import {
+  BridgeTrackingRecoveryLogic,
+  BridgeTracking
+} from "../20231019-recover-fund/contracts/BridgeTrackingRecoveryLogic.sol";
 
 import { SlashIndicator } from "@ronin/contracts/ronin/slash-indicator/SlashIndicator.sol";
 import { Staking, IStaking } from "@ronin/contracts/ronin/staking/Staking.sol";
@@ -28,7 +31,6 @@ contract Proposal__20240220_MikoHardfork_Before is Proposal__Base_20240220_MikoH
   /**
    * See `README.md`
    */
-
   function run() public virtual override onlyOn(DefaultNetwork.RoninMainnet.key()) {
     Proposal__Base_20240220_MikoHardfork.run();
 
@@ -40,7 +42,7 @@ contract Proposal__20240220_MikoHardfork_Before is Proposal__Base_20240220_MikoH
   }
 
   function _eoa__changeAdminToGA() internal {
-    bool shouldPrankOnly = CONFIG.isBroadcastDisable();
+    bool shouldPrankOnly = CONFIG.isPostChecking();
 
     if (shouldPrankOnly) {
       vm.prank(BAO_EOA);

@@ -54,11 +54,11 @@ contract MockBridgeTracking is IBridgeTracking {
     return _ballotOf(_tracks[period], operator);
   }
 
-  function handleVoteApproved(VoteKind _kind, uint256 _requestId) external {}
+  function handleVoteApproved(VoteKind _kind, uint256 _requestId) external { }
 
-  function recordVote(VoteKind _kind, uint256 _requestId, address _operator) external {}
+  function recordVote(VoteKind _kind, uint256 _requestId, address _operator) external { }
 
-  function startedAtBlock() external view returns (uint256) {}
+  function startedAtBlock() external view returns (uint256) { }
 
   function _ballotOf(PeriodTracking storage _sTrack, address operator) private view returns (uint256) {
     return _sTrack.ballotMap[operator];

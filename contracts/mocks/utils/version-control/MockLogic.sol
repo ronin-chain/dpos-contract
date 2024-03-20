@@ -18,7 +18,7 @@ interface ILogic {
 abstract contract MockLogicBase is ILogic {
   uint256 internal _value;
 
-  function magicNumber() public view virtual override returns (uint256) {}
+  function magicNumber() public view virtual override returns (uint256) { }
 
   receive() external payable virtual {
     emit Received(0);

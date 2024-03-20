@@ -36,10 +36,8 @@ abstract contract SlashingExecution is
     _blockProducerJailedBlock[validatorId] = Math.max(newJailedUntil, _blockProducerJailedBlock[validatorId]);
 
     if (slashAmount > 0) {
-      uint256 _actualAmount = IStaking(getContract(ContractType.STAKING)).execDeductStakingAmount(
-        validatorId,
-        slashAmount
-      );
+      uint256 _actualAmount =
+        IStaking(getContract(ContractType.STAKING)).execDeductStakingAmount(validatorId, slashAmount);
       _totalDeprecatedReward += _actualAmount;
     }
 

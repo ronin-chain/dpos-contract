@@ -8,4 +8,4 @@ import { Utils } from "./utils/Utils.sol";
 
 import { IBridgeManagerEvents } from "@ronin/contracts/interfaces/bridge/events/IBridgeManagerEvents.sol";
 
-abstract contract Base_Test is Assertions, Utils, StdCheats, IBridgeManagerEvents {}
+abstract contract Base_Test is Assertions, Utils, StdCheats, IBridgeManagerEvents { }

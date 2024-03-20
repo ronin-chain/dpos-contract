@@ -39,7 +39,7 @@ abstract contract DelegatorStaking is BaseStaking, IDelegatorStaking {
     uint256 total;
 
     address[] memory poolIds = __css2cidBatch(consensusAddrs);
-    for (uint i = 0; i < poolIds.length; ) {
+    for (uint i = 0; i < poolIds.length;) {
       total += amounts[i];
       _undelegate(consensusAddrs[i], _poolDetail[poolIds[i]], delegator, amounts[i]);
 
@@ -67,9 +67,12 @@ abstract contract DelegatorStaking is BaseStaking, IDelegatorStaking {
   /**
    * @inheritdoc IDelegatorStaking
    */
-  function claimRewards(
-    TConsensus[] calldata consensusAddrList
-  ) external override nonReentrant returns (uint256 amount) {
+  function claimRewards(TConsensus[] calldata consensusAddrList)
+    external
+    override
+    nonReentrant
+    returns (uint256 amount)
+  {
     amount = _claimRewards(msg.sender, __css2cidBatch(consensusAddrList));
     _transferRON(payable(msg.sender), amount);
   }
@@ -98,7 +101,7 @@ abstract contract DelegatorStaking is BaseStaking, IDelegatorStaking {
     rewards_ = new uint256[](consensusAddrs.length);
 
     address[] memory poolIds = __css2cidBatch(consensusAddrs);
-    for (uint256 i = 0; i < consensusAddrs.length; ) {
+    for (uint256 i = 0; i < consensusAddrs.length;) {
       address poolId = poolIds[i];
       rewards_[i] = _getReward(poolId, user, period, _getStakingAmount(poolId, user));
 
@@ -153,9 +156,9 @@ abstract contract DelegatorStaking is BaseStaking, IDelegatorStaking {
 
     IRoninValidatorSet validatorContract = IRoninValidatorSet(getContract(ContractType.VALIDATOR));
     if (
-      validatorContract.isValidatorCandidate(consensusAddr) &&
-      validatorContract.getCandidateInfo(consensusAddr).revokingTimestamp == 0 && // if candidate is not on renunciation
-      _pool.lastDelegatingTimestamp[delegator] + _cooldownSecsToUndelegate >= block.timestamp // delegator is still in cooldown
+      validatorContract.isValidatorCandidate(consensusAddr)
+        && validatorContract.getCandidateInfo(consensusAddr).revokingTimestamp == 0 // if candidate is not on renunciation
+        && _pool.lastDelegatingTimestamp[delegator] + _cooldownSecsToUndelegate >= block.timestamp // delegator is still in cooldown
     ) revert ErrUndelegateTooEarly();
 
     _changeDelegatingAmount(_pool, delegator, _pool.delegatingAmount[delegator] - amount, _pool.stakingTotal - amount);
@@ -168,7 +171,7 @@ abstract contract DelegatorStaking is BaseStaking, IDelegatorStaking {
    */
   function _claimRewards(address user, address[] memory poolIds) internal returns (uint256 amount) {
     uint256 period = _currentPeriod();
-    for (uint256 i = 0; i < poolIds.length; ) {
+    for (uint256 i = 0; i < poolIds.length;) {
       amount += _claimReward(poolIds[i], user, period);
 
       unchecked {

@@ -16,7 +16,7 @@ contract Migration__20240121_UpgradeReleaseV0_7_2_Testnet is RoninMigration {
   using StdStyle for *;
 
   address private constant STAKING_MIGRATOR = 0xf72bEAE310d08e184DDB0990ECc6ABe6340CF6eF;
-  address private constant STAKING_DEFAULT_ADMIN = 0x968D0Cd7343f711216817E617d3f92a23dC91c07;  // Testnet Proxy Admin
+  address private constant STAKING_DEFAULT_ADMIN = 0x968D0Cd7343f711216817E617d3f92a23dC91c07; // Testnet Proxy Admin
 
   address[] private contractsToUpgrade;
   TContract[] private contractTypesToUpgrade;

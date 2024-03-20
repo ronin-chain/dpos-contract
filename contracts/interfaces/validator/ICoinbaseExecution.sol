@@ -19,11 +19,7 @@ interface ICoinbaseExecution is ISlashingExecution {
   event BridgeOperatorSetUpdated(uint256 indexed period, uint256 indexed epoch, address[] bridgeOperators);
 
   /// @dev Emitted when the reward of the block producer is deprecated.
-  event BlockRewardDeprecated(
-    address indexed cid,
-    uint256 rewardAmount,
-    BlockRewardDeprecatedType deprecatedType
-  );
+  event BlockRewardDeprecated(address indexed cid, uint256 rewardAmount, BlockRewardDeprecatedType deprecatedType);
   /// @dev Emitted when the block reward is submitted.
   event BlockRewardSubmitted(address indexed cid, uint256 submittedAmount, uint256 bonusAmount);
 
@@ -31,18 +27,12 @@ interface ICoinbaseExecution is ISlashingExecution {
   event MiningRewardDistributed(address indexed cid, address indexed recipient, uint256 amount);
   /// @dev Emitted when the contract fails when distributing the block producer reward.
   event MiningRewardDistributionFailed(
-    address indexed cid,
-    address indexed recipient,
-    uint256 amount,
-    uint256 contractBalance
+    address indexed cid, address indexed recipient, uint256 amount, uint256 contractBalance
   );
 
   /// @dev Emitted when the bridge operator reward is distributed.
   event BridgeOperatorRewardDistributed(
-    address indexed cid,
-    address indexed bridgeOperator,
-    address indexed recipientAddr,
-    uint256 amount
+    address indexed cid, address indexed bridgeOperator, address indexed recipientAddr, uint256 amount
   );
   /// @dev Emitted when the contract fails when distributing the bridge operator reward.
   event BridgeOperatorRewardDistributionFailed(
@@ -57,20 +47,14 @@ interface ICoinbaseExecution is ISlashingExecution {
   event FastFinalityRewardDistributed(address indexed cid, address indexed recipient, uint256 amount);
   /// @dev Emitted when the contract fails when distributing the fast finality reward.
   event FastFinalityRewardDistributionFailed(
-    address indexed cid,
-    address indexed recipient,
-    uint256 amount,
-    uint256 contractBalance
+    address indexed cid, address indexed recipient, uint256 amount, uint256 contractBalance
   );
 
   /// @dev Emitted when the amount of RON reward is distributed to staking contract.
   event StakingRewardDistributed(uint256 totalAmount, address[] cids, uint256[] amounts);
   /// @dev Emitted when the contracts fails when distributing the amount of RON to the staking contract.
   event StakingRewardDistributionFailed(
-    uint256 totalAmount,
-    address[] cids,
-    uint256[] amounts,
-    uint256 contractBalance
+    uint256 totalAmount, address[] cids, uint256[] amounts, uint256 contractBalance
   );
 
   /// @dev Emitted when the epoch is wrapped up.

@@ -36,9 +36,8 @@ abstract contract PostChecker_Renounce is BaseMigration, PostChecker_Helper {
     _consensusAddr = makeAddr("mock-consensus-addr-to-renounce");
 
     _applyValidatorCandidate(_staking, _candidateAdmin, _consensusAddr);
-    (, bytes memory returndata) = _validatorSet.staticcall(
-      abi.encodeWithSelector(ICandidateManager.isValidatorCandidate.selector, _consensusAddr)
-    );
+    (, bytes memory returndata) =
+      _validatorSet.staticcall(abi.encodeWithSelector(ICandidateManager.isValidatorCandidate.selector, _consensusAddr));
     assertTrue(abi.decode(returndata, (bool)));
 
     _postCheck__RequestRenounceSuccess();
@@ -46,18 +45,15 @@ abstract contract PostChecker_Renounce is BaseMigration, PostChecker_Helper {
 
   function _postCheck__RequestRenounceSuccess() private logPostCheck("[Staking][Renounce] request renounce") {
     vm.startPrank(_candidateAdmin);
-    (bool success, ) = _staking.call(
-      abi.encodeWithSelector(ICandidateStaking.requestRenounce.selector, _consensusAddr)
-    );
+    (bool success,) = _staking.call(abi.encodeWithSelector(ICandidateStaking.requestRenounce.selector, _consensusAddr));
     assertTrue(success);
     vm.stopPrank();
 
     vm.warp(block.timestamp + IStaking(_staking).waitingSecsToRevoke());
     _fastForwardToNextDay();
     _wrapUpEpoch();
-    (, bytes memory returndata) = _validatorSet.staticcall(
-      abi.encodeWithSelector(ICandidateManager.isValidatorCandidate.selector, _consensusAddr)
-    );
+    (, bytes memory returndata) =
+      _validatorSet.staticcall(abi.encodeWithSelector(ICandidateManager.isValidatorCandidate.selector, _consensusAddr));
     assertFalse(abi.decode(returndata, (bool)));
   }
 }

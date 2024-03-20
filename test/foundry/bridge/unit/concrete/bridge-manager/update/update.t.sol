@@ -30,9 +30,7 @@ contract Update_Unit_Concrete_Test is BridgeManager_Unit_Concrete_Test {
     // Run the test.
     vm.expectRevert(
       abi.encodeWithSelector(
-        ErrUnauthorized.selector,
-        IBridgeManager.updateBridgeOperator.selector,
-        RoleAccess.GOVERNOR
+        ErrUnauthorized.selector, IBridgeManager.updateBridgeOperator.selector, RoleAccess.GOVERNOR
       )
     );
     _bridgeManager.updateBridgeOperator(newOperator);
@@ -74,11 +72,8 @@ contract Update_Unit_Concrete_Test is BridgeManager_Unit_Concrete_Test {
 
   function test_UpdateOperators_NewOperatorIsValid() external {
     // Get before test state.
-    (
-      address[] memory beforeBridgeOperators,
-      address[] memory beforeGovernors,
-      uint96[] memory beforeVoteWeights
-    ) = _getBridgeMembers();
+    (address[] memory beforeBridgeOperators, address[] memory beforeGovernors, uint96[] memory beforeVoteWeights) =
+      _getBridgeMembers();
 
     // Prepare data.
     address prevOperator = unwrapAddress(_bridgeManager.getBridgeOperatorOf(wrapAddress(_caller)));
@@ -93,11 +88,8 @@ contract Update_Unit_Concrete_Test is BridgeManager_Unit_Concrete_Test {
     _bridgeManager.updateBridgeOperator(newOperator);
 
     // Get after test state
-    (
-      address[] memory afterBridgeOperators,
-      address[] memory afterGovernors,
-      uint96[] memory afterVoteWeights
-    ) = _getBridgeMembers();
+    (address[] memory afterBridgeOperators, address[] memory afterGovernors, uint96[] memory afterVoteWeights) =
+      _getBridgeMembers();
 
     // it should modify the current operators list
     beforeBridgeOperators[0] = newOperator;

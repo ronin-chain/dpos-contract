@@ -71,8 +71,10 @@ library Token {
    */
   function validate(Info memory _info) internal pure {
     if (
-      !((_info.erc == Standard.ERC20 && _info.quantity > 0 && _info.id == 0) ||
-        (_info.erc == Standard.ERC721 && _info.quantity == 0))
+      !(
+        (_info.erc == Standard.ERC20 && _info.quantity > 0 && _info.id == 0)
+          || (_info.erc == Standard.ERC721 && _info.quantity == 0)
+      )
     ) revert ErrInvalidInfo();
   }
 
@@ -91,8 +93,10 @@ library Token {
       _success = _success && (_data.length == 0 || abi.decode(_data, (bool)));
     } else if (_info.erc == Standard.ERC721) {
       // bytes4(keccak256("transferFrom(address,address,uint256)"))
-      (_success, ) = _token.call(abi.encodeWithSelector(0x23b872dd, _from, _to, _info.id));
-    } else revert ErrUnsupportedStandard();
+      (_success,) = _token.call(abi.encodeWithSelector(0x23b872dd, _from, _to, _info.id));
+    } else {
+      revert ErrUnsupportedStandard();
+    }
 
     if (!_success) revert ErrTokenCouldNotTransferFrom(_info, _from, _to, _token);
   }
@@ -101,7 +105,7 @@ library Token {
    * @dev Transfers ERC721 token and returns the result.
    */
   function tryTransferERC721(address _token, address _to, uint256 _id) internal returns (bool _success) {
-    (_success, ) = _token.call(abi.encodeWithSelector(IERC721.transferFrom.selector, address(this), _to, _id));
+    (_success,) = _token.call(abi.encodeWithSelector(IERC721.transferFrom.selector, address(this), _to, _id));
   }
 
   /**
@@ -122,7 +126,9 @@ library Token {
       _success = tryTransferERC20(_token, _to, _info.quantity);
     } else if (_info.erc == Standard.ERC721) {
       _success = tryTransferERC721(_token, _to, _info.id);
-    } else revert ErrUnsupportedStandard();
+    } else {
+      revert ErrUnsupportedStandard();
+    }
 
     if (!_success) revert ErrTokenCouldNotTransfer(_info, _to, _token);
   }
@@ -151,7 +157,7 @@ library Token {
 
       if (_balance < _info.quantity) {
         // bytes4(keccak256("mint(address,uint256)"))
-        (_success, ) = _token.call(abi.encodeWithSelector(0x40c10f19, address(this), _info.quantity - _balance));
+        (_success,) = _token.call(abi.encodeWithSelector(0x40c10f19, address(this), _info.quantity - _balance));
         if (!_success) revert ErrERC20MintingFailed();
       }
 
@@ -159,10 +165,12 @@ library Token {
     } else if (_info.erc == Token.Standard.ERC721) {
       if (!tryTransferERC721(_token, _to, _info.id)) {
         // bytes4(keccak256("mint(address,uint256)"))
-        (_success, ) = _token.call(abi.encodeWithSelector(0x40c10f19, _to, _info.id));
+        (_success,) = _token.call(abi.encodeWithSelector(0x40c10f19, _to, _info.id));
         if (!_success) revert ErrERC721MintingFailed();
       }
-    } else revert ErrUnsupportedStandard();
+    } else {
+      revert ErrUnsupportedStandard();
+    }
   }
 
   struct Owner {

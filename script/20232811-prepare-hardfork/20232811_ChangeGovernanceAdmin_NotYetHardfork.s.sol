@@ -9,8 +9,14 @@ import { TContract } from "foundry-deployment-kit/types/Types.sol";
 import { LibProxy } from "foundry-deployment-kit/libraries/LibProxy.sol";
 import { Proposal, RoninMigration } from "script/RoninMigration.s.sol";
 import { LibString, Contract } from "script/utils/Contract.sol";
-import { RoninGovernanceAdmin, HardForkRoninGovernanceAdminDeploy } from "script/contracts/HardForkRoninGovernanceAdminDeploy.s.sol";
-import { RoninTrustedOrganization, TemporalRoninTrustedOrganizationDeploy } from "script/contracts/TemporalRoninTrustedOrganizationDeploy.s.sol";
+import {
+  RoninGovernanceAdmin,
+  HardForkRoninGovernanceAdminDeploy
+} from "script/contracts/HardForkRoninGovernanceAdminDeploy.s.sol";
+import {
+  RoninTrustedOrganization,
+  TemporalRoninTrustedOrganizationDeploy
+} from "script/contracts/TemporalRoninTrustedOrganizationDeploy.s.sol";
 import "./20232811_ChangeGovernanceAdmin_Common.s.sol";
 
 contract Migration__20232811_ChangeGovernanceAdmin_NotYetHardfork is Migration__20232811_ChangeGovernanceAdmin_Common {

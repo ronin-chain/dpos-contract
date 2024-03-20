@@ -24,7 +24,7 @@ abstract contract CandidateManagerCallback is ICandidateManagerCallback, Candida
     if (_isValidatorCandidateById(cid)) revert ErrExistentCandidate();
     if (commissionRate > _MAX_PERCENTAGE) revert ErrInvalidCommissionRate();
 
-    for (uint i; i < length; ) {
+    for (uint i; i < length;) {
       ValidatorCandidate storage existentInfo = _candidateInfo[_candidateIds[i]];
       if (candidateAdmin == existentInfo.__shadowedAdmin) revert ErrExistentCandidateAdmin(candidateAdmin);
       if (treasuryAddr == existentInfo.__shadowedTreasury) revert ErrExistentTreasury(treasuryAddr);
@@ -105,10 +105,7 @@ abstract contract CandidateManagerCallback is ICandidateManagerCallback, Candida
   /**
    * @inheritdoc ICandidateManagerCallback
    */
-  function execChangeTreasuryAddr(
-    address cid,
-    address payable newTreasury
-  ) external onlyContract(ContractType.PROFILE) {
+  function execChangeTreasuryAddr(address cid, address payable newTreasury) external onlyContract(ContractType.PROFILE) {
     _candidateInfo[cid].__shadowedTreasury = newTreasury;
   }
 }

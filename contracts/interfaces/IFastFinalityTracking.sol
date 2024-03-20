@@ -22,7 +22,6 @@ interface IFastFinalityTracking {
     TConsensus[] calldata addrs
   ) external view returns (uint256[] memory voteCounts);
 
-
   /**
    * @dev Returns vote count of `cids` in the `period`.
    */

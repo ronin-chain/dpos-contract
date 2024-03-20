@@ -56,19 +56,19 @@ contract StakingVesting is
   /**
    * @inheritdoc IStakingVesting
    */
-  function receiveRON() external payable {}
+  function receiveRON() external payable { }
 
   /**
    * @inheritdoc IStakingVesting
    */
-  function blockProducerBlockBonus(uint256 /* _block */) public view override returns (uint256) {
+  function blockProducerBlockBonus(uint256 /* _block */ ) public view override returns (uint256) {
     return _blockProducerBonusPerBlock;
   }
 
   /**
    * @inheritdoc IStakingVesting
    */
-  function bridgeOperatorBlockBonus(uint256 /* _block */) public view override returns (uint256) {
+  function bridgeOperatorBlockBonus(uint256 /* _block */ ) public view override returns (uint256) {
     return _bridgeOperatorBonusPerBlock;
   }
 
@@ -115,11 +115,7 @@ contract StakingVesting is
 
       if (!success) {
         emit BonusTransferFailed(
-          block.number,
-          validatorContractAddr,
-          blockProducerBonus,
-          bridgeOperatorBonus,
-          address(this).balance
+          block.number, validatorContractAddr, blockProducerBonus, bridgeOperatorBonus, address(this).balance
         );
         return (success, 0, 0, 0);
       }

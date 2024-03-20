@@ -29,13 +29,9 @@ abstract contract PCUSortValidators is PrecompiledUsage {
     assembly {
       let _payloadStart := add(_payload, 0x20)
 
-      if iszero(staticcall(gas(), _smc, _payloadStart, _payloadLength, _result, _resultLength)) {
-        _success := 0
-      }
+      if iszero(staticcall(gas(), _smc, _payloadStart, _payloadLength, _result, _resultLength)) { _success := 0 }
 
-      if iszero(returndatasize()) {
-        _success := 0
-      }
+      if iszero(returndatasize()) { _success := 0 }
 
       _result := add(_result, 0x20)
     }

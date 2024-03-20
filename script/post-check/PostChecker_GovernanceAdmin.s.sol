@@ -68,7 +68,7 @@ abstract contract PostChecker_GovernanceAdmin is BaseMigration, PostChecker_Help
           console.log("Target Proxy to test upgrade with proposal", vm.getLabel(addrs[i]));
           _proxyTargets.push(addrs[i]);
         }
-      } catch {}
+      } catch { }
     }
 
     address[] memory targets = _proxyTargets;
@@ -85,10 +85,7 @@ abstract contract PostChecker_GovernanceAdmin is BaseMigration, PostChecker_Help
     logPostCheck("[GovernanceAdmin] change admin all contracts")
   {
     __newGovernanceAdmin = new RoninGovernanceAdmin(
-      block.chainid,
-      __trustedOrg,
-      CONFIG.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key()),
-      14 days
+      block.chainid, __trustedOrg, CONFIG.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key()), 14 days
     );
 
     // Get all contracts deployed from the current network
@@ -115,15 +112,14 @@ abstract contract PostChecker_GovernanceAdmin is BaseMigration, PostChecker_Help
         _proxyTargets.push(addrs[i]);
 
         // Change default admin role if it exist in the proxy
-        (bool success, bytes memory returnData) = addrs[i].call(
-          abi.encodeCall(AccessControl.hasRole, (DEFAULT_ADMIN_ROLE, __governanceAdmin))
-        );
+        (bool success, bytes memory returnData) =
+          addrs[i].call(abi.encodeCall(AccessControl.hasRole, (DEFAULT_ADMIN_ROLE, __governanceAdmin)));
 
         if (success && abi.decode(returnData, (bool))) {
           console.log("Target Proxy to change default admin role:", vm.getLabel(addrs[i]));
           _proxyACTargets.push(addrs[i]);
         }
-      } catch {}
+      } catch { }
     }
 
     {
@@ -135,10 +131,8 @@ abstract contract PostChecker_GovernanceAdmin is BaseMigration, PostChecker_Help
       // Build `changeAdmin` calldata to migrate to new Ronin Governance Admin
       for (uint256 i; i < _proxyTargets.length; ++i) {
         targets[i] = _proxyTargets[i];
-        callDatas[i] = abi.encodeWithSelector(
-          TransparentUpgradeableProxy.changeAdmin.selector,
-          address(__newGovernanceAdmin)
-        );
+        callDatas[i] =
+          abi.encodeWithSelector(TransparentUpgradeableProxy.changeAdmin.selector, address(__newGovernanceAdmin));
       }
 
       for (uint i; i < _proxyACTargets.length; ++i) {
@@ -147,19 +141,11 @@ abstract contract PostChecker_GovernanceAdmin is BaseMigration, PostChecker_Help
         callDatas[j] = abi.encodeCall(AccessControl.grantRole, (DEFAULT_ADMIN_ROLE, address(__newGovernanceAdmin)));
 
         targets[j + 1] = _proxyACTargets[i];
-        callDatas[j + 1] = abi.encodeCall(
-          AccessControl.renounceRole,
-          (DEFAULT_ADMIN_ROLE, address(__governanceAdmin))
-        );
+        callDatas[j + 1] = abi.encodeCall(AccessControl.renounceRole, (DEFAULT_ADMIN_ROLE, address(__governanceAdmin)));
       }
 
-      Proposal.ProposalDetail memory proposal = _buildProposal(
-        RoninGovernanceAdmin(__governanceAdmin),
-        block.timestamp + 5 minutes,
-        targets,
-        values,
-        callDatas
-      );
+      Proposal.ProposalDetail memory proposal =
+        _buildProposal(RoninGovernanceAdmin(__governanceAdmin), block.timestamp + 5 minutes, targets, values, callDatas);
 
       // // Execute the proposal
       _executeProposal(RoninGovernanceAdmin(__governanceAdmin), RoninTrustedOrganization(__trustedOrg), proposal);
@@ -171,7 +157,7 @@ abstract contract PostChecker_GovernanceAdmin is BaseMigration, PostChecker_Help
     CONFIG.setAddress(network(), Contract.RoninGovernanceAdmin.key(), address(__newGovernanceAdmin));
   }
 
-  function getProxyAdmin(address payable proxy) external returns (address payable proxyAdmin) {
+  function getProxyAdmin(address payable proxy) external view returns (address payable proxyAdmin) {
     return proxy.getProxyAdmin();
   }
 
@@ -188,6 +174,4 @@ abstract contract PostChecker_GovernanceAdmin is BaseMigration, PostChecker_Help
     uint256[] memory values,
     bytes[] memory callDatas
   ) internal virtual returns (Proposal.ProposalDetail memory proposal);
-
-  function _setDisableLogProposalStatus(bool flag) internal virtual;
 }
