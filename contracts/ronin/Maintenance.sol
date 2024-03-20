@@ -152,9 +152,7 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
     address candidateId = __css2cid(consensusAddr);
 
     if (!validatorContract.isBlockProducerById(candidateId)) revert ErrUnauthorized(msg.sig, RoleAccess.BLOCK_PRODUCER);
-    if (!validatorContract.isCandidateAdminById(candidateId, msg.sender)) {
-      revert ErrUnauthorized(msg.sig, RoleAccess.CANDIDATE_ADMIN);
-    }
+    _requireCandidateAdmin(candidateId);
     if (_checkScheduledById(candidateId)) revert ErrAlreadyScheduled();
     if (!_checkCooldownEndedById(candidateId)) revert ErrCooldownTimeNotYetEnded();
     if (totalSchedule() >= _maxSchedule) revert ErrTotalOfSchedulesExceeded();
@@ -187,9 +185,7 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
   function cancelSchedule(TConsensus consensusAddr) external override {
     address candidateId = __css2cid(consensusAddr);
 
-    if (!IRoninValidatorSet(getContract(ContractType.VALIDATOR)).isCandidateAdminById(candidateId, msg.sender)) {
-      revert ErrUnauthorized(msg.sig, RoleAccess.CANDIDATE_ADMIN);
-    }
+    _requireCandidateAdmin(candidateId);
 
     if (!_checkScheduledById(candidateId)) revert ErrUnexistedSchedule();
     if (_checkMaintainedById(candidateId, block.number)) revert ErrAlreadyOnMaintenance();
@@ -209,9 +205,7 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
   function exitMaintenance(TConsensus consensusAddr) external {
     address candidateId = __css2cid(consensusAddr);
 
-    if (!IRoninValidatorSet(getContract(ContractType.VALIDATOR)).isCandidateAdminById(candidateId, msg.sender)) {
-      revert ErrUnauthorized(msg.sig, RoleAccess.CANDIDATE_ADMIN);
-    }
+    _requireCandidateAdmin(candidateId);
 
     if (!_checkMaintainedById(candidateId, block.number)) revert ErrNotOnMaintenance();
 
@@ -416,6 +410,15 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
   ) private view returns (bool) {
     Schedule storage s = _schedule[candidateId];
     return Math.twoRangeOverlap(fromBlock, toBlock, s.from, s.to);
+  }
+
+  /**
+   * @dev Checks if the caller is a candidate admin for the given candidate ID.
+   */
+  function _requireCandidateAdmin(address candidateId) internal view {
+    if (!IRoninValidatorSet(getContract(ContractType.VALIDATOR)).isCandidateAdminById(candidateId, msg.sender)) {
+      revert ErrUnauthorized(msg.sig, RoleAccess.CANDIDATE_ADMIN);
+    }
   }
 
   function __css2cid(TConsensus consensusAddr) internal view returns (address) {
