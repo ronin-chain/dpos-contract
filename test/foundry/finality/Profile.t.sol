@@ -20,11 +20,7 @@ contract Profile_Unit_Test is Base_Test {
     _validatorSetContract = new MockValidatorSet();
 
     MockProfile _profileLogic = new MockProfile();
-    _profile = MockProfile(
-      address(
-        new TransparentUpgradeableProxyV2(address(_profileLogic), address(1), "")
-      )
-    );
+    _profile = MockProfile(address(new TransparentUpgradeableProxyV2(address(_profileLogic), address(1), "")));
     _profile.initialize(address(_validatorSetContract));
     _profile.initializeV2(_stakingContract, address(0));
     _profile.initializeV3(10);
@@ -32,17 +28,22 @@ contract Profile_Unit_Test is Base_Test {
     vm.startPrank(address(1));
 
     TransparentUpgradeableProxyV2 _proxy = TransparentUpgradeableProxyV2(payable(address(_profile)));
-    _proxy.functionDelegateCall(abi.encodeWithSelector(MockProfile.addNewProfile.selector, IProfile.CandidateProfile({
-      id: address(0x20000),
-      consensus: TConsensus.wrap(address(0x20000)),
-      admin: _validatorAdmin,
-      treasury: payable(address(0x20000)),
-      __reservedGovernor: address(0),
-      pubkey: '',
-      profileLastChange: 0,
-      oldPubkey: '',
-      oldConsensus: TConsensus.wrap(address(0))
-    })));
+    _proxy.functionDelegateCall(
+      abi.encodeWithSelector(
+        MockProfile.addNewProfile.selector,
+        IProfile.CandidateProfile({
+          id: address(0x20000),
+          consensus: TConsensus.wrap(address(0x20000)),
+          admin: _validatorAdmin,
+          treasury: payable(address(0x20000)),
+          __reservedGovernor: address(0),
+          pubkey: "",
+          profileLastChange: 0,
+          oldPubkey: "",
+          oldConsensus: TConsensus.wrap(address(0))
+        })
+      )
+    );
 
     vm.stopPrank();
   }
@@ -55,14 +56,14 @@ contract Profile_Unit_Test is Base_Test {
     vm.startPrank(_validatorAdmin);
     vm.warp(block.timestamp + 11);
 
-    vm.expectRevert(abi.encodeWithSelector(IProfile.ErrInvalidProofOfPossession.selector, '0xaa', ''));
-    _profile.changePubkey(address(0x20000), '0xaa', '');
+    vm.expectRevert(abi.encodeWithSelector(IProfile.ErrInvalidProofOfPossession.selector, "0xaa", ""));
+    _profile.changePubkey(address(0x20000), "0xaa", "");
 
     _profile.setVerificationFailed(false);
 
-    _profile.changePubkey(address(0x20000), '0xbb', '');
+    _profile.changePubkey(address(0x20000), "0xbb", "");
     _validatorProfile = _profile.getId2Profile(address(0x20000));
-    assertEq(_validatorProfile.pubkey, '0xbb');
+    assertEq(_validatorProfile.pubkey, "0xbb");
 
     vm.stopPrank();
   }
@@ -71,13 +72,13 @@ contract Profile_Unit_Test is Base_Test {
     _profile.setVerificationFailed(true);
 
     vm.startPrank(_stakingContract);
-    vm.expectRevert(abi.encodeWithSelector(IProfile.ErrInvalidProofOfPossession.selector, '0xcc', ''));
+    vm.expectRevert(abi.encodeWithSelector(IProfile.ErrInvalidProofOfPossession.selector, "0xcc", ""));
     _profile.execApplyValidatorCandidate({
       admin: address(0x30000),
       id: address(0x30001),
       treasury: address(0x30000),
-      pubkey: '0xcc',
-      proofOfPossession: ''
+      pubkey: "0xcc",
+      proofOfPossession: ""
     });
 
     _profile.setVerificationFailed(false);
@@ -85,8 +86,8 @@ contract Profile_Unit_Test is Base_Test {
       admin: address(0x30000),
       id: address(0x30001),
       treasury: address(0x30000),
-      pubkey: '0xcc',
-      proofOfPossession: ''
+      pubkey: "0xcc",
+      proofOfPossession: ""
     });
 
     vm.stopPrank();
@@ -96,17 +97,17 @@ contract Profile_Unit_Test is Base_Test {
     vm.startPrank(_validatorAdmin);
     vm.warp(block.timestamp + 11);
 
-    _profile.changePubkey(address(0x20000), '0xaa', '');
+    _profile.changePubkey(address(0x20000), "0xaa", "");
 
     vm.expectRevert(IProfile.ErrProfileChangeCooldownNotEnded.selector);
-    _profile.changePubkey(address(0x20000), '0xbb', '');
+    _profile.changePubkey(address(0x20000), "0xbb", "");
 
     vm.warp(block.timestamp + 11);
-    _profile.changePubkey(address(0x20000), '0xbb', '');
+    _profile.changePubkey(address(0x20000), "0xbb", "");
 
     IProfile.CandidateProfile memory _validatorProfile = _profile.getId2Profile(address(0x20000));
-    assertEq(_validatorProfile.oldPubkey, '0xaa');
-    assertEq(_validatorProfile.pubkey, '0xbb');
+    assertEq(_validatorProfile.oldPubkey, "0xaa");
+    assertEq(_validatorProfile.pubkey, "0xbb");
 
     vm.stopPrank();
   }
@@ -119,31 +120,31 @@ contract Profile_Unit_Test is Base_Test {
       admin: address(0x30000),
       id: address(0x30001),
       treasury: address(0x30000),
-      pubkey: '0xbb',
-      proofOfPossession: ''
+      pubkey: "0xbb",
+      proofOfPossession: ""
     });
 
     _profile.execApplyValidatorCandidate({
       admin: address(0x40000),
       id: address(0x40001),
       treasury: address(0x40000),
-      pubkey: '0xcc',
-      proofOfPossession: ''
+      pubkey: "0xcc",
+      proofOfPossession: ""
     });
 
     bytes[][2] memory listOfPublicKey;
     listOfPublicKey[0] = new bytes[](1);
-    listOfPublicKey[0][0] = '0xbb';
+    listOfPublicKey[0][0] = "0xbb";
 
     assertEq(_profile.arePublicKeysRegistered(listOfPublicKey), true);
 
     listOfPublicKey[1] = new bytes[](1);
-    listOfPublicKey[1][0] = '0xcc';
+    listOfPublicKey[1][0] = "0xcc";
     assertEq(_profile.arePublicKeysRegistered(listOfPublicKey), true);
 
     bytes[][2] memory listOfPublicKey2;
     listOfPublicKey2[0] = new bytes[](1);
-    listOfPublicKey2[0][0] = '0xaa';
+    listOfPublicKey2[0][0] = "0xaa";
     assertEq(_profile.arePublicKeysRegistered(listOfPublicKey2), false);
 
     vm.stopPrank();

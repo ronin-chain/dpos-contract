@@ -36,8 +36,8 @@ contract SlashIndicator is
     address __maintenanceContract,
     address __roninTrustedOrganizationContract,
     address __roninGovernanceAdminContract,
-    uint256[4] calldata /* _bridgeOperatorSlashingConfigs */,
-    uint256[2] calldata /* _bridgeVotingSlashingConfigs */,
+    uint256[4] calldata, /* _bridgeOperatorSlashingConfigs */
+    uint256[2] calldata, /* _bridgeVotingSlashingConfigs */
     // _doubleSignSlashingConfigs[0]: _slashDoubleSignAmount
     // _doubleSignSlashingConfigs[1]: _doubleSigningJailUntilBlock
     // _doubleSignSlashingConfigs[2]: _doubleSigningOffsetLimitBlock
@@ -59,9 +59,7 @@ contract SlashIndicator is
     _setContract(ContractType.RONIN_TRUSTED_ORGANIZATION, __roninTrustedOrganizationContract);
 
     _setDoubleSignSlashingConfigs(
-      _doubleSignSlashingConfigs[0],
-      _doubleSignSlashingConfigs[1],
-      _doubleSignSlashingConfigs[2]
+      _doubleSignSlashingConfigs[0], _doubleSignSlashingConfigs[1], _doubleSignSlashingConfigs[2]
     );
     _setUnavailabilitySlashingConfigs(
       _unavailabilitySlashingConfigs[0],
@@ -70,10 +68,7 @@ contract SlashIndicator is
       _unavailabilitySlashingConfigs[3]
     );
     _setCreditScoreConfigs(
-      _creditScoreConfigs[0],
-      _creditScoreConfigs[1],
-      _creditScoreConfigs[2],
-      _creditScoreConfigs[3]
+      _creditScoreConfigs[0], _creditScoreConfigs[1], _creditScoreConfigs[2], _creditScoreConfigs[3]
     );
   }
 
@@ -130,24 +125,24 @@ contract SlashIndicator is
     address validatorId
   ) internal view override(SlashDoubleSign, SlashUnavailability) returns (bool) {
     return
-      // The slasher must not be identical with the slashee
-      (msg.sender != TConsensus.unwrap(consensus)) &&
-      (msg.sender != validatorId) &&
-      // The slashee must still be block producer at the time of being slashed
-      IRoninValidatorSet(getContract(ContractType.VALIDATOR)).isBlockProducerById(validatorId) &&
-      // The slashee must not on maintenance
-      !IMaintenance(getContract(ContractType.MAINTENANCE)).checkMaintainedById(validatorId, block.number);
+    // The slasher must not be identical with the slashee
+    (msg.sender != TConsensus.unwrap(consensus)) && (msg.sender != validatorId)
+    // The slashee must still be block producer at the time of being slashed
+    && IRoninValidatorSet(getContract(ContractType.VALIDATOR)).isBlockProducerById(validatorId)
+    // The slashee must not on maintenance
+    && !IMaintenance(getContract(ContractType.MAINTENANCE)).checkMaintainedById(validatorId, block.number);
   }
 
-  function __css2cid(
-    TConsensus consensusAddr
-  ) internal view override(CreditScore, SlashUnavailability, SlashFastFinality) returns (address) {
+  function __css2cid(TConsensus consensusAddr)
+    internal
+    view
+    override(CreditScore, SlashUnavailability, SlashFastFinality)
+    returns (address)
+  {
     return IProfile(getContract(ContractType.PROFILE)).getConsensus2Id(consensusAddr);
   }
 
-  function __tryCss2cid(
-    TConsensus consensusAddr
-  ) internal view override(SlashDoubleSign) returns (bool, address) {
+  function __tryCss2cid(TConsensus consensusAddr) internal view override(SlashDoubleSign) returns (bool, address) {
     return IProfile(getContract(ContractType.PROFILE)).tryGetConsensus2Id(consensusAddr);
   }
 

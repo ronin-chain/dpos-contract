@@ -35,14 +35,16 @@ abstract contract CommonGovernanceProposal is CoreGovernance {
     address _signer;
     Signature calldata _sig;
     bool _hasValidVotes;
-    for (uint256 _i; _i < _signatures.length; ) {
+    for (uint256 _i; _i < _signatures.length;) {
       _sig = _signatures[_i];
 
       if (_supports[_i] == Ballot.VoteType.For) {
         _signer = ECDSA.recover(_forDigest, _sig.v, _sig.r, _sig.s);
       } else if (_supports[_i] == Ballot.VoteType.Against) {
         _signer = ECDSA.recover(_againstDigest, _sig.v, _sig.r, _sig.s);
-      } else revert ErrUnsupportedVoteType(msg.sig);
+      } else {
+        revert ErrUnsupportedVoteType(msg.sig);
+      }
 
       if (_lastSigner >= _signer) revert ErrInvalidOrder(msg.sig);
       _lastSigner = _signer;
@@ -88,7 +90,7 @@ abstract contract CommonGovernanceProposal is CoreGovernance {
     _supports = new Ballot.VoteType[](_voterLength);
     _signatures = new Signature[](_voterLength);
     _voters = new address[](_voterLength);
-    for (uint256 _i; _i < _forLength; ) {
+    for (uint256 _i; _i < _forLength;) {
       _supports[_i] = Ballot.VoteType.For;
       _signatures[_i] = vote[_chainId][_round].sig[_vote.forVoteds[_i]];
       _voters[_i] = _vote.forVoteds[_i];
@@ -97,7 +99,7 @@ abstract contract CommonGovernanceProposal is CoreGovernance {
         ++_i;
       }
     }
-    for (uint256 _i; _i < _againstLength; ) {
+    for (uint256 _i; _i < _againstLength;) {
       _supports[_i + _forLength] = Ballot.VoteType.Against;
       _signatures[_i + _forLength] = vote[_chainId][_round].sig[_vote.againstVoteds[_i]];
       _voters[_i + _forLength] = _vote.againstVoteds[_i];

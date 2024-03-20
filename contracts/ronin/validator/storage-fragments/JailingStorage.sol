@@ -44,9 +44,12 @@ abstract contract JailingStorage is IJailingInfo {
   /**
    * @inheritdoc IJailingInfo
    */
-  function getJailedTimeLeft(
-    TConsensus consensus
-  ) external view override returns (bool isJailed_, uint256 blockLeft_, uint256 epochLeft_) {
+  function getJailedTimeLeft(TConsensus consensus)
+    external
+    view
+    override
+    returns (bool isJailed_, uint256 blockLeft_, uint256 epochLeft_)
+  {
     return _getJailedTimeLeftAtBlockById(__css2cid(consensus), block.number);
   }
 
@@ -87,7 +90,7 @@ abstract contract JailingStorage is IJailingInfo {
 
   function _checkManyJailedById(address[] memory candidateIds) internal view returns (bool[] memory result) {
     result = new bool[](candidateIds.length);
-    for (uint256 i; i < candidateIds.length; ) {
+    for (uint256 i; i < candidateIds.length;) {
       result[i] = _isJailedById(candidateIds[i]);
 
       unchecked {

@@ -47,7 +47,7 @@ abstract contract ValidatorInfoStorageV2 is IValidatorInfoV2, HasContracts, HasT
   function getValidatorIds() public view override returns (address[] memory cids) {
     cids = new address[](_validatorCount);
     address iValidator;
-    for (uint i; i < cids.length; ) {
+    for (uint i; i < cids.length;) {
       iValidator = _validatorIds[i];
       cids[i] = iValidator;
 
@@ -70,7 +70,7 @@ abstract contract ValidatorInfoStorageV2 is IValidatorInfoV2, HasContracts, HasT
   function getBlockProducerIds() public view override returns (address[] memory cids) {
     cids = new address[](_validatorCount);
     uint256 count = 0;
-    for (uint i; i < cids.length; ) {
+    for (uint i; i < cids.length;) {
       address validatorId = _validatorIds[i];
       if (_isBlockProducerById(validatorId)) {
         cids[count++] = validatorId;

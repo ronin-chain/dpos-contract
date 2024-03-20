@@ -14,6 +14,7 @@ contract MockPaymentFallback {
 
 contract MockPaymentFallbackExpensive {
   uint[] public array;
+
   event SafeReceived(address indexed sender, uint256 value);
 
   constructor() {
@@ -30,7 +31,7 @@ contract MockPaymentFallbackExpensive {
 contract MockTransfer is RONTransferHelper {
   uint256 public track;
 
-  constructor() payable {}
+  constructor() payable { }
 
   function fooTransfer(address payable _recipient, uint256 _amount, uint256 _gas) external {
     if (_unsafeSendRONLimitGas(_recipient, _amount, _gas)) {

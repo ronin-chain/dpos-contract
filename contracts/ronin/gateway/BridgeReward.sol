@@ -13,7 +13,12 @@ import { IBridgeReward } from "../../interfaces/bridge/IBridgeReward.sol";
 import { IBridgeSlash } from "../../interfaces/bridge/IBridgeSlash.sol";
 import { Math } from "../../libraries/Math.sol";
 import { TUint256Slot } from "../../types/Types.sol";
-import { ErrSyncTooFarPeriod, ErrInvalidArguments, ErrLengthMismatch, ErrUnauthorizedCall } from "../../utils/CommonErrors.sol";
+import {
+  ErrSyncTooFarPeriod,
+  ErrInvalidArguments,
+  ErrLengthMismatch,
+  ErrUnauthorizedCall
+} from "../../utils/CommonErrors.sol";
 
 contract BridgeReward is IBridgeReward, BridgeTrackingHelper, HasContracts, RONTransferHelper, Initializable {
   /// @dev value is equal to keccak256("@ronin.dpos.gateway.BridgeReward.rewardInfo.slot") - 1
@@ -90,7 +95,7 @@ contract BridgeReward is IBridgeReward, BridgeTrackingHelper, HasContracts, RONT
     address[] memory operators = IBridgeManager(getContract(ContractType.BRIDGE_MANAGER)).getBridgeOperators();
     IBridgeTracking bridgeTrackingContract = IBridgeTracking(getContract(ContractType.BRIDGE_TRACKING));
 
-    for (uint256 i = 1; i <= periodLength; ) {
+    for (uint256 i = 1; i <= periodLength;) {
       unchecked {
         _syncReward({
           operators: operators,
@@ -187,7 +192,7 @@ contract BridgeReward is IBridgeReward, BridgeTrackingHelper, HasContracts, RONT
     bool shouldSlash;
     uint256 sumRewards;
 
-    for (uint256 i; i < numBridgeOperators; ) {
+    for (uint256 i; i < numBridgeOperators;) {
       (reward, shouldSlash) = _calcRewardAndCheckSlashedStatus({
         shouldShareEqually: shouldShareEqually,
         numBridgeOperators: numBridgeOperators,

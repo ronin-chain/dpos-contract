@@ -44,17 +44,10 @@ abstract contract GlobalCoreGovernance is CoreGovernance {
     address creator
   ) internal virtual {
     uint256 round_ = _createVotingRound(0);
-    GlobalProposal.GlobalProposalDetail memory globalProposal = GlobalProposal.GlobalProposalDetail(
-      round_,
-      expiryTimestamp,
-      targetOptions,
-      values,
-      calldatas,
-      gasAmounts
-    );
-    Proposal.ProposalDetail memory proposal = globalProposal.intoProposalDetail(
-      _resolveTargets({ targetOptions: targetOptions, strict: true })
-    );
+    GlobalProposal.GlobalProposalDetail memory globalProposal =
+      GlobalProposal.GlobalProposalDetail(round_, expiryTimestamp, targetOptions, values, calldatas, gasAmounts);
+    Proposal.ProposalDetail memory proposal =
+      globalProposal.intoProposalDetail(_resolveTargets({ targetOptions: targetOptions, strict: true }));
     proposal.validate(_proposalExpiryDuration);
 
     bytes32 proposalHash = proposal.hash();
@@ -75,9 +68,8 @@ abstract contract GlobalCoreGovernance is CoreGovernance {
     GlobalProposal.GlobalProposalDetail memory globalProposal,
     address creator
   ) internal virtual returns (Proposal.ProposalDetail memory proposal) {
-    proposal = globalProposal.intoProposalDetail(
-      _resolveTargets({ targetOptions: globalProposal.targetOptions, strict: true })
-    );
+    proposal =
+      globalProposal.intoProposalDetail(_resolveTargets({ targetOptions: globalProposal.targetOptions, strict: true }));
     proposal.validate(_proposalExpiryDuration);
 
     bytes32 proposalHash = proposal.hash();
@@ -91,9 +83,11 @@ abstract contract GlobalCoreGovernance is CoreGovernance {
   /**
    * @dev Returns corresponding address of target options. Return address(0) on non-existent target.
    */
-  function resolveTargets(
-    GlobalProposal.TargetOption[] calldata targetOptions
-  ) external view returns (address[] memory targets) {
+  function resolveTargets(GlobalProposal.TargetOption[] calldata targetOptions)
+    external
+    view
+    returns (address[] memory targets)
+  {
     return _resolveTargets({ targetOptions: targetOptions, strict: false });
   }
 
@@ -108,7 +102,7 @@ abstract contract GlobalCoreGovernance is CoreGovernance {
   ) internal view returns (address[] memory targets) {
     targets = new address[](targetOptions.length);
 
-    for (uint256 i; i < targetOptions.length; ) {
+    for (uint256 i; i < targetOptions.length;) {
       targets[i] = _targetOptionsMap[targetOptions[i]];
       if (strict && targets[i] == address(0)) revert ErrInvalidArguments(msg.sig);
       unchecked {
@@ -122,7 +116,8 @@ abstract contract GlobalCoreGovernance is CoreGovernance {
    *
    * Requirement:
    * - Only allow self-call through proposal.
-   * */
+   *
+   */
   function updateManyTargetOption(
     GlobalProposal.TargetOption[] memory targetOptions,
     address[] memory targets
@@ -139,7 +134,7 @@ abstract contract GlobalCoreGovernance is CoreGovernance {
     GlobalProposal.TargetOption[] memory targetOptions,
     address[] memory targets
   ) internal {
-    for (uint256 i; i < targetOptions.length; ) {
+    for (uint256 i; i < targetOptions.length;) {
       if (targets[i] == address(this)) revert ErrInvalidArguments(msg.sig);
       _updateTargetOption(targetOptions[i], targets[i]);
       unchecked {

@@ -14,7 +14,12 @@ import "../../interfaces/slash-indicator/ISlashIndicator.sol";
 import "../../interfaces/validator/ICoinbaseExecution.sol";
 import "../../libraries/EnumFlags.sol";
 import "../../libraries/Math.sol";
-import { HasStakingVestingDeprecated, HasBridgeTrackingDeprecated, HasMaintenanceDeprecated, HasSlashIndicatorDeprecated } from "../../utils/DeprecatedSlots.sol";
+import {
+  HasStakingVestingDeprecated,
+  HasBridgeTrackingDeprecated,
+  HasMaintenanceDeprecated,
+  HasSlashIndicatorDeprecated
+} from "../../utils/DeprecatedSlots.sol";
 import "../../precompile-usages/PCUSortValidators.sol";
 import "../../precompile-usages/PCUPickValidatorSet.sol";
 import "./storage-fragments/CommonStorage.sol";
@@ -62,11 +67,10 @@ abstract contract CoinbaseExecution is
   function submitBlockReward() external payable override onlyCoinbase {
     address id = __css2cid(TConsensus.wrap(msg.sender));
 
-    bool requestForBlockProducer = _isBlockProducerById(id) &&
-      !_isJailedById(id) &&
-      !_miningRewardDeprecatedById(id, currentPeriod());
+    bool requestForBlockProducer =
+      _isBlockProducerById(id) && !_isJailedById(id) && !_miningRewardDeprecatedById(id, currentPeriod());
 
-    (, uint256 blockProducerBonus, , uint256 fastFinalityRewardPercentage) = IStakingVesting(
+    (, uint256 blockProducerBonus,, uint256 fastFinalityRewardPercentage) = IStakingVesting(
       getContract(ContractType.STAKING_VESTING)
     ).requestBonus({ forBlockProducer: requestForBlockProducer, forBridgeOperator: false });
 
@@ -89,8 +93,8 @@ abstract contract CoinbaseExecution is
     _totalFastFinalityReward += rewardFastFinality;
 
     if (_miningRewardBailoutCutOffAtPeriod[msg.sender][period]) {
-      (, , , uint256 cutOffPercentage) = ISlashIndicator(getContract(ContractType.SLASH_INDICATOR))
-        .getCreditScoreConfigs();
+      (,,, uint256 cutOffPercentage) =
+        ISlashIndicator(getContract(ContractType.SLASH_INDICATOR)).getCreditScoreConfigs();
       cutOffReward = (rewardProducingBlock * cutOffPercentage) / _MAX_PERCENTAGE;
       _totalDeprecatedReward += cutOffReward;
       emit BlockRewardDeprecated(id, cutOffReward, BlockRewardDeprecatedType.AFTER_BAILOUT);
@@ -120,10 +124,8 @@ abstract contract CoinbaseExecution is
     _syncFastFinalityReward(epoch, currValidatorIds);
 
     if (periodEnding) {
-      (
-        uint256 totalDelegatingReward,
-        uint256[] memory delegatingRewards
-      ) = _distributeRewardToTreasuriesAndCalculateTotalDelegatingReward(lastPeriod, currValidatorIds);
+      (uint256 totalDelegatingReward, uint256[] memory delegatingRewards) =
+        _distributeRewardToTreasuriesAndCalculateTotalDelegatingReward(lastPeriod, currValidatorIds);
       _settleAndTransferDelegatingRewards(lastPeriod, currValidatorIds, totalDelegatingReward, delegatingRewards);
       _tryRecycleLockedFundsFromEmergencyExits();
       _recycleDeprecatedRewards();
@@ -158,7 +160,7 @@ abstract contract CoinbaseExecution is
     uint256 totalReward = _totalFastFinalityReward;
     uint256 totalDispensedReward = 0;
 
-    for (uint i; i < validatorIds.length; ) {
+    for (uint i; i < validatorIds.length;) {
       iReward = (totalReward * voteCounts[i]) / divisor;
       _fastFinalityReward[validatorIds[i]] += iReward;
       totalDispensedReward += iReward;
@@ -188,7 +190,7 @@ abstract contract CoinbaseExecution is
     address payable treasury;
     delegatingRewards = new uint256[](currValidatorIds.length);
 
-    for (uint _i; _i < currValidatorIds.length; ) {
+    for (uint _i; _i < currValidatorIds.length;) {
       vId = currValidatorIds[_i];
       treasury = _candidateInfo[vId].__shadowedTreasury;
 
@@ -269,10 +271,7 @@ abstract contract CoinbaseExecution is
       }
 
       emit StakingRewardDistributionFailed(
-        totalDelegatingReward,
-        currValidatorIds,
-        delegatingRewards,
-        address(this).balance
+        totalDelegatingReward, currValidatorIds, delegatingRewards, address(this).balance
       );
     }
   }
@@ -291,9 +290,8 @@ abstract contract CoinbaseExecution is
 
       delete _totalDeprecatedReward;
 
-      (bool _success, ) = withdrawTarget.call{ value: withdrawAmount }(
-        abi.encodeWithSelector(IStakingVesting.receiveRON.selector)
-      );
+      (bool _success,) =
+        withdrawTarget.call{ value: withdrawAmount }(abi.encodeWithSelector(IStakingVesting.receiveRON.selector));
 
       if (_success) {
         emit DeprecatedRewardRecycled(withdrawTarget, withdrawAmount);
@@ -311,21 +309,17 @@ abstract contract CoinbaseExecution is
    * Note: This method should be called once in the end of each period.
    *
    */
-  function _syncValidatorSet(
-    uint256 newPeriod
-  ) private returns (address[] memory newValidatorIds, address[] memory unsatisfiedCandidates) {
+  function _syncValidatorSet(uint256 newPeriod)
+    private
+    returns (address[] memory newValidatorIds, address[] memory unsatisfiedCandidates)
+  {
     unsatisfiedCandidates = _syncCandidateSet(newPeriod);
     uint256[] memory weights = IStaking(getContract(ContractType.STAKING)).getManyStakingTotalsById(_candidateIds);
     uint256[] memory trustedWeights = IRoninTrustedOrganization(getContract(ContractType.RONIN_TRUSTED_ORGANIZATION))
       .getConsensusWeightsById(_candidateIds);
     uint256 newValidatorCount;
-    (newValidatorIds, newValidatorCount) = _pcPickValidatorSet(
-      _candidateIds,
-      weights,
-      trustedWeights,
-      _maxValidatorNumber,
-      _maxPrioritizedValidatorNumber
-    );
+    (newValidatorIds, newValidatorCount) =
+      _pcPickValidatorSet(_candidateIds, weights, trustedWeights, _maxValidatorNumber, _maxPrioritizedValidatorNumber);
     _setNewValidatorSet(newValidatorIds, newValidatorCount, newPeriod);
   }
 
@@ -337,13 +331,9 @@ abstract contract CoinbaseExecution is
    * Note: This method should be called once in the end of each period.
    *
    */
-  function _setNewValidatorSet(
-    address[] memory _newValidators,
-    uint256 _newValidatorCount,
-    uint256 _newPeriod
-  ) private {
+  function _setNewValidatorSet(address[] memory _newValidators, uint256 _newValidatorCount, uint256 _newPeriod) private {
     // Remove exceeding validators in the current set
-    for (uint256 _i = _newValidatorCount; _i < _validatorCount; ) {
+    for (uint256 _i = _newValidatorCount; _i < _validatorCount;) {
       delete _validatorMap[_validatorIds[_i]];
       delete _validatorIds[_i];
 
@@ -353,7 +343,7 @@ abstract contract CoinbaseExecution is
     }
 
     // Remove flag for all validator in the current set
-    for (uint _i; _i < _newValidatorCount; ) {
+    for (uint _i; _i < _newValidatorCount;) {
       delete _validatorMap[_validatorIds[_i]];
 
       unchecked {
@@ -362,7 +352,7 @@ abstract contract CoinbaseExecution is
     }
 
     // Update new validator set and set flag correspondingly.
-    for (uint256 _i; _i < _newValidatorCount; ) {
+    for (uint256 _i; _i < _newValidatorCount;) {
       address _newValidator = _newValidators[_i];
       _validatorMap[_newValidator] = EnumFlags.ValidatorFlag.Both;
       _validatorIds[_i] = _newValidator;
@@ -387,18 +377,15 @@ abstract contract CoinbaseExecution is
    *
    */
   function _revampRoles(uint256 _newPeriod, uint256 _nextEpoch, address[] memory currValidatorIds) private {
-    bool[] memory _maintainedList = IMaintenance(getContract(ContractType.MAINTENANCE)).checkManyMaintainedById(
-      currValidatorIds,
-      block.number + 1
-    );
+    bool[] memory _maintainedList =
+      IMaintenance(getContract(ContractType.MAINTENANCE)).checkManyMaintainedById(currValidatorIds, block.number + 1);
 
-    for (uint _i; _i < currValidatorIds.length; ) {
+    for (uint _i; _i < currValidatorIds.length;) {
       address validatorId = currValidatorIds[_i];
       bool emergencyExitRequested = block.timestamp <= _emergencyExitJailedTimestamp[validatorId];
       bool isProducerBefore = _isBlockProducerById(validatorId);
-      bool isProducerAfter = !(_isJailedAtBlockById(validatorId, block.number + 1) ||
-        _maintainedList[_i] ||
-        emergencyExitRequested);
+      bool isProducerAfter =
+        !(_isJailedAtBlockById(validatorId, block.number + 1) || _maintainedList[_i] || emergencyExitRequested);
 
       if (!isProducerBefore && isProducerAfter) {
         _validatorMap[validatorId] = _validatorMap[validatorId].addFlag(EnumFlags.ValidatorFlag.BlockProducer);
@@ -417,9 +404,8 @@ abstract contract CoinbaseExecution is
    * @dev Override `CandidateManager-_isTrustedOrg`.
    */
   function _isTrustedOrg(address validatorId) internal view override returns (bool) {
-    return
-      IRoninTrustedOrganization(getContract(ContractType.RONIN_TRUSTED_ORGANIZATION)).getConsensusWeightById(
-        validatorId
-      ) > 0;
+    return IRoninTrustedOrganization(getContract(ContractType.RONIN_TRUSTED_ORGANIZATION)).getConsensusWeightById(
+      validatorId
+    ) > 0;
   }
 }

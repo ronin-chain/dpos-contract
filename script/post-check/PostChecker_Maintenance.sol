@@ -63,8 +63,8 @@ abstract contract PostChecker_Maintenance is BaseMigration, PostChecker_Helper {
     uint256 numberOfBlocksInEpoch = RoninValidatorSet(_validatorSet).numberOfBlocksInEpoch();
     uint256 minDuration = IMaintenance(_maintenance).minMaintenanceDurationInBlock();
 
-    uint256 startBlock = latestEpochBlock + numberOfBlocksInEpoch + 1 + minOffset;
-    uint256 endBlock = latestEpochBlock + numberOfBlocksInEpoch + minOffset
+    uint startBlock = latestEpochBlock + numberOfBlocksInEpoch + 1 + minOffset;
+    uint endBlock = latestEpochBlock + numberOfBlocksInEpoch + minOffset
       + numberOfBlocksInEpoch * (minDuration / numberOfBlocksInEpoch + 1);
     (bool success,) =
       _maintenance.call(abi.encodeWithSelector(IMaintenance.schedule.selector, _consensusAddr, startBlock, endBlock));

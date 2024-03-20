@@ -6,17 +6,10 @@ interface IEmergencyExit {
   /// @dev Emitted when the fund is locked from an emergency exit request
   event EmergencyExitRequested(address indexed cid, uint256 lockedAmount);
   /// @dev Emitted when the fund that locked from an emergency exit request is transferred to the recipient.
-  event EmergencyExitLockedFundReleased(
-    address indexed cid,
-    address indexed recipient,
-    uint256 unlockedAmount
-  );
+  event EmergencyExitLockedFundReleased(address indexed cid, address indexed recipient, uint256 unlockedAmount);
   /// @dev Emitted when the fund that locked from an emergency exit request is failed to transferred back.
   event EmergencyExitLockedFundReleasingFailed(
-    address indexed cid,
-    address indexed recipient,
-    uint256 unlockedAmount,
-    uint256 contractBalance
+    address indexed cid, address indexed recipient, uint256 unlockedAmount, uint256 contractBalance
   );
 
   /// @dev Emitted when the emergency exit locked amount is updated.

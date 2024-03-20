@@ -1,10 +1,23 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import { ILogicValidatorSet, MockLogicValidatorSetV1, MockLogicValidatorSetV2 } from "@ronin/contracts/mocks/utils/version-control/MockLogicValidatorSet.sol";
+import {
+  ILogicValidatorSet,
+  MockLogicValidatorSetV1,
+  MockLogicValidatorSetV2
+} from "@ronin/contracts/mocks/utils/version-control/MockLogicValidatorSet.sol";
 import { NotifiedMigrator } from "@ronin/contracts/ronin/validator/migrations/NotifiedMigrator.sol";
-import { RoninValidatorSetTimedMigrator } from "@ronin/contracts/ronin/validator/migrations/RoninValidatorSetTimedMigrator.sol";
-import { MockActor, MockLogicV1, MockLogicV2, IConditionalImplementControl, AddressArrayUtils, ConditionalImplementControlTest, TransparentUpgradeableProxyV2 } from "./ConditionalVersionControl.t.sol";
+import { RoninValidatorSetTimedMigrator } from
+  "@ronin/contracts/ronin/validator/migrations/RoninValidatorSetTimedMigrator.sol";
+import {
+  MockActor,
+  MockLogicV1,
+  MockLogicV2,
+  IConditionalImplementControl,
+  AddressArrayUtils,
+  ConditionalImplementControlTest,
+  TransparentUpgradeableProxyV2
+} from "./ConditionalVersionControl.t.sol";
 import { IHasContracts } from "@ronin/contracts/interfaces/collections/IHasContracts.sol";
 import { ContractType } from "@ronin/contracts/utils/ContractType.sol";
 
@@ -36,18 +49,16 @@ contract RoninValidatorSetTimedMigratorTest is ConditionalImplementControlTest {
     address slashIndicatorLogicV1 = address(new MockLogicV1());
     address slashIndicatorLogicV2 = address(new MockLogicV2());
     _slashIndicatorProxy = address(new TransparentUpgradeableProxyV2(slashIndicatorLogicV1, _proxyAdmin, ""));
-    address slashIndicatorSwitcher = address(
-      new NotifiedMigrator(_slashIndicatorProxy, slashIndicatorLogicV1, slashIndicatorLogicV2, _proxy)
-    );
+    address slashIndicatorSwitcher =
+      address(new NotifiedMigrator(_slashIndicatorProxy, slashIndicatorLogicV1, slashIndicatorLogicV2, _proxy));
     vm.prank(_proxyAdmin, _proxyAdmin);
     TransparentUpgradeableProxyV2(payable(_slashIndicatorProxy)).upgradeTo(slashIndicatorSwitcher);
 
     address roninTrustedOrgLogicV1 = address(new MockLogicV1());
     address roninTrustedOrgLogicV2 = address(new MockLogicV2());
     _roninTrustedOrgProxy = address(new TransparentUpgradeableProxyV2(roninTrustedOrgLogicV1, _proxyAdmin, ""));
-    address roninTrustedOrgSwitcher = address(
-      new NotifiedMigrator(_roninTrustedOrgProxy, roninTrustedOrgLogicV1, roninTrustedOrgLogicV2, _proxy)
-    );
+    address roninTrustedOrgSwitcher =
+      address(new NotifiedMigrator(_roninTrustedOrgProxy, roninTrustedOrgLogicV1, roninTrustedOrgLogicV2, _proxy));
 
     vm.prank(_proxyAdmin, _proxyAdmin);
     TransparentUpgradeableProxyV2(payable(_roninTrustedOrgProxy)).upgradeTo(roninTrustedOrgSwitcher);
@@ -114,7 +125,7 @@ contract RoninValidatorSetTimedMigratorTest is ConditionalImplementControlTest {
     vm.expectEmit(_proxy);
     emit Received(ILogicValidatorSet(_oldImpl).version());
     vm.prank(user);
-    (bool ok, ) = _proxy.call{ value: amount }("");
+    (bool ok,) = _proxy.call{ value: amount }("");
     assertEq(ok, true);
     assertEq(amount, _proxy.balance);
   }
@@ -136,7 +147,7 @@ contract RoninValidatorSetTimedMigratorTest is ConditionalImplementControlTest {
     vm.expectEmit(_proxy);
     emit Received(ILogicValidatorSet(_newImpl).version());
     vm.prank(user);
-    (bool ok, ) = _proxy.call{ value: amount }("");
+    (bool ok,) = _proxy.call{ value: amount }("");
     assertEq(ok, true);
     assertEq(amount, _proxy.balance);
   }

@@ -13,7 +13,10 @@ import { RoninTrustedOrganization } from "@ronin/contracts/multi-chains/RoninTru
 import { BridgeReward } from "@ronin/contracts/ronin/gateway/BridgeReward.sol";
 import { TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
 
-import { IRoninTrustedOrganization, RoninTrustedOrganization } from "@ronin/contracts/multi-chains/RoninTrustedOrganization.sol";
+import {
+  IRoninTrustedOrganization,
+  RoninTrustedOrganization
+} from "@ronin/contracts/multi-chains/RoninTrustedOrganization.sol";
 
 contract Simulation__20231019_RecoverFund is RoninMigration {
   BridgeReward public constant DEPRECATED_BRIDGE_REWARD = BridgeReward(0x1C952D6717eBFd2E92E5f43Ef7C1c3f7677F007D);
@@ -31,8 +34,10 @@ contract Simulation__20231019_RecoverFund is RoninMigration {
 
     address deployer = 0xFE490b68E64B190B415Bb92F8D2F7566243E6ea0; // Mainnet Shadow deployer address
 
-    RoninGovernanceAdmin roninGovernanceAdmin = RoninGovernanceAdmin(config.getAddressFromCurrentNetwork(Contract.RoninGovernanceAdmin.key()));
-    RoninTrustedOrganization trustedOrgContract = RoninTrustedOrganization(config.getAddressFromCurrentNetwork(Contract.RoninTrustedOrganization.key()));
+    RoninGovernanceAdmin roninGovernanceAdmin =
+      RoninGovernanceAdmin(config.getAddressFromCurrentNetwork(Contract.RoninGovernanceAdmin.key()));
+    RoninTrustedOrganization trustedOrgContract =
+      RoninTrustedOrganization(config.getAddressFromCurrentNetwork(Contract.RoninTrustedOrganization.key()));
     address bridgeTracking = config.getAddressFromCurrentNetwork(Contract.BridgeTracking.key());
 
     // _initBalanceForUser(trustedOrgContract);
@@ -51,11 +56,12 @@ contract Simulation__20231019_RecoverFund is RoninMigration {
     callDatas[0] = abi.encodeCall(GovernanceAdmin.changeProxyAdmin, (bridgeTracking, admin));
     callDatas[1] = abi.encodeCall(BridgeReward.initializeREP2, ());
 
-    Proposal.ProposalDetail memory proposal = _buildProposal(roninGovernanceAdmin, block.timestamp + 20 minutes, tos, values, callDatas);
+    Proposal.ProposalDetail memory proposal =
+      _buildProposal(roninGovernanceAdmin, block.timestamp + 20 minutes, tos, values, callDatas);
     _executeProposal(roninGovernanceAdmin, trustedOrgContract, proposal);
 
     // Step 3
-    bool shouldPrankOnly = CONFIG.isBroadcastDisable();
+    bool shouldPrankOnly = CONFIG.isPostChecking();
 
     if (shouldPrankOnly) {
       vm.prank(deployer);
@@ -88,12 +94,12 @@ contract Simulation__20231019_RecoverFund is RoninMigration {
 
   function _initBalanceForUser(RoninTrustedOrganization trustedOrgContract) internal {
     address genesisUser = sender();
-    bool shouldPrankOnly = CONFIG.isBroadcastDisable();
+    bool shouldPrankOnly = CONFIG.isPostChecking();
 
-    IRoninTrustedOrganization.TrustedOrganization[] memory allTrustedOrgs = trustedOrgContract.getAllTrustedOrganizations();
+    IRoninTrustedOrganization.TrustedOrganization[] memory allTrustedOrgs =
+      trustedOrgContract.getAllTrustedOrganizations();
 
     for (uint256 i = 0; i < allTrustedOrgs.length; ++i) {
-
       if (shouldPrankOnly) {
         vm.prank(genesisUser);
       } else {
