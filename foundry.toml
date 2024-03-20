@@ -21,9 +21,9 @@ fs_permissions = [{ access = "read-write", path = "./" }]
 [fmt]
 line_length = 120
 tab_width = 2
+multiline_func_header = 'params_first'
 bracket_spacing = true
 int_types = 'preserve'
-multiline_func_header = 'params_first'
 
 [profile.ci]
 verbosity = 4

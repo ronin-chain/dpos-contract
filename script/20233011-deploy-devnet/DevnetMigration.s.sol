@@ -17,11 +17,9 @@ contract DevnetMigration is RoninMigration {
       address deployedProxyAdmin;
       try devnetConfig.getAddressFromCurrentNetwork(Contract.RoninGovernanceAdmin.key()) returns (address payable res) {
         deployedProxyAdmin = res;
-      } catch {}
+      } catch { }
 
-      proxyAdmin = deployedProxyAdmin == address(0x0)
-        ? devnetConfig.sharedArguments().initialOwner
-        : deployedProxyAdmin;
+      proxyAdmin = deployedProxyAdmin == address(0x0) ? devnetConfig.sharedArguments().initialOwner : deployedProxyAdmin;
     }
   }
 

@@ -41,10 +41,7 @@ abstract contract EmergencyExit is IEmergencyExit, RONTransferHelper, CandidateM
       _info.lockedAmount = deductedAmount;
       _info.recyclingAt = recyclingAt;
       IRoninGovernanceAdmin(_getAdmin()).createEmergencyExitPoll(
-        cid,
-        _candidateInfo[cid].__shadowedTreasury,
-        block.timestamp,
-        recyclingAt
+        cid, _candidateInfo[cid].__shadowedTreasury, block.timestamp, recyclingAt
       );
     }
     emit EmergencyExitRequested(cid, deductedAmount);
@@ -75,7 +72,7 @@ abstract contract EmergencyExit is IEmergencyExit, RONTransferHelper, CandidateM
     uint256 length = _lockedConsensusList.length;
     uint256 index = length;
 
-    for (uint i; i < length; ) {
+    for (uint i; i < length;) {
       if (_lockedConsensusList[i] == cid) {
         index = i;
         break;
@@ -156,19 +153,28 @@ abstract contract EmergencyExit is IEmergencyExit, RONTransferHelper, CandidateM
   }
 
   /// @dev See {RoninValidatorSet-__css2cid}
-  function __css2cid(
-    TConsensus consensusAddr
-  ) internal view virtual override(CandidateManager, CommonStorage) returns (address);
+  function __css2cid(TConsensus consensusAddr)
+    internal
+    view
+    virtual
+    override(CandidateManager, CommonStorage)
+    returns (address);
 
   /// @dev See {RoninValidatorSet-__css2cidBatch}
-  function __css2cidBatch(
-    TConsensus[] memory consensusAddrs
-  ) internal view virtual override(CandidateManager, CommonStorage) returns (address[] memory);
+  function __css2cidBatch(TConsensus[] memory consensusAddrs)
+    internal
+    view
+    virtual
+    override(CandidateManager, CommonStorage)
+    returns (address[] memory);
 
   /// @dev See {RoninValidatorSet-__cid2cssBatch}
-  function __cid2cssBatch(
-    address[] memory cids
-  ) internal view virtual override(CandidateManager, ValidatorInfoStorageV2) returns (TConsensus[] memory);
+  function __cid2cssBatch(address[] memory cids)
+    internal
+    view
+    virtual
+    override(CandidateManager, ValidatorInfoStorageV2)
+    returns (TConsensus[] memory);
 
   /**
    * @dev See `setEmergencyExitLockedAmount.

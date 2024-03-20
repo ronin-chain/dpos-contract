@@ -13,9 +13,10 @@ interface IJailingInfo {
   /**
    * @dev Returns whether the validator are put in jail and the number of block and epoch that he still is in the jail.
    */
-  function getJailedTimeLeft(
-    TConsensus addr
-  ) external view returns (bool isJailed_, uint256 blockLeft_, uint256 epochLeft_);
+  function getJailedTimeLeft(TConsensus addr)
+    external
+    view
+    returns (bool isJailed_, uint256 blockLeft_, uint256 epochLeft_);
 
   /**
    * @dev Returns whether the validator are put in jail (cannot join the set of validators) at a specific block.

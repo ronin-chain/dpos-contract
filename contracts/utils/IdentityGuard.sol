@@ -4,7 +4,13 @@ pragma solidity ^0.8.0;
 import { AddressArrayUtils } from "../libraries/AddressArrayUtils.sol";
 import { IERC165 } from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import { TransparentUpgradeableProxyV2 } from "../extensions/TransparentUpgradeableProxyV2.sol";
-import { ErrAddressIsNotCreatedEOA, ErrZeroAddress, ErrOnlySelfCall, ErrZeroCodeContract, ErrUnsupportedInterface } from "./CommonErrors.sol";
+import {
+  ErrAddressIsNotCreatedEOA,
+  ErrZeroAddress,
+  ErrOnlySelfCall,
+  ErrZeroCodeContract,
+  ErrUnsupportedInterface
+} from "./CommonErrors.sol";
 
 abstract contract IdentityGuard {
   using AddressArrayUtils for address[];

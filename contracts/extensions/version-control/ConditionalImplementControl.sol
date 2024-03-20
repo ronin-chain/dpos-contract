@@ -48,7 +48,7 @@ abstract contract ConditionalImplementControl is IConditionalImplementControl, I
   modifier whenConditionsAreMet() virtual {
     _;
     if (_isConditionMet()) {
-      try this.selfUpgrade{ gas: _gasStipenedNoGrief() }() {} catch {}
+      try this.selfUpgrade{ gas: _gasStipenedNoGrief() }() { } catch { }
     }
   }
 
@@ -109,7 +109,7 @@ abstract contract ConditionalImplementControl is IConditionalImplementControl, I
   function setCallDatas(bytes[] calldata args) external onlyAdmin onlyDelegateFromProxyStorage {
     bytes[] storage callDatas = _callDatas();
     uint256 length = args.length;
-    for (uint256 i; i < length; ) {
+    for (uint256 i; i < length;) {
       callDatas.push(args[i]);
 
       unchecked {
@@ -138,7 +138,7 @@ abstract contract ConditionalImplementControl is IConditionalImplementControl, I
     uint256 length = callDatas.length;
     bool success;
     bytes memory returnOrRevertData;
-    for (uint256 i; i < length; ) {
+    for (uint256 i; i < length;) {
       (success, returnOrRevertData) = newImplementation.delegatecall(callDatas[i]);
       success.handleRevert(bytes4(callDatas[i]), returnOrRevertData);
 
@@ -160,7 +160,7 @@ abstract contract ConditionalImplementControl is IConditionalImplementControl, I
    * @dev Internal function to check if the condition for switching implementation is met.
    * @return the boolean indicating if condition is met.
    */
-  function _isConditionMet() internal view virtual returns (bool) {}
+  function _isConditionMet() internal view virtual returns (bool) { }
 
   /**
    * @dev Logic for fallback function.

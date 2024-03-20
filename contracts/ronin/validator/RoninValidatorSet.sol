@@ -29,7 +29,7 @@ contract RoninValidatorSet is Initializable, CoinbaseExecution, SlashingExecutio
     address __stakingVestingContract,
     address __maintenanceContract,
     address __roninTrustedOrganizationContract,
-    address /* __bridgeTrackingContract */,
+    address, /* __bridgeTrackingContract */
     uint256 __maxValidatorNumber,
     uint256 __maxValidatorCandidate,
     uint256 __maxPrioritizedValidatorNumber,
@@ -97,18 +97,24 @@ contract RoninValidatorSet is Initializable, CoinbaseExecution, SlashingExecutio
   /**
    * @dev Convert many consensus addresses to corresponding ids from the Profile contract.
    */
-  function __css2cidBatch(
-    TConsensus[] memory consensusAddrs
-  ) internal view override(EmergencyExit, CommonStorage) returns (address[] memory) {
+  function __css2cidBatch(TConsensus[] memory consensusAddrs)
+    internal
+    view
+    override(EmergencyExit, CommonStorage)
+    returns (address[] memory)
+  {
     return IProfile(getContract(ContractType.PROFILE)).getManyConsensus2Id(consensusAddrs);
   }
 
   /**
    * @dev Convert many id to corresponding consensus addresses from the Profile contract.
    */
-  function __cid2cssBatch(
-    address[] memory cids
-  ) internal view override(EmergencyExit, ValidatorInfoStorageV2) returns (TConsensus[] memory) {
+  function __cid2cssBatch(address[] memory cids)
+    internal
+    view
+    override(EmergencyExit, ValidatorInfoStorageV2)
+    returns (TConsensus[] memory)
+  {
     return IProfile(getContract(ContractType.PROFILE)).getManyId2Consensus(cids);
   }
 }

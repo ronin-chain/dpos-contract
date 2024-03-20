@@ -10,10 +10,7 @@ interface IStakingVesting {
 
   /// @dev Emitted when the block bonus for block producer is transferred.
   event BonusTransferred(
-    uint256 indexed blockNumber,
-    address indexed recipient,
-    uint256 blockProducerAmount,
-    uint256 bridgeOperatorAmount
+    uint256 indexed blockNumber, address indexed recipient, uint256 blockProducerAmount, uint256 bridgeOperatorAmount
   );
   /// @dev Emitted when the transfer of block bonus for block producer is failed.
   event BonusTransferFailed(

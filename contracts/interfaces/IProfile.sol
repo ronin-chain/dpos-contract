@@ -128,7 +128,6 @@ interface IProfile {
    * - The proof of public key possession must be verified successfully.
    * - The public key change cooldown must be ended.
    */
-
   function changePubkey(address id, bytes memory pubkey, bytes memory proofOfPossession) external;
 
   /**
@@ -137,7 +136,6 @@ interface IProfile {
    *
    * Returns whether all public keys are registered.
    */
-
   function arePublicKeysRegistered(bytes[][2] calldata listOfPublicKey) external view returns (bool);
 
   /**

@@ -2,7 +2,10 @@
 pragma solidity ^0.8.19;
 
 import { IBaseStaking } from "@ronin/contracts/interfaces/staking/IBaseStaking.sol";
-import { TransparentUpgradeableProxy, TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
+import {
+  TransparentUpgradeableProxy,
+  TransparentUpgradeableProxyV2
+} from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
 import { console2 as console } from "forge-std/console2.sol";
 import { TContract } from "foundry-deployment-kit/types/Types.sol";
@@ -20,12 +23,10 @@ contract Migration__20240301_UpgradeReleaseV0_7_6_Testnet is RoninMigration {
   TContract[] private contractTypesToUpgrade;
 
   function run() public onlyOn(DefaultNetwork.RoninTestnet.key()) {
-    RoninGovernanceAdmin governanceAdmin = RoninGovernanceAdmin(
-      config.getAddressFromCurrentNetwork(Contract.RoninGovernanceAdmin.key())
-    );
-    RoninTrustedOrganization trustedOrg = RoninTrustedOrganization(
-      config.getAddressFromCurrentNetwork(Contract.RoninTrustedOrganization.key())
-    );
+    RoninGovernanceAdmin governanceAdmin =
+      RoninGovernanceAdmin(config.getAddressFromCurrentNetwork(Contract.RoninGovernanceAdmin.key()));
+    RoninTrustedOrganization trustedOrg =
+      RoninTrustedOrganization(config.getAddressFromCurrentNetwork(Contract.RoninTrustedOrganization.key()));
     address payable[] memory allContracts = config.getAllAddresses(network());
 
     for (uint256 i; i < allContracts.length; ++i) {
@@ -86,13 +87,8 @@ contract Migration__20240301_UpgradeReleaseV0_7_6_Testnet is RoninMigration {
       );
     }
 
-    Proposal.ProposalDetail memory proposal = _buildProposal(
-      governanceAdmin,
-      block.timestamp + 14 days,
-      targets,
-      values,
-      callDatas
-    );
+    Proposal.ProposalDetail memory proposal =
+      _buildProposal(governanceAdmin, block.timestamp + 14 days, targets, values, callDatas);
     _executeProposal(governanceAdmin, trustedOrg, proposal);
   }
 }

@@ -26,7 +26,7 @@ contract Forwarder is AccessControlEnumerable {
    * @dev Initializes the forwarder with an initial target address and a contract admin.
    */
   constructor(address[] memory targets, address admin, address moderator) payable {
-    for (uint i = 0; i < targets.length; ) {
+    for (uint i = 0; i < targets.length;) {
       _setupRole(TARGET_ROLE, targets[i]);
 
       unchecked {
@@ -45,12 +45,12 @@ contract Forwarder is AccessControlEnumerable {
   /**
    * @dev Receives RON transfer from all addresses.
    */
-  fallback() external payable {}
+  fallback() external payable { }
 
   /**
    * @dev Receives RON transfer from all addresses.
    */
-  receive() external payable {}
+  receive() external payable { }
 
   /**
    * @dev Forwards the encoded call specified by `_data` to the target. The forwarder attachs `_val` value

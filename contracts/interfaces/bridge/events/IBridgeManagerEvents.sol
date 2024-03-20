@@ -35,8 +35,6 @@ interface IBridgeManagerEvents {
    * @param toBridgeOperator The updated address of the bridge operator.
    */
   event BridgeOperatorUpdated(
-    address indexed governor,
-    address indexed fromBridgeOperator,
-    address indexed toBridgeOperator
+    address indexed governor, address indexed fromBridgeOperator, address indexed toBridgeOperator
   );
 }

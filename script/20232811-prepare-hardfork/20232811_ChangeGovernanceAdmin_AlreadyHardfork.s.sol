@@ -9,8 +9,14 @@ import { TContract } from "foundry-deployment-kit/types/Types.sol";
 import { LibProxy } from "foundry-deployment-kit/libraries/LibProxy.sol";
 import { Proposal, RoninMigration } from "script/RoninMigration.s.sol";
 import { LibString, Contract } from "script/utils/Contract.sol";
-import { RoninGovernanceAdmin, HardForkRoninGovernanceAdminDeploy } from "script/contracts/HardForkRoninGovernanceAdminDeploy.s.sol";
-import { RoninTrustedOrganization, TemporalRoninTrustedOrganizationDeploy } from "script/contracts/TemporalRoninTrustedOrganizationDeploy.s.sol";
+import {
+  RoninGovernanceAdmin,
+  HardForkRoninGovernanceAdminDeploy
+} from "script/contracts/HardForkRoninGovernanceAdminDeploy.s.sol";
+import {
+  RoninTrustedOrganization,
+  TemporalRoninTrustedOrganizationDeploy
+} from "script/contracts/TemporalRoninTrustedOrganizationDeploy.s.sol";
 import "./20232811_ChangeGovernanceAdmin_Common.s.sol";
 
 contract Migration__20232811_ChangeGovernanceAdmin_AlreadyHardfork is Migration__20232811_ChangeGovernanceAdmin_Common {
@@ -35,8 +41,8 @@ contract Migration__20232811_ChangeGovernanceAdmin_AlreadyHardfork is Migration_
       //   bytes32(uint256(uint160(0x6A51C2B073a6daDBeCAC1A420AFcA7788C81612f)))
       // );
       require(
-        address(uint160(uint256(vm.load(address(__trustedOrg), $_IMPL_SLOT)))) ==
-          0x6A51C2B073a6daDBeCAC1A420AFcA7788C81612f,
+        address(uint160(uint256(vm.load(address(__trustedOrg), $_IMPL_SLOT))))
+          == 0x6A51C2B073a6daDBeCAC1A420AFcA7788C81612f,
         "testnet-shadow / testnet not hardfork yet!!!"
       );
     } else {

@@ -10,7 +10,12 @@ import { SignatureConsumer } from "@ronin/contracts/interfaces/consumers/Signatu
 import { BridgeSlash } from "@ronin/contracts/ronin/gateway/BridgeSlash.sol";
 import { BridgeReward } from "@ronin/contracts/ronin/gateway/BridgeReward.sol";
 
-import { Ballot, GlobalProposal, RoninBridgeManager, BridgeManager } from "@ronin/contracts/ronin/gateway/RoninBridgeManager.sol";
+import {
+  Ballot,
+  GlobalProposal,
+  RoninBridgeManager,
+  BridgeManager
+} from "@ronin/contracts/ronin/gateway/RoninBridgeManager.sol";
 
 // ETH
 import { MainchainBridgeManager } from "@ronin/contracts/mainchain/MainchainBridgeManager.sol";
@@ -65,22 +70,15 @@ contract NewBridgeForkTest is RoninTest, BridgeManagerUtils, SignatureConsumer {
   function test_Fork_DepositToGateway() external {
     Account memory user = _createPersistentAccount("USER", DEFAULT_BALANCE);
 
-    Transfer.Request memory request = Transfer.Request(
-      user.addr,
-      address(0),
-      Token.Info(Token.Standard.ERC20, 0, 1 ether)
-    );
+    Transfer.Request memory request =
+      Transfer.Request(user.addr, address(0), Token.Info(Token.Standard.ERC20, 0, 1 ether));
     vm.selectFork(_ethFork);
     address weth = address(MainchainGatewayV3(payable(address(ETH_GATEWAY_CONTRACT))).wrappedNativeToken());
-    MappedTokenConsumer.MappedToken memory token = IMainchainGatewayV3(address(ETH_GATEWAY_CONTRACT)).getRoninToken(
-      weth
-    );
+    MappedTokenConsumer.MappedToken memory token =
+      IMainchainGatewayV3(address(ETH_GATEWAY_CONTRACT)).getRoninToken(weth);
 
     Transfer.Receipt memory receipt = Transfer.Request(user.addr, weth, request.info).into_deposit_receipt(
-      user.addr,
-      IMainchainGatewayV3(address(ETH_GATEWAY_CONTRACT)).depositCount(),
-      token.tokenAddr,
-      _ronChainId
+      user.addr, IMainchainGatewayV3(address(ETH_GATEWAY_CONTRACT)).depositCount(), token.tokenAddr, _ronChainId
     );
 
     vm.prank(user.addr, user.addr);
@@ -100,12 +98,8 @@ contract NewBridgeForkTest is RoninTest, BridgeManagerUtils, SignatureConsumer {
     uint256 r3 = 2;
     uint256 numBridgeOperators = 3;
 
-    (address[] memory operators, address[] memory governors, uint96[] memory weights) = getValidInputs(
-      r1,
-      r2,
-      r3,
-      numBridgeOperators
-    );
+    (address[] memory operators, address[] memory governors, uint96[] memory weights) =
+      getValidInputs(r1, r2, r3, numBridgeOperators);
     uint256 deadline = block.timestamp + DEFAULT_EXPIRY_DURATION;
 
     GlobalProposal.TargetOption[] memory targetOptions = new GlobalProposal.TargetOption[](1);
@@ -117,23 +111,16 @@ contract NewBridgeForkTest is RoninTest, BridgeManagerUtils, SignatureConsumer {
     bytes[] memory calldatas = new bytes[](1);
     calldatas[0] = abi.encodeCall(BridgeManager.addBridgeOperators, (weights, governors, operators));
 
-    GlobalProposal.GlobalProposalDetail memory proposal = GlobalProposal.GlobalProposalDetail(
-      1,
-      deadline,
-      targetOptions,
-      values,
-      calldatas,
-      gasAmounts
-    );
+    GlobalProposal.GlobalProposalDetail memory proposal =
+      GlobalProposal.GlobalProposalDetail(1, deadline, targetOptions, values, calldatas, gasAmounts);
 
     bytes32 digest = ECDSA.toTypedDataHash(
-      _ronBridgeManagerContract.DOMAIN_SEPARATOR(),
-      Ballot.hash(proposal.hash(), Ballot.VoteType.For)
+      _ronBridgeManagerContract.DOMAIN_SEPARATOR(), Ballot.hash(proposal.hash(), Ballot.VoteType.For)
     );
     uint256 length = DEFAULT_NUM_BRIDGE_OPERATORS;
     Signature[] memory sigs = new Signature[](length);
     uint256[] memory pks = new uint256[](length);
-    for (uint256 i; i < length; ) {
+    for (uint256 i; i < length;) {
       pks[i] = _getGovernorPrivateKey(i);
       unchecked {
         ++i;
@@ -145,7 +132,7 @@ contract NewBridgeForkTest is RoninTest, BridgeManagerUtils, SignatureConsumer {
       uintGovernors := __governors
     }
     pks = pks.sort(uintGovernors);
-    for (uint256 i; i < length; ) {
+    for (uint256 i; i < length;) {
       (sigs[i].v, sigs[i].r, sigs[i].s) = vm.sign(pks[length - i - 1], digest);
 
       unchecked {
@@ -154,7 +141,7 @@ contract NewBridgeForkTest is RoninTest, BridgeManagerUtils, SignatureConsumer {
     }
 
     Ballot.VoteType[] memory supportsType = new Ballot.VoteType[](length);
-    for (uint256 i; i < length; ) {
+    for (uint256 i; i < length;) {
       supportsType[i] = Ballot.VoteType.For;
       unchecked {
         ++i;
@@ -200,7 +187,7 @@ contract NewBridgeForkTest is RoninTest, BridgeManagerUtils, SignatureConsumer {
             _weights,
             targets,
             targetOptions
-          ),
+            ),
           value: ZERO_VALUE
         })
       )
@@ -248,7 +235,7 @@ contract NewBridgeForkTest is RoninTest, BridgeManagerUtils, SignatureConsumer {
     });
 
     // deploy BridgeSlash
-    (_ronBridgeSlashProxy, ) = deployProxy({
+    (_ronBridgeSlashProxy,) = deployProxy({
       contractName: type(BridgeSlash).name,
       logicCode: type(BridgeSlash).creationCode,
       proxyAdmin: _defaultAdmin,
@@ -261,11 +248,11 @@ contract NewBridgeForkTest is RoninTest, BridgeManagerUtils, SignatureConsumer {
           address(RONIN_BRIDGE_TRACKING_CONTRACT),
           address(0)
         )
-      )
+        )
     });
 
     // deploy BridgeReward
-    (_ronBridgeRewardProxy, ) = deployProxy({
+    (_ronBridgeRewardProxy,) = deployProxy({
       contractName: type(BridgeReward).name,
       logicCode: type(BridgeReward).creationCode,
       proxyAdmin: _defaultAdmin,
@@ -280,7 +267,7 @@ contract NewBridgeForkTest is RoninTest, BridgeManagerUtils, SignatureConsumer {
           address(0),
           DEFAULT_REWARD_PER_PERIOD
         )
-      )
+        )
     });
 
     // deploy RoninBridgeManager
@@ -304,11 +291,8 @@ contract NewBridgeForkTest is RoninTest, BridgeManagerUtils, SignatureConsumer {
     });
 
     // upgrade BridgeTracking
-    (, address proxyAdmin) = upgradeTo(
-      RONIN_BRIDGE_TRACKING_CONTRACT,
-      type(BridgeTracking).name,
-      type(BridgeTracking).creationCode
-    );
+    (, address proxyAdmin) =
+      upgradeTo(RONIN_BRIDGE_TRACKING_CONTRACT, type(BridgeTracking).name, type(BridgeTracking).creationCode);
 
     vm.startPrank(proxyAdmin, proxyAdmin);
     RONIN_BRIDGE_TRACKING_CONTRACT.functionDelegateCall(abi.encodeCall(BridgeTracking.initializeV2, ()));
@@ -334,7 +318,7 @@ contract NewBridgeForkTest is RoninTest, BridgeManagerUtils, SignatureConsumer {
     uint96 weight = uint96(DEFAULT_WEIGHT);
     uint256 defaultBalance = DEFAULT_BALANCE;
 
-    for (uint256 i; i < length; ) {
+    for (uint256 i; i < length;) {
       weights[i] = weight;
       governors[i] = _createPersistentAccount(_getGovernorPrivateKey(i), defaultBalance);
       operators[i] = _createPersistentAccount(_getOperatorPrivateKey(i), defaultBalance);

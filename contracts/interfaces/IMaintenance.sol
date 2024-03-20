@@ -65,7 +65,7 @@ interface IMaintenance {
     uint256 lastUpdatedBlock;
     uint256 requestTimestamp;
   }
-  
+
   /// @dev Emitted when a maintenance is early exit in maintenance duration.
   event MaintenanceExited(address indexed cid);
   /// @dev Emitted when a maintenance is scheduled.

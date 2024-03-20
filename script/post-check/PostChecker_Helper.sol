@@ -68,11 +68,7 @@ abstract contract PostChecker_Helper is BaseMigration {
     if (!success) {
       (success, returnData) = staking.call{ value: value }(
         abi.encodeWithSelector(
-          ICandidateStaking.applyValidatorCandidate.selector,
-          candidateAdmin,
-          consensusAddr,
-          candidateAdmin,
-          15_00
+          ICandidateStaking.applyValidatorCandidate.selector, candidateAdmin, consensusAddr, candidateAdmin, 15_00
         )
       );
     }
@@ -101,12 +97,9 @@ abstract contract PostChecker_Helper is BaseMigration {
     vm.warp(block.timestamp + 3 seconds);
     vm.roll(block.number + 1);
 
-    uint256 numberOfBlocksInEpoch = RoninValidatorSet(
-      CONFIG.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key())
-    ).numberOfBlocksInEpoch();
-    uint256 epochEndingBlockNumber = block.number +
-      (numberOfBlocksInEpoch - 1) -
-      (block.number % numberOfBlocksInEpoch);
+    uint256 numberOfBlocksInEpoch =
+      RoninValidatorSet(CONFIG.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key())).numberOfBlocksInEpoch();
+    uint256 epochEndingBlockNumber = block.number + (numberOfBlocksInEpoch - 1) - (block.number % numberOfBlocksInEpoch);
 
     vm.roll(epochEndingBlockNumber);
   }

@@ -50,22 +50,19 @@ abstract contract CreditScore is
 
     bool[] memory jaileds = validatorContract.checkManyJailedById(validatorIds);
     bool[] memory maintaineds = IMaintenance(getContract(ContractType.MAINTENANCE)).checkManyMaintainedInBlockRangeById(
-      validatorIds,
-      periodStartAtBlock,
-      block.number
+      validatorIds, periodStartAtBlock, block.number
     );
     uint256[] memory updatedCreditScores = new uint256[](validatorIds.length);
 
-    for (uint i = 0; i < validatorIds.length; ) {
+    for (uint i = 0; i < validatorIds.length;) {
       address vId = validatorIds[i];
 
       uint256 indicator = _getUnavailabilityIndicatorById(vId, period);
       bool isJailedInPeriod = jaileds[i];
       bool isMaintainingInPeriod = maintaineds[i];
 
-      uint256 _actualGain = (isJailedInPeriod || isMaintainingInPeriod)
-        ? 0
-        : Math.subNonNegative(_gainCreditScore, indicator);
+      uint256 _actualGain =
+        (isJailedInPeriod || isMaintainingInPeriod) ? 0 : Math.subNonNegative(_gainCreditScore, indicator);
 
       _creditScore[vId] = Math.addWithUpperbound(_creditScore[vId], _actualGain, _maxCreditScore);
       updatedCreditScores[i] = _creditScore[vId];
@@ -77,11 +74,13 @@ abstract contract CreditScore is
     emit CreditScoresUpdated(validatorIds, updatedCreditScores);
   }
 
-  function execResetCreditScores(
-    address[] calldata validatorIds
-  ) external override onlyContract(ContractType.VALIDATOR) {
+  function execResetCreditScores(address[] calldata validatorIds)
+    external
+    override
+    onlyContract(ContractType.VALIDATOR)
+  {
     uint256[] memory updatedCreditScores = new uint256[](validatorIds.length);
-    for (uint i = 0; i < validatorIds.length; ) {
+    for (uint i = 0; i < validatorIds.length;) {
       address _validator = validatorIds[i];
       delete _creditScore[_validator];
       delete updatedCreditScores[i];
@@ -99,13 +98,15 @@ abstract contract CreditScore is
   function bailOut(TConsensus consensusAddr) external override {
     address validatorId = __css2cid(consensusAddr);
     IRoninValidatorSet validatorContract = IRoninValidatorSet(getContract(ContractType.VALIDATOR));
-    if (!validatorContract.isValidatorCandidate(consensusAddr))
+    if (!validatorContract.isValidatorCandidate(consensusAddr)) {
       revert ErrUnauthorized(msg.sig, RoleAccess.VALIDATOR_CANDIDATE);
+    }
 
-    if (!validatorContract.isCandidateAdminById(validatorId, msg.sender))
+    if (!validatorContract.isCandidateAdminById(validatorId, msg.sender)) {
       revert ErrUnauthorized(msg.sig, RoleAccess.CANDIDATE_ADMIN);
+    }
 
-    (bool isJailed, , uint256 jailedEpochLeft) = validatorContract.getJailedTimeLeft(consensusAddr);
+    (bool isJailed,, uint256 jailedEpochLeft) = validatorContract.getJailedTimeLeft(consensusAddr);
     if (!isJailed) revert ErrCallerMustBeJailedInTheCurrentPeriod();
 
     uint256 period = validatorContract.currentPeriod();
@@ -167,13 +168,16 @@ abstract contract CreditScore is
   /**
    * @inheritdoc ICreditScore
    */
-  function getManyCreditScores(
-    TConsensus[] calldata consensusAddrs
-  ) public view override returns (uint256[] memory resultList) {
+  function getManyCreditScores(TConsensus[] calldata consensusAddrs)
+    public
+    view
+    override
+    returns (uint256[] memory resultList)
+  {
     address[] memory validatorIds = __css2cidBatch(consensusAddrs);
     resultList = new uint256[](validatorIds.length);
 
-    for (uint i = 0; i < resultList.length; ) {
+    for (uint i = 0; i < resultList.length;) {
       resultList[i] = _creditScore[validatorIds[i]];
 
       unchecked {

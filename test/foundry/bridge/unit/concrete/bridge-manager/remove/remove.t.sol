@@ -20,7 +20,7 @@ contract Remove_Unit_Concrete_Test is BridgeManager_Unit_Concrete_Test {
 
   function test_RevertWhen_NotSelfCall() external {
     // Prepare data
-    (address[] memory removingOperators, , , , , ) = _generateRemovingOperators(1);
+    (address[] memory removingOperators,,,,,) = _generateRemovingOperators(1);
 
     // Make the caller not self-call.
     changePrank({ msgSender: _bridgeOperators[0] });
@@ -54,19 +54,12 @@ contract Remove_Unit_Concrete_Test is BridgeManager_Unit_Concrete_Test {
 
     assertEq(_bridgeManager.totalBridgeOperator(), _bridgeOperators.length - 1, "wrong total bridge operator");
     assertEq(_bridgeManager.getTotalWeight(), _totalWeight - removingWeights[0], "wrong total total weight");
-    assertEq(
-      _bridgeManager.getBridgeOperatorOf(removingGovernors),
-      wrapAddress(address(0)),
-      "wrong bridge operator of"
-    );
+    assertEq(_bridgeManager.getBridgeOperatorOf(removingGovernors), wrapAddress(address(0)), "wrong bridge operator of");
     assertEq(_bridgeManager.getGovernorsOf(removingOperators), wrapAddress(address(0)), "wrong governor of");
 
     // Compare after and before state
-    (
-      address[] memory afterBridgeOperators,
-      address[] memory afterGovernors,
-      uint96[] memory afterVoteWeights
-    ) = _getBridgeMembers(remainingGovernors);
+    (address[] memory afterBridgeOperators, address[] memory afterGovernors, uint96[] memory afterVoteWeights) =
+      _getBridgeMembers(remainingGovernors);
 
     _assertBridgeMembers({
       comparingOperators: afterBridgeOperators,
@@ -79,14 +72,8 @@ contract Remove_Unit_Concrete_Test is BridgeManager_Unit_Concrete_Test {
   }
 
   function test_RevertWhen_TwoAddress_Duplicated() external {
-    (
-      address[] memory removingOperators,
-      address[] memory removingGovernors,
-      uint96[] memory removingWeights,
-      ,
-      ,
-
-    ) = _generateRemovingOperators(2);
+    (address[] memory removingOperators, address[] memory removingGovernors, uint96[] memory removingWeights,,,) =
+      _generateRemovingOperators(2);
 
     removingOperators[1] = removingOperators[0];
     removingGovernors[1] = removingGovernors[0];
@@ -121,19 +108,14 @@ contract Remove_Unit_Concrete_Test is BridgeManager_Unit_Concrete_Test {
 
     assertEq(_bridgeManager.totalBridgeOperator(), _bridgeOperators.length - 2, "wrong total bridge operator");
     assertEq(
-      _bridgeManager.getTotalWeight(),
-      _totalWeight - (LibArrayUtils.sum(removingWeights)),
-      "wrong total total weight"
+      _bridgeManager.getTotalWeight(), _totalWeight - (LibArrayUtils.sum(removingWeights)), "wrong total total weight"
     );
     assertEq(_bridgeManager.getBridgeOperatorOf(removingGovernors), zeroAddressArrays, "wrong bridge operator of");
     assertEq(_bridgeManager.getGovernorsOf(removingOperators), zeroAddressArrays, "wrong governor of");
 
     // Compare after and before state
-    (
-      address[] memory afterBridgeOperators,
-      address[] memory afterGovernors,
-      uint96[] memory afterVoteWeights
-    ) = _getBridgeMembers(remainingGovernors);
+    (address[] memory afterBridgeOperators, address[] memory afterGovernors, uint96[] memory afterVoteWeights) =
+      _getBridgeMembers(remainingGovernors);
 
     _assertBridgeMembers({
       comparingOperators: afterBridgeOperators,

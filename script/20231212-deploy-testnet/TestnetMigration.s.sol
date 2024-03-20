@@ -14,16 +14,14 @@ contract TestnetMigration is RoninMigration {
   function _getProxyAdminFromCurrentNetwork() internal view virtual override returns (address proxyAdmin) {
     if (network() == DefaultNetwork.RoninTestnet.key()) {
       address deployedProxyAdmin;
-      try testnetConfig.getAddressFromCurrentNetwork(Contract.RoninGovernanceAdmin.key()) returns (
-        address payable res
-      ) {
+      try testnetConfig.getAddressFromCurrentNetwork(Contract.RoninGovernanceAdmin.key()) returns (address payable res)
+      {
         if (res == 0x53Ea388CB72081A3a397114a43741e7987815896) deployedProxyAdmin = address(0x0);
         else deployedProxyAdmin = res;
-      } catch {}
+      } catch { }
 
-      proxyAdmin = deployedProxyAdmin == address(0x0)
-        ? testnetConfig.sharedArguments().initialOwner
-        : deployedProxyAdmin;
+      proxyAdmin =
+        deployedProxyAdmin == address(0x0) ? testnetConfig.sharedArguments().initialOwner : deployedProxyAdmin;
     }
   }
 

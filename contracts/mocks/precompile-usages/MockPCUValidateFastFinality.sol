@@ -26,13 +26,8 @@ contract MockPCUValidateFastFinality is PCUValidateFastFinality {
     bytes[][2] memory listOfPublicKey,
     bytes[2] memory aggregatedSignature
   ) public view returns (bool) {
-    return
-      _pcValidateFastFinalityEvidence(
-        voterPublicKey,
-        targetBlockNumber,
-        targetBlockHash,
-        listOfPublicKey,
-        aggregatedSignature
-      );
+    return _pcValidateFastFinalityEvidence(
+      voterPublicKey, targetBlockNumber, targetBlockHash, listOfPublicKey, aggregatedSignature
+    );
   }
 }

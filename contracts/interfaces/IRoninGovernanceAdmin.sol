@@ -6,11 +6,7 @@ import "../utils/CommonErrors.sol";
 interface IRoninGovernanceAdmin {
   /// @dev Emitted when an emergency exit poll is created.
   event EmergencyExitPollCreated(
-    bytes32 voteHash,
-    address validatorId,
-    address recipientAfterUnlockedFund,
-    uint256 requestedAt,
-    uint256 expiredAt
+    bytes32 voteHash, address validatorId, address recipientAfterUnlockedFund, uint256 requestedAt, uint256 expiredAt
   );
   /// @dev Emitted when an emergency exit poll is approved.
   event EmergencyExitPollApproved(bytes32 voteHash);

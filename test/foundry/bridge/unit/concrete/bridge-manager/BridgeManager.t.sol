@@ -16,20 +16,14 @@ contract BridgeManager_Unit_Concrete_Test is Base_Test {
 
   modifier assertStateNotChange() {
     // Get before test state
-    (
-      address[] memory beforeBridgeOperators,
-      address[] memory beforeGovernors,
-      uint96[] memory beforeVoteWeights
-    ) = _getBridgeMembers();
+    (address[] memory beforeBridgeOperators, address[] memory beforeGovernors, uint96[] memory beforeVoteWeights) =
+      _getBridgeMembers();
 
     _;
 
     // Compare after and before state
-    (
-      address[] memory afterBridgeOperators,
-      address[] memory afterGovernors,
-      uint96[] memory afterVoteWeights
-    ) = _getBridgeMembers();
+    (address[] memory afterBridgeOperators, address[] memory afterGovernors, uint96[] memory afterVoteWeights) =
+      _getBridgeMembers();
 
     _assertBridgeMembers({
       comparingOperators: beforeBridgeOperators,
@@ -85,9 +79,7 @@ contract BridgeManager_Unit_Concrete_Test is Base_Test {
     weights[0] = 100;
   }
 
-  function _generateRemovingOperators(
-    uint removingNumber
-  )
+  function _generateRemovingOperators(uint removingNumber)
     internal
     view
     returns (
@@ -140,9 +132,11 @@ contract BridgeManager_Unit_Concrete_Test is Base_Test {
     // (governors, bridgeOperators, voteWeights) = _bridgeManager.getFullBridgeOperatorInfos();
   }
 
-  function _getBridgeMembers(
-    address[] memory governors
-  ) internal view returns (address[] memory bridgeOperators, address[] memory governors_, uint96[] memory voteWeights) {
+  function _getBridgeMembers(address[] memory governors)
+    internal
+    view
+    returns (address[] memory bridgeOperators, address[] memory governors_, uint96[] memory voteWeights)
+  {
     governors_ = governors;
     bridgeOperators = _bridgeManager.getBridgeOperatorOf(governors);
     voteWeights = _bridgeManager.getGovernorWeights(governors);

@@ -113,15 +113,8 @@ contract RoninGovernanceAdmin is
     Ballot.VoteType _support
   ) external onlyGovernor {
     address _voter = msg.sender;
-    Proposal.ProposalDetail memory _proposal = _proposeProposal(
-      block.chainid,
-      _expiryTimestamp,
-      _targets,
-      _values,
-      _calldatas,
-      _gasAmounts,
-      _voter
-    );
+    Proposal.ProposalDetail memory _proposal =
+      _proposeProposal(block.chainid, _expiryTimestamp, _targets, _values, _calldatas, _gasAmounts, _voter);
     _castProposalVoteForCurrentNetwork(_voter, _proposal, _support);
   }
 

@@ -15,7 +15,7 @@ interface ICandidateStaking is IRewardPool {
   /// @dev Emitted when the pool admin unstaked the amount of RON from themself.
   event Unstaked(address indexed poolId, uint256 amount);
   /// @dev Emitted when the holder of the staking amount in the `poolId` is changed.
-  event StakeholderChanged(address indexed poolId, address oldAdmin , address newAdmin, uint256 amount);
+  event StakeholderChanged(address indexed poolId, address oldAdmin, address newAdmin, uint256 amount);
 
   /// @dev Emitted when the validator pool is approved.
   event PoolApproved(address indexed poolId, address indexed admin);
@@ -23,17 +23,11 @@ interface ICandidateStaking is IRewardPool {
   event PoolsDeprecated(address[] poolIds);
   /// @dev Emitted when the staking amount transfer failed.
   event StakingAmountTransferFailed(
-    address indexed poolId,
-    address indexed admin,
-    uint256 amount,
-    uint256 contractBalance
+    address indexed poolId, address indexed admin, uint256 amount, uint256 contractBalance
   );
   /// @dev Emitted when the staking amount deducted failed, e.g. when the validator gets slashed.
   event StakingAmountDeductFailed(
-    address indexed poolId,
-    address indexed recipient,
-    uint256 amount,
-    uint256 contractBalance
+    address indexed poolId, address indexed recipient, uint256 amount, uint256 contractBalance
   );
 
   /// @dev Error of three interaction addresses must be of the same in applying for validator candidate.

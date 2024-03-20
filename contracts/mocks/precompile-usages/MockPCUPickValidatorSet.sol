@@ -26,12 +26,7 @@ contract MockPCUPickValidatorSet is PCUPickValidatorSet {
     uint256 _maxValidatorNumber,
     uint256 _maxPrioritizedValidatorNumber
   ) public view returns (address[] memory _result) {
-    (_result, ) = _pcPickValidatorSet(
-      _candidates,
-      _weights,
-      _trustedWeights,
-      _maxValidatorNumber,
-      _maxPrioritizedValidatorNumber
-    );
+    (_result,) =
+      _pcPickValidatorSet(_candidates, _weights, _trustedWeights, _maxValidatorNumber, _maxPrioritizedValidatorNumber);
   }
 }

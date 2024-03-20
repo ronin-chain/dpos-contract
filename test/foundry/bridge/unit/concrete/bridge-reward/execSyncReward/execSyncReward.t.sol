@@ -24,12 +24,8 @@ contract Add_Unit_Concrete_Test is
   }
 
   function test_RevertWhen_NotCalledByBridgeTracking() external {
-    (
-      address[] memory operators,
-      uint256[] memory ballots,
-      uint256 totalBallot,
-      uint256 totalVote
-    ) = _generateInput_execSyncReward();
+    (address[] memory operators, uint256[] memory ballots, uint256 totalBallot, uint256 totalVote) =
+      _generateInput_execSyncReward();
 
     uint256 period = _validatorSetContract.currentPeriod() + 1;
 
@@ -52,12 +48,8 @@ contract Add_Unit_Concrete_Test is
   }
 
   function test_RevertWhen_OperatorsLengthIsZero() external {
-    (
-      address[] memory operators,
-      uint256[] memory ballots,
-      uint256 totalBallot,
-      uint256 totalVote
-    ) = _generateInput_execSyncReward();
+    (address[] memory operators, uint256[] memory ballots, uint256 totalBallot, uint256 totalVote) =
+      _generateInput_execSyncReward();
     uint256 period = _validatorSetContract.currentPeriod() + 1;
 
     assembly ("memory-safe") {
@@ -76,12 +68,8 @@ contract Add_Unit_Concrete_Test is
   }
 
   function test_RevertWhen_TwoInputArraysLengthsDiffer() external {
-    (
-      address[] memory operators,
-      uint256[] memory ballots,
-      uint256 totalBallot,
-      uint256 totalVote
-    ) = _generateInput_execSyncReward();
+    (address[] memory operators, uint256[] memory ballots, uint256 totalBallot, uint256 totalVote) =
+      _generateInput_execSyncReward();
     uint256 period = _validatorSetContract.currentPeriod() + 1;
 
     assembly ("memory-safe") {
@@ -111,12 +99,8 @@ contract Add_Unit_Concrete_Test is
   }
 
   function test_RevertWhen_AlreadyRewardedPeriod() external {
-    (
-      address[] memory operators,
-      uint256[] memory ballots,
-      uint256 totalBallot,
-      uint256 totalVote
-    ) = _generateInput_execSyncReward();
+    (address[] memory operators, uint256[] memory ballots, uint256 totalBallot, uint256 totalVote) =
+      _generateInput_execSyncReward();
     uint256 period = _validatorSetContract.currentPeriod() - 1;
 
     vm.expectRevert(abi.encodeWithSelector(ErrInvalidArguments.selector, IBridgeReward.execSyncReward.selector));
@@ -130,12 +114,8 @@ contract Add_Unit_Concrete_Test is
   }
 
   function test_RevertWhen_PeriodTooFar() external {
-    (
-      address[] memory operators,
-      uint256[] memory ballots,
-      uint256 totalBallot,
-      uint256 totalVote
-    ) = _generateInput_execSyncReward();
+    (address[] memory operators, uint256[] memory ballots, uint256 totalBallot, uint256 totalVote) =
+      _generateInput_execSyncReward();
     uint256 latestPeriod = _validatorSetContract.currentPeriod() - 1;
     uint256 requestingPeriod = latestPeriod + 10;
 
@@ -150,12 +130,8 @@ contract Add_Unit_Concrete_Test is
   }
 
   function test_execSyncReward_ShareEqually_WhenDataCorrupts_NotTopUpFund() external {
-    (
-      address[] memory operators,
-      uint256[] memory ballots,
-      uint256 totalBallot,
-      uint256 totalVote
-    ) = _generateInput_execSyncReward();
+    (address[] memory operators, uint256[] memory ballots, uint256 totalBallot, uint256 totalVote) =
+      _generateInput_execSyncReward();
     uint256 period = _validatorSetContract.currentPeriod();
 
     ballots[0] = 100_000;
@@ -182,12 +158,8 @@ contract Add_Unit_Concrete_Test is
   }
 
   function test_execSyncReward_ShareEqually_WhenDataCorrupts_HaveEnoughFund_OneAbnormalBallot() external {
-    (
-      address[] memory operators,
-      uint256[] memory ballots,
-      uint256 totalBallot,
-      uint256 totalVote
-    ) = _generateInput_execSyncReward();
+    (address[] memory operators, uint256[] memory ballots, uint256 totalBallot, uint256 totalVote) =
+      _generateInput_execSyncReward();
     uint256 period = _validatorSetContract.currentPeriod();
 
     ballots[0] = 100_000;
@@ -210,12 +182,8 @@ contract Add_Unit_Concrete_Test is
   }
 
   function test_execSyncReward_ShareEqually_WhenDataCorrupts_HaveEnoughFund_AbnormalTotalBallot() external {
-    (
-      address[] memory operators,
-      uint256[] memory ballots,
-      uint256 totalBallot,
-      uint256 totalVote
-    ) = _generateInput_execSyncReward();
+    (address[] memory operators, uint256[] memory ballots, uint256 totalBallot, uint256 totalVote) =
+      _generateInput_execSyncReward();
     uint256 period = _validatorSetContract.currentPeriod();
 
     // Reduce number of total ballot
@@ -238,12 +206,8 @@ contract Add_Unit_Concrete_Test is
   }
 
   function test_execSyncReward_ShareEqually_WhenNoVote() external {
-    (
-      address[] memory operators,
-      uint256[] memory ballots,
-      uint256 totalBallot,
-      uint256 totalVote
-    ) = _generateInput_execSyncReward();
+    (address[] memory operators, uint256[] memory ballots, uint256 totalBallot, uint256 totalVote) =
+      _generateInput_execSyncReward();
     uint256 period = _validatorSetContract.currentPeriod();
 
     ballots[0] = 0;
@@ -269,12 +233,8 @@ contract Add_Unit_Concrete_Test is
   }
 
   function test_execSyncReward_SharePropotionally() public {
-    (
-      address[] memory operators,
-      uint256[] memory ballots,
-      uint256 totalBallot,
-      uint256 totalVote
-    ) = _generateInput_execSyncReward();
+    (address[] memory operators, uint256[] memory ballots, uint256 totalBallot, uint256 totalVote) =
+      _generateInput_execSyncReward();
     uint256 period = _validatorSetContract.currentPeriod();
 
     for (uint i; i < operators.length; i++) {
@@ -295,12 +255,8 @@ contract Add_Unit_Concrete_Test is
   function test_RevertWhen_SharePropotionally_ThenShareAgain() external {
     test_execSyncReward_SharePropotionally();
 
-    (
-      address[] memory operators,
-      uint256[] memory ballots,
-      uint256 totalBallot,
-      uint256 totalVote
-    ) = _generateInput_execSyncReward();
+    (address[] memory operators, uint256[] memory ballots, uint256 totalBallot, uint256 totalVote) =
+      _generateInput_execSyncReward();
     uint256 period = _validatorSetContract.currentPeriod();
     vm.expectRevert(abi.encodeWithSelector(ErrInvalidArguments.selector, IBridgeReward.execSyncReward.selector));
     _bridgeReward.execSyncReward({
