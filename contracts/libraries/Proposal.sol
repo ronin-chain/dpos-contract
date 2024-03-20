@@ -35,10 +35,11 @@ library Proposal {
    */
   function validate(ProposalDetail memory _proposal, uint256 _maxExpiryDuration) internal view {
     if (
-      !(_proposal.targets.length > 0 &&
-        _proposal.targets.length == _proposal.values.length &&
-        _proposal.targets.length == _proposal.calldatas.length &&
-        _proposal.targets.length == _proposal.gasAmounts.length)
+      !(
+        _proposal.targets.length > 0 && _proposal.targets.length == _proposal.values.length
+          && _proposal.targets.length == _proposal.calldatas.length
+          && _proposal.targets.length == _proposal.gasAmounts.length
+      )
     ) {
       revert ErrLengthMismatch(msg.sig);
     }
@@ -57,7 +58,7 @@ library Proposal {
     bytes32[] memory _calldataHashList = new bytes32[](_proposal.calldatas.length);
     uint256[] memory _gasAmounts = _proposal.gasAmounts;
 
-    for (uint256 _i; _i < _calldataHashList.length; ) {
+    for (uint256 _i; _i < _calldataHashList.length;) {
       _calldataHashList[_i] = keccak256(_proposal.calldatas[_i]);
 
       unchecked {
@@ -111,14 +112,15 @@ library Proposal {
   /**
    * @dev Executes the proposal.
    */
-  function execute(
-    ProposalDetail memory _proposal
-  ) internal returns (bool[] memory _successCalls, bytes[] memory _returnDatas) {
+  function execute(ProposalDetail memory _proposal)
+    internal
+    returns (bool[] memory _successCalls, bytes[] memory _returnDatas)
+  {
     if (!executable(_proposal)) revert ErrInvalidChainId(msg.sig, _proposal.chainId, block.chainid);
 
     _successCalls = new bool[](_proposal.targets.length);
     _returnDatas = new bytes[](_proposal.targets.length);
-    for (uint256 _i = 0; _i < _proposal.targets.length; ) {
+    for (uint256 _i = 0; _i < _proposal.targets.length;) {
       if (gasleft() <= _proposal.gasAmounts[_i]) revert ErrInsufficientGas(hash(_proposal));
 
       (_successCalls[_i], _returnDatas[_i]) = _proposal.targets[_i].call{

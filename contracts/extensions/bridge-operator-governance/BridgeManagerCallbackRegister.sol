@@ -33,9 +33,11 @@ abstract contract BridgeManagerCallbackRegister is IdentityGuard, IBridgeManager
   /**
    * @inheritdoc IBridgeManagerCallbackRegister
    */
-  function unregisterCallbacks(
-    address[] calldata registers
-  ) external onlySelfCall returns (bool[] memory unregistereds) {
+  function unregisterCallbacks(address[] calldata registers)
+    external
+    onlySelfCall
+    returns (bool[] memory unregistereds)
+  {
     unregistereds = _unregisterCallbacks(registers);
   }
 
@@ -51,9 +53,11 @@ abstract contract BridgeManagerCallbackRegister is IdentityGuard, IBridgeManager
    * @param registers The array of callback addresses to register.
    * @return registereds An array indicating the success status of each registration.
    */
-  function _registerCallbacks(
-    address[] memory registers
-  ) internal nonDuplicate(registers) returns (bool[] memory registereds) {
+  function _registerCallbacks(address[] memory registers)
+    internal
+    nonDuplicate(registers)
+    returns (bool[] memory registereds)
+  {
     uint256 length = registers.length;
     registereds = new bool[](length);
     if (length == 0) return registereds;
@@ -62,7 +66,7 @@ abstract contract BridgeManagerCallbackRegister is IdentityGuard, IBridgeManager
     address register;
     bytes4 callbackInterface = type(IBridgeManagerCallback).interfaceId;
 
-    for (uint256 i; i < length; ) {
+    for (uint256 i; i < length;) {
       register = registers[i];
 
       _requireHasCode(register);
@@ -81,14 +85,16 @@ abstract contract BridgeManagerCallbackRegister is IdentityGuard, IBridgeManager
    * @param registers The array of callback addresses to unregister.
    * @return unregistereds An array indicating the success status of each unregistration.
    */
-  function _unregisterCallbacks(
-    address[] memory registers
-  ) internal nonDuplicate(registers) returns (bool[] memory unregistereds) {
+  function _unregisterCallbacks(address[] memory registers)
+    internal
+    nonDuplicate(registers)
+    returns (bool[] memory unregistereds)
+  {
     uint256 length = registers.length;
     unregistereds = new bool[](length);
     EnumerableSet.AddressSet storage _callbackRegisters = _getCallbackRegisters();
 
-    for (uint256 i; i < length; ) {
+    for (uint256 i; i < length;) {
       unregistereds[i] = _callbackRegisters.remove(registers[i]);
 
       unchecked {
@@ -112,7 +118,7 @@ abstract contract BridgeManagerCallbackRegister is IdentityGuard, IBridgeManager
     bytes memory callData = abi.encodePacked(callbackFnSig, inputs);
     bytes memory proxyCallData = abi.encodeCall(TransparentUpgradeableProxyV2.functionDelegateCall, (callData));
 
-    for (uint256 i; i < length; ) {
+    for (uint256 i; i < length;) {
       (successes[i], returnDatas[i]) = registers[i].call(callData);
       if (!successes[i]) {
         (successes[i], returnDatas[i]) = registers[i].call(proxyCallData);

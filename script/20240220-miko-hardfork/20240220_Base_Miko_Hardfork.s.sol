@@ -6,7 +6,10 @@ import { LibProxy } from "foundry-deployment-kit/libraries/LibProxy.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
 import { JSONParserLib } from "lib/foundry-deployment-kit/lib/solady/src/utils/JSONParserLib.sol";
 
-import { BridgeTrackingRecoveryLogic, BridgeTracking } from "../20231019-recover-fund/contracts/BridgeTrackingRecoveryLogic.sol";
+import {
+  BridgeTrackingRecoveryLogic,
+  BridgeTracking
+} from "../20231019-recover-fund/contracts/BridgeTrackingRecoveryLogic.sol";
 
 import { SlashIndicator } from "@ronin/contracts/ronin/slash-indicator/SlashIndicator.sol";
 import { Staking, IStaking } from "@ronin/contracts/ronin/staking/Staking.sol";
@@ -62,19 +65,16 @@ contract Proposal__Base_20240220_MikoHardfork is MikoConfig {
   }
 
   function _sys__loadContracts() internal {
-    roninGovernanceAdmin = RoninGovernanceAdmin(
-      config.getAddressFromCurrentNetwork(Contract.RoninGovernanceAdmin.key())
-    );
-    trustedOrgContract = RoninTrustedOrganization(
-      config.getAddressFromCurrentNetwork(Contract.RoninTrustedOrganization.key())
-    );
+    roninGovernanceAdmin =
+      RoninGovernanceAdmin(config.getAddressFromCurrentNetwork(Contract.RoninGovernanceAdmin.key()));
+    trustedOrgContract =
+      RoninTrustedOrganization(config.getAddressFromCurrentNetwork(Contract.RoninTrustedOrganization.key()));
     roninBridgeManager = config.getAddressFromCurrentNetwork(Contract.RoninBridgeManager.key());
 
     bridgeTracking = config.getAddressFromCurrentNetwork(Contract.BridgeTracking.key());
 
-    fastFinalityTrackingContract = FastFinalityTracking(
-      config.getAddressFromCurrentNetwork(Contract.FastFinalityTracking.key())
-    );
+    fastFinalityTrackingContract =
+      FastFinalityTracking(config.getAddressFromCurrentNetwork(Contract.FastFinalityTracking.key()));
     maintenanceContract = Maintenance(config.getAddressFromCurrentNetwork(Contract.Maintenance.key()));
     profileContract = Profile(config.getAddressFromCurrentNetwork(Contract.Profile.key()));
     slashIndicatorContract = SlashIndicator(config.getAddressFromCurrentNetwork(Contract.SlashIndicator.key()));
@@ -92,9 +92,11 @@ contract Proposal__Base_20240220_MikoHardfork is MikoConfig {
     allDPoSContracts.push(payable(address(validatorContract)));
   }
 
-  function _sys__parseMigrateData(
-    string memory path
-  ) internal view returns (address[] memory poolIds, address[] memory admins, bool[] memory flags) {
+  function _sys__parseMigrateData(string memory path)
+    internal
+    view
+    returns (address[] memory poolIds, address[] memory admins, bool[] memory flags)
+  {
     string memory raw = vm.readFile(path);
     JSONParserLib.Item memory data = raw.parse();
     uint256 size = data.size();

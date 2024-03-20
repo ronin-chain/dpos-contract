@@ -3,13 +3,19 @@ pragma solidity ^0.8.0;
 
 import { Vm, Test } from "forge-std/Test.sol";
 import { console } from "forge-std/console.sol";
-import { TransparentUpgradeableProxyV2, ERC1967Upgrade } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
+import {
+  TransparentUpgradeableProxyV2, ERC1967Upgrade
+} from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
 import { ILogic, MockLogicV1, MockLogicV2 } from "@ronin/contracts/mocks/utils/version-control/MockLogic.sol";
-import { IConditionalImplementControl } from "@ronin/contracts/interfaces/version-control/IConditionalImplementControl.sol";
+import { IConditionalImplementControl } from
+  "@ronin/contracts/interfaces/version-control/IConditionalImplementControl.sol";
 import { AddressArrayUtils } from "@ronin/contracts/libraries/AddressArrayUtils.sol";
 import { ErrOnlySelfCall } from "@ronin/contracts/utils/CommonErrors.sol";
 import { MockActor } from "@ronin/contracts/mocks/utils/version-control/MockActor.sol";
-import { MockConditionalImplementControl, ConditionalImplementControl } from "@ronin/contracts/mocks/utils/version-control/MockConditionalImplementControl.sol";
+import {
+  MockConditionalImplementControl,
+  ConditionalImplementControl
+} from "@ronin/contracts/mocks/utils/version-control/MockConditionalImplementControl.sol";
 import { ErrZeroCodeContract } from "@ronin/contracts/utils/CommonErrors.sol";
 
 contract ConditionalImplementControlTest is Test {
@@ -144,7 +150,7 @@ contract ConditionalImplementControlTest is Test {
     vm.expectEmit(_proxy);
     emit Received(ILogic(_oldImpl).magicNumber());
     vm.prank(user);
-    (bool ok, ) = _proxy.call{ value: amount }("");
+    (bool ok,) = _proxy.call{ value: amount }("");
     assertEq(ok, true);
     assertEq(amount, _proxy.balance);
   }
@@ -162,7 +168,7 @@ contract ConditionalImplementControlTest is Test {
     vm.expectEmit(_proxy);
     emit Received(ILogic(_newImpl).magicNumber());
     vm.prank(user);
-    (bool ok, ) = _proxy.call{ value: amount }("");
+    (bool ok,) = _proxy.call{ value: amount }("");
     assertEq(ok, true);
     assertEq(amount, _proxy.balance);
   }

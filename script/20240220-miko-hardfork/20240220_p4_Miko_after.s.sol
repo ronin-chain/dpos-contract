@@ -60,7 +60,7 @@ contract Proposal__20240220_MikoHardfork_After is Proposal__Base_20240220_MikoHa
     _lockedAmount = address(DEPRECATED_BRIDGE_REWARD).balance;
 
     // Step 3
-    bool shouldPrankOnly = CONFIG.isBroadcastDisable();
+    bool shouldPrankOnly = CONFIG.isPostChecking();
 
     if (shouldPrankOnly) {
       vm.prank(DEPLOYER);
@@ -107,7 +107,7 @@ contract Proposal__20240220_MikoHardfork_After is Proposal__Base_20240220_MikoHa
     console.log("Andy", ANDY_TREZOR);
 
     address doctor = ADMIN_TMP_BRIDGE_TRACKING;
-    bool shouldPrankOnly = CONFIG.isBroadcastDisable();
+    bool shouldPrankOnly = CONFIG.isPostChecking();
 
     if (shouldPrankOnly) {
       vm.prank(DEPLOYER);

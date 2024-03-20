@@ -8,7 +8,7 @@ import { Network } from "./utils/Network.sol";
 import { Contract } from "./utils/Contract.sol";
 
 contract GeneralConfig is BaseGeneralConfig {
-  constructor() BaseGeneralConfig("", "deployments/") {}
+  constructor() BaseGeneralConfig("", "deployments/") { }
 
   function _setUpNetworks() internal virtual override {
     setNetworkInfo(

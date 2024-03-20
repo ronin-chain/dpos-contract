@@ -2,7 +2,10 @@
 pragma solidity ^0.8.0;
 
 import { CoreGovernance } from "../extensions/sequential-governance/CoreGovernance.sol";
-import { GlobalCoreGovernance, GlobalGovernanceRelay } from "../extensions/sequential-governance/governance-relay/GlobalGovernanceRelay.sol";
+import {
+  GlobalCoreGovernance,
+  GlobalGovernanceRelay
+} from "../extensions/sequential-governance/governance-relay/GlobalGovernanceRelay.sol";
 import { GovernanceRelay } from "../extensions/sequential-governance/governance-relay/GovernanceRelay.sol";
 import { ContractType, BridgeManager } from "../extensions/bridge-operator-governance/BridgeManager.sol";
 import { Ballot } from "../libraries/Ballot.sol";
@@ -29,7 +32,7 @@ contract MainchainBridgeManager is BridgeManager, GovernanceRelay, GlobalGoverna
     CoreGovernance(DEFAULT_EXPIRY_DURATION)
     GlobalCoreGovernance(targetOptions, targets)
     BridgeManager(num, denom, roninChainId, bridgeContract, callbackRegisters, bridgeOperators, governors, voteWeights)
-  {}
+  { }
 
   /**
    * @dev See `GovernanceRelay-_relayProposal`.

@@ -137,8 +137,9 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
     address candidateId = __css2cid(consensusAddr);
 
     if (!validatorContract.isBlockProducerById(candidateId)) revert ErrUnauthorized(msg.sig, RoleAccess.BLOCK_PRODUCER);
-    if (!validatorContract.isCandidateAdminById(candidateId, msg.sender))
+    if (!validatorContract.isCandidateAdminById(candidateId, msg.sender)) {
       revert ErrUnauthorized(msg.sig, RoleAccess.CANDIDATE_ADMIN);
+    }
     if (_checkScheduledById(candidateId)) revert ErrAlreadyScheduled();
     if (!_checkCooldownEndedById(candidateId)) revert ErrCooldownTimeNotYetEnded();
     if (totalSchedule() >= _maxSchedule) revert ErrTotalOfSchedulesExceeded();
@@ -193,27 +194,35 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
   /**
    * @inheritdoc IMaintenance
    */
-  function checkManyMaintained(
-    TConsensus[] calldata addrList,
-    uint256 atBlock
-  ) external view override returns (bool[] memory) {
+  function checkManyMaintained(TConsensus[] calldata addrList, uint256 atBlock)
+    external
+    view
+    override
+    returns (bool[] memory)
+  {
     address[] memory idList = __css2cidBatch(addrList);
     return _checkManyMaintainedById(idList, atBlock);
   }
 
-  function checkManyMaintainedById(
-    address[] calldata idList,
-    uint256 atBlock
-  ) external view override returns (bool[] memory) {
+  /**
+   * @inheritdoc IMaintenance
+   */
+  function checkManyMaintainedById(address[] calldata idList, uint256 atBlock)
+    external
+    view
+    override
+    returns (bool[] memory)
+  {
     return _checkManyMaintainedById(idList, atBlock);
   }
 
-  function _checkManyMaintainedById(
-    address[] memory idList,
-    uint256 atBlock
-  ) internal view returns (bool[] memory resList) {
+  function _checkManyMaintainedById(address[] memory idList, uint256 atBlock)
+    internal
+    view
+    returns (bool[] memory resList)
+  {
     resList = new bool[](idList.length);
-    for (uint i = 0; i < idList.length; ) {
+    for (uint i = 0; i < idList.length;) {
       resList[i] = _checkMaintainedById(idList[i], atBlock);
 
       unchecked {
@@ -225,30 +234,35 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
   /**
    * @inheritdoc IMaintenance
    */
-  function checkManyMaintainedInBlockRange(
-    TConsensus[] calldata addrList,
-    uint256 fromBlock,
-    uint256 toBlock
-  ) external view override returns (bool[] memory) {
+  function checkManyMaintainedInBlockRange(TConsensus[] calldata addrList, uint256 fromBlock, uint256 toBlock)
+    external
+    view
+    override
+    returns (bool[] memory)
+  {
     address[] memory idList = __css2cidBatch(addrList);
     return _checkManyMaintainedInBlockRangeById(idList, fromBlock, toBlock);
   }
 
-  function checkManyMaintainedInBlockRangeById(
-    address[] calldata idList,
-    uint256 fromBlock,
-    uint256 toBlock
-  ) external view override returns (bool[] memory) {
+  /**
+   * @inheritdoc IMaintenance
+   */
+  function checkManyMaintainedInBlockRangeById(address[] calldata idList, uint256 fromBlock, uint256 toBlock)
+    external
+    view
+    override
+    returns (bool[] memory)
+  {
     return _checkManyMaintainedInBlockRangeById(idList, fromBlock, toBlock);
   }
 
-  function _checkManyMaintainedInBlockRangeById(
-    address[] memory idList,
-    uint256 fromBlock,
-    uint256 toBlock
-  ) internal view returns (bool[] memory resList) {
+  function _checkManyMaintainedInBlockRangeById(address[] memory idList, uint256 fromBlock, uint256 toBlock)
+    internal
+    view
+    returns (bool[] memory resList)
+  {
     resList = new bool[](idList.length);
-    for (uint i = 0; i < idList.length; ) {
+    for (uint i = 0; i < idList.length;) {
       resList[i] = _maintainingInBlockRange(idList[i], fromBlock, toBlock);
 
       unchecked {
@@ -290,11 +304,12 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
   /**
    * @inheritdoc IMaintenance
    */
-  function checkMaintainedInBlockRange(
-    TConsensus consensusAddr,
-    uint256 fromBlock,
-    uint256 toBlock
-  ) public view override returns (bool) {
+  function checkMaintainedInBlockRange(TConsensus consensusAddr, uint256 fromBlock, uint256 toBlock)
+    public
+    view
+    override
+    returns (bool)
+  {
     return _maintainingInBlockRange(__css2cid(consensusAddr), fromBlock, toBlock);
   }
 
@@ -361,11 +376,11 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
    *
    * Note: This method should be called at the end of the period.
    */
-  function _maintainingInBlockRange(
-    address candidateId,
-    uint256 fromBlock,
-    uint256 toBlock
-  ) private view returns (bool) {
+  function _maintainingInBlockRange(address candidateId, uint256 fromBlock, uint256 toBlock)
+    private
+    view
+    returns (bool)
+  {
     Schedule storage s = _schedule[candidateId];
     return Math.twoRangeOverlap(fromBlock, toBlock, s.from, s.to);
   }

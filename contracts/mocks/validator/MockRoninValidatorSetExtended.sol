@@ -9,7 +9,7 @@ contract MockRoninValidatorSetExtended is MockRoninValidatorSetOverridePrecompil
   bool private _initialized;
   uint256[] internal _epochs;
 
-  constructor() {}
+  constructor() { }
 
   function initEpoch() public {
     if (!_initialized) {

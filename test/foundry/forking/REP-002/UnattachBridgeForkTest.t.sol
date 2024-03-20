@@ -4,12 +4,16 @@ pragma solidity ^0.8.0;
 import "../RoninTest.t.sol";
 
 import { TConsensus } from "@ronin/contracts/udvts/Types.sol";
-import { RoninValidatorSetTimedMigrator } from "@ronin/contracts/ronin/validator/migrations/RoninValidatorSetTimedMigrator.sol";
+import { RoninValidatorSetTimedMigrator } from
+  "@ronin/contracts/ronin/validator/migrations/RoninValidatorSetTimedMigrator.sol";
 import { ContractType } from "@ronin/contracts/utils/ContractType.sol";
 import { Staking } from "@ronin/contracts/ronin/staking/Staking.sol";
 import { SlashIndicator } from "@ronin/contracts/ronin/slash-indicator/SlashIndicator.sol";
 import { NotifiedMigrator } from "@ronin/contracts/ronin/validator/migrations/NotifiedMigrator.sol";
-import { IRoninTrustedOrganization, RoninTrustedOrganization } from "@ronin/contracts/multi-chains/RoninTrustedOrganization.sol";
+import {
+  IRoninTrustedOrganization,
+  RoninTrustedOrganization
+} from "@ronin/contracts/multi-chains/RoninTrustedOrganization.sol";
 import { IHasContracts } from "@ronin/contracts/interfaces/collections/IHasContracts.sol";
 import { ICoinbaseExecution } from "@ronin/contracts/interfaces/validator/ICoinbaseExecution.sol";
 import { ITimingInfo } from "@ronin/contracts/interfaces/validator/info-fragments/ITimingInfo.sol";
@@ -45,12 +49,8 @@ contract UnattachBridgeForkTest is RoninTest {
   }
 
   function _setUp() internal virtual override onWhichFork(_roninFork) {
-    address mockPrecompile = deployImmutable(
-      type(MockPrecompile).name,
-      type(MockPrecompile).creationCode,
-      EMPTY_PARAM,
-      ZERO_VALUE
-    );
+    address mockPrecompile =
+      deployImmutable(type(MockPrecompile).name, type(MockPrecompile).creationCode, EMPTY_PARAM, ZERO_VALUE);
     vm.etch(address(0x68), mockPrecompile.code);
 
     _prevImpl = _getProxyImplementation(RONIN_VALIDATOR_SET_CONTRACT);
@@ -90,12 +90,8 @@ contract UnattachBridgeForkTest is RoninTest {
     );
 
     address stakingOldLogic = _getProxyImplementation(_stakingProxy);
-    address stakingNewLogic = deployImmutable(
-      _join("New_", type(Staking).name),
-      type(Staking).creationCode,
-      EMPTY_PARAM,
-      ZERO_VALUE
-    );
+    address stakingNewLogic =
+      deployImmutable(_join("New_", type(Staking).name), type(Staking).creationCode, EMPTY_PARAM, ZERO_VALUE);
     _stakingSwitcher = deployImmutable(
       _join("Staking_", type(NotifiedMigrator).name),
       type(NotifiedMigrator).creationCode,
@@ -105,10 +101,7 @@ contract UnattachBridgeForkTest is RoninTest {
 
     address slashIndicatorOldLogic = _getProxyImplementation(_slashIndicatorProxy);
     address slashIndicatorNewLogic = deployImmutable(
-      _join("New_", type(SlashIndicator).name),
-      type(SlashIndicator).creationCode,
-      EMPTY_PARAM,
-      ZERO_VALUE
+      _join("New_", type(SlashIndicator).name), type(SlashIndicator).creationCode, EMPTY_PARAM, ZERO_VALUE
     );
     _slashIndicatorSwitcher = deployImmutable(
       _join("SlashIndicator_", type(NotifiedMigrator).name),
@@ -138,13 +131,11 @@ contract UnattachBridgeForkTest is RoninTest {
 
     assertEq(_getProxyImplementation(RONIN_VALIDATOR_SET_CONTRACT), _newImpl);
     assertEq(
-      _getProxyImplementation(_roninTrustedOrgProxy),
-      NotifiedMigrator(payable(_roninTrustedOrgSwitcher)).NEW_IMPL()
+      _getProxyImplementation(_roninTrustedOrgProxy), NotifiedMigrator(payable(_roninTrustedOrgSwitcher)).NEW_IMPL()
     );
     assertEq(_getProxyImplementation(_stakingProxy), NotifiedMigrator(payable(_stakingSwitcher)).NEW_IMPL());
     assertEq(
-      _getProxyImplementation(_slashIndicatorProxy),
-      NotifiedMigrator(payable(_slashIndicatorSwitcher)).NEW_IMPL()
+      _getProxyImplementation(_slashIndicatorProxy), NotifiedMigrator(payable(_slashIndicatorSwitcher)).NEW_IMPL()
     );
 
     _updateDuplicatedTrustedOrg(seed);
@@ -160,9 +151,7 @@ contract UnattachBridgeForkTest is RoninTest {
 
     uint256 numberOfBlocksInEpoch = ITimingInfo(address(RONIN_VALIDATOR_SET_CONTRACT)).numberOfBlocksInEpoch();
 
-    uint256 epochEndingBlockNumber = block.number +
-      (numberOfBlocksInEpoch - 1) -
-      (block.number % numberOfBlocksInEpoch);
+    uint256 epochEndingBlockNumber = block.number + (numberOfBlocksInEpoch - 1) - (block.number % numberOfBlocksInEpoch);
     uint256 nextDayTimestamp = block.timestamp + 1 days;
 
     // fast forward to next day
@@ -195,28 +184,23 @@ contract UnattachBridgeForkTest is RoninTest {
       payable(candidateAdmin),
       commissionRate,
       abi.encodePacked(candidateAdmin, consensusAddr),
-      '0x'
+      "0x"
     );
   }
 
   function _updateDuplicatedTrustedOrg(uint256 seed) internal onWhichFork(_roninFork) {
-    IRoninTrustedOrganization.TrustedOrganization[] memory allTrustedOrgs = IRoninTrustedOrganization(
-      address(_roninTrustedOrgProxy)
-    ).getAllTrustedOrganizations();
+    IRoninTrustedOrganization.TrustedOrganization[] memory allTrustedOrgs =
+      IRoninTrustedOrganization(address(_roninTrustedOrgProxy)).getAllTrustedOrganizations();
 
-    IRoninTrustedOrganization.TrustedOrganization memory trustedOrgToUpdate = allTrustedOrgs[
-      _bound(seed, 0, allTrustedOrgs.length - 1)
-    ];
+    IRoninTrustedOrganization.TrustedOrganization memory trustedOrgToUpdate =
+      allTrustedOrgs[_bound(seed, 0, allTrustedOrgs.length - 1)];
 
-    IRoninTrustedOrganization.TrustedOrganization memory trustedOrgToDuplicate = allTrustedOrgs[
-      _bound(~seed, 0, allTrustedOrgs.length - 1)
-    ];
+    IRoninTrustedOrganization.TrustedOrganization memory trustedOrgToDuplicate =
+      allTrustedOrgs[_bound(~seed, 0, allTrustedOrgs.length - 1)];
 
     trustedOrgToUpdate.governor = trustedOrgToDuplicate.governor;
 
-    IRoninTrustedOrganization.TrustedOrganization[] memory list = new IRoninTrustedOrganization.TrustedOrganization[](
-      1
-    );
+    IRoninTrustedOrganization.TrustedOrganization[] memory list = new IRoninTrustedOrganization.TrustedOrganization[](1);
     list[0] = trustedOrgToUpdate;
 
     vm.prank(_getProxyAdmin(_roninTrustedOrgProxy), _getProxyAdmin(_roninTrustedOrgProxy));

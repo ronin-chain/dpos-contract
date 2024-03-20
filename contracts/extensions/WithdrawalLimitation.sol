@@ -106,10 +106,7 @@ abstract contract WithdrawalLimitation is GatewayV3 {
    * Emits the `HighTierThresholdsUpdated` event.
    *
    */
-  function setHighTierThresholds(
-    address[] calldata _tokens,
-    uint256[] calldata _thresholds
-  ) external virtual onlyAdmin {
+  function setHighTierThresholds(address[] calldata _tokens, uint256[] calldata _thresholds) external virtual onlyAdmin {
     if (_tokens.length == 0) revert ErrEmptyArray();
     _setHighTierThresholds(_tokens, _thresholds);
   }
@@ -203,7 +200,7 @@ abstract contract WithdrawalLimitation is GatewayV3 {
   function _setHighTierThresholds(address[] calldata _tokens, uint256[] calldata _thresholds) internal virtual {
     if (_tokens.length != _thresholds.length) revert ErrLengthMismatch(msg.sig);
 
-    for (uint256 _i; _i < _tokens.length; ) {
+    for (uint256 _i; _i < _tokens.length;) {
       highTierThreshold[_tokens[_i]] = _thresholds[_i];
 
       unchecked {
@@ -225,7 +222,7 @@ abstract contract WithdrawalLimitation is GatewayV3 {
   function _setLockedThresholds(address[] calldata _tokens, uint256[] calldata _thresholds) internal virtual {
     if (_tokens.length != _thresholds.length) revert ErrLengthMismatch(msg.sig);
 
-    for (uint256 _i; _i < _tokens.length; ) {
+    for (uint256 _i; _i < _tokens.length;) {
       lockedThreshold[_tokens[_i]] = _thresholds[_i];
 
       unchecked {
@@ -248,7 +245,7 @@ abstract contract WithdrawalLimitation is GatewayV3 {
   function _setUnlockFeePercentages(address[] calldata _tokens, uint256[] calldata _percentages) internal virtual {
     if (_tokens.length != _percentages.length) revert ErrLengthMismatch(msg.sig);
 
-    for (uint256 _i; _i < _tokens.length; ) {
+    for (uint256 _i; _i < _tokens.length;) {
       if (_percentages[_i] > _MAX_PERCENTAGE) revert ErrInvalidPercentage();
 
       unlockFeePercentages[_tokens[_i]] = _percentages[_i];
@@ -272,7 +269,7 @@ abstract contract WithdrawalLimitation is GatewayV3 {
   function _setDailyWithdrawalLimits(address[] calldata _tokens, uint256[] calldata _limits) internal virtual {
     if (_tokens.length != _limits.length) revert ErrLengthMismatch(msg.sig);
 
-    for (uint256 _i; _i < _tokens.length; ) {
+    for (uint256 _i; _i < _tokens.length;) {
       dailyWithdrawalLimit[_tokens[_i]] = _limits[_i];
 
       unchecked {

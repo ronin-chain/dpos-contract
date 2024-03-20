@@ -32,7 +32,7 @@ library BridgeOperatorsBallot {
     if (_ballot.operators.length == 0) revert ErrEmptyArray();
 
     address _addr = _ballot.operators[0];
-    for (uint _i = 1; _i < _ballot.operators.length; ) {
+    for (uint _i = 1; _i < _ballot.operators.length;) {
       if (_addr >= _ballot.operators[_i]) revert ErrInvalidOrderOfBridgeOperator();
       _addr = _ballot.operators[_i];
       unchecked {

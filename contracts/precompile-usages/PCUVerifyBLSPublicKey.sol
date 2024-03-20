@@ -23,23 +23,16 @@ abstract contract PCUVerifyBLSPublicKey is PrecompiledUsage {
     address smc = precompileVerifyBLSPublicKeyAddress();
     bool success = true;
 
-    bytes memory payload = abi.encodeWithSignature(
-      "validateProofOfPossession(bytes,bytes)",
-      publicKey,
-      proofOfPossession
-    );
+    bytes memory payload =
+      abi.encodeWithSignature("validateProofOfPossession(bytes,bytes)", publicKey, proofOfPossession);
     uint payloadLength = payload.length;
     uint[1] memory output;
 
     assembly {
       let payloadStart := add(payload, 0x20)
-      if iszero(staticcall(gas(), smc, payloadStart, payloadLength, output, 0x20)) {
-        success := 0
-      }
+      if iszero(staticcall(gas(), smc, payloadStart, payloadLength, output, 0x20)) { success := 0 }
 
-      if iszero(returndatasize()) {
-        success := 0
-      }
+      if iszero(returndatasize()) { success := 0 }
     }
 
     if (!success) revert ErrCallPrecompiled();
