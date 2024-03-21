@@ -259,13 +259,9 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
   ) internal view returns (bool[] memory resList) {
     uint256 length = idList.length;
     resList = new bool[](length);
-    
-    for (uint256 i; i < length;) {
-      resList[i] = _checkMaintainedById(idList[i], atBlock);
 
-      unchecked {
-        ++i;
-      }
+    for (uint256 i; i < length; ++i) {
+      resList[i] = _checkMaintainedById(idList[i], atBlock);
     }
   }
 
@@ -297,13 +293,11 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
     uint256 fromBlock,
     uint256 toBlock
   ) internal view returns (bool[] memory resList) {
-    resList = new bool[](idList.length);
-    for (uint i = 0; i < idList.length;) {
-      resList[i] = _maintainingInBlockRange(idList[i], fromBlock, toBlock);
+    uint256 length = idList.length;
+    resList = new bool[](length);
 
-      unchecked {
-        ++i;
-      }
+    for (uint256 i; i < length; ++i) {
+      resList[i] = _maintainingInBlockRange(idList[i], fromBlock, toBlock);
     }
   }
 
@@ -312,11 +306,11 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
    */
   function totalSchedule() public view returns (uint256 count) {
     unchecked {
-      address[] memory scheduledCandidates = _scheduledCandidates.values();
-      uint256 length = scheduledCandidates.length;
+      address[] memory mSchedules = _scheduledCandidates.values();
+      uint256 length = mSchedules.length;
 
       for (uint256 i; i < length; ++i) {
-        if (_checkScheduledById(scheduledCandidates[i])) ++count;
+        if (_checkScheduledById(mSchedules[i])) ++count;
       }
     }
   }
@@ -334,14 +328,14 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
    */
   function _syncSchedule() internal returns (uint256 count) {
     unchecked {
-      address[] memory scheduledCandidates = _scheduledCandidates.values();
-      uint256 length = scheduledCandidates.length;
+      address[] memory mSchedules = _scheduledCandidates.values();
+      uint256 length = mSchedules.length;
 
       for (uint256 i; i < length; ++i) {
-        if (_checkScheduledById(scheduledCandidates[i])) {
+        if (_checkScheduledById(mSchedules[i])) {
           ++count;
         } else {
-          _scheduledCandidates.remove(scheduledCandidates[i]);
+          _scheduledCandidates.remove(mSchedules[i]);
         }
       }
     }
