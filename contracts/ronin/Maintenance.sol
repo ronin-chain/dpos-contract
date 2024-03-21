@@ -81,7 +81,9 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
       uint256 length = validatorIds.length;
 
       for (uint256 i; i < length; ++i) {
-        if (_checkScheduledById(validatorIds[i])) _scheduledCandidates.add(validatorIds[i]);
+        if (_checkScheduledById(validatorIds[i])) {
+          _scheduledCandidates.add(validatorIds[i]);
+        }
       }
     }
   }
