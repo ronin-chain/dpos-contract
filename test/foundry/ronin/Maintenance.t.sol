@@ -38,7 +38,7 @@ contract MaintenanceTest is Test {
     _applyValidatorCandidate();
   }
 
-  function testFuzz_schedule(uint256 index, uint64 durationInBlock) external {
+  function testFuzz_schedule(uint256 index, uint32 durationInBlock) external {
     address[] memory validatorIds = validatorSet.getValidatorIds();
     address validatorId = validatorIds[index % validatorIds.length];
 
@@ -98,7 +98,10 @@ contract MaintenanceTest is Test {
     uint256 minDuration = maintenance.minMaintenanceDurationInBlock();
     uint256 maxDuration = maintenance.maxMaintenanceDurationInBlock();
 
-    durationInBlock = _bound(durationInBlock, minDuration, maxDuration);
+    console.log("minDuration", minDuration);
+    console.log("maxDuration", maxDuration);
+
+    durationInBlock = _bound(durationInBlock, minDuration - 1, maxDuration - 1);
 
     startBlock = latestEpochBlock + numberOfBlockInEpoch + minOffset + 1;
     endBlock = latestEpochBlock + numberOfBlockInEpoch + minOffset

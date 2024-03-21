@@ -38,6 +38,11 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
     _disableInitializers();
   }
 
+  modifier syncSchedule() {
+    _syncSchedule();
+    _;
+  }
+
   /**
    * @dev Initializes the contract storage.
    */
@@ -155,7 +160,7 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
     _requireCandidateAdmin(candidateId);
     if (_checkScheduledById(candidateId)) revert ErrAlreadyScheduled();
     if (!_checkCooldownEndedById(candidateId)) revert ErrCooldownTimeNotYetEnded();
-    if (totalSchedule() >= _maxSchedule) revert ErrTotalOfSchedulesExceeded();
+    if (_syncSchedule() >= _maxSchedule) revert ErrTotalOfSchedulesExceeded();
     if (!startedAtBlock.inRange(block.number + _minOffsetToStartSchedule, block.number + _maxOffsetToStartSchedule)) {
       revert ErrStartBlockOutOfRange();
     }
@@ -182,7 +187,7 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
   /**
    * @inheritdoc IMaintenance
    */
-  function cancelSchedule(TConsensus consensusAddr) external override {
+  function cancelSchedule(TConsensus consensusAddr) external override syncSchedule {
     address candidateId = __css2cid(consensusAddr);
 
     _requireCandidateAdmin(candidateId);
@@ -202,7 +207,7 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
   /**
    * @inheritdoc IMaintenance
    */
-  function exitMaintenance(TConsensus consensusAddr) external {
+  function exitMaintenance(TConsensus consensusAddr) external syncSchedule {
     address candidateId = __css2cid(consensusAddr);
     uint256 currentBlock = block.number;
 
@@ -250,8 +255,10 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
     address[] memory idList,
     uint256 atBlock
   ) internal view returns (bool[] memory resList) {
-    resList = new bool[](idList.length);
-    for (uint i = 0; i < idList.length;) {
+    uint256 length = idList.length;
+    resList = new bool[](length);
+    
+    for (uint256 i; i < length;) {
       resList[i] = _checkMaintainedById(idList[i], atBlock);
 
       unchecked {
@@ -301,10 +308,11 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
   /**
    * @inheritdoc IMaintenance
    */
-  function totalSchedule() public view override returns (uint256 count) {
+  function totalSchedule() public view returns (uint256 count) {
     unchecked {
       address[] memory scheduledCandidates = _scheduledCandidates.values();
       uint256 length = scheduledCandidates.length;
+
       for (uint256 i; i < length; ++i) {
         if (_checkScheduledById(scheduledCandidates[i])) ++count;
       }
@@ -316,6 +324,25 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
    */
   function checkMaintained(TConsensus consensusAddr, uint256 atBlock) external view override returns (bool) {
     return _checkMaintainedById(__css2cid(consensusAddr), atBlock);
+  }
+
+  /**
+   * @dev Synchronizes the schedule by checking if the scheduled candidates are still in maintenance and removes the candidates that are no longer in maintenance.
+   * @return count The number of active schedules.
+   */
+  function _syncSchedule() internal returns (uint256 count) {
+    unchecked {
+      address[] memory scheduledCandidates = _scheduledCandidates.values();
+      uint256 length = scheduledCandidates.length;
+
+      for (uint256 i; i < length; ++i) {
+        if (_checkScheduledById(scheduledCandidates[i])) {
+          ++count;
+        } else {
+          _scheduledCandidates.remove(scheduledCandidates[i]);
+        }
+      }
+    }
   }
 
   /**
@@ -360,7 +387,9 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
   }
 
   function _checkCooldownEndedById(address candidateId) internal view returns (bool) {
-    return block.timestamp > _schedule[candidateId].requestTimestamp + _cooldownSecsToMaintain;
+    unchecked {
+      return block.timestamp > _schedule[candidateId].requestTimestamp + _cooldownSecsToMaintain;
+    }
   }
 
   /**
