@@ -20,7 +20,6 @@ import {
   RoninTrustedOrganization,
   TemporalRoninTrustedOrganizationDeploy
 } from "script/contracts/TemporalRoninTrustedOrganizationDeploy.s.sol";
-import { Profile_Testnet } from "@ronin/contracts/ronin/profile/Profile_Testnet.sol";
 import { Profile_Mainnet } from "@ronin/contracts/ronin/profile/Profile_Mainnet.sol";
 import { Profile } from "@ronin/contracts/ronin/profile/Profile.sol";
 
@@ -124,14 +123,14 @@ abstract contract Migration__20232811_ChangeGovernanceAdmin_Common is RoninMigra
         }
 
         // Cheat add Profile for community-validator: 0x9687e8C41fa369aD08FD278a43114C4207856a61,  0x32F66d0F9F19Db7b0EF1E9f13160884DA65467e7
-        __scriptProxyTarget.push(profileProxy);
-        __values.push(0);
-        __calldatas.push(
-          abi.encodeWithSelector(
-            TransparentUpgradeableProxyV2.functionDelegateCall.selector,
-            abi.encodeWithSelector(Profile_Testnet.migrateRenouncedCandidate.selector)
-          )
-        );
+        // __scriptProxyTarget.push(profileProxy);
+        // __values.push(0);
+        // __calldatas.push(
+        //   abi.encodeWithSelector(
+        //     TransparentUpgradeableProxyV2.functionDelegateCall.selector,
+        //     abi.encodeWithSelector(Profile_Testnet.migrateRenouncedCandidate.selector)
+        //   )
+        // );
       } else if (block.chainid == DefaultNetwork.RoninMainnet.chainId()) {
         _proposalDuration = 10 days;
         // address profileProxy = config.getAddressFromCurrentNetwork(Contract.Profile.key());
