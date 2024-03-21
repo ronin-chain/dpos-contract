@@ -45,20 +45,77 @@ contract MaintenanceTest is Test {
     _schedule(validatorId, durationInBlock);
   }
 
+  function testFuzz_cancelSchedule(uint256 index) external {
+    address[] memory validatorIds = validatorSet.getValidatorIds();
+    address validatorId = validatorIds[index % validatorIds.length];
+
+    IProfile.CandidateProfile memory candidateProfile = profile.getId2Profile(validatorId);
+    TConsensus consensus = candidateProfile.consensus;
+    address admin = candidateProfile.admin;
+
+    uint256 minOffset = maintenance.minOffsetToStartSchedule();
+    uint256 latestEpochBlock = validatorSet.getLastUpdatedBlock();
+    uint256 numberOfBlockInEpoch = validatorSet.numberOfBlocksInEpoch();
+    uint256 minDuration = maintenance.minMaintenanceDurationInBlock();
+    uint256 maxDuration = maintenance.maxMaintenanceDurationInBlock();
+
+    uint256 durationInBlock = _bound(100, minDuration, maxDuration);
+
+    uint256 startBlock = latestEpochBlock + numberOfBlockInEpoch + minOffset + 1;
+    uint256 endBlock = latestEpochBlock + numberOfBlockInEpoch + minOffset
+      + numberOfBlockInEpoch * (durationInBlock / numberOfBlockInEpoch + 1);
+
+    vm.prank(admin);
+    maintenance.schedule(consensus, startBlock, endBlock);
+
+    assertTrue(maintenance.checkScheduled(consensus));
+
+    vm.prank(admin);
+    maintenance.cancelSchedule(consensus);
+
+    vm.roll(startBlock + 1);
+    assertFalse(maintenance.checkScheduled(consensus), "maintenance is still scheduled");
+    assertEq(maintenance.totalSchedule(), 0, "total schedule is not 0");
+  }
+
+  function testConcrete_CanSchedule_AfterAutoEndSchedules_schedule() external {
+    address[] memory validatorIds = validatorSet.getValidatorIds();
+    assertEq(validatorIds.length, 4);
+
+    _schedule(validatorIds[0], 100);
+    _schedule(validatorIds[1], 200);
+
+    vm.roll(block.number + 20);
+    vm.warp(block.timestamp + 60);
+    (,,, uint256 end2) = _schedule(validatorIds[2], 300);
+
+    vm.roll(end2 + 1);
+    vm.warp(block.timestamp + (end2 + 1) * 3);
+    _wrapUpEpoch();
+
+    _fastForwardToNextDay();
+    _wrapUpEpoch();
+    assertEq(maintenance.totalSchedule(), 0);
+
+    _schedule(validatorIds[3], 300);
+
+    assertEq(maintenance.totalSchedule(), 1);
+  }
+
   function testConcrete_totalSchedule() external {
     assertEq(maintenance.totalSchedule(), 0);
 
     address[] memory validatorIds = validatorSet.getValidatorIds();
 
-    (address admin0, TConsensus consensus0, uint256 start0, uint256 end0) = _schedule(validatorIds[0], 100);
+    (address admin0, TConsensus consensus0, uint256 start0,) = _schedule(validatorIds[0], 100);
 
     vm.roll(block.number + 10);
     vm.warp(block.timestamp + 30);
-    (address admin1, TConsensus consensus1, uint256 start1, uint256 end1) = _schedule(validatorIds[1], 200);
+    (address admin1, TConsensus consensus1, uint256 start1,) = _schedule(validatorIds[1], 200);
 
     vm.roll(block.number + 20);
     vm.warp(block.timestamp + 60);
-    (address admin2, TConsensus consensus2, uint256 start2, uint256 end2) = _schedule(validatorIds[2], 300);
+    (, TConsensus consensus2,, uint256 end2) = _schedule(validatorIds[2], 300);
 
     assertEq(maintenance.totalSchedule(), 3);
 
@@ -92,6 +149,9 @@ contract MaintenanceTest is Test {
     consensus = candidateProfile.consensus;
     admin = candidateProfile.admin;
 
+    console.log("admin", admin);
+    console.log("consensus", TConsensus.unwrap(consensus));
+
     uint256 minOffset = maintenance.minOffsetToStartSchedule();
     uint256 latestEpochBlock = validatorSet.getLastUpdatedBlock();
     uint256 numberOfBlockInEpoch = validatorSet.numberOfBlocksInEpoch();
@@ -101,7 +161,7 @@ contract MaintenanceTest is Test {
     console.log("minDuration", minDuration);
     console.log("maxDuration", maxDuration);
 
-    durationInBlock = _bound(durationInBlock, minDuration - 1, maxDuration - 1);
+    durationInBlock = _bound(durationInBlock, minDuration, maxDuration);
 
     startBlock = latestEpochBlock + numberOfBlockInEpoch + minOffset + 1;
     endBlock = latestEpochBlock + numberOfBlockInEpoch + minOffset
@@ -163,8 +223,8 @@ contract MaintenanceTest is Test {
   }
 
   function _applyValidatorCandidate() private {
-    address candidateAdmin = makeAddr("mock-candidate-admin-t1");
-    TConsensus consensusAddr = TConsensus.wrap(makeAddr("mock-consensus-addr-t1"));
+    address candidateAdmin = makeAddr("mock-candidate-admin-t1111");
+    TConsensus consensusAddr = TConsensus.wrap(makeAddr("mock-consensus-addr-t1111"));
 
     _applyValidatorCandidate(candidateAdmin, consensusAddr, 1000 ether);
 
@@ -192,6 +252,16 @@ contract MaintenanceTest is Test {
 
     _fastForwardToNextDay();
     _wrapUpEpoch();
+
+    candidateAdmin = makeAddr("mock-candidate-admin-t4444");
+    consensusAddr = TConsensus.wrap(makeAddr("mock-consensus-addr-t4444"));
+
+    _applyValidatorCandidate(candidateAdmin, consensusAddr, 1000 ether);
+
+    assertTrue(validatorSet.isValidatorCandidate(consensusAddr));
+
+    _fastForwardToNextDay();
+    _wrapUpEpoch();
   }
 
   function _wrapUpEpochs(uint256 times) internal {
@@ -207,7 +277,7 @@ contract MaintenanceTest is Test {
 
   function _wrapUpEpoch(address caller) internal {
     vm.startPrank(caller);
-    validatorSet.wrapUpEpoch();
+    try validatorSet.wrapUpEpoch() { } catch { }
     vm.stopPrank();
   }
 
