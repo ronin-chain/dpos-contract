@@ -29,6 +29,13 @@ abstract contract RewardCalculation is IRewardPool {
    */
   function getReward(TConsensus consensusAddr, address user) external view returns (uint256) {
     address poolId = __css2cid(consensusAddr);
+    return getRewardById(poolId, user);
+  }
+
+  /**
+   * @inheritdoc IRewardPool
+   */
+  function getRewardById(address poolId, address user) public view returns (uint256) {
     return _getReward(poolId, user, _currentPeriod(), _getStakingAmount(poolId, user));
   }
 
@@ -45,12 +52,11 @@ abstract contract RewardCalculation is IRewardPool {
   /**
    * @dev Returns the reward amount that user claimable.
    */
-  function _getReward(
-    address poolId,
-    address user,
-    uint256 latestPeriod,
-    uint256 latestStakingAmount
-  ) internal view returns (uint256) {
+  function _getReward(address poolId, address user, uint256 latestPeriod, uint256 latestStakingAmount)
+    internal
+    view
+    returns (uint256)
+  {
     UserRewardFields storage _reward = _userReward[poolId][user];
 
     if (_reward.lastPeriod == latestPeriod) {
