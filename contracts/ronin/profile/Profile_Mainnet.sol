@@ -10,42 +10,22 @@ contract Profile_Mainnet is Profile {
     _;
   }
 
-  function __migrationRenouncedCandidates() internal override onlyInitializing {
+  function migrateOmissionREP4() external onlyAdmin {
     if (block.chainid != 2020) return;
+    address[] memory omittedCssList = new address[](3);
 
-    address[4] memory lConsensus = __consensuses();
-    address[4] memory lAdmin = __admins();
-    address[4] memory lTreasury = __treasuries();
+    omittedCssList[0] = 0x454f6C34F0cfAdF1733044Fdf8B06516BD1E9529;
+    omittedCssList[1] = 0xD7fEf73d95ccEdb26483fd3C6C48393e50708159;
+    omittedCssList[2] = 0xbD4bf317Da1928CC2f9f4DA9006401f3944A0Ab5;
 
-    for (uint i; i < lConsensus.length; ++i) {
-      __migrate(lConsensus[i], lAdmin[i], lTreasury[i]);
+    CandidateProfile storage _profile;
+    for (uint i; i < omittedCssList.length; ++i) {
+      address id = omittedCssList[i];
+      TConsensus css = TConsensus.wrap(id);
+
+      _profile = _id2Profile[id];
+      _profile.oldConsensus = css;
+      _consensus2Id[css] = id;
     }
-  }
-
-  function __admins() private pure returns (address[4] memory list) {
-    return [
-      0xdb3b1F69259f88Ce9d58f3738e15e3CC1B5A8563,
-      0x335fE9EF827a9F27CBAb819b31e5eE182c2081d7,
-      0xbCcB3FDa2B9e3Ab5b824AA9D5c1C4A62A98Da937,
-      0x9bc1946f1Aa6DA4667a6Ee966e66b9ec60637E10
-    ];
-  }
-
-  function __consensuses() private pure returns (address[4] memory list) {
-    return [
-      0x07d28F88D677C4056EA6722aa35d92903b2a63da,
-      0x262B9fcfe8CFA900aF4D1f5c20396E969B9655DD,
-      0x20238eB5643d4D7b7Ab3C30f3bf7B8E2B85cA1e7,
-      0x03A7B98C226225e330d11D1B9177891391Fa4f80
-    ];
-  }
-
-  function __treasuries() private pure returns (address[4] memory list) {
-    return [
-      0xdb3b1F69259f88Ce9d58f3738e15e3CC1B5A8563,
-      0x335fE9EF827a9F27CBAb819b31e5eE182c2081d7,
-      0xbCcB3FDa2B9e3Ab5b824AA9D5c1C4A62A98Da937,
-      0x9bc1946f1Aa6DA4667a6Ee966e66b9ec60637E10
-    ];
   }
 }

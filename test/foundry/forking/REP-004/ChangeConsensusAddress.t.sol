@@ -9,7 +9,6 @@ import { Maintenance } from "@ronin/contracts/ronin/Maintenance.sol";
 import { ContractType } from "@ronin/contracts/utils/ContractType.sol";
 import { MockPrecompile } from "@ronin/contracts/mocks/MockPrecompile.sol";
 import { IProfile, Profile } from "@ronin/contracts/ronin/profile/Profile.sol";
-import { Profile_Testnet } from "@ronin/contracts/ronin/profile/Profile_Testnet.sol";
 import { Profile_Mainnet } from "@ronin/contracts/ronin/profile/Profile_Mainnet.sol";
 import { IBaseStaking, Staking } from "@ronin/contracts/ronin/staking/Staking.sol";
 import { HasContracts } from "@ronin/contracts/extensions/collections/HasContracts.sol";
@@ -964,7 +963,8 @@ contract ChangeConsensusAddressForkTest is Test {
       logic = new Profile_Mainnet();
     }
     if (block.chainid == 2021) {
-      logic = new Profile_Testnet();
+      // logic = new Profile_Testnet();
+      logic = new Profile();
     }
 
     uint gl1 = gasleft();
