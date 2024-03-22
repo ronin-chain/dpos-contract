@@ -12,7 +12,12 @@ import { IBridgeSlash, MockBridgeSlash, BridgeSlash } from "@ronin/contracts/moc
 import { IBridgeManager, BridgeManagerUtils } from "../utils/BridgeManagerUtils.t.sol";
 import { RoninBridgeManager } from "@ronin/contracts/ronin/gateway/RoninBridgeManager.sol";
 import { Math } from "@ronin/contracts/libraries/Math.sol";
-import { RoleAccess, ContractType, AddressArrayUtils, MockBridgeManager } from "@ronin/contracts/mocks/ronin/MockBridgeManager.sol";
+import {
+  RoleAccess,
+  ContractType,
+  AddressArrayUtils,
+  MockBridgeManager
+} from "@ronin/contracts/mocks/ronin/MockBridgeManager.sol";
 import { ErrProxyCallFailed, ErrorHandler } from "@ronin/contracts/libraries/ErrorHandler.sol";
 import { IBridgeSlashEvents } from "@ronin/contracts/interfaces/bridge/events/IBridgeSlashEvents.sol";
 
@@ -60,11 +65,8 @@ contract BridgeSlashTest is IBridgeSlashEvents, BridgeManagerUtils {
     IBridgeSlash bridgeSlashContract = IBridgeSlash(_bridgeSlashContract);
     IBridgeSlash.Tier tier = bridgeSlashContract.getSlashTier(ballot, totalVote);
     // Calculate the new slash until period using the mock bridge slash contract
-    uint256 newSlashUntilPeriod = MockBridgeSlash(payable(_bridgeSlashContract)).calcSlashUntilPeriod(
-      tier,
-      period,
-      slashUntilPeriod
-    );
+    uint256 newSlashUntilPeriod =
+      MockBridgeSlash(payable(_bridgeSlashContract)).calcSlashUntilPeriod(tier, period, slashUntilPeriod);
 
     // Log the tier and slash period information
     console.log("tier", "period", "slashUntilPeriod", "newSlashUntilPeriod");
@@ -128,19 +130,15 @@ contract BridgeSlashTest is IBridgeSlashEvents, BridgeManagerUtils {
     MockBridgeManager(payable(_bridgeManagerContract)).registerCallbacks(registers);
 
     // Generate valid inputs for bridge operators
-    (address[] memory bridgeOperators, address[] memory governors, uint96[] memory voteWeights) = getValidInputs(
-      r1,
-      r2,
-      r3,
-      numBridgeOperators
-    );
+    (address[] memory bridgeOperators, address[] memory governors, uint96[] memory voteWeights) =
+      getValidInputs(r1, r2, r3, numBridgeOperators);
 
     _addBridgeOperators(_bridgeManagerContract, _bridgeManagerContract, voteWeights, governors, bridgeOperators);
 
     // Retrieve the added periods for the bridge operators
     uint256[] memory addedPeriods = IBridgeSlash(_bridgeSlashContract).getAddedPeriodOf(bridgeOperators);
     // Check that the added periods match the current period
-    for (uint256 i; i < addedPeriods.length; ) {
+    for (uint256 i; i < addedPeriods.length;) {
       assertEq(addedPeriods[i], period);
       unchecked {
         ++i;
@@ -175,9 +173,9 @@ contract BridgeSlashTest is IBridgeSlashEvents, BridgeManagerUtils {
     MockBridgeManager(payable(_bridgeManagerContract)).registerCallbacks(registers);
 
     // Decode the default bridge manager inputs to retrieve bridge operators
-    (address[] memory bridgeOperators, , ) = abi.decode(_defaultBridgeManagerInputs, (address[], address[], uint256[]));
+    (address[] memory bridgeOperators,,) = abi.decode(_defaultBridgeManagerInputs, (address[], address[], uint256[]));
 
-    for (uint256 i; i < duration; ) {
+    for (uint256 i; i < duration;) {
       // Set the current period in the mock validator contract
       MockValidatorContract(payable(_validatorContract)).setCurrentPeriod(period);
       // Generate valid inputs for newly added operators
@@ -186,19 +184,12 @@ contract BridgeSlashTest is IBridgeSlashEvents, BridgeManagerUtils {
       {
         address[] memory newlyAddedGovernors;
         uint96[] memory newlyAddedWeights;
-        (newlyAddedOperators, newlyAddedGovernors, newlyAddedWeights) = getValidInputs(
-          r1,
-          ~r1,
-          r1 << 1,
-          newlyAddedSize
-        );
+        (newlyAddedOperators, newlyAddedGovernors, newlyAddedWeights) = getValidInputs(r1, ~r1, r1 << 1, newlyAddedSize);
 
         // Add the newly added operators using the bridge manager contract
         vm.prank(_bridgeManagerContract, _bridgeManagerContract);
         bool[] memory addeds = IBridgeManager(_bridgeManagerContract).addBridgeOperators(
-          newlyAddedWeights,
-          newlyAddedGovernors,
-          newlyAddedOperators
+          newlyAddedWeights, newlyAddedGovernors, newlyAddedOperators
         );
         vm.assume(addeds.sum() == addeds.length);
         // Retrieve the added periods for the newly added operators
@@ -210,19 +201,13 @@ contract BridgeSlashTest is IBridgeSlashEvents, BridgeManagerUtils {
       // Execute slashBridgeOperators for all operators
       vm.prank(_bridgeTrackingContract, _bridgeTrackingContract);
       IBridgeSlash(_bridgeSlashContract).execSlashBridgeOperators(
-        bridgeOperators.extend(newlyAddedOperators),
-        ballots,
-        ballots.sum(),
-        ballots.sum(),
-        period
+        bridgeOperators.extend(newlyAddedOperators), ballots, ballots.sum(), ballots.sum(), period
       );
 
       // Check that the slashUntilPeriods and newlyAddedAtPeriods are correctly set
       uint256 length = newlyAddedAtPeriods.length;
-      uint256[] memory slashUntilPeriods = IBridgeSlash(_bridgeSlashContract).getSlashUntilPeriodOf(
-        newlyAddedOperators
-      );
-      for (uint256 j; j < length; ) {
+      uint256[] memory slashUntilPeriods = IBridgeSlash(_bridgeSlashContract).getSlashUntilPeriodOf(newlyAddedOperators);
+      for (uint256 j; j < length;) {
         assertEq(slashUntilPeriods[j], 0);
         assertEq(newlyAddedAtPeriods[j], period);
         unchecked {
@@ -252,14 +237,14 @@ contract BridgeSlashTest is IBridgeSlashEvents, BridgeManagerUtils {
     duration = _bound(duration, MIN_PERIOD_DURATION, MAX_PERIOD_DURATION);
 
     // Decode the default bridge manager inputs to retrieve bridge operators
-    (address[] memory bridgeOperators, , ) = abi.decode(_defaultBridgeManagerInputs, (address[], address[], uint256[]));
+    (address[] memory bridgeOperators,,) = abi.decode(_defaultBridgeManagerInputs, (address[], address[], uint256[]));
 
     vm.startPrank(_bridgeTrackingContract, _bridgeTrackingContract);
     uint256[] memory ballots;
     uint256 totalBallotForPeriod;
     IBridgeSlash bridgeSlashContract = IBridgeSlash(_bridgeSlashContract);
     MockValidatorContract validatorContract = MockValidatorContract(payable(_validatorContract));
-    for (uint256 i; i < duration; ) {
+    for (uint256 i; i < duration;) {
       // Generate random ballots for bridge operators
       ballots = _createRandomNumbers(r1, bridgeOperators.length, 0, MAX_FUZZ_INPUTS);
       totalBallotForPeriod = ballots.sum();
@@ -269,11 +254,7 @@ contract BridgeSlashTest is IBridgeSlashEvents, BridgeManagerUtils {
 
       // Execute the `execSlashBridgeOperators` function
       bridgeSlashContract.execSlashBridgeOperators(
-        bridgeOperators,
-        ballots,
-        totalBallotForPeriod,
-        totalBallotForPeriod,
-        period
+        bridgeOperators, ballots, totalBallotForPeriod, totalBallotForPeriod, period
       );
 
       // Generate the next random number for r1 using the keccak256 hash function
@@ -290,12 +271,8 @@ contract BridgeSlashTest is IBridgeSlashEvents, BridgeManagerUtils {
   function _setUp() internal virtual {
     _admin = vm.addr(1);
     _validatorContract = address(new MockValidatorContract());
-    (address[] memory bridgeOperators, address[] memory governors, uint96[] memory voteWeights) = getValidInputs(
-      DEFAULT_R1,
-      DEFAULT_R2,
-      DEFAULT_R3,
-      DEFAULT_NUM_BRIDGE_OPERATORS
-    );
+    (address[] memory bridgeOperators, address[] memory governors, uint96[] memory voteWeights) =
+      getValidInputs(DEFAULT_R1, DEFAULT_R2, DEFAULT_R3, DEFAULT_NUM_BRIDGE_OPERATORS);
     _defaultBridgeManagerInputs = abi.encode(bridgeOperators, governors, voteWeights);
     _bridgeManagerContract = address(new MockBridgeManager(bridgeOperators, governors, voteWeights));
 
@@ -303,16 +280,17 @@ contract BridgeSlashTest is IBridgeSlashEvents, BridgeManagerUtils {
     _gatewayContract = address(new TransparentUpgradeableProxyV2(_gatewayLogic, _admin, ""));
 
     _bridgeTrackingLogic = address(new BridgeTracking());
-    _bridgeTrackingContract = address(
-      new TransparentUpgradeableProxyV2(_bridgeTrackingLogic, _bridgeManagerContract, "")
-    );
+    _bridgeTrackingContract =
+      address(new TransparentUpgradeableProxyV2(_bridgeTrackingLogic, _bridgeManagerContract, ""));
 
     _bridgeSlashLogic = address(new MockBridgeSlash());
     _bridgeSlashContract = address(
       new TransparentUpgradeableProxyV2(
         _bridgeSlashLogic,
         _bridgeManagerContract,
-        abi.encodeCall(BridgeSlash.initialize, (_validatorContract, _bridgeManagerContract, _bridgeTrackingContract, address(0)))
+        abi.encodeCall(
+          BridgeSlash.initialize, (_validatorContract, _bridgeManagerContract, _bridgeTrackingContract, address(0))
+        )
       )
     );
   }

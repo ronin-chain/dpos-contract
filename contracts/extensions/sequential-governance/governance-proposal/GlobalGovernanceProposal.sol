@@ -39,13 +39,13 @@ abstract contract GlobalGovernanceProposal is GlobalCoreGovernance, CommonGovern
     Signature[] calldata signatures,
     bytes32 domainSeparator
   ) internal {
-    Proposal.ProposalDetail memory _proposal = globalProposal.intoProposalDetail(
-      _resolveTargets({ targetOptions: globalProposal.targetOptions, strict: true })
-    );
+    Proposal.ProposalDetail memory _proposal =
+      globalProposal.intoProposalDetail(_resolveTargets({ targetOptions: globalProposal.targetOptions, strict: true }));
 
     bytes32 proposalHash = _proposal.hash();
-    if (vote[0][_proposal.nonce].hash != proposalHash)
+    if (vote[0][_proposal.nonce].hash != proposalHash) {
       revert ErrInvalidProposal(proposalHash, vote[0][_proposal.nonce].hash);
+    }
 
     bytes32 globalProposalHash = globalProposal.hash();
     _castVotesBySignatures(
@@ -60,9 +60,11 @@ abstract contract GlobalGovernanceProposal is GlobalCoreGovernance, CommonGovern
   /**
    * @dev See {CommonGovernanceProposal-_getProposalSignatures}
    */
-  function getGlobalProposalSignatures(
-    uint256 round_
-  ) external view returns (address[] memory voters, Ballot.VoteType[] memory supports_, Signature[] memory signatures) {
+  function getGlobalProposalSignatures(uint256 round_)
+    external
+    view
+    returns (address[] memory voters, Ballot.VoteType[] memory supports_, Signature[] memory signatures)
+  {
     return _getProposalSignatures(0, round_);
   }
 

@@ -13,16 +13,9 @@ contract MockBridgeReward is BridgeReward {
     uint256 period,
     uint256 slashUntilPeriod
   ) external pure returns (uint256 reward, bool isSlashed) {
-    return
-      _calcRewardAndCheckSlashedStatus(
-        isValidTrackingResponse,
-        numBridgeOperators,
-        rewardPerPeriod,
-        ballot,
-        totalBallot,
-        period,
-        slashUntilPeriod
-      );
+    return _calcRewardAndCheckSlashedStatus(
+      isValidTrackingResponse, numBridgeOperators, rewardPerPeriod, ballot, totalBallot, period, slashUntilPeriod
+    );
   }
 
   function calcReward(

@@ -5,17 +5,13 @@ script = 'script'
 out = 'out'
 optimizer = true
 optimizer_runs = 1_000
-ffi=true
+ffi = true
 
-libs = [
-  'lib',
-  'node_modules/@openzeppelin',
-  'node_modules/hardhat',
-]
+libs = ['lib', 'node_modules/@openzeppelin', 'node_modules/hardhat']
 
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config
 
-solc = '0.8.22'
+solc = '0.8.25'
 use_literal_content = true
 extra_output = ["devdoc", "userdoc", "storagelayout"]
 evm_version = 'istanbul'
@@ -25,6 +21,7 @@ fs_permissions = [{ access = "read-write", path = "./" }]
 [fmt]
 line_length = 120
 tab_width = 2
+multiline_func_header = 'params_first'
 bracket_spacing = true
 int_types = 'preserve'
 

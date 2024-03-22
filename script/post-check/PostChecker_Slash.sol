@@ -43,7 +43,7 @@ abstract contract PostChecker_Slash is BaseMigration, PostChecker_Helper {
     _slashingContract = CONFIG.getAddressFromCurrentNetwork(Contract.SlashIndicator.key());
     _postCheck_RandomQueryData();
 
-    (, _tier2Threshold, _slashAmountTier2, ) = ISlashIndicator(_slashingContract).getUnavailabilitySlashingConfigs();
+    (, _tier2Threshold, _slashAmountTier2,) = ISlashIndicator(_slashingContract).getUnavailabilitySlashingConfigs();
 
     uint256 snapshotId = vm.snapshot();
 
@@ -59,15 +59,14 @@ abstract contract PostChecker_Slash is BaseMigration, PostChecker_Helper {
   }
 
   function _postCheck_CreditScore() private {
-    (uint256 gainCreditScore, uint256 maxCreditScore, , ) = ICreditScore(_slashingContract).getCreditScoreConfigs();
+    (uint256 gainCreditScore, uint256 maxCreditScore,,) = ICreditScore(_slashingContract).getCreditScoreConfigs();
     uint256 wrapUpCount = maxCreditScore / gainCreditScore;
     _wrapUpEpochs(wrapUpCount);
   }
 
   function _postCheck_RandomQueryData() private view logPostCheck("[Slash] query random data") {
-    (uint256 tier1Threshold, uint256 tier2Threshold, uint256 slashAmountTier2, uint256 jailDuration) = ISlashIndicator(
-      _slashingContract
-    ).getUnavailabilitySlashingConfigs();
+    (uint256 tier1Threshold, uint256 tier2Threshold, uint256 slashAmountTier2, uint256 jailDuration) =
+      ISlashIndicator(_slashingContract).getUnavailabilitySlashingConfigs();
     require(tier1Threshold < NORMAL_SMALL_NUMBER || tier1Threshold == 0, "abnormal tier 1");
     require(tier2Threshold < NORMAL_SMALL_NUMBER || tier2Threshold == 0, "abnormal tier 2");
     require(slashAmountTier2 >= 1 ether, "abnormal slash amount tier 2");
@@ -82,9 +81,8 @@ abstract contract PostChecker_Slash is BaseMigration, PostChecker_Helper {
     vm.coinbase(_slasher);
     vm.startPrank(_slasher);
     for (uint256 i; i < _tier2Threshold; i++) {
-      (bool success, ) = _slashingContract.call(
-        abi.encodeWithSelector(ISlashUnavailability.slashUnavailability.selector, _slashee)
-      );
+      (bool success,) =
+        _slashingContract.call(abi.encodeWithSelector(ISlashUnavailability.slashUnavailability.selector, _slashee));
       assertTrue(success);
       vm.roll(block.number + 1);
     }
@@ -103,7 +101,7 @@ abstract contract PostChecker_Slash is BaseMigration, PostChecker_Helper {
     (, res) = _slashingContract.staticcall(abi.encodeWithSelector(ICreditScore.getCreditScore.selector, _slashee));
     uint256 creditScoreBefore = abi.decode(res, (uint256));
 
-    (bool success, ) = _slashingContract.call(abi.encodeWithSelector(ICreditScore.bailOut.selector, _slashee));
+    (bool success,) = _slashingContract.call(abi.encodeWithSelector(ICreditScore.bailOut.selector, _slashee));
     assertEq(success, true);
 
     (, res) = _slashingContract.staticcall(abi.encodeWithSelector(ICreditScore.getCreditScore.selector, _slashee));
@@ -125,15 +123,14 @@ abstract contract PostChecker_Slash is BaseMigration, PostChecker_Helper {
     _postCheckSlashUnavailability();
 
     vm.startPrank(_slasheeAdmin);
-    (bool success, ) = _slashingContract.call(abi.encodeWithSelector(ICreditScore.bailOut.selector, _slashee));
+    (bool success,) = _slashingContract.call(abi.encodeWithSelector(ICreditScore.bailOut.selector, _slashee));
     assertFalse(success);
     vm.stopPrank();
   }
 
   function _postCheckSlashUntilBelowRequirement() private logPostCheck("[Slash] slash until below requirement") {
-    (, bytes memory returndata) = _validatorSet.staticcall(
-      abi.encodeWithSelector(ICandidateManager.getCandidateInfo.selector, _slashee)
-    );
+    (, bytes memory returndata) =
+      _validatorSet.staticcall(abi.encodeWithSelector(ICandidateManager.getCandidateInfo.selector, _slashee));
     ICandidateManager.ValidatorCandidate memory info = abi.decode(returndata, (ICandidateManager.ValidatorCandidate));
     assertTrue(info.topupDeadline == 0);
     _postCheckSlashUnavailability();
@@ -141,49 +138,43 @@ abstract contract PostChecker_Slash is BaseMigration, PostChecker_Helper {
     _fastForwardToNextDay();
     _wrapUpEpoch();
 
-    (, returndata) = _validatorSet.staticcall(
-      abi.encodeWithSelector(ICandidateManager.getCandidateInfo.selector, _slashee)
-    );
+    (, returndata) =
+      _validatorSet.staticcall(abi.encodeWithSelector(ICandidateManager.getCandidateInfo.selector, _slashee));
     info = abi.decode(returndata, (ICandidateManager.ValidatorCandidate));
     assertTrue(info.topupDeadline > 0);
   }
 
   function _pickRandomSlashee() private {
-    (, bytes memory returnedData) = _validatorSet.staticcall(
-      abi.encodeWithSelector(IValidatorInfoV2.getValidators.selector)
-    );
+    (, bytes memory returnedData) =
+      _validatorSet.staticcall(abi.encodeWithSelector(IValidatorInfoV2.getValidators.selector));
     address[] memory consensusLst = abi.decode(returnedData, (address[]));
     _slashee = consensusLst[0];
 
     (, returnedData) = _staking.staticcall(abi.encodeWithSelector(IBaseStaking.getPoolDetail.selector, _slashee));
-    (_slasheeAdmin, , ) = abi.decode(returnedData, (address, uint256, uint256));
+    (_slasheeAdmin,,) = abi.decode(returnedData, (address, uint256, uint256));
 
     _slasher = consensusLst[1];
   }
 
   function _pickSuitableSlasheeForSlashBelowRequirement() private {
-    uint i;
-    uint stakingAmount;
+    uint256 i;
+    uint256 stakingAmount;
 
-    uint minStakingAmount = IStaking(_staking).minValidatorStakingAmount();
+    uint256 minStakingAmount = IStaking(_staking).minValidatorStakingAmount();
 
-    (, bytes memory returnedData) = _validatorSet.staticcall(
-      abi.encodeWithSelector(IValidatorInfoV2.getValidators.selector)
-    );
+    (, bytes memory returnedData) =
+      _validatorSet.staticcall(abi.encodeWithSelector(IValidatorInfoV2.getValidators.selector));
     address[] memory consensusLst = abi.decode(returnedData, (address[]));
 
     do {
       _slashee = consensusLst[i];
       (, returnedData) = _staking.staticcall(abi.encodeWithSelector(IBaseStaking.getPoolDetail.selector, _slashee));
-      (_slasheeAdmin, stakingAmount, ) = abi.decode(returnedData, (address, uint256, uint256));
+      (_slasheeAdmin, stakingAmount,) = abi.decode(returnedData, (address, uint256, uint256));
 
       i++;
-    } while (stakingAmount >= _slashAmountTier2 + minStakingAmount && i < consensusLst.length);
+    } while (stakingAmount > _slashAmountTier2 + minStakingAmount && i < consensusLst.length);
 
-    assertTrue(
-      (stakingAmount < _slashAmountTier2 + minStakingAmount) && (i < consensusLst.length),
-      "PostChecker_Slash: cannot find suitable validator, skip"
-    );
+    assertTrue(i < consensusLst.length, "PostChecker_Slash: cannot find suitable validator, skip");
     _slasher = consensusLst[(i * (consensusLst.length - 1)) % consensusLst.length];
   }
 }

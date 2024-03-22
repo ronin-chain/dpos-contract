@@ -16,4 +16,4 @@ interface IRoninValidatorSet is
   ISlashingExecution,
   ICoinbaseExecution,
   IEmergencyExit
-{}
+{ }

@@ -6,13 +6,13 @@ import { IBridgeSlash } from "@ronin/contracts/interfaces/bridge/IBridgeSlash.so
 contract MockBridgeSlash is IBridgeSlash {
   mapping(address => uint256) internal _slashMap;
 
-  function MINIMUM_VOTE_THRESHOLD() external view returns (uint256) {}
+  function MINIMUM_VOTE_THRESHOLD() external view returns (uint256) { }
 
-  function REMOVE_DURATION_THRESHOLD() external view returns (uint256) {}
+  function REMOVE_DURATION_THRESHOLD() external view returns (uint256) { }
 
-  function TIER_1_PENALTY_DURATION() external view returns (uint256) {}
+  function TIER_1_PENALTY_DURATION() external view returns (uint256) { }
 
-  function TIER_2_PENALTY_DURATION() external view returns (uint256) {}
+  function TIER_2_PENALTY_DURATION() external view returns (uint256) { }
 
   function execSlashBridgeOperators(
     address[] calldata operators,
@@ -20,13 +20,13 @@ contract MockBridgeSlash is IBridgeSlash {
     uint256 totalBallot,
     uint256 totalVote,
     uint256 period
-  ) external {}
+  ) external { }
 
-  function getAddedPeriodOf(address[] calldata bridgeOperators) external view returns (uint256[] memory addedPeriods) {}
+  function getAddedPeriodOf(address[] calldata bridgeOperators) external view returns (uint256[] memory addedPeriods) { }
 
-  function getPenaltyDurations() external pure returns (uint256[] memory penaltyDurations) {}
+  function getPenaltyDurations() external pure returns (uint256[] memory penaltyDurations) { }
 
-  function getSlashTier(uint256 ballot, uint256 totalVote) external pure returns (Tier tier) {}
+  function getSlashTier(uint256 ballot, uint256 totalVote) external pure returns (Tier tier) { }
 
   function getSlashUntilPeriodOf(address[] calldata operators) external view returns (uint256[] memory untilPeriods) {
     untilPeriods = new uint256[](operators.length);

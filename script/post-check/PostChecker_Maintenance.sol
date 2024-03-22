@@ -63,33 +63,33 @@ abstract contract PostChecker_Maintenance is BaseMigration, PostChecker_Helper {
     uint256 numberOfBlocksInEpoch = RoninValidatorSet(_validatorSet).numberOfBlocksInEpoch();
     uint256 minDuration = IMaintenance(_maintenance).minMaintenanceDurationInBlock();
 
-    uint256 startBlock = latestEpochBlock + numberOfBlocksInEpoch + 1 + minOffset;
-    uint256 endBlock = latestEpochBlock + numberOfBlocksInEpoch + minOffset
-      + numberOfBlocksInEpoch * (minDuration / numberOfBlocksInEpoch + 1);
+    uint startBlock = latestEpochBlock + numberOfBlocksInEpoch + 1
+      + ((minOffset + numberOfBlocksInEpoch) / numberOfBlocksInEpoch) * numberOfBlocksInEpoch;
+    uint endBlock = startBlock - 1 + numberOfBlocksInEpoch * (minDuration / numberOfBlocksInEpoch + 1);
     (bool success,) =
       _maintenance.call(abi.encodeWithSelector(IMaintenance.schedule.selector, _consensusAddr, startBlock, endBlock));
-    assertEq(success, true);
+    assertEq(success, true, "schedule failed");
 
     vm.stopPrank();
 
     bytes4 checkMaintained_Selector = IMaintenance.checkMaintained.selector;
     bytes memory res;
     (, res) = _maintenance.staticcall(abi.encodeWithSelector(checkMaintained_Selector, _consensusAddr, startBlock - 1));
-    assertFalse(abi.decode(res, (bool)));
+    assertFalse(abi.decode(res, (bool)), "should not be maintained");
 
     (, res) = _maintenance.staticcall(abi.encodeWithSelector(checkMaintained_Selector, _consensusAddr, startBlock));
-    assertTrue(abi.decode(res, (bool)));
+    assertTrue(abi.decode(res, (bool)), "should be maintained");
 
     (, res) = _maintenance.staticcall(abi.encodeWithSelector(checkMaintained_Selector, _consensusAddr, startBlock + 1));
-    assertTrue(abi.decode(res, (bool)));
+    assertTrue(abi.decode(res, (bool)), "should be maintained at startBlock + 1");
 
     (, res) = _maintenance.staticcall(abi.encodeWithSelector(checkMaintained_Selector, _consensusAddr, endBlock - 1));
-    assertTrue(abi.decode(res, (bool)));
+    assertTrue(abi.decode(res, (bool)), "should be maintained until endBlock - 1");
 
     (, res) = _maintenance.staticcall(abi.encodeWithSelector(checkMaintained_Selector, _consensusAddr, endBlock));
-    assertTrue(abi.decode(res, (bool)));
+    assertTrue(abi.decode(res, (bool)), "should be maintained until endBlock");
 
     (, res) = _maintenance.staticcall(abi.encodeWithSelector(checkMaintained_Selector, _consensusAddr, endBlock + 1));
-    assertFalse(abi.decode(res, (bool)));
+    assertFalse(abi.decode(res, (bool)), "should not be maintained after endBlock");
   }
 }

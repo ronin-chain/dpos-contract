@@ -200,7 +200,9 @@ abstract contract CoreGovernance is SignatureConsumer, VoteStatusConsumer, Chain
     } else if (support == Ballot.VoteType.Against) {
       _vote.againstVoteds.push(voter);
       _againstVoteWeight = _vote.againstVoteWeight += voterWeight;
-    } else revert ErrUnsupportedVoteType(msg.sig);
+    } else {
+      revert ErrUnsupportedVoteType(msg.sig);
+    }
 
     if (_forVoteWeight >= minimumForVoteWeight) {
       done = true;
@@ -223,15 +225,13 @@ abstract contract CoreGovernance is SignatureConsumer, VoteStatusConsumer, Chain
    * before or it will emit an unexpected event of `ProposalExpired`.
    */
   function _tryDeleteExpiredVotingRound(ProposalVote storage proposalVote) internal returns (bool isExpired) {
-    isExpired =
-      _getChainType() == ChainType.RoninChain &&
-      proposalVote.status == VoteStatus.Pending &&
-      proposalVote.expiryTimestamp <= block.timestamp;
+    isExpired = _getChainType() == ChainType.RoninChain && proposalVote.status == VoteStatus.Pending
+      && proposalVote.expiryTimestamp <= block.timestamp;
 
     if (isExpired) {
       emit ProposalExpired(proposalVote.hash);
 
-      for (uint256 _i; _i < proposalVote.forVoteds.length; ) {
+      for (uint256 _i; _i < proposalVote.forVoteds.length;) {
         delete proposalVote.voted[proposalVote.forVoteds[_i]];
         delete proposalVote.sig[proposalVote.forVoteds[_i]];
 
@@ -239,7 +239,7 @@ abstract contract CoreGovernance is SignatureConsumer, VoteStatusConsumer, Chain
           ++_i;
         }
       }
-      for (uint256 _i; _i < proposalVote.againstVoteds.length; ) {
+      for (uint256 _i; _i < proposalVote.againstVoteds.length;) {
         delete proposalVote.voted[proposalVote.againstVoteds[_i]];
         delete proposalVote.sig[proposalVote.againstVoteds[_i]];
 

@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import { IBridgeManagerCallback, EnumerableSet, BridgeManagerCallbackRegister } from "./BridgeManagerCallbackRegister.sol";
+import {
+  IBridgeManagerCallback, EnumerableSet, BridgeManagerCallbackRegister
+} from "./BridgeManagerCallbackRegister.sol";
 import { IHasContracts, HasContracts } from "../../extensions/collections/HasContracts.sol";
 import { IQuorum } from "../../interfaces/IQuorum.sol";
 import { IBridgeManager } from "../../interfaces/bridge/IBridgeManager.sol";
@@ -23,8 +25,7 @@ abstract contract BridgeManager is IQuorum, IBridgeManager, BridgeManagerCallbac
   /// @dev value is equal to keccak256("@ronin.dpos.gateway.BridgeAdmin.governors.slot") - 1
   bytes32 private constant GOVERNOR_SET_SLOT = 0x546f6b46ab35b030b6816596b352aef78857377176c8b24baa2046a62cf1998c;
   /// @dev value is equal to keccak256("@ronin.dpos.gateway.BridgeAdmin.bridgeOperators.slot") - 1
-  bytes32 private constant BRIDGE_OPERATOR_SET_SLOT =
-    0xd38c234075fde25875da8a6b7e36b58b86681d483271a99eeeee1d78e258a24d;
+  bytes32 private constant BRIDGE_OPERATOR_SET_SLOT = 0xd38c234075fde25875da8a6b7e36b58b86681d483271a99eeeee1d78e258a24d;
 
   /**
    * @dev The numerator value used for calculations in the contract.
@@ -105,9 +106,11 @@ abstract contract BridgeManager is IQuorum, IBridgeManager, BridgeManagerCallbac
   /**
    * @inheritdoc IBridgeManager
    */
-  function removeBridgeOperators(
-    address[] calldata bridgeOperators
-  ) external onlySelfCall returns (bool[] memory removeds) {
+  function removeBridgeOperators(address[] calldata bridgeOperators)
+    external
+    onlySelfCall
+    returns (bool[] memory removeds)
+  {
     removeds = _removeBridgeOperators(bridgeOperators);
   }
 
@@ -138,8 +141,7 @@ abstract contract BridgeManager is IQuorum, IBridgeManager, BridgeManagerCallbac
     _gorvernorToBridgeOperatorInfo[msg.sender].addr = newBridgeOperator;
 
     _notifyRegisters(
-      IBridgeManagerCallback.onBridgeOperatorUpdated.selector,
-      abi.encode(currentBridgeOperator, newBridgeOperator)
+      IBridgeManagerCallback.onBridgeOperatorUpdated.selector, abi.encode(currentBridgeOperator, newBridgeOperator)
     );
 
     emit BridgeOperatorUpdated(msg.sender, currentBridgeOperator, newBridgeOperator);
@@ -187,9 +189,7 @@ abstract contract BridgeManager is IQuorum, IBridgeManager, BridgeManagerCallbac
   /**
    * @inheritdoc IBridgeManager
    */
-  function sumGovernorsWeight(
-    address[] calldata governors
-  ) external view nonDuplicate(governors) returns (uint256 sum) {
+  function sumGovernorsWeight(address[] calldata governors) external view nonDuplicate(governors) returns (uint256 sum) {
     sum = _sumGovernorsWeight(governors);
   }
 
@@ -229,7 +229,7 @@ abstract contract BridgeManager is IQuorum, IBridgeManager, BridgeManagerCallbac
     bridgeOperators = new address[](length);
 
     mapping(address => BridgeOperatorInfo) storage _gorvernorToBridgeOperator = _getGovernorToBridgeOperatorInfo();
-    for (uint256 i; i < length; ) {
+    for (uint256 i; i < length;) {
       bridgeOperators[i] = _gorvernorToBridgeOperator[governors[i]].addr;
       unchecked {
         ++i;
@@ -245,7 +245,7 @@ abstract contract BridgeManager is IQuorum, IBridgeManager, BridgeManagerCallbac
     governors = new address[](length);
     mapping(address => address) storage _governorOf = _getGovernorOf();
 
-    for (uint256 i; i < length; ) {
+    for (uint256 i; i < length;) {
       governors[i] = _governorOf[bridgeOperators[i]];
       unchecked {
         ++i;
@@ -330,7 +330,7 @@ abstract contract BridgeManager is IQuorum, IBridgeManager, BridgeManagerCallbac
     uint256 accumulatedWeight;
     BridgeOperatorInfo memory bridgeOperatorInfo;
 
-    for (uint256 i; i < length; ) {
+    for (uint256 i; i < length;) {
       governor = governors[i];
       bridgeOperator = bridgeOperators[i];
 
@@ -338,10 +338,10 @@ abstract contract BridgeManager is IQuorum, IBridgeManager, BridgeManagerCallbac
       _requireNonZeroAddress(bridgeOperator);
       if (voteWeights[i] == 0) revert ErrInvalidVoteWeight(msg.sig);
 
-      addeds[i] = !(_governorSet.contains(governor) ||
-        _governorSet.contains(bridgeOperator) ||
-        _bridgeOperatorSet.contains(governor) ||
-        _bridgeOperatorSet.contains(bridgeOperator));
+      addeds[i] = !(
+        _governorSet.contains(governor) || _governorSet.contains(bridgeOperator)
+          || _bridgeOperatorSet.contains(governor) || _bridgeOperatorSet.contains(bridgeOperator)
+      );
 
       if (addeds[i]) {
         _governorSet.add(governor);
@@ -375,9 +375,11 @@ abstract contract BridgeManager is IQuorum, IBridgeManager, BridgeManagerCallbac
    * @param bridgeOperators An array of addresses representing the bridge operators to be removed.
    * @return removeds An array of boolean values indicating whether each bridge operator was successfully removed.
    */
-  function _removeBridgeOperators(
-    address[] memory bridgeOperators
-  ) internal nonDuplicate(bridgeOperators) returns (bool[] memory removeds) {
+  function _removeBridgeOperators(address[] memory bridgeOperators)
+    internal
+    nonDuplicate(bridgeOperators)
+    returns (bool[] memory removeds)
+  {
     uint256 length = bridgeOperators.length;
     removeds = new bool[](length);
     // simply skip remove operations if inputs are empty.
@@ -393,7 +395,7 @@ abstract contract BridgeManager is IQuorum, IBridgeManager, BridgeManagerCallbac
     uint256 accumulatedWeight;
     BridgeOperatorInfo memory bridgeOperatorInfo;
 
-    for (uint256 i; i < length; ) {
+    for (uint256 i; i < length;) {
       bridgeOperator = bridgeOperators[i];
       governor = _governorOf[bridgeOperator];
 
@@ -470,7 +472,7 @@ abstract contract BridgeManager is IQuorum, IBridgeManager, BridgeManagerCallbac
     uint256 length = governors.length;
     weights = new uint96[](length);
     mapping(address => BridgeOperatorInfo) storage _governorToBridgeOperatorInfo = _getGovernorToBridgeOperatorInfo();
-    for (uint256 i; i < length; ) {
+    for (uint256 i; i < length;) {
       weights[i] = _governorToBridgeOperatorInfo[governors[i]].voteWeight;
       unchecked {
         ++i;
@@ -487,7 +489,7 @@ abstract contract BridgeManager is IQuorum, IBridgeManager, BridgeManagerCallbac
   function _sumGovernorsWeight(address[] memory governors) internal view nonDuplicate(governors) returns (uint256 sum) {
     mapping(address => BridgeOperatorInfo) storage _governorToBridgeOperatorInfo = _getGovernorToBridgeOperatorInfo();
 
-    for (uint256 i; i < governors.length; ) {
+    for (uint256 i; i < governors.length;) {
       sum += _governorToBridgeOperatorInfo[governors[i]].voteWeight;
 
       unchecked {

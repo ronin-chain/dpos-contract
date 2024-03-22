@@ -5,7 +5,10 @@ import { TContract } from "foundry-deployment-kit/types/Types.sol";
 import { LibProxy } from "foundry-deployment-kit/libraries/LibProxy.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
 
-import { BridgeTrackingRecoveryLogic, BridgeTracking } from "../20231019-recover-fund/contracts/BridgeTrackingRecoveryLogic.sol";
+import {
+  BridgeTrackingRecoveryLogic,
+  BridgeTracking
+} from "../20231019-recover-fund/contracts/BridgeTrackingRecoveryLogic.sol";
 
 import { SlashIndicator } from "@ronin/contracts/ronin/slash-indicator/SlashIndicator.sol";
 import { Staking, IStaking } from "@ronin/contracts/ronin/staking/Staking.sol";
@@ -36,11 +39,8 @@ abstract contract Proposal__20240220_MikoHardfork_BuildProposal is Proposal__Bas
 
     // [B1.] Change admin of Bridge Tracking to doctor
     {
-      (
-        bytes[] memory sub_callDatas,
-        address[] memory sub_targets,
-        uint256[] memory sub_values
-      ) = _ga__changeAdminBridgeTracking();
+      (bytes[] memory sub_callDatas, address[] memory sub_targets, uint256[] memory sub_values) =
+        _ga__changeAdminBridgeTracking();
 
       tos = tos.replace(sub_targets, prCnt);
       callDatas = callDatas.replace(sub_callDatas, prCnt);
@@ -50,11 +50,8 @@ abstract contract Proposal__20240220_MikoHardfork_BuildProposal is Proposal__Bas
 
     // [B2.] Upgrade all contracts
     {
-      (
-        bytes[] memory sub_callDatas,
-        address[] memory sub_targets,
-        uint256[] memory sub_values
-      ) = _ga__upgradeAllDPoSContracts();
+      (bytes[] memory sub_callDatas, address[] memory sub_targets, uint256[] memory sub_values) =
+        _ga__upgradeAllDPoSContracts();
 
       tos = tos.replace(sub_targets, prCnt);
       callDatas = callDatas.replace(sub_callDatas, prCnt);
@@ -74,11 +71,8 @@ abstract contract Proposal__20240220_MikoHardfork_BuildProposal is Proposal__Bas
 
     // [B4.] Replace StableNode governor
     {
-      (
-        bytes[] memory sub_callDatas,
-        address[] memory sub_targets,
-        uint256[] memory sub_values
-      ) = _ga__changeGovernorStableNode();
+      (bytes[] memory sub_callDatas, address[] memory sub_targets, uint256[] memory sub_values) =
+        _ga__changeGovernorStableNode();
       tos = tos.replace(sub_targets, prCnt);
       callDatas = callDatas.replace(sub_callDatas, prCnt);
       values = values.replace(sub_values, prCnt);
@@ -87,11 +81,8 @@ abstract contract Proposal__20240220_MikoHardfork_BuildProposal is Proposal__Bas
 
     // [B5.] Change admin of all contracts
     {
-      (
-        bytes[] memory sub_callDatas,
-        address[] memory sub_targets,
-        uint256[] memory sub_values
-      ) = _ga__changeAdminAllContracts();
+      (bytes[] memory sub_callDatas, address[] memory sub_targets, uint256[] memory sub_values) =
+        _ga__changeAdminAllContracts();
 
       tos = tos.replace(sub_targets, prCnt);
       callDatas = callDatas.replace(sub_callDatas, prCnt);
@@ -101,11 +92,8 @@ abstract contract Proposal__20240220_MikoHardfork_BuildProposal is Proposal__Bas
 
     // [B5.] Change default admin role of Staking Contract
     {
-      (
-        bytes[] memory sub_callDatas,
-        address[] memory sub_targets,
-        uint256[] memory sub_values
-      ) = _ga__changeDefaultAdminRoleOfStaking();
+      (bytes[] memory sub_callDatas, address[] memory sub_targets, uint256[] memory sub_values) =
+        _ga__changeDefaultAdminRoleOfStaking();
 
       tos = tos.replace(sub_targets, prCnt);
       callDatas = callDatas.replace(sub_callDatas, prCnt);
@@ -120,13 +108,7 @@ abstract contract Proposal__20240220_MikoHardfork_BuildProposal is Proposal__Bas
       mstore(values, prCnt)
     }
 
-    proposal = _buildProposal(
-      roninGovernanceAdmin,
-      block.timestamp + PROPOSAL_DURATION,
-      tos,
-      values,
-      callDatas
-    );
+    proposal = _buildProposal(roninGovernanceAdmin, block.timestamp + PROPOSAL_DURATION, tos, values, callDatas);
   }
 
   function _ga__changeAdminBridgeTracking()
@@ -298,8 +280,8 @@ abstract contract Proposal__20240220_MikoHardfork_BuildProposal is Proposal__Bas
     );
 
     // Add new governor for StableNode
-    IRoninTrustedOrganization.TrustedOrganization[]
-      memory trOrgLst = new IRoninTrustedOrganization.TrustedOrganization[](1);
+    IRoninTrustedOrganization.TrustedOrganization[] memory trOrgLst =
+      new IRoninTrustedOrganization.TrustedOrganization[](1);
     trOrgLst[0].consensusAddr = STABLE_NODE_CONSENSUS;
     trOrgLst[0].governor = STABLE_NODE_GOVERNOR;
     trOrgLst[0].weight = 100;
@@ -322,16 +304,15 @@ abstract contract Proposal__20240220_MikoHardfork_BuildProposal is Proposal__Bas
   {
     address payable[] memory allContracts = allDPoSContracts;
 
-    bool shouldPrankOnly = CONFIG.isBroadcastDisable();
+    bool shouldPrankOnly = CONFIG.isPostChecking();
 
     if (shouldPrankOnly) {
       vm.prank(DEPLOYER);
     } else {
       vm.broadcast(DEPLOYER);
     }
-    _newGA = address(
-      new RoninGovernanceAdmin(block.chainid, address(trustedOrgContract), address(validatorContract), 14 days)
-    );
+    _newGA =
+      address(new RoninGovernanceAdmin(block.chainid, address(trustedOrgContract), address(validatorContract), 14 days));
 
     for (uint256 i; i < allContracts.length; ++i) {
       address proxyAdmin = allContracts[i].getProxyAdmin(false);
@@ -355,9 +336,8 @@ abstract contract Proposal__20240220_MikoHardfork_BuildProposal is Proposal__Bas
       contractsToChangeAdmin.push(allContracts[i]);
 
       // Change default admin role if it exist in the proxy
-      (bool success, bytes memory returnData) = allContracts[i].call(
-        abi.encodeCall(AccessControl.hasRole, (DEFAULT_ADMIN_ROLE, proxyAdmin))
-      );
+      (bool success, bytes memory returnData) =
+        allContracts[i].call(abi.encodeCall(AccessControl.hasRole, (DEFAULT_ADMIN_ROLE, proxyAdmin)));
       // AccessControl(allContracts[i]).hasRole(DEFAULT_ADMIN_ROLE, proxyAdmin);
       if (success && abi.decode(returnData, (bool))) {
         console.log("Contract to change default admin role:".cyan(), vm.getLabel(allContracts[i]));
@@ -384,10 +364,7 @@ abstract contract Proposal__20240220_MikoHardfork_BuildProposal is Proposal__Bas
       callDatas[j] = abi.encodeCall(AccessControl.grantRole, (DEFAULT_ADMIN_ROLE, _newGA));
 
       targets[j + 1] = contractsToChangeDefaultAdminRole[i];
-      callDatas[j + 1] = abi.encodeCall(
-        AccessControl.renounceRole,
-        (DEFAULT_ADMIN_ROLE, address(roninGovernanceAdmin))
-      );
+      callDatas[j + 1] = abi.encodeCall(AccessControl.renounceRole, (DEFAULT_ADMIN_ROLE, address(roninGovernanceAdmin)));
     }
   }
 

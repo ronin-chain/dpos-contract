@@ -63,20 +63,15 @@ abstract contract GovernanceProposal is CoreGovernance, CommonGovernanceProposal
     if (_proposal.chainId != block.chainid) revert ErrInvalidChainId(msg.sig, _proposal.chainId, block.chainid);
 
     bytes32 proposalHash = _proposal.hash();
-    if (vote[_proposal.chainId][_proposal.nonce].hash != proposalHash)
+    if (vote[_proposal.chainId][_proposal.nonce].hash != proposalHash) {
       revert ErrInvalidProposal(proposalHash, vote[_proposal.chainId][_proposal.nonce].hash);
+    }
 
     uint256 _minimumForVoteWeight = _getMinimumVoteWeight();
     uint256 _minimumAgainstVoteWeight = _getTotalWeight() - _minimumForVoteWeight + 1;
     Signature memory _emptySignature;
     _castVote(
-      _proposal,
-      _support,
-      _minimumForVoteWeight,
-      _minimumAgainstVoteWeight,
-      _voter,
-      _emptySignature,
-      _getWeight(_voter)
+      _proposal, _support, _minimumForVoteWeight, _minimumAgainstVoteWeight, _voter, _emptySignature, _getWeight(_voter)
     );
   }
 
