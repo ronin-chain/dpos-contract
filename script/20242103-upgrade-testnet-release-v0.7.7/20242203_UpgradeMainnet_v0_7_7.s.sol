@@ -21,6 +21,7 @@ contract Migration__20242103_UpgradeReleaseV0_7_7_Mainnet is RoninMigration {
   using LibProxy for *;
   using StdStyle for *;
 
+  address public constant SKY_MAVIS_GOVERNOR = 0xe880802580a1fbdeF67ACe39D1B21c5b2C74f059; // op:
   uint256 private constant NEW_MIN_OFFSET_TO_START_SCHEDULE = 1;
 
   address[] private contractsToUpgrade;
@@ -89,7 +90,12 @@ contract Migration__20242103_UpgradeReleaseV0_7_7_Mainnet is RoninMigration {
 
     Proposal.ProposalDetail memory proposal =
       _buildProposal(governanceAdmin, block.timestamp + 14 days, targets, values, callDatas);
-    _executeProposal(governanceAdmin, trustedOrg, proposal);
+
+    _proposeProposal(governanceAdmin, trustedOrg, proposal, SKY_MAVIS_GOVERNOR);
+
+    CONFIG.setPostCheckingStatus(true);
+    _voteProposalUntilSuccess(governanceAdmin, trustedOrg, proposal);
+    CONFIG.setPostCheckingStatus(false);
   }
 
   function _postCheck() internal override {
