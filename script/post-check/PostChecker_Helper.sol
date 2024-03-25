@@ -15,12 +15,20 @@ abstract contract PostChecker_Helper is BaseMigration {
   uint256 NORMAL_SMALL_NUMBER = 1_000_000;
   uint256 NORMAL_BLOCK_NUMBER = 100_000_000;
 
+  uint private innerLogLevel = 0;
+
   using LibErrorHandler for bool;
 
   modifier logPostCheck(string memory task) {
-    console.log(string.concat("[>] Post-checking: ", task, "..."));
+    innerLogLevel++;
+    if (innerLogLevel == 1) {
+      console.log(string.concat("[>] Post-checking: ", task, "..."));
+    }
     _;
-    console.log(StdStyle.green(string.concat("    Check success: ", task, unicode"... ✅")));
+    if (innerLogLevel == 1) {
+      console.log(StdStyle.green(string.concat("    Check success: ", task, unicode"... ✅")));
+    }
+    innerLogLevel--;
   }
 
   function _applyValidatorCandidate(address staking, address candidateAdmin, address consensusAddr) internal {
