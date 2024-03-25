@@ -5,14 +5,16 @@ on:
     branches:
       - mainnet
       - testnet
-      - 'feature/*'
-      - 'features/*'
+      - "release/*"
+      - "feature/*"
+      - "features/*"
   pull_request:
     branches:
       - mainnet
       - testnet
-      - 'feature/*'
-      - 'features/*'
+      - "release/*"
+      - "feature/*"
+      - "features/*"
 
 env:
   FOUNDRY_PROFILE: ci
