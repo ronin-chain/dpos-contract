@@ -1,0 +1,26 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+set -ex
+
+# Workaround: git stash no changes doesn't cause failure but git stash pop cause
+output=$(git stash)
+stashed=true
+if [[ $output == *"No local changes to save"* ]]; then
+  stashed=false
+fi
+
+forge build --sizes 2>&1 | sed -n '/Contract/,$p' > logs/contract-code-sizes.log
+.husky/generate-layout.sh
+
+git add logs
+
+output=$(git status -s)
+word_count=$(echo "$output" | wc -w)
+if [ "$word_count" -gt 0 ]; then
+  git commit -m "chore: storage layout"
+fi
+
+if $stashed; then
+  git stash pop 
+fi
