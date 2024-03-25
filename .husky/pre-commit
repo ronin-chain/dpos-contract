@@ -1,11 +1,5 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
 
-set -ex
-
-yarn lint-staged
-yarn clean
-yarn compile
-yarn plugin:storage-layout
-git add logs/storage_layout.log
-git add logs/contract_code_sizes.log
+forge build
+npx lint-staged
