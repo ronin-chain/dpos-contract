@@ -90,7 +90,10 @@ contract Migration__20242103_UpgradeReleaseV0_7_7_Mainnet is RoninMigration {
     Proposal.ProposalDetail memory proposal =
       _buildProposal(governanceAdmin, block.timestamp + 14 days, targets, values, callDatas);
     _executeProposal(governanceAdmin, trustedOrg, proposal);
+  }
 
+  function _postCheck() internal override {
+    super._postCheck();
     v0_7_7Postcheck();
   }
 
