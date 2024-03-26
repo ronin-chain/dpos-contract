@@ -93,6 +93,8 @@ contract Migration__20242103_UpgradeReleaseV0_7_7_Mainnet is RoninMigration {
 
     _proposeProposal(governanceAdmin, trustedOrg, proposal, SKY_MAVIS_GOVERNOR);
 
+    v0_7_7Precheck();
+
     CONFIG.setPostCheckingStatus(true);
     _voteProposalUntilSuccess(governanceAdmin, trustedOrg, proposal);
     CONFIG.setPostCheckingStatus(false);
@@ -134,6 +136,29 @@ contract Migration__20242103_UpgradeReleaseV0_7_7_Mainnet is RoninMigration {
         )
       )
     );
+  }
+
+  function v0_7_7Precheck() internal {
+    TConsensus[] memory lostAddr = new TConsensus[](3);
+    lostAddr[0] = TConsensus.wrap(0x454f6C34F0cfAdF1733044Fdf8B06516BD1E9529);
+    lostAddr[1] = TConsensus.wrap(0xD7fEf73d95ccEdb26483fd3C6C48393e50708159);
+    lostAddr[2] = TConsensus.wrap(0xbD4bf317Da1928CC2f9f4DA9006401f3944A0Ab5);
+
+    Profile_Mainnet profile = Profile_Mainnet(loadContract(Contract.Profile.key()));
+    vm.expectRevert(
+      abi.encodeWithSelector(IProfile.ErrLookUpIdFailed.selector, (TConsensus.unwrap(lostAddr[0])))
+    );
+    profile.getConsensus2Id(lostAddr[0]);
+
+    vm.expectRevert(
+      abi.encodeWithSelector(IProfile.ErrLookUpIdFailed.selector, (TConsensus.unwrap(lostAddr[1])))
+    );
+    profile.getConsensus2Id(lostAddr[1]);
+
+    vm.expectRevert(
+      abi.encodeWithSelector(IProfile.ErrLookUpIdFailed.selector, (TConsensus.unwrap(lostAddr[2])))
+    );
+    profile.getConsensus2Id(lostAddr[2]);
   }
 
   function v0_7_7Postcheck() internal {
