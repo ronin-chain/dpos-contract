@@ -63,7 +63,8 @@ contract MaintenanceTest is Test {
 
     uint startBlock = latestEpochBlock + numberOfBlocksInEpoch + 1
       + ((minOffset + numberOfBlocksInEpoch) / numberOfBlocksInEpoch) * numberOfBlocksInEpoch;
-    uint endBlock = startBlock - 1 + numberOfBlocksInEpoch * (durationInBlock / numberOfBlocksInEpoch + 1);
+    uint endBlock = startBlock - 1 + (durationInBlock / numberOfBlocksInEpoch + 1) * numberOfBlocksInEpoch;
+
 
     vm.prank(admin);
     maintenance.schedule(consensus, startBlock, endBlock);
@@ -165,7 +166,10 @@ contract MaintenanceTest is Test {
 
     startBlock = latestEpochBlock + numberOfBlocksInEpoch + 1
       + ((minOffset + numberOfBlocksInEpoch) / numberOfBlocksInEpoch) * numberOfBlocksInEpoch;
-    endBlock = startBlock - 1 + numberOfBlocksInEpoch * (durationInBlock / numberOfBlocksInEpoch + 1);
+    endBlock = startBlock - 1 + ((durationInBlock / numberOfBlocksInEpoch + 1) * numberOfBlocksInEpoch);
+
+    console.log("startBlock", startBlock);
+    console.log("endBlock", endBlock);
 
     vm.prank(admin);
     maintenance.schedule(consensus, startBlock, endBlock);
@@ -190,7 +194,7 @@ contract MaintenanceTest is Test {
 
     uint startBlock = latestEpochBlock + numberOfBlocksInEpoch + 1
       + ((minOffset + numberOfBlocksInEpoch) / numberOfBlocksInEpoch) * numberOfBlocksInEpoch;
-    uint endBlock = startBlock - 1 + numberOfBlocksInEpoch * (minDuration / numberOfBlocksInEpoch + 1);
+    uint endBlock = startBlock - 1 + (minDuration / numberOfBlocksInEpoch + 1) * numberOfBlocksInEpoch;
 
     vm.prank(admin);
     maintenance.schedule(consensus, startBlock, endBlock);
