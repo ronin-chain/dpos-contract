@@ -6,7 +6,7 @@ import "../MockPrecompile.sol";
 import "../../ronin/validator/RoninValidatorSet.sol";
 
 contract MockRoninValidatorSetOverridePrecompile is RoninValidatorSet, MockPrecompile {
-  constructor() {}
+  constructor() { }
 
   function arrangeValidatorCandidates(
     address[] memory _candidates,
@@ -32,13 +32,8 @@ contract MockRoninValidatorSetOverridePrecompile is RoninValidatorSet, MockPreco
     uint256 _maxValidatorNumber,
     uint256 _maxPrioritizedValidatorNumber
   ) internal pure override returns (address[] memory _result, uint256 _newValidatorCount) {
-    _result = pickValidatorSet(
-      _candidates,
-      _weights,
-      _trustedWeights,
-      _maxValidatorNumber,
-      _maxPrioritizedValidatorNumber
-    );
+    _result =
+      pickValidatorSet(_candidates, _weights, _trustedWeights, _maxValidatorNumber, _maxPrioritizedValidatorNumber);
 
     _newValidatorCount = _result.length;
   }

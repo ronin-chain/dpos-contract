@@ -15,12 +15,20 @@ abstract contract PostChecker_Helper is BaseMigration {
   uint256 NORMAL_SMALL_NUMBER = 1_000_000;
   uint256 NORMAL_BLOCK_NUMBER = 100_000_000;
 
+  uint private innerLogLevel = 0;
+
   using LibErrorHandler for bool;
 
   modifier logPostCheck(string memory task) {
-    console.log(string.concat("[>] Post-checking: ", task, "..."));
+    innerLogLevel++;
+    if (innerLogLevel == 1) {
+      console.log(string.concat("[>] Post-checking: ", task, "..."));
+    }
     _;
-    console.log(StdStyle.green(string.concat("    Check success: ", task, unicode"... ✅")));
+    if (innerLogLevel == 1) {
+      console.log(StdStyle.green(string.concat("    Check success: ", task, unicode"... ✅")));
+    }
+    innerLogLevel--;
   }
 
   function _applyValidatorCandidate(address staking, address candidateAdmin, address consensusAddr) internal {
@@ -68,11 +76,7 @@ abstract contract PostChecker_Helper is BaseMigration {
     if (!success) {
       (success, returnData) = staking.call{ value: value }(
         abi.encodeWithSelector(
-          ICandidateStaking.applyValidatorCandidate.selector,
-          candidateAdmin,
-          consensusAddr,
-          candidateAdmin,
-          15_00
+          ICandidateStaking.applyValidatorCandidate.selector, candidateAdmin, consensusAddr, candidateAdmin, 15_00
         )
       );
     }
@@ -101,12 +105,9 @@ abstract contract PostChecker_Helper is BaseMigration {
     vm.warp(block.timestamp + 3 seconds);
     vm.roll(block.number + 1);
 
-    uint256 numberOfBlocksInEpoch = RoninValidatorSet(
-      CONFIG.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key())
-    ).numberOfBlocksInEpoch();
-    uint256 epochEndingBlockNumber = block.number +
-      (numberOfBlocksInEpoch - 1) -
-      (block.number % numberOfBlocksInEpoch);
+    uint256 numberOfBlocksInEpoch =
+      RoninValidatorSet(CONFIG.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key())).numberOfBlocksInEpoch();
+    uint256 epochEndingBlockNumber = block.number + (numberOfBlocksInEpoch - 1) - (block.number % numberOfBlocksInEpoch);
 
     vm.roll(epochEndingBlockNumber);
   }

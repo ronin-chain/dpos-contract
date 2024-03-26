@@ -6,8 +6,4 @@ import "./ISlashDoubleSign.sol";
 import "./ISlashUnavailability.sol";
 import "./ICreditScore.sol";
 
-interface ISlashIndicator is
-  ISlashDoubleSign,
-  ISlashUnavailability,
-  ICreditScore
-{}
+interface ISlashIndicator is ISlashDoubleSign, ISlashUnavailability, ICreditScore { }

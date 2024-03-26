@@ -31,5 +31,5 @@ contract MockRoninBridgeManager is RoninBridgeManager {
       targetOptions,
       targets
     )
-  {}
+  { }
 }

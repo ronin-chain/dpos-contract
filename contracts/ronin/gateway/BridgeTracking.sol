@@ -157,7 +157,7 @@ contract BridgeTracking is HasBridgeDeprecated, HasValidatorDeprecated, HasContr
     uint256 length = operators.length;
     res = new uint256[](length);
     bool isBufferCounted = _isBufferCountedForPeriod(period);
-    for (uint i = 0; i < length; ) {
+    for (uint i = 0; i < length;) {
       res[i] = _totalBallotOf(period, operators[i], isBufferCounted);
 
       unchecked {
@@ -193,7 +193,7 @@ contract BridgeTracking is HasBridgeDeprecated, HasValidatorDeprecated, HasContr
       _bufferRequest.id = requestId;
 
       address[] storage _voters = _receiptInfo.voters;
-      for (uint i = 0; i < _voters.length; ) {
+      for (uint i = 0; i < _voters.length;) {
         _increaseBallot(kind, requestId, _voters[i], currentPeriod);
 
         unchecked {
@@ -240,16 +240,11 @@ contract BridgeTracking is HasBridgeDeprecated, HasValidatorDeprecated, HasContr
       address bridgeSlashContract = getContract(ContractType.BRIDGE_SLASH);
       (bool success, bytes memory returnOrRevertData) = bridgeSlashContract.call(
         abi.encodeCall(
-          IBridgeSlash.execSlashBridgeOperators,
-          (allOperators, ballots, totalBallot_, totalVote_, lastSyncPeriod)
+          IBridgeSlash.execSlashBridgeOperators, (allOperators, ballots, totalBallot_, totalVote_, lastSyncPeriod)
         )
       );
       if (!success) {
-        emit ExternalCallFailed(
-          bridgeSlashContract,
-          IBridgeSlash.execSlashBridgeOperators.selector,
-          returnOrRevertData
-        );
+        emit ExternalCallFailed(bridgeSlashContract, IBridgeSlash.execSlashBridgeOperators.selector, returnOrRevertData);
       }
 
       address bridgeRewardContract = getContract(ContractType.BRIDGE_REWARD);
@@ -327,7 +322,7 @@ contract BridgeTracking is HasBridgeDeprecated, HasValidatorDeprecated, HasContr
       _metric.totalBallot += _bufferMetric.data.totalBallot;
 
       // Copy voters info and voters' ballot
-      for (uint i = 0; i < _bufferMetric.data.voters.length; ) {
+      for (uint i = 0; i < _bufferMetric.data.voters.length;) {
         address voter = _bufferMetric.data.voters[i];
         _metric.totalBallotOf[voter] += _bufferMetric.data.totalBallotOf[voter];
         delete _bufferMetric.data.totalBallotOf[voter]; // need to manually delete each element, due to mapping
@@ -338,7 +333,7 @@ contract BridgeTracking is HasBridgeDeprecated, HasValidatorDeprecated, HasContr
       }
 
       // Mark all receipts in the buffer as tracked. Keep total number of receipts and delete receipt details.
-      for (uint i = 0; i < _bufferMetric.requests.length; ) {
+      for (uint i = 0; i < _bufferMetric.requests.length;) {
         Request storage _bufferRequest = _bufferMetric.requests[i];
         ReceiptTrackingInfo storage _receiptInfo = _receiptTrackingInfo[_bufferRequest.kind][_bufferRequest.id];
         _receiptInfo.trackedPeriod = trackedPeriod;
@@ -359,9 +354,8 @@ contract BridgeTracking is HasBridgeDeprecated, HasValidatorDeprecated, HasContr
   function _isBufferCountedForPeriod(uint256 queriedPeriod) internal view returns (bool) {
     IRoninValidatorSet validatorContract = IRoninValidatorSet(getContract(ContractType.VALIDATOR));
     uint256 currentEpoch = validatorContract.epochOf(block.number);
-    (bool filled, uint256 periodOfNextTemporaryEpoch) = validatorContract.tryGetPeriodOfEpoch(
-      _bufferMetric.lastEpoch + 1
-    );
+    (bool filled, uint256 periodOfNextTemporaryEpoch) =
+      validatorContract.tryGetPeriodOfEpoch(_bufferMetric.lastEpoch + 1);
     return filled && queriedPeriod == periodOfNextTemporaryEpoch && _bufferMetric.lastEpoch < currentEpoch;
   }
 }

@@ -9,17 +9,26 @@ import { Maintenance } from "@ronin/contracts/ronin/Maintenance.sol";
 import { ContractType } from "@ronin/contracts/utils/ContractType.sol";
 import { MockPrecompile } from "@ronin/contracts/mocks/MockPrecompile.sol";
 import { IProfile, Profile } from "@ronin/contracts/ronin/profile/Profile.sol";
-import { Profile_Testnet } from "@ronin/contracts/ronin/profile/Profile_Testnet.sol";
 import { Profile_Mainnet } from "@ronin/contracts/ronin/profile/Profile_Mainnet.sol";
 import { IBaseStaking, Staking } from "@ronin/contracts/ronin/staking/Staking.sol";
 import { HasContracts } from "@ronin/contracts/extensions/collections/HasContracts.sol";
 import { CandidateManager } from "@ronin/contracts/ronin/validator/CandidateManager.sol";
 import { EmergencyExitBallot } from "@ronin/contracts/libraries/EmergencyExitBallot.sol";
 import { SlashIndicator } from "@ronin/contracts/ronin/slash-indicator/SlashIndicator.sol";
-import { ICandidateManagerCallback, ICandidateManager, RoninValidatorSet } from "@ronin/contracts/ronin/validator/RoninValidatorSet.sol";
-import { TransparentUpgradeableProxy, TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
+import {
+  ICandidateManagerCallback,
+  ICandidateManager,
+  RoninValidatorSet
+} from "@ronin/contracts/ronin/validator/RoninValidatorSet.sol";
+import {
+  TransparentUpgradeableProxy,
+  TransparentUpgradeableProxyV2
+} from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
 import { IRoninGovernanceAdmin, RoninGovernanceAdmin } from "@ronin/contracts/ronin/RoninGovernanceAdmin.sol";
-import { IRoninTrustedOrganization, RoninTrustedOrganization } from "@ronin/contracts/multi-chains/RoninTrustedOrganization.sol";
+import {
+  IRoninTrustedOrganization,
+  RoninTrustedOrganization
+} from "@ronin/contracts/multi-chains/RoninTrustedOrganization.sol";
 import { Proposal } from "@ronin/contracts/libraries/Proposal.sol";
 import { Ballot } from "@ronin/contracts/libraries/Ballot.sol";
 
@@ -181,13 +190,8 @@ contract ChangeConsensusAddressForkTest is Test {
     // add trusted org
     address consensus = makeAddr("consensus");
     address governor = makeAddr("governor");
-    IRoninTrustedOrganization.TrustedOrganization memory newTrustedOrg = IRoninTrustedOrganization.TrustedOrganization(
-      TConsensus.wrap(consensus),
-      governor,
-      address(0x0),
-      1000,
-      0
-    );
+    IRoninTrustedOrganization.TrustedOrganization memory newTrustedOrg =
+      IRoninTrustedOrganization.TrustedOrganization(TConsensus.wrap(consensus), governor, address(0x0), 1000, 0);
     _addTrustedOrg(newTrustedOrg);
 
     address newLogic = address(new RoninValidatorSet());
@@ -202,12 +206,7 @@ contract ChangeConsensusAddressForkTest is Test {
 
     vm.startPrank(governor);
     _roninGA.proposeProposalForCurrentNetwork(
-      block.timestamp + 5 minutes,
-      targets,
-      values,
-      calldatas,
-      gasAmounts,
-      support
+      block.timestamp + 5 minutes, targets, values, calldatas, gasAmounts, support
     );
     vm.stopPrank();
   }
@@ -222,13 +221,8 @@ contract ChangeConsensusAddressForkTest is Test {
     // add trusted org
     address consensus = makeAddr("c1");
     address governor = makeAddr("governor");
-    IRoninTrustedOrganization.TrustedOrganization memory newTrustedOrg = IRoninTrustedOrganization.TrustedOrganization(
-      TConsensus.wrap(consensus),
-      governor,
-      address(0x0),
-      1000,
-      0
-    );
+    IRoninTrustedOrganization.TrustedOrganization memory newTrustedOrg =
+      IRoninTrustedOrganization.TrustedOrganization(TConsensus.wrap(consensus), governor, address(0x0), 1000, 0);
     _addTrustedOrg(newTrustedOrg);
 
     address newConsensus = makeAddr("c2");
@@ -257,7 +251,7 @@ contract ChangeConsensusAddressForkTest is Test {
 
     (, TConsensus standardConsensus) = _pickOneStandardCandidate();
 
-    (address admin, , ) = _staking.getPoolDetail(standardConsensus);
+    (address admin,,) = _staking.getPoolDetail(standardConsensus);
     vm.prank(admin);
     _staking.requestRenounce(standardConsensus);
 
@@ -267,13 +261,8 @@ contract ChangeConsensusAddressForkTest is Test {
 
     assertFalse(_validator.isValidatorCandidate(standardConsensus));
 
-    IRoninTrustedOrganization.TrustedOrganization memory newTrustedOrg = IRoninTrustedOrganization.TrustedOrganization(
-      standardConsensus,
-      makeAddr("governor"),
-      address(0x0),
-      1000,
-      0
-    );
+    IRoninTrustedOrganization.TrustedOrganization memory newTrustedOrg =
+      IRoninTrustedOrganization.TrustedOrganization(standardConsensus, makeAddr("governor"), address(0x0), 1000, 0);
     _addTrustedOrg(newTrustedOrg);
   }
 
@@ -283,13 +272,8 @@ contract ChangeConsensusAddressForkTest is Test {
     // add trusted org
     address consensus = makeAddr("consensus");
     address governor = makeAddr("governor");
-    IRoninTrustedOrganization.TrustedOrganization memory newTrustedOrg = IRoninTrustedOrganization.TrustedOrganization(
-      TConsensus.wrap(consensus),
-      governor,
-      address(0x0),
-      newWeight,
-      0
-    );
+    IRoninTrustedOrganization.TrustedOrganization memory newTrustedOrg =
+      IRoninTrustedOrganization.TrustedOrganization(TConsensus.wrap(consensus), governor, address(0x0), newWeight, 0);
     IRoninTrustedOrganization.TrustedOrganization[] memory trustedOrgs = _addTrustedOrg(newTrustedOrg);
 
     // apply validator candidate
@@ -325,9 +309,8 @@ contract ChangeConsensusAddressForkTest is Test {
     );
 
     IProfile.CandidateProfile memory profile = _profile.getId2Profile(consensus);
-    IRoninTrustedOrganization.TrustedOrganization memory trustedOrg = _roninTO.getTrustedOrganization(
-      TConsensus.wrap(newConsensus)
-    );
+    IRoninTrustedOrganization.TrustedOrganization memory trustedOrg =
+      _roninTO.getTrustedOrganization(TConsensus.wrap(newConsensus));
 
     // assert eq to updated address
     // 1.
@@ -353,13 +336,8 @@ contract ChangeConsensusAddressForkTest is Test {
     // add trusted org
     address consensus = makeAddr("consensus");
     address governor = makeAddr("governor");
-    IRoninTrustedOrganization.TrustedOrganization memory newTrustedOrg = IRoninTrustedOrganization.TrustedOrganization(
-      TConsensus.wrap(consensus),
-      governor,
-      address(0x0),
-      newWeight,
-      0
-    );
+    IRoninTrustedOrganization.TrustedOrganization memory newTrustedOrg =
+      IRoninTrustedOrganization.TrustedOrganization(TConsensus.wrap(consensus), governor, address(0x0), newWeight, 0);
     IRoninTrustedOrganization.TrustedOrganization[] memory trustedOrgs = _addTrustedOrg(newTrustedOrg);
 
     address admin = makeAddr("candidate-admin");
@@ -392,9 +370,8 @@ contract ChangeConsensusAddressForkTest is Test {
     );
 
     IProfile.CandidateProfile memory profile = _profile.getId2Profile(consensus);
-    IRoninTrustedOrganization.TrustedOrganization memory trustedOrg = _roninTO.getTrustedOrganization(
-      TConsensus.wrap(newConsensus)
-    );
+    IRoninTrustedOrganization.TrustedOrganization memory trustedOrg =
+      _roninTO.getTrustedOrganization(TConsensus.wrap(newConsensus));
 
     // assert eq to updated address
     assertEq(trustedOrg.governor, newGovernor);
@@ -439,7 +416,7 @@ contract ChangeConsensusAddressForkTest is Test {
     TConsensus validatorCandidate = validatorCandidates[2];
     ICandidateManager.ValidatorCandidate memory oldCandidate = _validator.getCandidateInfo(validatorCandidate);
 
-    (address admin, , ) = _staking.getPoolDetail(validatorCandidate);
+    (address admin,,) = _staking.getPoolDetail(validatorCandidate);
     console2.log("admin", admin);
 
     address newAdmin = makeAddr("new-admin");
@@ -510,7 +487,7 @@ contract ChangeConsensusAddressForkTest is Test {
     vm.prank(admin);
     _profile.changeConsensusAddr(TConsensus.unwrap(trustedOrg), newConsensus);
 
-    (address poolAdmin, , ) = _staking.getPoolDetail(newConsensus);
+    (address poolAdmin,,) = _staking.getPoolDetail(newConsensus);
     console2.log("poolAdmin", poolAdmin);
 
     vm.expectRevert();
@@ -527,7 +504,7 @@ contract ChangeConsensusAddressForkTest is Test {
     vm.prank(admin);
     _profile.changeConsensusAddr(TConsensus.unwrap(trustedOrg), newConsensus);
 
-    (address poolAdmin, , ) = _staking.getPoolDetail(newConsensus);
+    (address poolAdmin,,) = _staking.getPoolDetail(newConsensus);
     console2.log("poolAdmin", poolAdmin);
 
     vm.prank(poolAdmin);
@@ -541,7 +518,7 @@ contract ChangeConsensusAddressForkTest is Test {
 
     uint256 snapshotId = vm.snapshot();
 
-    (address admin, , ) = _staking.getPoolDetail(validatorCandidate);
+    (address admin,,) = _staking.getPoolDetail(validatorCandidate);
     console2.log("before-upgrade-admin", admin);
     vm.prank(admin);
     _staking.requestEmergencyExit(validatorCandidate);
@@ -575,7 +552,7 @@ contract ChangeConsensusAddressForkTest is Test {
     vm.revertTo(snapshotId);
     _upgradeContracts();
 
-    (admin, , ) = _staking.getPoolDetail(validatorCandidate);
+    (admin,,) = _staking.getPoolDetail(validatorCandidate);
     console2.log("after-upgrade-admin", admin);
     vm.prank(admin);
     _staking.requestEmergencyExit(validatorCandidate);
@@ -612,7 +589,7 @@ contract ChangeConsensusAddressForkTest is Test {
     (, TConsensus standardConsensus) = _pickOneStandardCandidate();
     address recipient = _validator.getCandidateInfo(standardConsensus).__shadowedTreasury;
 
-    (address admin, , ) = _staking.getPoolDetail(standardConsensus);
+    (address admin,,) = _staking.getPoolDetail(standardConsensus);
     vm.prank(admin);
     _staking.requestRenounce(standardConsensus);
 
@@ -628,12 +605,7 @@ contract ChangeConsensusAddressForkTest is Test {
     vm.expectRevert();
     vm.prank(admin);
     _staking.applyValidatorCandidate{ value: amount }(
-      admin,
-      TConsensus.wrap(makeAddr("new-consensus")),
-      payable(admin),
-      2500,
-      "new-consensus",
-      ""
+      admin, TConsensus.wrap(makeAddr("new-consensus")), payable(admin), 2500, "new-consensus", ""
     );
     // re-apply same consensus
     address newAdmin = makeAddr("new-admin");
@@ -641,12 +613,7 @@ contract ChangeConsensusAddressForkTest is Test {
     vm.expectRevert();
     vm.prank(newAdmin);
     _staking.applyValidatorCandidate{ value: amount }(
-      newAdmin,
-      standardConsensus,
-      payable(newAdmin),
-      2500,
-      "new-admin",
-      ""
+      newAdmin, standardConsensus, payable(newAdmin), 2500, "new-admin", ""
     );
 
     console2.log("recipient", recipient);
@@ -719,9 +686,8 @@ contract ChangeConsensusAddressForkTest is Test {
 
     // revert to state before wrap up
     vm.revertTo(snapshotId);
-    ICandidateManager.ValidatorCandidate memory nonWrapUpInfo = _validator.getCandidateInfo(
-      TConsensus.wrap(newConsensus)
-    );
+    ICandidateManager.ValidatorCandidate memory nonWrapUpInfo =
+      _validator.getCandidateInfo(TConsensus.wrap(newConsensus));
     ICandidateManager.ValidatorCandidate[] memory nonWrapUpInfos = _validator.getCandidateInfos();
 
     assertEq(wrapUpInfo.__shadowedAdmin, nonWrapUpInfo.__shadowedAdmin);
@@ -997,7 +963,8 @@ contract ChangeConsensusAddressForkTest is Test {
       logic = new Profile_Mainnet();
     }
     if (block.chainid == 2021) {
-      logic = new Profile_Testnet();
+      // logic = new Profile_Testnet();
+      logic = new Profile();
     }
 
     uint gl1 = gasleft();
@@ -1005,8 +972,7 @@ contract ChangeConsensusAddressForkTest is Test {
 
     vm.prank(_getProxyAdmin(address(_profile)));
     TransparentUpgradeableProxyV2(payable(address(_profile))).upgradeToAndCall(
-      address(logic),
-      abi.encodeCall(Profile.initializeV2, (address(_staking), address(_roninTO)))
+      address(logic), abi.encodeCall(Profile.initializeV2, (address(_staking), address(_roninTO)))
     );
 
     uint gl2 = gasleft();
@@ -1015,12 +981,8 @@ contract ChangeConsensusAddressForkTest is Test {
   }
 
   function _cheatSetRoninGACode() internal {
-    RoninGovernanceAdmin logic = new RoninGovernanceAdmin(
-      block.chainid,
-      address(_roninTO),
-      address(_validator),
-      type(uint256).max
-    );
+    RoninGovernanceAdmin logic =
+      new RoninGovernanceAdmin(block.chainid, address(_roninTO), address(_validator), type(uint256).max);
     vm.etch(address(_roninGA), address(logic).code);
 
     vm.startPrank(address(_roninGA));
@@ -1033,8 +995,7 @@ contract ChangeConsensusAddressForkTest is Test {
     Maintenance logic = new Maintenance();
     vm.prank(_getProxyAdmin(address(_maintenance)));
     TransparentUpgradeableProxyV2(payable(address(_maintenance))).upgradeToAndCall(
-      address(logic),
-      abi.encodeCall(Maintenance.initializeV3, (address(_profile)))
+      address(logic), abi.encodeCall(Maintenance.initializeV3, (address(_profile)))
     );
   }
 
@@ -1042,8 +1003,7 @@ contract ChangeConsensusAddressForkTest is Test {
     RoninTrustedOrganization logic = new RoninTrustedOrganization();
     vm.prank(_getProxyAdmin(address(_roninTO)));
     TransparentUpgradeableProxyV2(payable(address(_roninTO))).upgradeToAndCall(
-      address(logic),
-      abi.encodeCall(RoninTrustedOrganization.initializeV2, (address(_profile)))
+      address(logic), abi.encodeCall(RoninTrustedOrganization.initializeV2, (address(_profile)))
     );
   }
 
@@ -1057,8 +1017,7 @@ contract ChangeConsensusAddressForkTest is Test {
     Staking logic = new Staking();
     vm.prank(_getProxyAdmin(address(_staking)));
     TransparentUpgradeableProxyV2(payable(_staking)).upgradeToAndCall(
-      address(logic),
-      abi.encodeCall(Staking.initializeV3, (address(_profile)))
+      address(logic), abi.encodeCall(Staking.initializeV3, (address(_profile)))
     );
   }
 
@@ -1066,8 +1025,7 @@ contract ChangeConsensusAddressForkTest is Test {
     RoninValidatorSet logic = new RoninValidatorSet();
     vm.prank(_getProxyAdmin(address(_validator)));
     TransparentUpgradeableProxyV2(payable(_validator)).upgradeToAndCall(
-      address(logic),
-      abi.encodeCall(RoninValidatorSet.initializeV4, (address(_profile)))
+      address(logic), abi.encodeCall(RoninValidatorSet.initializeV4, (address(_profile)))
     );
   }
 
@@ -1086,9 +1044,7 @@ contract ChangeConsensusAddressForkTest is Test {
 
     uint256 numberOfBlocksInEpoch = _validator.numberOfBlocksInEpoch();
 
-    uint256 epochEndingBlockNumber = block.number +
-      (numberOfBlocksInEpoch - 1) -
-      (block.number % numberOfBlocksInEpoch);
+    uint256 epochEndingBlockNumber = block.number + (numberOfBlocksInEpoch - 1) - (block.number % numberOfBlocksInEpoch);
     uint256 nextDayTimestamp = block.timestamp + 1 days;
 
     // fast forward to next day
@@ -1096,9 +1052,10 @@ contract ChangeConsensusAddressForkTest is Test {
     vm.roll(epochEndingBlockNumber);
   }
 
-  function _addTrustedOrg(
-    IRoninTrustedOrganization.TrustedOrganization memory trustedOrg
-  ) internal returns (IRoninTrustedOrganization.TrustedOrganization[] memory trustedOrgs) {
+  function _addTrustedOrg(IRoninTrustedOrganization.TrustedOrganization memory trustedOrg)
+    internal
+    returns (IRoninTrustedOrganization.TrustedOrganization[] memory trustedOrgs)
+  {
     trustedOrgs = new IRoninTrustedOrganization.TrustedOrganization[](1);
     trustedOrgs[0] = trustedOrg;
     vm.prank(_getProxyAdmin(address(_roninTO)));
@@ -1116,12 +1073,7 @@ contract ChangeConsensusAddressForkTest is Test {
     vm.deal(candidateAdmin, amount);
     vm.prank(candidateAdmin, candidateAdmin);
     _staking.applyValidatorCandidate{ value: amount }(
-      candidateAdmin,
-      consensusAddr,
-      payable(candidateAdmin),
-      15_00,
-      pubKey,
-      ""
+      candidateAdmin, consensusAddr, payable(candidateAdmin), 15_00, pubKey, ""
     );
   }
 

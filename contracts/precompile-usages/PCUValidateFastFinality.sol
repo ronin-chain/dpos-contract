@@ -39,13 +39,8 @@ abstract contract PCUValidateFastFinality is PrecompiledUsage {
 
     assembly {
       let payloadStart := add(payload, 0x20)
-      if iszero(staticcall(gas(), smc, payloadStart, payloadLength, output, 0x20)) {
-        success := 0
-      }
-
-      if iszero(returndatasize()) {
-        success := 0
-      }
+      if iszero(staticcall(gas(), smc, payloadStart, payloadLength, output, 0x20)) { success := 0 }
+      if iszero(returndatasize()) { success := 0 }
     }
 
     if (!success) revert ErrCallPrecompiled();

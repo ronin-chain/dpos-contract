@@ -56,9 +56,13 @@ abstract contract CommonStorage is ICommonInfo, TimingStorage, JailingStorage, V
   /**
    * @inheritdoc ITimingInfo
    */
-  function epochOf(
-    uint256 _block
-  ) public view virtual override(ITimingInfo, JailingStorage, TimingStorage) returns (uint256) {
+  function epochOf(uint256 _block)
+    public
+    view
+    virtual
+    override(ITimingInfo, JailingStorage, TimingStorage)
+    returns (uint256)
+  {
     return TimingStorage.epochOf(_block);
   }
 
@@ -70,12 +74,18 @@ abstract contract CommonStorage is ICommonInfo, TimingStorage, JailingStorage, V
   }
 
   /// @dev See {RoninValidatorSet-__css2cid}
-  function __css2cid(
-    TConsensus consensusAddr
-  ) internal view virtual override(JailingStorage, ValidatorInfoStorageV2) returns (address);
+  function __css2cid(TConsensus consensusAddr)
+    internal
+    view
+    virtual
+    override(JailingStorage, ValidatorInfoStorageV2)
+    returns (address);
 
   /// @dev See {RoninValidatorSet-__css2cidBatch}
-  function __css2cidBatch(
-    TConsensus[] memory consensusAddrs
-  ) internal view virtual override(JailingStorage, ValidatorInfoStorageV2) returns (address[] memory);
+  function __css2cidBatch(TConsensus[] memory consensusAddrs)
+    internal
+    view
+    virtual
+    override(JailingStorage, ValidatorInfoStorageV2)
+    returns (address[] memory);
 }

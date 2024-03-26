@@ -19,7 +19,7 @@ contract TransparentUpgradeableProxyV3 is TransparentUpgradeableProxy {
       ITransparentUpgradeableProxyDeployer(msg.sender).paramAdmin(),
       ITransparentUpgradeableProxyDeployer(msg.sender).paramExtraData()
     )
-  {}
+  { }
 
   /**
    * @dev Calls a function from the current implementation as specified by `_data`, which should be an encoded function call.
@@ -38,12 +38,8 @@ contract TransparentUpgradeableProxyV3 is TransparentUpgradeableProxy {
       let _result := delegatecall(gas(), _addr, add(_data, 32), mload(_data), 0, 0)
       returndatacopy(0, 0, returndatasize())
       switch _result
-      case 0 {
-        revert(0, returndatasize())
-      }
-      default {
-        return(0, returndatasize())
-      }
+      case 0 { revert(0, returndatasize()) }
+      default { return(0, returndatasize()) }
     }
   }
 }

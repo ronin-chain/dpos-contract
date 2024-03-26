@@ -28,7 +28,8 @@ abstract contract SlashUnavailability is ISlashUnavailability, HasContracts, Has
   /**
    * @dev The amount of RON to deduct from self-staking of a block producer when (s)he is slashed with
    * tier-2 or tier-3.
-   **/
+   *
+   */
   uint256 internal _slashAmountForUnavailabilityTier2Threshold;
   /// @dev The number of blocks to jail a block producer when (s)he is slashed with tier-2 or tier-3.
   uint256 internal _jailDurationForUnavailabilityTier2Threshold;
@@ -74,12 +75,7 @@ abstract contract SlashUnavailability is ISlashUnavailability, HasContracts, Has
 
     if (count == _unavailabilityTier2Threshold) {
       emit Slashed(validatorId, SlashType.UNAVAILABILITY_TIER_2, period);
-      validatorContract.execSlash(
-        validatorId,
-        newJailedUntilBlock,
-        _slashAmountForUnavailabilityTier2Threshold,
-        false
-      );
+      validatorContract.execSlash(validatorId, newJailedUntilBlock, _slashAmountForUnavailabilityTier2Threshold, false);
     } else if (count == _unavailabilityTier1Threshold) {
       bool tier1SecondTime = _checkBailedOutAtPeriodById(validatorId, period);
       if (!tier1SecondTime) {
@@ -88,12 +84,7 @@ abstract contract SlashUnavailability is ISlashUnavailability, HasContracts, Has
       } else {
         /// Handles tier-3
         emit Slashed(validatorId, SlashType.UNAVAILABILITY_TIER_3, period);
-        validatorContract.execSlash(
-          validatorId,
-          newJailedUntilBlock,
-          _slashAmountForUnavailabilityTier2Threshold,
-          true
-        );
+        validatorContract.execSlash(validatorId, newJailedUntilBlock, _slashAmountForUnavailabilityTier2Threshold, true);
       }
     }
   }
@@ -141,11 +132,9 @@ abstract contract SlashUnavailability is ISlashUnavailability, HasContracts, Has
    * @inheritdoc ISlashUnavailability
    */
   function currentUnavailabilityIndicator(TConsensus consensus) external view override returns (uint256) {
-    return
-      _getUnavailabilityIndicatorById(
-        __css2cid(consensus),
-        IRoninValidatorSet(getContract(ContractType.VALIDATOR)).currentPeriod()
-      );
+    return _getUnavailabilityIndicatorById(
+      __css2cid(consensus), IRoninValidatorSet(getContract(ContractType.VALIDATOR)).currentPeriod()
+    );
   }
 
   /**
@@ -158,10 +147,7 @@ abstract contract SlashUnavailability is ISlashUnavailability, HasContracts, Has
     return _getUnavailabilityIndicatorById(__css2cid(consensus), period);
   }
 
-  function _getUnavailabilityIndicatorById(
-    address validatorId,
-    uint256 period
-  ) internal view virtual returns (uint256) {
+  function _getUnavailabilityIndicatorById(address validatorId, uint256 period) internal view virtual returns (uint256) {
     return _unavailabilityIndicator[validatorId][period];
   }
 
@@ -187,12 +173,7 @@ abstract contract SlashUnavailability is ISlashUnavailability, HasContracts, Has
     _unavailabilityTier2Threshold = tier2Threshold;
     _slashAmountForUnavailabilityTier2Threshold = slashAmountForTier2;
     _jailDurationForUnavailabilityTier2Threshold = jailDurationForTier2;
-    emit UnavailabilitySlashingConfigsUpdated(
-      tier1Threshold,
-      tier2Threshold,
-      slashAmountForTier2,
-      jailDurationForTier2
-    );
+    emit UnavailabilitySlashingConfigsUpdated(tier1Threshold, tier2Threshold, slashAmountForTier2, jailDurationForTier2);
   }
 
   /**

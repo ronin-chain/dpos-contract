@@ -8,7 +8,7 @@ import { Network } from "./utils/Network.sol";
 import { Contract } from "./utils/Contract.sol";
 
 contract GeneralConfig is BaseGeneralConfig {
-  constructor() BaseGeneralConfig("", "deployments/") {}
+  constructor() BaseGeneralConfig("", "deployments/") { }
 
   function _setUpNetworks() internal virtual override {
     setNetworkInfo(
@@ -65,7 +65,7 @@ contract GeneralConfig is BaseGeneralConfig {
     _contractNameMap[Contract.TemporalRoninTrustedOrganization.key()] = Contract.RoninTrustedOrganization.name();
 
     if (block.chainid == 2021) {
-      _contractNameMap[Contract.Profile.key()] = "Profile_Testnet";
+      _contractNameMap[Contract.Profile.key()] = "Profile";
     } else if (block.chainid == 2020) {
       _contractNameMap[Contract.Profile.key()] = "Profile_Mainnet";
     }

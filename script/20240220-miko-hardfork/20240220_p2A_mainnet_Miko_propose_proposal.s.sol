@@ -21,9 +21,9 @@ contract Proposal__20240220_MikoHardfork_ProposeProposal is Proposal__20240220_M
     Proposal.ProposalDetail memory proposal = _buildFinalProposal();
     _proposeProposal(roninGovernanceAdmin, trustedOrgContract, proposal, SKY_MAVIS_GOVERNOR);
 
-    CONFIG.setBroadcastDisableStatus(true);
+    CONFIG.setPostCheckingStatus(true);
     _voteProposalUntilSuccess(roninGovernanceAdmin, trustedOrgContract, proposal);
-    CONFIG.setBroadcastDisableStatus(false);
+    CONFIG.setPostCheckingStatus(false);
 
     CONFIG.setAddress(network(), Contract.RoninGovernanceAdmin.key(), address(_newGA));
   }

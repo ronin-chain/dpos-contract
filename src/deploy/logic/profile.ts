@@ -14,8 +14,6 @@ const deploy = async ({ getNamedAccounts, deployments }: HardhatRuntimeEnvironme
 
   let contractToDeploy;
   switch (network.name!) {
-    case Network.Testnet:
-      contractToDeploy = 'Profile_Testnet';
     case Network.Mainnet:
       contractToDeploy = 'Profile_Mainnet';
     default:

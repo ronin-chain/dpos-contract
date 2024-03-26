@@ -48,6 +48,11 @@ interface IRewardPool is PeriodWrapperConsumer {
   function getReward(TConsensus consensusAddr, address user) external view returns (uint256);
 
   /**
+   * @dev Returns the reward amount that user claimable.
+   */
+  function getRewardById(address poolId, address user) external view returns (uint256);
+
+  /**
    * @dev Returns the staking amount of an user.
    */
   function getStakingAmount(TConsensus consensusAddr, address user) external view returns (uint256);
@@ -55,15 +60,15 @@ interface IRewardPool is PeriodWrapperConsumer {
   /**
    * @dev Returns the staking amounts of the users.
    */
-  function getManyStakingAmounts(
-    TConsensus[] calldata consensusAddrs,
-    address[] calldata userList
-  ) external view returns (uint256[] memory);
+  function getManyStakingAmounts(TConsensus[] calldata consensusAddrs, address[] calldata userList)
+    external
+    view
+    returns (uint256[] memory);
 
-  function getManyStakingAmountsById(
-    address[] calldata poolIds,
-    address[] calldata userList
-  ) external view returns (uint256[] memory);
+  function getManyStakingAmountsById(address[] calldata poolIds, address[] calldata userList)
+    external
+    view
+    returns (uint256[] memory);
 
   /**
    * @dev Returns the total staking amount of all users for a pool.
@@ -78,7 +83,8 @@ interface IRewardPool is PeriodWrapperConsumer {
   /**
    * @dev Returns the total staking amounts of all users for the pools `poolIds`.
    */
-  function getManyStakingTotalsById(
-    address[] calldata poolIds
-  ) external view returns (uint256[] memory stakingAmounts_);
+  function getManyStakingTotalsById(address[] calldata poolIds)
+    external
+    view
+    returns (uint256[] memory stakingAmounts_);
 }

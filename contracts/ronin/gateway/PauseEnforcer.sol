@@ -63,7 +63,7 @@ contract PauseEnforcer is AccessControlEnumerable, Initializable {
   function initialize(IPauseTarget _target, address _admin, address[] memory _sentries) external initializer {
     _changeTarget(_target);
     _setupRole(DEFAULT_ADMIN_ROLE, _admin);
-    for (uint _i; _i < _sentries.length; ) {
+    for (uint _i; _i < _sentries.length;) {
       _grantRole(SENTRY_ROLE, _sentries[_i]);
 
       unchecked {

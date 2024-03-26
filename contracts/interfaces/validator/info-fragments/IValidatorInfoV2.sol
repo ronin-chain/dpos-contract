@@ -9,6 +9,7 @@ interface IValidatorInfoV2 {
   /// @dev Error thrown when an invalid maximum prioritized validator number is provided.
   error ErrInvalidMaxPrioritizedValidatorNumber();
   /// @dev Emitted when the number of max validator is updated.
+
   event MaxValidatorNumberUpdated(uint256);
   /// @dev Emitted when the number of reserved slots for prioritized validators is updated.
   event MaxPrioritizedValidatorNumberUpdated(uint256);

@@ -1,0 +1,12 @@
+| Name                           | Type                                             | Slot | Offset | Bytes | Contract                                    |
+|--------------------------------|--------------------------------------------------|------|--------|-------|---------------------------------------------|
+| ______deprecatedValidator      | address                                          | 0    | 0      | 20    | contracts/ronin/Maintenance.sol:Maintenance |
+| _initialized                   | uint8                                            | 0    | 20     | 1     | contracts/ronin/Maintenance.sol:Maintenance |
+| _initializing                  | bool                                             | 0    | 21     | 1     | contracts/ronin/Maintenance.sol:Maintenance |
+| _schedule                      | mapping(address => struct IMaintenance.Schedule) | 1    | 0      | 32    | contracts/ronin/Maintenance.sol:Maintenance |
+| _minMaintenanceDurationInBlock | uint256                                          | 2    | 0      | 32    | contracts/ronin/Maintenance.sol:Maintenance |
+| _maxMaintenanceDurationInBlock | uint256                                          | 3    | 0      | 32    | contracts/ronin/Maintenance.sol:Maintenance |
+| _minOffsetToStartSchedule      | uint256                                          | 4    | 0      | 32    | contracts/ronin/Maintenance.sol:Maintenance |
+| _maxOffsetToStartSchedule      | uint256                                          | 5    | 0      | 32    | contracts/ronin/Maintenance.sol:Maintenance |
+| _maxSchedule                   | uint256                                          | 6    | 0      | 32    | contracts/ronin/Maintenance.sol:Maintenance |
+| _cooldownSecsToMaintain        | uint256                                          | 7    | 0      | 32    | contracts/ronin/Maintenance.sol:Maintenance |

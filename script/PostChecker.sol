@@ -32,14 +32,8 @@ abstract contract PostChecker is
   using LibProxy for *;
   using LibErrorHandler for bool;
 
-  function run(bytes calldata callData, string calldata command) public override {
-    super.run(callData, command);
-
+  function _postCheck() internal virtual override {
     console.log(StdStyle.bold(StdStyle.cyan("\n\n ====================== Post checking... ======================")));
-
-    CONFIG.setUserDefinedConfig(CONFIG.DISABLE_LOG_ARTIFACT(), bytes32(uint256(0x01)));
-    CONFIG.setBroadcastDisableStatus(true);
-    _setDisableLogProposalStatus(true);
 
     _postCheckValidatorSet();
     _postCheck__GovernanceAdmin();
@@ -50,10 +44,6 @@ abstract contract PostChecker is
     _postCheck__Maintenance();
     _postCheck__Slash();
     _postCheck__GovernanceAdmin();
-
-    CONFIG.setUserDefinedConfig(CONFIG.DISABLE_LOG_ARTIFACT(), bytes32(uint256(0x00)));
-    CONFIG.setBroadcastDisableStatus(false);
-    _setDisableLogProposalStatus(false);
 
     console.log(StdStyle.bold(StdStyle.cyan("\n\n================== Finish post checking ==================\n\n")));
   }

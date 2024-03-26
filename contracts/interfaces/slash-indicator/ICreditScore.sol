@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.9;
+
 import { TConsensus } from "../../udvts/Types.sol";
 
 interface ICreditScore {
@@ -31,10 +32,7 @@ interface ICreditScore {
 
   /// @dev Emitted when the configs to credit score is updated. See the method `setCreditScoreConfigs` for param details.
   event CreditScoreConfigsUpdated(
-    uint256 gainCreditScore,
-    uint256 maxCreditScore,
-    uint256 bailOutCostMultiplier,
-    uint256 cutOffPercentageAfterBailout
+    uint256 gainCreditScore, uint256 maxCreditScore, uint256 bailOutCostMultiplier, uint256 cutOffPercentageAfterBailout
   );
   /// @dev Emitted the credit score of validators is updated.
   event CreditScoresUpdated(address[] cids, uint256[] creditScores);
@@ -125,9 +123,10 @@ interface ICreditScore {
   /**
    * @dev Returns the current credit score of a list of validators.
    */
-  function getManyCreditScores(
-    TConsensus[] calldata consensusAddrs
-  ) external view returns (uint256[] memory _resultList);
+  function getManyCreditScores(TConsensus[] calldata consensusAddrs)
+    external
+    view
+    returns (uint256[] memory _resultList);
 
   /**
    * @dev Returns the whether the `consensus` has been bailed out at the `period`.
