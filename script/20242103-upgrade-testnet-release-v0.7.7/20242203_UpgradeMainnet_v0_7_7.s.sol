@@ -27,6 +27,10 @@ contract Migration__20242103_UpgradeReleaseV0_7_7_Mainnet is RoninMigration {
   address[] private contractsToUpgrade;
   TContract[] private contractTypesToUpgrade;
 
+  function sender() public pure override returns (address payable) {
+    return payable(0x4d58Ea7231c394d5804e8B06B1365915f906E27F);
+  }
+
   function run() public onlyOn(DefaultNetwork.RoninMainnet.key()) {
     RoninGovernanceAdmin governanceAdmin = RoninGovernanceAdmin(loadContract(Contract.RoninGovernanceAdmin.key()));
     RoninTrustedOrganization trustedOrg =
@@ -98,11 +102,12 @@ contract Migration__20242103_UpgradeReleaseV0_7_7_Mainnet is RoninMigration {
     CONFIG.setPostCheckingStatus(true);
     _voteProposalUntilSuccess(governanceAdmin, trustedOrg, proposal);
     CONFIG.setPostCheckingStatus(false);
+
+    v0_7_7Postcheck();
   }
 
   function _postCheck() internal override {
     super._postCheck();
-    v0_7_7Postcheck();
   }
 
   function _buildMigrateProfileProposal(address[] memory targets, bytes[] memory callDatas, uint256 at) internal view {
@@ -145,19 +150,13 @@ contract Migration__20242103_UpgradeReleaseV0_7_7_Mainnet is RoninMigration {
     lostAddr[2] = TConsensus.wrap(0xbD4bf317Da1928CC2f9f4DA9006401f3944A0Ab5);
 
     Profile_Mainnet profile = Profile_Mainnet(loadContract(Contract.Profile.key()));
-    vm.expectRevert(
-      abi.encodeWithSelector(IProfile.ErrLookUpIdFailed.selector, (TConsensus.unwrap(lostAddr[0])))
-    );
+    vm.expectRevert(abi.encodeWithSelector(IProfile.ErrLookUpIdFailed.selector, (TConsensus.unwrap(lostAddr[0]))));
     profile.getConsensus2Id(lostAddr[0]);
 
-    vm.expectRevert(
-      abi.encodeWithSelector(IProfile.ErrLookUpIdFailed.selector, (TConsensus.unwrap(lostAddr[1])))
-    );
+    vm.expectRevert(abi.encodeWithSelector(IProfile.ErrLookUpIdFailed.selector, (TConsensus.unwrap(lostAddr[1]))));
     profile.getConsensus2Id(lostAddr[1]);
 
-    vm.expectRevert(
-      abi.encodeWithSelector(IProfile.ErrLookUpIdFailed.selector, (TConsensus.unwrap(lostAddr[2])))
-    );
+    vm.expectRevert(abi.encodeWithSelector(IProfile.ErrLookUpIdFailed.selector, (TConsensus.unwrap(lostAddr[2]))));
     profile.getConsensus2Id(lostAddr[2]);
   }
 
