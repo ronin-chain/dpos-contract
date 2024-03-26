@@ -55,15 +55,15 @@ contract MaintenanceTest is Test {
 
     uint256 minOffset = maintenance.minOffsetToStartSchedule();
     uint256 latestEpochBlock = validatorSet.getLastUpdatedBlock();
-    uint256 numberOfBlockInEpoch = validatorSet.numberOfBlocksInEpoch();
+    uint256 numberOfBlocksInEpoch = validatorSet.numberOfBlocksInEpoch();
     uint256 minDuration = maintenance.minMaintenanceDurationInBlock();
     uint256 maxDuration = maintenance.maxMaintenanceDurationInBlock();
 
     uint256 durationInBlock = _bound(100, minDuration, maxDuration);
 
-    uint256 startBlock = latestEpochBlock + numberOfBlockInEpoch + minOffset + 1;
-    uint256 endBlock = latestEpochBlock + numberOfBlockInEpoch + minOffset
-      + numberOfBlockInEpoch * (durationInBlock / numberOfBlockInEpoch + 1);
+    uint startBlock = latestEpochBlock + numberOfBlocksInEpoch + 1
+      + ((minOffset + numberOfBlocksInEpoch) / numberOfBlocksInEpoch) * numberOfBlocksInEpoch;
+    uint endBlock = startBlock - 1 + numberOfBlocksInEpoch * (durationInBlock / numberOfBlocksInEpoch + 1);
 
     vm.prank(admin);
     maintenance.schedule(consensus, startBlock, endBlock);
@@ -154,7 +154,7 @@ contract MaintenanceTest is Test {
 
     uint256 minOffset = maintenance.minOffsetToStartSchedule();
     uint256 latestEpochBlock = validatorSet.getLastUpdatedBlock();
-    uint256 numberOfBlockInEpoch = validatorSet.numberOfBlocksInEpoch();
+    uint256 numberOfBlocksInEpoch = validatorSet.numberOfBlocksInEpoch();
     uint256 minDuration = maintenance.minMaintenanceDurationInBlock();
     uint256 maxDuration = maintenance.maxMaintenanceDurationInBlock();
 
@@ -163,9 +163,9 @@ contract MaintenanceTest is Test {
 
     durationInBlock = _bound(durationInBlock, minDuration, maxDuration);
 
-    startBlock = latestEpochBlock + numberOfBlockInEpoch + minOffset + 1;
-    endBlock = latestEpochBlock + numberOfBlockInEpoch + minOffset
-      + numberOfBlockInEpoch * (durationInBlock / numberOfBlockInEpoch + 1);
+    startBlock = latestEpochBlock + numberOfBlocksInEpoch + 1
+      + ((minOffset + numberOfBlocksInEpoch) / numberOfBlocksInEpoch) * numberOfBlocksInEpoch;
+    endBlock = startBlock - 1 + numberOfBlocksInEpoch * (durationInBlock / numberOfBlocksInEpoch + 1);
 
     vm.prank(admin);
     maintenance.schedule(consensus, startBlock, endBlock);
@@ -185,12 +185,12 @@ contract MaintenanceTest is Test {
 
     uint256 minOffset = maintenance.minOffsetToStartSchedule();
     uint256 latestEpochBlock = validatorSet.getLastUpdatedBlock();
-    uint256 numberOfBlockInEpoch = validatorSet.numberOfBlocksInEpoch();
+    uint256 numberOfBlocksInEpoch = validatorSet.numberOfBlocksInEpoch();
     uint256 minDuration = maintenance.minMaintenanceDurationInBlock();
 
-    uint256 startBlock = latestEpochBlock + numberOfBlockInEpoch + minOffset + 1;
-    uint256 endBlock = latestEpochBlock + numberOfBlockInEpoch + minOffset
-      + numberOfBlockInEpoch * (minDuration / numberOfBlockInEpoch + 1);
+    uint startBlock = latestEpochBlock + numberOfBlocksInEpoch + 1
+      + ((minOffset + numberOfBlocksInEpoch) / numberOfBlocksInEpoch) * numberOfBlocksInEpoch;
+    uint endBlock = startBlock - 1 + numberOfBlocksInEpoch * (minDuration / numberOfBlocksInEpoch + 1);
 
     vm.prank(admin);
     maintenance.schedule(consensus, startBlock, endBlock);
