@@ -204,7 +204,7 @@ contract RoninRandomBeacon is
     uint256 epochIndex;
 
     if (ITimingInfo(validator).isPeriodEnding()) {
-      epochIndex = 0;
+      epochIndex = 1;
       period = currentPeriod + 1;
     } else {
       period = currentPeriod;
