@@ -103,7 +103,6 @@ library LibArray {
         c[i] = a[i];
         ++i;
       }
-
       for (uint256 j; j < lengthB;) {
         c[i] = b[j];
         ++i;
@@ -334,7 +333,6 @@ library LibArray {
   ) private pure {
     unchecked {
       if (left == right) return;
-
       int256 i = left;
       int256 j = right;
       uint256 pivot = values[uint256(left + right) >> 1];
