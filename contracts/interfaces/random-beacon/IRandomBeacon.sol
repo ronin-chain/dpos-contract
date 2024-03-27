@@ -60,11 +60,10 @@ interface IRandomBeacon {
 
   /**
    * @dev Emitted when the validator threshold is updated.
-   * @param by The address that updates the pick threshold.
    * @param validatorType The validator type.
    * @param threshold The new value.
    */
-  event ValidatorThresholdUpdated(address indexed by, ValidatorType indexed validatorType, uint256 threshold);
+  event ValidatorThresholdUpdated(ValidatorType indexed validatorType, uint256 threshold);
 
   /**
    * @dev Emitted when the unavailability slash threshold is updated.

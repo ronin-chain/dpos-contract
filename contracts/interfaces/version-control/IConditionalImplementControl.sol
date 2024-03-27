@@ -14,9 +14,4 @@ interface IConditionalImplementControl {
    * @dev Executes the selfUpgrade function, upgrading to the new contract implementation.
    */
   function selfUpgrade() external;
-
-  /**
-   * @dev Set additional calldata to call when upgrading via `selfUpgrade`.
-   */
-  function setCallDatas(bytes[] calldata args) external;
 }

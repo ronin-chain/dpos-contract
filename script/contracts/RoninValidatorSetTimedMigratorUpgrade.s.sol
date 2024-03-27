@@ -2,8 +2,8 @@
 pragma solidity ^0.8.19;
 
 import { LibProxy } from "foundry-deployment-kit/libraries/LibProxy.sol";
-import { ConditionalImplementControl } from
-  "@ronin/contracts/extensions/version-control/ConditionalImplementControl.sol";
+import { RoninValidatorSetTimedMigrator } from
+  "@ronin/contracts/ronin/validator/migrations/RoninValidatorSetTimedMigrator.sol";
 import { RoninValidatorSet } from "@ronin/contracts/ronin/validator/RoninValidatorSet.sol";
 import { RoninMigration } from "../RoninMigration.s.sol";
 import { Contract } from "../utils/Contract.sol";
@@ -33,7 +33,7 @@ contract RoninValidatorSetTimedMigratorUpgrade is RoninMigration {
     callDatas[1] =
       abi.encodeCall(RoninValidatorSet.initializeV3, (loadContractOrDeploy(Contract.FastFinalityTracking.key())));
 
-    _upgradeRaw(proxyAdmin, proxy, switcher, abi.encodeCall(ConditionalImplementControl.setCallDatas, (callDatas)));
+    _upgradeRaw(proxyAdmin, proxy, switcher, abi.encodeCall(RoninValidatorSetTimedMigrator.initialize, (callDatas)));
     return RoninValidatorSet(proxy);
   }
 }
