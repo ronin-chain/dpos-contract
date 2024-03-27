@@ -5,7 +5,6 @@ pragma solidity ^0.8.9;
 import { CandidateManager } from "./CandidateManager.sol";
 import { IProfile } from "../../interfaces/IProfile.sol";
 import { IStaking } from "../../interfaces/staking/IStaking.sol";
-import { IRandomBeacon } from "../../interfaces/random-beacon/IRandomBeacon.sol";
 import { ICandidateManagerCallback } from "../../interfaces/validator/ICandidateManagerCallback.sol";
 import { TConsensus } from "../../udvts/Types.sol";
 import { ContractType } from "../../utils/ContractType.sol";
@@ -24,11 +23,9 @@ abstract contract CandidateManagerCallback is ICandidateManagerCallback, Candida
     address payable treasuryAddr,
     uint256 commissionRate
   ) external override onlyContract(ContractType.STAKING) {
-    IRandomBeacon randomBeacon = IRandomBeacon(getContract(ContractType.RANDOM_BEACON));
     uint256 length = _candidateIds.length;
-    if (length >= randomBeacon.getValidatorThreshold(IRandomBeacon.ValidatorType.All)) {
-      revert ErrExceedsMaxNumberOfCandidate();
-    }
+
+    if (length >= maxValidatorCandidate()) revert ErrExceedsMaxNumberOfCandidate();
     if (_isValidatorCandidateById(cid)) revert ErrExistentCandidate();
     if (commissionRate > _MAX_PERCENTAGE) revert ErrInvalidCommissionRate();
 
