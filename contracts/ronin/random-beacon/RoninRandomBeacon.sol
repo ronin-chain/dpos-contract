@@ -109,14 +109,16 @@ contract RoninRandomBeacon is
     ) {
       revert ErrUnauthorizedCall(msg.sig);
     }
+
+    uint256 coolDownThreshold = COOLDOWN_PERIOD_THRESHOLD;
     // only allow to fulfill if the candidate is not newly registered
-    if (currentPeriod - _toPeriod(profile.getId2RegisteredAt(cid)) < COOLDOWN_PERIOD_THRESHOLD) {
+    if (currentPeriod - _toPeriod(profile.getId2RegisteredAt(cid)) < coolDownThreshold) {
       revert ErrRegisterCoolDownNotEnded();
     }
 
     // key hash should be the same as the one in the profile
     bytes32 keyHash = proof.pk.hash();
-    if (currentPeriod - _toPeriod(profile.getId2VRFKeyHashLastChange(cid)) < COOLDOWN_PERIOD_THRESHOLD) {
+    if (currentPeriod - _toPeriod(profile.getId2VRFKeyHashLastChange(cid)) < coolDownThreshold) {
       revert ErrKeyHashChangeCooldownNotEnded();
     }
     bytes32 expectedKeyHash = profile.getId2VRFKeyHash(cid);
