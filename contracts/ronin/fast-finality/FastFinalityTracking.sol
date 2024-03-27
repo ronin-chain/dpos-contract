@@ -2,16 +2,24 @@
 
 pragma solidity ^0.8.9;
 
-import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
-import { IRoninValidatorSet } from "../../interfaces/validator/IRoninValidatorSet.sol";
+import { Initializable } from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
+import { Math } from "@openzeppelin/contracts/utils/math/Math.sol";
+import { HasContracts } from "../../extensions/collections/HasContracts.sol";
+import { IProfile } from "../../interfaces/IProfile.sol";
+import { IStaking } from "../../interfaces/staking/IStaking.sol";
+import { ICandidateManager } from "../../interfaces/validator/ICandidateManager.sol";
 import { IFastFinalityTracking } from "../../interfaces/IFastFinalityTracking.sol";
-import "../../interfaces/IProfile.sol";
-import "../../extensions/collections/HasContracts.sol";
-import "../../utils/CommonErrors.sol";
+import { RoninValidatorSet } from "../../ronin/validator/RoninValidatorSet.sol";
+import { LibArray } from "../../libraries/LibArray.sol";
+import { TConsensus } from "../../udvts/Types.sol";
+import { ContractType } from "../../utils/ContractType.sol";
+import { ErrOncePerBlock, ErrCallerMustBeCoinbase } from "../../utils/CommonErrors.sol";
 
 contract FastFinalityTracking is IFastFinalityTracking, Initializable, HasContracts {
-  /// @dev Mapping from epoch number => candidate id => number of QC vote
-  mapping(uint256 epochNumber => mapping(address cid => uint256 qcVoteCount)) internal _tracker;
+  using LibArray for *;
+
+  /// @dev Mapping from epoch number => candidate id => fast finality record
+  mapping(uint256 epochNumber => mapping(address cid => Record)) internal _tracker;
   /// @dev The latest block that tracked the QC vote
   uint256 internal _latestTrackingBlock;
 
@@ -41,6 +49,10 @@ contract FastFinalityTracking is IFastFinalityTracking, Initializable, HasContra
     _setContract(ContractType.PROFILE, profileContract);
   }
 
+  function initializeV3(address stakingContract) external reinitializer(3) {
+    _setContract(ContractType.STAKING, stakingContract);
+  }
+
   /**
    * @dev Getter of `_latestTrackingBlock`
    */
@@ -51,12 +63,38 @@ contract FastFinalityTracking is IFastFinalityTracking, Initializable, HasContra
   /**
    * @inheritdoc IFastFinalityTracking
    */
-  function recordFinality(TConsensus[] calldata voters) external override oncePerBlock onlyCoinbase {
-    uint256 currentEpoch = IRoninValidatorSet(getContract(ContractType.VALIDATOR)).epochOf(block.number);
-    address[] memory cids = __css2cidBatch(voters);
+  function recordFinality(TConsensus[] calldata voters) external oncePerBlock onlyCoinbase {
+    {
+      unchecked {
+        uint256 h;
+        uint256 g;
+        uint256 upper;
+        uint256 epoch;
 
-    for (uint i; i < cids.length; ++i) {
-      ++_tracker[currentEpoch][cids[i]];
+        uint256[] memory votedStakeds;
+        address[] memory votedCids = __css2cidBatch(voters);
+
+        Record storage $record;
+        {
+          IStaking staking = IStaking(getContract(ContractType.STAKING));
+          RoninValidatorSet validator = RoninValidatorSet(getContract(ContractType.VALIDATOR));
+
+          epoch = validator.epochOf(block.number);
+          votedStakeds = staking.getManyStakingTotalsById(votedCids);
+
+          g = votedStakeds.sum() / 1 ether;
+          upper = g / validator.maxValidatorNumber();
+          h = staking.getManyStakingTotalsById(validator.getValidatorCandidateIds()).sum() / 1 ether;
+        }
+
+        for (uint256 i; i < voters.length; ++i) {
+          $record = _tracker[epoch][votedCids[i]];
+
+          $record.qcVoteCount++;
+          // bound to range [staked, 1/22 of total staked]
+          $record.score += Math.min(upper, votedStakeds[i]) * g / h;
+        }
+      }
     }
   }
 
@@ -66,7 +104,7 @@ contract FastFinalityTracking is IFastFinalityTracking, Initializable, HasContra
   function getManyFinalityVoteCounts(
     uint256 epoch,
     TConsensus[] calldata addrs
-  ) external view override returns (uint256[] memory voteCounts) {
+  ) external view returns (uint256[] memory voteCounts) {
     address[] memory cids = __css2cidBatch(addrs);
     return getManyFinalityVoteCountsById(epoch, cids);
   }
@@ -77,12 +115,28 @@ contract FastFinalityTracking is IFastFinalityTracking, Initializable, HasContra
   function getManyFinalityVoteCountsById(
     uint256 epoch,
     address[] memory cids
-  ) public view override returns (uint256[] memory voteCounts) {
+  ) public view returns (uint256[] memory voteCounts) {
     uint256 length = cids.length;
 
     voteCounts = new uint256[](length);
     for (uint i; i < length; ++i) {
-      voteCounts[i] = _tracker[epoch][cids[i]];
+      voteCounts[i] = _tracker[epoch][cids[i]].qcVoteCount;
+    }
+  }
+
+  /**
+   * @inheritdoc IFastFinalityTracking
+   */
+  function getManyFinalityScoresById(
+    uint256 epoch,
+    address[] calldata cids
+  ) external view returns (uint256[] memory scores) {
+    uint256 length = cids.length;
+    scores = new uint256[](length);
+    mapping(address => Record) storage $epochTracker = _tracker[epoch];
+
+    for (uint256 i; i < length; ++i) {
+      scores[i] = $epochTracker[cids[i]].score;
     }
   }
 
