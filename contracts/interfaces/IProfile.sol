@@ -31,11 +31,16 @@ interface IProfile {
     bytes oldPubkey;
     /// @dev Old consensus
     TConsensus oldConsensus;
+    /// @dev Timestamp where the profile is registered.
+    uint256 registeredAt;
+    /// @dev VRF key hash for the profile.
+    bytes32 vrfKeyHash;
+    /// @dev Timestamp of last change of VRF key hash.
+    uint256 vrfKeyHashLastChange;
   }
 
   /// @dev Event emitted when a profile with `id` is added.
   event ProfileAdded(address indexed id);
-
   /// @dev Event emitted when the profile is migrated (mostly when REP-4 update).
   event ProfileMigrated(address indexed id, address indexed admin, address indexed treasury);
   /// @dev Event emitted when a address in a profile is changed.
@@ -44,6 +49,8 @@ interface IProfile {
   event ConsensusAddressOfNonGovernorChanged(address indexed id);
   /// @dev Event emitted when the pubkey of the `id` is changed.
   event PubkeyChanged(address indexed id, bytes pubkey);
+  /// @dev Event emitted when the VRF key hash of the `id` is changed.
+  event VRFKeyHashChanged(address indexed id, bytes32 vrfKeyHash);
   /// @dev Event emitted when the pubkey is verified successfully.
   event PubkeyVerified(bytes pubkey, bytes proofOfPossession);
 
@@ -62,6 +69,7 @@ interface IProfile {
   error ErrDuplicatedInfo(RoleAccess infoType, uint256 value);
   error ErrDuplicatedPubkey(bytes pubkey);
   error ErrZeroAddress(RoleAccess infoType);
+  error ErrDuplicatedVRFKeyHash(bytes32 vrfKeyHash);
   error ErrZeroPubkey();
   error ErrInvalidProofOfPossession(bytes pubkey, bytes proofOfPossession);
   error ErrLookUpIdFailed(TConsensus consensus);
@@ -69,6 +77,39 @@ interface IProfile {
 
   /// @dev Getter to query full `profile` from `id` address.
   function getId2Profile(address id) external view returns (CandidateProfile memory profile);
+
+  /// @dev Getter to query `admin` from `id` address.
+  function getId2PoolAdmin(address id) external view returns (address);
+
+  /// @dev Getter to query `treasury` from `id` address.
+  function getId2Treasury(address id) external view returns (address payable);
+
+  /// @dev Getter to query `pubkey` from `id` address.
+  function getId2Pubkey(address id) external view returns (bytes memory);
+
+  /// @dev Getter to query `profileLastChange` from `id` address.
+  function getId2ProfileLastChange(address id) external view returns (uint256);
+
+  /// @dev Getter to query `oldPubkey` from `id` address.
+  function getId2OldPubkey(address id) external view returns (bytes memory);
+
+  /// @dev Getter to query `oldConsensus` from `id` address.
+  function getId2OldConsensus(address id) external view returns (TConsensus);
+
+  /// @dev Getter to query `registeredAt` from `id` address.
+  function getId2RegisteredAt(address id) external view returns (uint256);
+
+  /// @dev Getter to query `consensus` from `id` address.
+  function getId2Consensus(address id) external view returns (TConsensus);
+
+  /// @dev Getter to query `vrfKeyHash` from `id` address.
+  function getId2VRFKeyHash(address id) external view returns (bytes32);
+
+  /// @dev Getter to query `vrfKeyHashLastChange` from `id` address.
+  function getId2VRFKeyHashLastChange(address id) external view returns (uint256);
+
+  /// @dev Getter to batch query from `id` to `registeredAt`.
+  function getManyId2RegisteredAt(address[] calldata idList) external view returns (uint256[] memory);
 
   /// @dev Getter to batch query from `id` to `consensus`, return address(0) if the profile not exist.
   function getManyId2Consensus(address[] calldata idList) external view returns (TConsensus[] memory consensusList);
@@ -129,6 +170,17 @@ interface IProfile {
    * - The public key change cooldown must be ended.
    */
   function changePubkey(address id, bytes memory pubkey, bytes memory proofOfPossession) external;
+
+  /**
+   * @notice The candidate admin changes the VRF key hash.
+   *
+   * @dev Requirements:
+   * - The profile must be existed.
+   * - Only user with candidate admin role can call this method.
+   * - New VRF key hash must not be duplicated.
+   * - The VRF key hash change cooldown must be ended.
+   */
+  function changeVRFKeyHash(address id, bytes32 vrfKeyHash) external;
 
   /**
    * @dev Cross-contract function to for slash indicator to check the list of public

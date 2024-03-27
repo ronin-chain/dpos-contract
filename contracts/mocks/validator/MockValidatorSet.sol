@@ -65,13 +65,14 @@ contract MockValidatorSet is
 
   function epochEndingAt(uint256 _block) external view override returns (bool) { }
 
-  function execSlash(address cid, uint256 newJailedUntil, uint256 slashAmount, bool cannotBailout) external override { }
+  function execSlash(
+    address cid,
+    uint256 newJailedUntil,
+    uint256 slashAmount,
+    bool cannotBailout
+  ) external override returns (bool) { }
 
   function execBailOut(address, uint256) external override { }
-
-  function setMaxValidatorNumber(uint256 _maxValidatorNumber) external override { }
-
-  function setMaxPrioritizedValidatorNumber(uint256 _maxPrioritizedValidatorNumber) external override { }
 
   function maxValidatorNumber() external view override returns (uint256 _maximumValidatorNumber) { }
 

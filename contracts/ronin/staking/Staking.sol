@@ -119,10 +119,12 @@ contract Staking is IStaking, StakingCallback, Initializable, AccessControlEnume
   function execDeductStakingAmount(
     address poolId,
     uint256 amount
-  ) external override onlyContract(ContractType.VALIDATOR) returns (uint256 actualDeductingAmount_) {
+  ) external override onlyContract(ContractType.VALIDATOR) returns (uint256 actualDeductingAmount_, bool success) {
     actualDeductingAmount_ = _deductStakingAmount(_poolDetail[poolId], amount);
     address payable validatorContractAddr = payable(msg.sender);
+    success = true;
     if (!_unsafeSendRON(validatorContractAddr, actualDeductingAmount_)) {
+      success = false;
       emit StakingAmountDeductFailed(poolId, validatorContractAddr, actualDeductingAmount_, address(this).balance);
     }
   }

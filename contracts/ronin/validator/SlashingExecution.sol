@@ -24,7 +24,7 @@ abstract contract SlashingExecution is
     uint256 newJailedUntil,
     uint256 slashAmount,
     bool cannotBailout
-  ) external override onlyContract(ContractType.SLASH_INDICATOR) {
+  ) external override onlyContract(ContractType.SLASH_INDICATOR) returns (bool slashed) {
     uint256 period = currentPeriod();
     _miningRewardDeprecatedAtPeriod[validatorId][period] = true;
 
@@ -36,7 +36,8 @@ abstract contract SlashingExecution is
     _blockProducerJailedBlock[validatorId] = Math.max(newJailedUntil, _blockProducerJailedBlock[validatorId]);
 
     if (slashAmount > 0) {
-      uint256 _actualAmount =
+      uint256 _actualAmount;
+      (_actualAmount, slashed) =
         IStaking(getContract(ContractType.STAKING)).execDeductStakingAmount(validatorId, slashAmount);
       _totalDeprecatedReward += _actualAmount;
     }

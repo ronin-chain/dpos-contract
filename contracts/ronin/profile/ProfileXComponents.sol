@@ -3,6 +3,7 @@
 import "../../interfaces/IProfile.sol";
 import { ContractType } from "../../utils/ContractType.sol";
 import "./ProfileHandler.sol";
+import { ITimingInfo } from "../../interfaces/validator/info-fragments/ITimingInfo.sol";
 
 pragma solidity ^0.8.9;
 
@@ -31,8 +32,12 @@ abstract contract ProfileXComponents is IProfile, ProfileHandler {
       pubkey: pubkey,
       profileLastChange: 0,
       oldPubkey: "",
-      oldConsensus: TConsensus.wrap(address(0))
+      oldConsensus: TConsensus.wrap(address(0)),
+      registeredAt: block.timestamp,
+      vrfKeyHash: 0x0,
+      vrfKeyHashLastChange: 0
     });
+
     _requireNonDuplicatedInRegistry(profile);
     _verifyPubkey(pubkey, proofOfPossession);
     _addNewProfile(_profile, profile);

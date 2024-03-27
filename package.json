@@ -32,6 +32,7 @@
   "devDependencies": {
     "@bahuy3103/hardhat-contract-sizer": "2.10.3",
     "@bahuy3103/hardhat-storage-layout": "0.2.6",
+    "@chainlink/contracts": "0.4.1",
     "@nomicfoundation/hardhat-chai-matchers": "^1.0.3",
     "@nomicfoundation/hardhat-foundry": "^1.0.1",
     "@nomiclabs/hardhat-ethers": "^2.0.3",
