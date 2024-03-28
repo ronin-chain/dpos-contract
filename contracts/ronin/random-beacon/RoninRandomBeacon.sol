@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.9;
 
-import { VRF } from "@chainlink/contracts/src/v0.8/dev/VRF.sol";
+import { VRF } from "@chainlink/contracts/src/v0.8/VRF.sol";
 import { Initializable } from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import { HasContracts } from "../../extensions/collections/HasContracts.sol";
 import { GlobalConfigConsumer } from "../../extensions/consumers/GlobalConfigConsumer.sol";

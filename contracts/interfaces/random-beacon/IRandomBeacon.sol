@@ -3,7 +3,7 @@
 pragma solidity ^0.8.9;
 
 import { RandomRequest } from "../../libraries/LibSLA.sol";
-import { VRF } from "@chainlink/contracts/src/v0.8/dev/VRF.sol";
+import { VRF } from "@chainlink/contracts/src/v0.8/VRF.sol";
 
 interface IRandomBeacon {
   /// @dev Throws if current period is less than the target activation period
