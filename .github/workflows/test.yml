@@ -46,3 +46,9 @@ jobs:
         run: |
           forge test --no-match-path '*forking/*' -vvv
         id: test
+
+      - name: Storage Layout Check
+        run: |
+          echo "Checking storage layout..."
+          lib/storage-delta/run.sh ${{ github.sha }}
+        id: storage-layout-check
