@@ -352,7 +352,6 @@ contract RoninRandomBeacon is
     if (length != thresholds.length) revert ErrLengthMismatch(msg.sig);
 
     uint256 threshold;
-    address sender = msg.sender;
     ValidatorType validatorType;
 
     for (uint256 i; i < length; ++i) {
@@ -361,7 +360,7 @@ contract RoninRandomBeacon is
 
       _validatorThreshold[validatorType] = threshold;
 
-      emit ValidatorThresholdUpdated(sender, validatorType, threshold);
+      emit ValidatorThresholdUpdated(validatorType, threshold);
     }
   }
 
