@@ -8,6 +8,8 @@ on:
       - "release/*"
       - "feature/*"
       - "features/*"
+      - "implement-feature/**"
+      - "implement-feature/**/**"
   pull_request:
     branches:
       - mainnet
