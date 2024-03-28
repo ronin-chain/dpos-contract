@@ -1,16 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-import {
-  ConditionalImplementControl
-} from "../../../extensions/version-control/ConditionalImplementControl.sol";
+import { ConditionalImplementControl } from "../../../extensions/version-control/ConditionalImplementControl.sol";
 import { ITimingInfo } from "../../../interfaces/validator/info-fragments/ITimingInfo.sol";
 import { ICoinbaseExecution } from "../../../interfaces/validator/ICoinbaseExecution.sol";
 import { TransparentUpgradeableProxyV2 } from "../../../extensions/TransparentUpgradeableProxyV2.sol";
 import { ContractType } from "../../../utils/ContractType.sol";
 
 /**
- * @title RoninValidatorSetTimedMigrator
+ * @title RoninValidatorSetREP10Migrator
  * @dev A contract that supports migration for RoninValidatorSet to REP-10.
  */
 contract RoninValidatorSetREP10Migrator is ConditionalImplementControl {
@@ -33,7 +31,7 @@ contract RoninValidatorSetREP10Migrator is ConditionalImplementControl {
   }
 
   /**
-   * @dev Constructs the {RoninValidatorSetTimedMigrator} contract.
+   * @dev Constructs the {RoninValidatorSetREP10Migrator} contract.
    * @param proxyStorage The address of the proxy storage contract.
    * @param prevImpl The address of the current contract implementation.
    * @param newImpl The address of the new contract implementation.
@@ -44,6 +42,11 @@ contract RoninValidatorSetREP10Migrator is ConditionalImplementControl {
     address newImpl
   ) ConditionalImplementControl(proxyStorage, prevImpl, newImpl) { }
 
+  /**
+   * @dev Initializes the contract with @openzepppelin-v0.5.2-Initializeable.
+   * @notice This function is called while deploying middle layer migrator and {_initialized} slot is customized.
+   * @param randomBeacon The address of the RandomBeacon contract.
+   */
   function initialize(address randomBeacon) external initializer {
     _setContract(ContractType.RANDOM_BEACON, randomBeacon);
   }

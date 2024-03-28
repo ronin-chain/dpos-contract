@@ -29,9 +29,6 @@ abstract contract ConditionalImplementControl is
    */
   bytes32 internal constant IMPLEMENTATION_SLOT = 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc;
 
-  /// @dev value is equal to keccak256("@ronin.extensions.version-control.ConditionalImplementControl.calldatas.slot") - 1
-  bytes32 internal constant CALLDATAS_SLOT = 0x330d87be17f5b23d41285647e0e9b0e7124a778feb3f952590ed6a023ae02633;
-
   /**
    * @dev address of the proxy that delegates to this contract.
    * @notice immutable variables are directly stored in contract code.
@@ -149,7 +146,7 @@ abstract contract ConditionalImplementControl is
   function _dispatchCall(address impl) internal virtual whenConditionsAreMet returns (bytes memory returnData) {
     (bool success, bytes memory returnOrRevertData) = impl.delegatecall(msg.data);
     success.handleRevert(msg.sig, returnOrRevertData);
-    assembly {
+    assembly ("memory-safe") {
       returnData := returnOrRevertData
     }
   }
