@@ -19,3 +19,6 @@
 	path = lib/foundry-deployment-kit
 	url = https://github.com/axieinfinity/foundry-deployment-kit
 	branch = v0.2.0
+[submodule "lib/storage-delta"]
+	path = lib/storage-delta
+	url = https://github.com/TuDo1403/storage-delta

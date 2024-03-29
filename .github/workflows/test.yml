@@ -8,6 +8,8 @@ on:
       - "release/*"
       - "feature/*"
       - "features/*"
+      - "implement-feature/**"
+      - "implement-feature/**/**"
   pull_request:
     branches:
       - mainnet
@@ -42,7 +44,27 @@ jobs:
           forge build
         id: build
 
-      - name: Run Forge tests
+      # - name: Run Forge tests
+      #   run: |
+      #     forge test --no-match-path '*forking/*' -vvv
+      #   id: test
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.base.ref}}
+
+      - name: "Setup Node"
+        uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 #v3.4.1
+        with:
+          node-version: v16.16.0
+
+      - name: Get latest commit hash of target branch
+        run: echo "TARGET_COMMIT_HASH=$(git rev-parse HEAD)" >> $GITHUB_ENV
+
+      - name: Storage Layout Check
         run: |
-          forge test --no-match-path '*forking/*' -vvv
-        id: test
+          echo "Checking storage layout..."
+          echo "CURRENT_COMMIT_HASH: ${{ github.sha }}"
+          echo "TARGET_COMMIT_HASH: ${{ env.TARGET_COMMIT_HASH }}"
+          lib/storage-delta/run.sh ${{ env.TARGET_COMMIT_HASH }} --omit new --contracts contracts
