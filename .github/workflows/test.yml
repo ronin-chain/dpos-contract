@@ -59,9 +59,6 @@ jobs:
         with:
           node-version: v16.16.0
 
-      - name: Install dependencies
-        run: npm install --force && npm ci
-
       - name: Get latest commit hash of target branch
         run: echo "TARGET_COMMIT_HASH=$(git rev-parse HEAD)" >> $GITHUB_ENV
 
