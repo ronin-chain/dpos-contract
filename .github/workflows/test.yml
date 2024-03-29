@@ -63,6 +63,14 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.base.ref}}
 
+      - name: Use Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14" # Specify the Node.js version
+
+      - name: Install dependencies
+        run: npm ci
+
       - name: Get latest commit hash of target branch
         run: echo "TARGET_COMMIT_HASH=$(git rev-parse HEAD)" >> $GITHUB_ENV
 
