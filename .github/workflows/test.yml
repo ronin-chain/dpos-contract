@@ -54,10 +54,10 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.base.ref}}
 
-      - name: Use Node.js
-        uses: actions/setup-node@v2
+      - name: "Setup Node"
+        uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 #v3.4.1
         with:
-          node-version: "16" # Specify the Node.js version
+          node-version: v16.16.0
 
       - name: Install dependencies
         run: npm install --force && npm ci
