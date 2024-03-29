@@ -60,7 +60,7 @@ jobs:
           node-version: "16" # Specify the Node.js version
 
       - name: Install dependencies
-        run: npm install && npm ci
+        run: npm install --force && npm ci
 
       - name: Get latest commit hash of target branch
         run: echo "TARGET_COMMIT_HASH=$(git rev-parse HEAD)" >> $GITHUB_ENV
