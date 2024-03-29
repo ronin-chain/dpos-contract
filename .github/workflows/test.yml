@@ -57,18 +57,18 @@ jobs:
       #   run: |
       #     forge test --no-match-path '*forking/*' -vvv
       #   id: test
-       
+
       - name: Checkout code
         uses: actions/checkout@v3
         with:
           ref: ${{ github.event.pull_request.base.ref}}
-        
+
       - name: Get latest commit hash of target branch
         run: echo "TARGET_COMMIT_HASH=$(git rev-parse HEAD)" >> $GITHUB_ENV
-        
+
       - name: Storage Layout Check
         run: |
           echo "Checking storage layout..."
           echo "CURRENT_COMMIT_HASH: ${{ github.sha }}"
           echo "TARGET_COMMIT_HASH: ${{ env.TARGET_COMMIT_HASH }}"
-          lib/storage-delta/run.sh ${{ env.TARGET_COMMIT_HASH }}
+          lib/storage-delta/run.sh ${{ env.TARGET_COMMIT_HASH }} --omit new --contracts contracts
