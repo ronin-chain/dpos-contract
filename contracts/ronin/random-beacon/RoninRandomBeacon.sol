@@ -14,7 +14,6 @@ import { ICandidateManager } from "../../interfaces/validator/ICandidateManager.
 import { ITimingInfo } from "../../interfaces/validator/info-fragments/ITimingInfo.sol";
 import { IRoninTrustedOrganization } from "../../interfaces/IRoninTrustedOrganization.sol";
 import { ISlashRandomBeacon } from "../../interfaces/slash-indicator/ISlashRandomBeacon.sol";
-import { IValidatorInfoV2 } from "../../interfaces/validator/info-fragments/IValidatorInfoV2.sol";
 import { LibSLA, RandomRequest } from "../../libraries/LibSLA.sol";
 import { TConsensus } from "../../udvts/Types.sol";
 import { ContractType } from "../../utils/ContractType.sol";
@@ -149,9 +148,8 @@ contract RoninRandomBeacon is
    * @inheritdoc IRandomBeacon
    */
   function onWrapUpEpoch(uint256 lastUpdatedPeriod, uint256 newPeriod) external onlyContract(ContractType.VALIDATOR) {
-    // skip if the random beacon sorting is not activated
     if (lastUpdatedPeriod < _activatedAtPeriod) return;
-
+    
     unchecked {
       bool periodEnding = newPeriod > lastUpdatedPeriod;
 
@@ -198,9 +196,6 @@ contract RoninRandomBeacon is
   {
     address validator = getContract(ContractType.VALIDATOR);
     uint256 currentPeriod = ITimingInfo(validator).currentPeriod();
-
-    // handle legacy sorting method
-    if (currentPeriod < _activatedAtPeriod) return IValidatorInfoV2(validator).getValidatorIds();
 
     uint256 period;
     uint256 epochIndex;
@@ -311,7 +306,6 @@ contract RoninRandomBeacon is
     uint256[] memory trustedWeights
   ) internal {
     unchecked {
-      if (lastUpdatedPeriod < _activatedAtPeriod) return;
       ISlashRandomBeacon slashIndicator = ISlashRandomBeacon(getContract(ContractType.SLASH_INDICATOR));
 
       address id;
