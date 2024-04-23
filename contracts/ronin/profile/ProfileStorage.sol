@@ -26,7 +26,7 @@ abstract contract ProfileStorage is IProfile, HasContracts {
   uint256 internal _profileChangeCooldown;
 
   /// @dev Upgradeable gap.
-  bytes32[46] __gap;
+  bytes32[47] __gap;
 
   /**
    * @dev Add a profile from memory to storage.
