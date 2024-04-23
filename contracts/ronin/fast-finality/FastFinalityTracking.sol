@@ -22,6 +22,7 @@ contract FastFinalityTracking is IFastFinalityTracking, Initializable, HasContra
   mapping(uint256 epochNumber => mapping(address cid => Record)) internal _tracker;
   /// @dev The latest block that tracked the QC vote
   uint256 internal _latestTrackingBlock;
+  mapping(uint256 period => NormalizedData) internal _normalizedData;
 
   modifier oncePerBlock() {
     if (block.number <= _latestTrackingBlock) {
@@ -66,35 +67,51 @@ contract FastFinalityTracking is IFastFinalityTracking, Initializable, HasContra
   function recordFinality(TConsensus[] calldata voters) external oncePerBlock onlyCoinbase {
     {
       unchecked {
-        uint256 h;
-        uint256 g;
-        uint256 upper;
-        uint256 epoch;
-
-        uint256[] memory votedStakeds;
         address[] memory votedCids = __css2cidBatch(voters);
 
+        IStaking staking = IStaking(getContract(ContractType.STAKING));
+        RoninValidatorSet validator = RoninValidatorSet(getContract(ContractType.VALIDATOR));
+
+        (uint256 h, uint256 upper) = _loadOrRecordNormalizedSumAndUpperBound(staking, validator);
+        uint256[] memory normalizedVotedStakeds =
+          LibArray.inplaceClip({ values: staking.getManyStakingTotalsById(votedCids), lower: 0, upper: upper });
+        uint256 g = normalizedVotedStakeds.sum();
+
+        h /= 1 ether;
+        g /= 1 ether;
+
         Record storage $record;
-        {
-          IStaking staking = IStaking(getContract(ContractType.STAKING));
-          RoninValidatorSet validator = RoninValidatorSet(getContract(ContractType.VALIDATOR));
+        uint256 length = voters.length;
+        uint256 epoch = validator.epochOf(block.number);
 
-          epoch = validator.epochOf(block.number);
-          votedStakeds = staking.getManyStakingTotalsById(votedCids);
-
-          g = votedStakeds.sum() / 1 ether;
-          upper = g / validator.maxValidatorNumber();
-          h = staking.getManyStakingTotalsById(validator.getValidatorCandidateIds()).sum() / 1 ether;
-        }
-
-        for (uint256 i; i < voters.length; ++i) {
+        for (uint256 i; i < length; ++i) {
           $record = _tracker[epoch][votedCids[i]];
 
-          $record.qcVoteCount++;
-          // bound to range [staked, 1/22 of total staked]
-          $record.score += Math.min(upper, votedStakeds[i]) * g / h;
+          ++$record.qcVoteCount;
+          $record.score += normalizedVotedStakeds[i] * (g * g) / (h * h);
         }
       }
+    }
+  }
+
+  function _loadOrRecordNormalizedSumAndUpperBound(
+    IStaking staking,
+    RoninValidatorSet validator
+  ) private returns (uint256 normalizedSum, uint256 upperBound) {
+    uint256 currentPeriod = validator.currentPeriod();
+    NormalizedData storage $normalizedData = _normalizedData[currentPeriod];
+
+    if ($normalizedData.upperBound == 0) {
+      (normalizedSum, upperBound) = LibArray.findNormalizedSumAndUpperBound({
+        values: staking.getManyStakingTotalsById({ poolIds: validator.getValidatorCandidateIds() }),
+        divisor: validator.maxValidatorNumber()
+      });
+
+      $normalizedData.upperBound = upperBound;
+      $normalizedData.normalizedSum = normalizedSum;
+    } else {
+      normalizedSum = $normalizedData.normalizedSum;
+      upperBound = $normalizedData.upperBound;
     }
   }
 
