@@ -35,12 +35,12 @@ interface IFastFinalityTracking {
   ) external view returns (uint256[] memory voteCounts);
 
   /**
-   * @dev Returns vote count of `addrs` in the `period`.
+   * @dev Returns finality scores of `addrs` in the `period`.
    */
   function getManyFinalityScoresById(
     uint256 period,
     address[] calldata cids
-  ) external view returns (uint256[] memory voteCounts);
+  ) external view returns (uint256[] memory scores);
 
   /**
    * @dev Returns vote count of `cids` in the `period`.
