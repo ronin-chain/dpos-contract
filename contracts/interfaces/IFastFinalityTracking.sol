@@ -12,6 +12,11 @@ interface IFastFinalityTracking {
     uint256 score;
   }
 
+  struct NormalizedData {
+    uint256 upperBound;
+    uint256 normalizedSum;
+  }
+
   /**
    * @dev Submit list of `voters` who vote for fast finality in the current block.
    *
