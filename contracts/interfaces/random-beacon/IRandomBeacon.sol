@@ -34,12 +34,12 @@ interface IRandomBeacon {
     Unknown,
     // Max Validator Number
     All,
-    // Max Governance Validator Number
-    Governance,
+    // Max Governing Validator Number
+    Governing,
     // Max Standard Validator Number
     Standard,
     // Max Rotating Validator Number
-    Rotate
+    Rotating
   }
 
   /**
