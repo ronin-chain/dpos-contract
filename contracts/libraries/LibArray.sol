@@ -58,8 +58,94 @@ library LibArray {
         }
       }
     }
+  }
 
-    return false;
+  function findNormalizedSumAndUpperBound(
+    uint256[] memory values,
+    uint256 divisor
+  ) internal pure returns (uint256 normSum, uint256 upperBound) {
+    values = inplaceSort(values);
+
+    bool shouldExit;
+    uint256 sumInBound;
+    uint256 sumOutBound;
+    uint256 outBoundCount;
+
+    normSum = sum(values);
+    upperBound = normSum / divisor;
+
+    while (!shouldExit) {
+      shouldExit = true;
+
+      while (values[outBoundCount] > upperBound) {
+        sumOutBound += values[outBoundCount++];
+        shouldExit = false;
+      }
+
+      if (shouldExit) break;
+
+      sumInBound = normSum - sumOutBound;
+      upperBound = sumInBound / (divisor - outBoundCount);
+      sumOutBound = upperBound * outBoundCount;
+      normSum = sumInBound + sumOutBound;
+    }
+  }
+
+  function inplaceClip(
+    uint256[] memory values,
+    uint256 lower,
+    uint256 upper
+  ) internal pure returns (uint256[] memory clippedValues) {
+    uint256 length = values.length;
+
+    for (uint256 i; i < length; ++i) {
+      if (values[i] < lower) values[i] = lower;
+      if (values[i] > upper) values[i] = upper;
+    }
+
+    assembly ("memory-safe") {
+      clippedValues := values
+    }
+  }
+
+  function inplaceSort(uint256[] memory values) internal pure returns (uint256[] memory sorted) {
+    return inplaceQuickSort(values);
+  }
+
+  function inplaceQuickSort(uint256[] memory values) internal pure returns (uint256[] memory sorted) {
+    uint256 length = values.length;
+    unchecked {
+      if (length > 1) inplaceQuickSort(values, 0, int256(length - 1));
+    }
+
+    assembly ("memory-safe") {
+      sorted := values
+    }
+  }
+
+  function inplaceQuickSort(uint256[] memory values, int256 left, int256 right) internal pure {
+    unchecked {
+      if (left < right) {
+        if (left == right) return;
+        int256 i = left;
+        int256 j = right;
+        uint256 pivot = values[uint256(left + right) >> 1];
+
+        while (i <= j) {
+          while (pivot < values[uint256(i)]) ++i;
+          while (pivot > values[uint256(j)]) --j;
+
+          if (i <= j) {
+            (values[uint256(i)], values[uint256(j)]) = (values[uint256(j)], values[uint256(i)]);
+            ++i;
+            --j;
+          }
+        }
+
+        if (left < j) inplaceQuickSort(values, left, j);
+        if (i < right) inplaceQuickSort(values, i, right);
+      }
+    }
   }
 
   /**
