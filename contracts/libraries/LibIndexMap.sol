@@ -15,14 +15,13 @@ using LibIndexMap for IndexMap global;
  * It is implemented as an array of uint256 values, where each element in an array is a bitmap which can represent the presence or absence of an element at a particular index.
  * Each element in an array of bitmap can represent the presence or absence of 256 elements.
  * The Presence of a particular index is represented by setting the corresponding bit in the bitmap to 1.
- * Example 1:
- * - Given an array of values: [1, 4, 3, 2]. Returns the indexes of odd numbers.
- * - The values of odd numbers are: [1, 3]. Therefore, the indices of odd numbers are: [0, 2].
+ * Example:
+ * - Given an array of values: [11, 24, 33, 52]. Returns the indexes of odd numbers.
+ * - The values of odd numbers are: [11, 33]. Therefore, the indices of odd numbers are: [0, 2].
  * - However, we can save more gas by using a bitmap to represent the indices of odd numbers.
- * - index 0 is an odd number, so we set the first bit of the bitmap to 1. (bitmap = 0001)
- * - index 2 is an odd number, so we set the third bit of the bitmap to 1. (bitmap = 0100)
+ * - Index 0 is an odd number, so we set the first bit of the bitmap to 1, (bitmap = 0001)
+ * - Index 2 is an odd number, so we set the third bit of the bitmap to 1, (bitmap = 0100)
  * - The bitmap for the indices of odd number is: b'0001' | b'0100' = b'0101' = 5 in decimal
- * - The bitmap for the indices of odd number is: b'0101' = 5 in decimal
  */
 library LibIndexMap {
   /// @dev Throws if the index is out of bitmap length.
