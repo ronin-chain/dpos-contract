@@ -70,7 +70,7 @@ library LibArray {
    * - `s` is the sum of the array
    * - `k` is the pivot value = (s / divisor)
    *
-   * Finds `a'` and `k'` = (`s'` / divisor) such that: `∀x ∈ a': x ≤ k'`
+   * Transforms `a` to `a'` such that: `k' = (s' / divisor)` and `∀x ∈ a': x ≤ k'`
    *
    * Example:
    * - Input is an array that sorted in descending order
