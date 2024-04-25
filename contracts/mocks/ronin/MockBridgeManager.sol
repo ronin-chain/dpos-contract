@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import {
   RoleAccess,
   ContractType,
-  AddressArrayUtils,
+  LibArray,
   IBridgeManager,
   BridgeManager
 } from "../../extensions/bridge-operator-governance/BridgeManager.sol";

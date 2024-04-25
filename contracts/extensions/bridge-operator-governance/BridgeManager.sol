@@ -7,14 +7,14 @@ import {
 import { IHasContracts, HasContracts } from "../../extensions/collections/HasContracts.sol";
 import { IQuorum } from "../../interfaces/IQuorum.sol";
 import { IBridgeManager } from "../../interfaces/bridge/IBridgeManager.sol";
-import { AddressArrayUtils } from "../../libraries/AddressArrayUtils.sol";
+import { LibArray } from "../../libraries/LibArray.sol";
 import { ContractType } from "../../utils/ContractType.sol";
 import { RoleAccess } from "../../utils/RoleAccess.sol";
 import { TUint256Slot } from "../../types/Types.sol";
 import "../../utils/CommonErrors.sol";
 
 abstract contract BridgeManager is IQuorum, IBridgeManager, BridgeManagerCallbackRegister, HasContracts {
-  using AddressArrayUtils for address[];
+  using LibArray for address[];
   using EnumerableSet for EnumerableSet.AddressSet;
 
   /// @dev value is equal to keccak256("@ronin.dpos.gateway.BridgeAdmin.governorToBridgeOperatorInfo.slot") - 1
@@ -313,7 +313,7 @@ abstract contract BridgeManager is IQuorum, IBridgeManager, BridgeManagerCallbac
     uint96[] memory voteWeights,
     address[] memory governors,
     address[] memory bridgeOperators
-  ) internal nonDuplicate(governors.extend(bridgeOperators)) returns (bool[] memory addeds) {
+  ) internal nonDuplicate(governors.concat(bridgeOperators)) returns (bool[] memory addeds) {
     uint256 length = bridgeOperators.length;
     if (!(length == voteWeights.length && length == governors.length)) revert ErrLengthMismatch(msg.sig);
     addeds = new bool[](length);

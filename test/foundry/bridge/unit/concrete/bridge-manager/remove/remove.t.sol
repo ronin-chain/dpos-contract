@@ -7,7 +7,7 @@ import { StdStyle } from "forge-std/StdStyle.sol";
 import { LibArrayUtils } from "@ronin/test/helpers/LibArrayUtils.t.sol";
 
 import "@ronin/contracts/utils/CommonErrors.sol";
-import { AddressArrayUtils } from "@ronin/contracts/libraries/AddressArrayUtils.sol";
+import { LibArray } from "@ronin/contracts/libraries/LibArray.sol";
 import { IBridgeManager } from "@ronin/contracts/interfaces/bridge/IBridgeManager.sol";
 
 import { BridgeManager_Unit_Concrete_Test } from "../BridgeManager.t.sol";
@@ -81,7 +81,7 @@ contract Remove_Unit_Concrete_Test is BridgeManager_Unit_Concrete_Test {
 
     // Run the test.
     vm.expectRevert(
-      abi.encodeWithSelector(AddressArrayUtils.ErrDuplicated.selector, IBridgeManager.removeBridgeOperators.selector)
+      abi.encodeWithSelector(LibArray.ErrDuplicated.selector, IBridgeManager.removeBridgeOperators.selector)
     );
     _bridgeManager.removeBridgeOperators(removingOperators);
   }

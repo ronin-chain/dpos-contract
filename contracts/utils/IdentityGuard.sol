@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import { AddressArrayUtils } from "../libraries/AddressArrayUtils.sol";
+import { LibArray } from "../libraries/LibArray.sol";
 import { IERC165 } from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import { TransparentUpgradeableProxyV2 } from "../extensions/TransparentUpgradeableProxyV2.sol";
 import {
@@ -13,7 +13,7 @@ import {
 } from "./CommonErrors.sol";
 
 abstract contract IdentityGuard {
-  using AddressArrayUtils for address[];
+  using LibArray for address[];
 
   /// @dev value is equal to keccak256(abi.encode())
   /// @dev see: https://eips.ethereum.org/EIPS/eip-1052
@@ -71,7 +71,7 @@ abstract contract IdentityGuard {
    * @param arr The array of addresses to check.
    */
   function _requireNonDuplicate(address[] memory arr) internal pure {
-    if (arr.hasDuplicate()) revert AddressArrayUtils.ErrDuplicated(msg.sig);
+    if (arr.hasDuplicate()) revert LibArray.ErrDuplicated(msg.sig);
   }
 
   /**
