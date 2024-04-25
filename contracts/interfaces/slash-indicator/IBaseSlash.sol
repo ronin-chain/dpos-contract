@@ -12,7 +12,8 @@ interface IBaseSlash {
     BRIDGE_OPERATOR_MISSING_VOTE_TIER_1,
     BRIDGE_OPERATOR_MISSING_VOTE_TIER_2,
     UNAVAILABILITY_TIER_3,
-    FAST_FINALITY
+    FAST_FINALITY,
+    RANDOM_BEACON
   }
 
   /// @dev Error thrown when evidence has already been submitted.

@@ -33,5 +33,7 @@ enum ContractType {
   /* 14 */
   FAST_FINALITY_TRACKING,
   /* 15 */
-  PROFILE
+  PROFILE,
+  /* 16 */
+  RANDOM_BEACON
 }

@@ -34,8 +34,8 @@ abstract contract HasContracts is HasProxyAdmin, IHasContracts, IdentityGuard {
   /**
    * @inheritdoc IHasContracts
    */
-  function getContract(ContractType contractType) public view returns (address contract_) {
-    contract_ = _getContractMap()[uint8(contractType)];
+  function getContract(ContractType contractType) public view returns (address payable contract_) {
+    contract_ = payable(_getContractMap()[uint8(contractType)]);
     if (contract_ == address(0)) revert ErrContractTypeNotFound(contractType);
   }
 
