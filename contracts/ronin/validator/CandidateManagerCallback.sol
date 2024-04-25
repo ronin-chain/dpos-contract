@@ -2,8 +2,12 @@
 
 pragma solidity ^0.8.9;
 
-import "../../interfaces/validator/ICandidateManagerCallback.sol";
-import "./CandidateManager.sol";
+import { CandidateManager } from "./CandidateManager.sol";
+import { IProfile } from "../../interfaces/IProfile.sol";
+import { IStaking } from "../../interfaces/staking/IStaking.sol";
+import { ICandidateManagerCallback } from "../../interfaces/validator/ICandidateManagerCallback.sol";
+import { TConsensus } from "../../udvts/Types.sol";
+import { ContractType } from "../../utils/ContractType.sol";
 
 abstract contract CandidateManagerCallback is ICandidateManagerCallback, CandidateManager {
   //                                             //
