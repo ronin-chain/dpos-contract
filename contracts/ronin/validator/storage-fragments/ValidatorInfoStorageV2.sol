@@ -6,14 +6,15 @@ import "../../../libraries/EnumFlags.sol";
 import { HasTrustedOrgDeprecated } from "../../../utils/DeprecatedSlots.sol";
 import "../../../extensions/collections/HasContracts.sol";
 import "../../../interfaces/validator/info-fragments/IValidatorInfoV2.sol";
-import "../../../interfaces/IProfile.sol";
+import { IProfile } from "../../../interfaces/IProfile.sol";
+import { IRandomBeacon } from "../../../interfaces/random-beacon/IRandomBeacon.sol";
 import { TConsensus } from "../../../udvts/Types.sol";
 
 abstract contract ValidatorInfoStorageV2 is IValidatorInfoV2, HasContracts, HasTrustedOrgDeprecated {
   using EnumFlags for EnumFlags.ValidatorFlag;
 
   /// @dev The maximum number of validator.
-  uint256 internal _maxValidatorNumber;
+  uint256 internal __deprecatedMaxValidatorNumber;
 
   /// @dev The total of validators
   uint256 internal _validatorCount;
@@ -22,7 +23,7 @@ abstract contract ValidatorInfoStorageV2 is IValidatorInfoV2, HasContracts, HasT
   /// @dev Mapping from validator id => flag indicating the validator ability: producing block, operating bridge
   mapping(address => EnumFlags.ValidatorFlag) internal _validatorMap;
   /// @dev The number of slot that is reserved for prioritized validators
-  uint256 internal _maxPrioritizedValidatorNumber;
+  uint256 internal __deprecatedMaxPrioritizedValidatorNumber;
 
   /**
    * @dev This empty reserved space is put in place to allow future versions to add new
@@ -118,45 +119,16 @@ abstract contract ValidatorInfoStorageV2 is IValidatorInfoV2, HasContracts, HasT
    * @inheritdoc IValidatorInfoV2
    */
   function maxValidatorNumber() external view override returns (uint256 _maximumValidatorNumber) {
-    return _maxValidatorNumber;
+    return IRandomBeacon(getContract(ContractType.RANDOM_BEACON)).getValidatorThreshold(IRandomBeacon.ValidatorType.All);
   }
 
   /**
    * @inheritdoc IValidatorInfoV2
    */
   function maxPrioritizedValidatorNumber() external view override returns (uint256 _maximumPrioritizedValidatorNumber) {
-    return _maxPrioritizedValidatorNumber;
-  }
-
-  /**
-   * @inheritdoc IValidatorInfoV2
-   */
-  function setMaxValidatorNumber(uint256 _max) external override onlyAdmin {
-    _setMaxValidatorNumber(_max);
-  }
-
-  /**
-   * @inheritdoc IValidatorInfoV2
-   */
-  function setMaxPrioritizedValidatorNumber(uint256 _number) external override onlyAdmin {
-    _setMaxPrioritizedValidatorNumber(_number);
-  }
-
-  /**
-   * @dev See `IValidatorInfoV2-setMaxValidatorNumber`
-   */
-  function _setMaxValidatorNumber(uint256 _number) internal {
-    _maxValidatorNumber = _number;
-    emit MaxValidatorNumberUpdated(_number);
-  }
-
-  /**
-   * @dev See `IValidatorInfoV2-setMaxPrioritizedValidatorNumber`
-   */
-  function _setMaxPrioritizedValidatorNumber(uint256 _number) internal {
-    if (_number > _maxValidatorNumber) revert ErrInvalidMaxPrioritizedValidatorNumber();
-    _maxPrioritizedValidatorNumber = _number;
-    emit MaxPrioritizedValidatorNumberUpdated(_number);
+    return IRandomBeacon(getContract(ContractType.RANDOM_BEACON)).getValidatorThreshold(
+      IRandomBeacon.ValidatorType.Governance
+    );
   }
 
   /// @dev See {RoninValidatorSet-__css2cid}
