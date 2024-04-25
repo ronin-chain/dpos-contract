@@ -6,6 +6,7 @@ import "../../udvts/Types.sol";
 import "../../extensions/collections/HasContracts.sol";
 import "../../utils/RoleAccess.sol";
 import { IProfile } from "../../interfaces/IProfile.sol";
+import { ITimingInfo } from "../../interfaces/validator/info-fragments/ITimingInfo.sol";
 
 abstract contract ProfileStorage is IProfile, HasContracts {
   /// @dev Mapping from id address => candidate profile.
@@ -32,12 +33,14 @@ abstract contract ProfileStorage is IProfile, HasContracts {
    */
   function _addNewProfile(CandidateProfile storage _profile, CandidateProfile memory newProfile) internal {
     _profile.id = newProfile.id;
+    _profile.registeredAt = newProfile.registeredAt;
 
     _setConsensus(_profile, newProfile.consensus);
     _setAdmin(_profile, newProfile.admin);
     _setTreasury(_profile, newProfile.treasury);
     _setGovernor(_profile, newProfile.__reservedGovernor);
     _setPubkey(_profile, newProfile.pubkey);
+    _setVRFKeyHash(_profile, newProfile.vrfKeyHash);
 
     emit ProfileAdded(newProfile.id);
   }
@@ -90,6 +93,15 @@ abstract contract ProfileStorage is IProfile, HasContracts {
     _registry[_hashPubkey(pubkey)] = true;
 
     emit PubkeyChanged(_profile.id, pubkey);
+  }
+
+  function _setVRFKeyHash(CandidateProfile storage _profile, bytes32 vrfKeyHash) internal {
+    if (vrfKeyHash == bytes32(0x0)) return;
+    if (_registry[uint256(vrfKeyHash)]) revert ErrDuplicatedVRFKeyHash(vrfKeyHash);
+    _profile.vrfKeyHash = vrfKeyHash;
+    _profile.vrfKeyHashLastChange = block.timestamp;
+
+    emit VRFKeyHashChanged(_profile.id, vrfKeyHash);
   }
 
   function _startCooldown(CandidateProfile storage _profile) internal {
