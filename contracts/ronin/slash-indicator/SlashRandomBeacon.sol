@@ -25,7 +25,7 @@ abstract contract SlashRandomBeacon is ISlashRandomBeacon, HasContracts {
       cid: validatorId,
       newJailedUntil: 0,
       slashAmount: config._slashAmount,
-      cannotBailout: true
+      cannotBailout: false
     });
   }
 
