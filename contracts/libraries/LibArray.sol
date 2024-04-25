@@ -60,6 +60,31 @@ library LibArray {
     }
   }
 
+  /**
+   *
+   * @dev Find Normalized Sum and Pivot
+   * 
+   * Given an (a, s, k) where:
+   *
+   * - `a` is an array of values of length `n`
+   * - `s` is the sum of the array
+   * - `k` is the pivot value = (s / divisor)
+   *
+   * Finds `a'` and `k'` = (`s'` / divisor) such that:
+   * - `a'[i]` <= `k'` for `i` in [0, n)
+   *
+   * Example:
+   * - Input is an array sorted descending
+   *            | > pivot |                 <= pivot                         |
+   * - input =  |---------|--------------------------------------------------|
+   *           left     pivot                                             right
+   *
+   *            |                           <= pivot                         |
+   * - output = |------------------------------------------------------------|
+   *          pivot                                                       right
+   *
+   * More Information, please reach out to the author (phuctd95)
+   */
   function findNormalizedSumAndPivot(
     uint256[] memory values,
     uint256 divisor
