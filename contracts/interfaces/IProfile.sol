@@ -35,7 +35,7 @@ interface IProfile {
     uint256 registeredAt;
     /// @dev VRF key hash for the profile.
     bytes32 vrfKeyHash;
-    /// @dev Timestamp of last change of VRF key hash.
+    /// @dev Timestamp of last change of VRF key hash. Only used in the logic of Beacon. Not used for checking for cooldown of updating the profile.
     uint256 vrfKeyHashLastChange;
   }
 
