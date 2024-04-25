@@ -8,29 +8,23 @@ import { ISlashRandomBeacon } from "../../interfaces/slash-indicator/ISlashRando
 import { ContractType } from "../../utils/ContractType.sol";
 
 abstract contract SlashRandomBeacon is ISlashRandomBeacon, HasContracts {
-  /// @dev The amount of RON to slash random beacon.
-  uint256 internal _slashRandomBeaconAmount;
-
-  /**
-   * @dev This empty reserved space is put in place to allow future versions to add new
-   * variables without shifting down storage in the inheritance chain.
-   */
-  uint256[19] private ______gap;
+  /// @dev value is equal to keccak256(abi.encode(uint256(keccak256("@ronin.SlashRandomBeacon.storage.SlashRandomBeaconConfig")) - 1)) & ~bytes32(uint256(0xff))
+  bytes32 private constant $$_SlashRandomBeaconConfigStorageLocation =
+    0x91c8f2da0132d5a54177c69679e2999120ba8f9ed42cabc35c99b69642ac8500;
 
   /**
    * @inheritdoc ISlashRandomBeacon
    */
-  function slashRandomBeacon(
-    address validatorId,
-    uint256 period
-  ) external onlyContract(ContractType.RANDOM_BEACON) returns (bool slashed) {
+  function slashRandomBeacon(address validatorId, uint256 period) external onlyContract(ContractType.RANDOM_BEACON) {
     IRoninValidatorSet validatorContract = IRoninValidatorSet(getContract(ContractType.VALIDATOR));
+    SlashRandomBeaconConfig memory config = _getSlashRandomBeaconConfig();
+
     emit Slashed(validatorId, SlashType.RANDOM_BEACON, period);
 
     validatorContract.execSlash({
       cid: validatorId,
       newJailedUntil: 0,
-      slashAmount: _slashRandomBeaconAmount,
+      slashAmount: config._slashAmount,
       cannotBailout: true
     });
   }
@@ -38,8 +32,8 @@ abstract contract SlashRandomBeacon is ISlashRandomBeacon, HasContracts {
   /**
    * @inheritdoc ISlashRandomBeacon
    */
-  function getRandomBeaconSlashingConfigs() external view returns (uint256 slashRandomBeaconAmount) {
-    return _slashRandomBeaconAmount;
+  function getRandomBeaconSlashingConfigs() external pure returns (SlashRandomBeaconConfig memory config) {
+    return _getSlashRandomBeaconConfig();
   }
 
   /**
@@ -53,7 +47,17 @@ abstract contract SlashRandomBeacon is ISlashRandomBeacon, HasContracts {
    * @dev See `ISlashRandomBeacon-setRandomBeaconSlashingConfigs`.
    */
   function _setRandomBeaconSlashingConfigs(uint256 slashAmount) internal {
-    _slashRandomBeaconAmount = slashAmount;
+    SlashRandomBeaconConfig storage $ = _getSlashRandomBeaconConfig();
+    $._slashAmount = slashAmount;
     emit RandomBeaconSlashingConfigsUpdated(slashAmount);
+  }
+
+  /**
+   * @dev Returns the storage of the random beacon slashing configs.
+   */
+  function _getSlashRandomBeaconConfig() private pure returns (SlashRandomBeaconConfig storage $) {
+    assembly ("memory-safe") {
+      $.slot := $$_SlashRandomBeaconConfigStorageLocation
+    }
   }
 }
