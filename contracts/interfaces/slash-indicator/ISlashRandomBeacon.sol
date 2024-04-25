@@ -39,13 +39,13 @@ interface ISlashRandomBeacon is IBaseSlash {
 
   /**
    * @dev Sets the configs to slash block producers.
-   * @param slashAmount The amount of RON to slash random beacon.
    *
    * Requirements:
    * - The method caller is admin.
    *
    * Emits the event `RandomBeaconSlashingConfigsUpdated`.
    *
+   * @param slashAmount The amount of RON to slash random beacon.
    */
   function setRandomBeaconSlashingConfigs(uint256 slashAmount) external;
 }
