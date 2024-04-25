@@ -66,10 +66,10 @@ library LibArray {
   ) internal pure returns (uint256 normSum, uint256 pivot) {
     values = inplaceDescSort(values);
 
-    bool shouldExit;
-    uint256 sRight;
     uint256 sLeft;
     uint256 nLeft;
+    uint256 sRight;
+    bool shouldExit;
 
     normSum = sum(values);
     pivot = normSum / divisor;
@@ -91,6 +91,14 @@ library LibArray {
     }
   }
 
+  /**
+   * @dev Clips the values in the given array to be within the specified lower and upper bounds.
+   *
+   * - The input array is modified in place.
+   *
+   * - Examples:
+   * `inplaceClip([1, 2, 3, 4, 5], 2, 4)` => `[2, 2, 3, 4, 4]`
+   */
   function inplaceClip(
     uint256[] memory values,
     uint256 lower,
@@ -105,46 +113,6 @@ library LibArray {
 
     assembly ("memory-safe") {
       clippedValues := values
-    }
-  }
-
-  function inplaceDescSort(uint256[] memory values) internal pure returns (uint256[] memory sorted) {
-    return inplaceQuickSort(values);
-  }
-
-  function inplaceQuickSort(uint256[] memory values) internal pure returns (uint256[] memory sorted) {
-    uint256 length = values.length;
-    unchecked {
-      if (length > 1) inplaceQuickSort(values, 0, int256(length - 1));
-    }
-
-    assembly ("memory-safe") {
-      sorted := values
-    }
-  }
-
-  function inplaceQuickSort(uint256[] memory values, int256 left, int256 right) internal pure {
-    unchecked {
-      if (left < right) {
-        if (left == right) return;
-        int256 i = left;
-        int256 j = right;
-        uint256 pivot = values[uint256(left + right) >> 1];
-
-        while (i <= j) {
-          while (pivot < values[uint256(i)]) ++i;
-          while (pivot > values[uint256(j)]) --j;
-
-          if (i <= j) {
-            (values[uint256(i)], values[uint256(j)]) = (values[uint256(j)], values[uint256(i)]);
-            ++i;
-            --j;
-          }
-        }
-
-        if (left < j) inplaceQuickSort(values, left, j);
-        if (i < right) inplaceQuickSort(values, i, right);
-      }
     }
   }
 
@@ -334,6 +302,67 @@ library LibArray {
   }
 
   /**
+   * @dev Sorts array of uint256 `values`.
+   *
+   * - Values are sorted in descending order.
+   *
+   * WARNING This function DOES modifies the original `values`.
+   */
+  function inplaceDescSort(uint256[] memory values) internal pure returns (uint256[] memory sorted) {
+    return inplaceDescQuickSort(values);
+  }
+
+  /**
+   * @dev Quick sort `values`.
+   *
+   * - Values are sorted in descending order.
+   *
+   * WARNING This function modify `values`
+   */
+  function inplaceDescQuickSort(uint256[] memory values) internal pure returns (uint256[] memory sorted) {
+    uint256 length = values.length;
+    unchecked {
+      if (length > 1) _inplaceDescQuickSort(values, 0, int256(length - 1));
+    }
+
+    assembly ("memory-safe") {
+      sorted := values
+    }
+  }
+
+  /**
+   * @dev Internal function to perform quicksort on an `values`.
+   *
+   * - Values are sorted in descending order.
+   *
+   * WARNING This function modify `values`
+   */
+  function _inplaceDescQuickSort(uint256[] memory values, int256 left, int256 right) private pure {
+    unchecked {
+      if (left < right) {
+        if (left == right) return;
+        int256 i = left;
+        int256 j = right;
+        uint256 pivot = values[uint256(left + right) >> 1];
+
+        while (i <= j) {
+          while (pivot < values[uint256(i)]) ++i;
+          while (pivot > values[uint256(j)]) --j;
+
+          if (i <= j) {
+            (values[uint256(i)], values[uint256(j)]) = (values[uint256(j)], values[uint256(i)]);
+            ++i;
+            --j;
+          }
+        }
+
+        if (left < j) _inplaceDescQuickSort(values, left, j);
+        if (i < right) _inplaceDescQuickSort(values, i, right);
+      }
+    }
+  }
+
+  /**
    * @dev Sorts array of addresses `self` based on `values`.
    *
    * - Values are sorted in descending order.
@@ -396,7 +425,7 @@ library LibArray {
     uint256 length = self.length;
     if (length != values.length) revert ErrLengthMismatch();
     unchecked {
-      if (length > 1) inplaceDescQuickSortByValue(self, values, 0, int256(length - 1));
+      if (length > 1) _inplaceDescQuickSortByValue(self, values, 0, int256(length - 1));
     }
 
     assembly ("memory-safe") {
@@ -411,7 +440,7 @@ library LibArray {
    *
    * WARNING This function modify `arr` and `values`
    */
-  function inplaceDescQuickSortByValue(
+  function _inplaceDescQuickSortByValue(
     uint256[] memory arr,
     uint256[] memory values,
     int256 left,
@@ -435,8 +464,8 @@ library LibArray {
         }
       }
 
-      if (left < j) inplaceDescQuickSortByValue(arr, values, left, j);
-      if (i < right) inplaceDescQuickSortByValue(arr, values, i, right);
+      if (left < j) _inplaceDescQuickSortByValue(arr, values, left, j);
+      if (i < right) _inplaceDescQuickSortByValue(arr, values, i, right);
     }
   }
 }
