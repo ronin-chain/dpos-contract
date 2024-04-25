@@ -2,8 +2,7 @@
 pragma solidity ^0.8.19;
 
 import { LibProxy } from "foundry-deployment-kit/libraries/LibProxy.sol";
-import { ConditionalImplementControl } from
-  "@ronin/contracts/extensions/version-control/ConditionalImplementControl.sol";
+import { NotifiedMigrator } from "@ronin/contracts/ronin/validator/migrations/NotifiedMigrator.sol";
 import { RoninMigration } from "../RoninMigration.s.sol";
 import { Contract } from "../utils/Contract.sol";
 
@@ -21,7 +20,7 @@ contract NotifiedMigratorUpgrade is RoninMigration {
     (address switcher,) = _deployRaw(
       config.getContractName(Contract.NotifiedMigrator.key()), abi.encode(proxy, prevImpl, newImpl, notifier)
     );
-    _upgradeRaw(proxyAdmin, proxy, switcher, abi.encodeCall(ConditionalImplementControl.setCallDatas, (callDatas)));
+    _upgradeRaw(proxyAdmin, proxy, switcher, abi.encodeCall(NotifiedMigrator.initialize, (callDatas)));
     return proxy;
   }
 }
