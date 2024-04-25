@@ -3,7 +3,6 @@
 pragma solidity ^0.8.9;
 
 import { IBaseSlash } from "./IBaseSlash.sol";
-import { TConsensus } from "../../udvts/Types.sol";
 
 interface ISlashRandomBeacon is IBaseSlash {
   struct SlashRandomBeaconConfig {
