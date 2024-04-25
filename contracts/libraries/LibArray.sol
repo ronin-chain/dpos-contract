@@ -74,7 +74,8 @@ library LibArray {
    * - `a'[i]` <= `k'` for `i` in [0, n)
    *
    * Example:
-   * - Input is an array sorted descending
+   * - Input is an array that sorted in descending order
+
    *            | > pivot |                 <= pivot                         |
    * - input =  |---------|--------------------------------------------------|
    *           left     pivot                                             right
