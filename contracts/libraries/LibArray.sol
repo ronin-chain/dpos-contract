@@ -63,7 +63,7 @@ library LibArray {
   /**
    *
    * @dev Find Normalized Sum and Pivot
-   * 
+   *
    * Given an (a, s, k) where:
    *
    * - `a` is an array of values of length `n`
@@ -74,7 +74,7 @@ library LibArray {
    *
    * Example:
    * - Input is an array that sorted in descending order
-
+   *
    *            | > pivot |                 <= pivot                         |
    * - input =  |---------|--------------------------------------------------|
    *           left     pivot                                             right
