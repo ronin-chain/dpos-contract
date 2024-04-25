@@ -76,12 +76,88 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
   /**
    * @inheritdoc IProfile
    */
+  function getId2PoolAdmin(address id) external view returns (address) {
+    return _id2Profile[id].admin;
+  }
+
+  /**
+   * @inheritdoc IProfile
+   */
+  function getId2Treasury(address id) external view returns (address payable) {
+    return _id2Profile[id].treasury;
+  }
+
+  /**
+   * @inheritdoc IProfile
+   */
+  function getId2Pubkey(address id) external view returns (bytes memory) {
+    return _id2Profile[id].pubkey;
+  }
+
+  /**
+   * @inheritdoc IProfile
+   */
+  function getId2ProfileLastChange(address id) external view returns (uint256) {
+    return _id2Profile[id].profileLastChange;
+  }
+
+  /**
+   * @inheritdoc IProfile
+   */
+  function getId2OldPubkey(address id) external view returns (bytes memory) {
+    return _id2Profile[id].oldPubkey;
+  }
+
+  /**
+   * @inheritdoc IProfile
+   */
+  function getId2OldConsensus(address id) external view returns (TConsensus) {
+    return _id2Profile[id].oldConsensus;
+  }
+
+  /**
+   * @inheritdoc IProfile
+   */
+  function getId2RegisteredAt(address id) external view returns (uint256) {
+    return _id2Profile[id].registeredAt;
+  }
+
+  function getId2VRFKeyHashLastChange(address id) external view returns (uint256) {
+    return _id2Profile[id].vrfKeyHashLastChange;
+  }
+
+  /**
+   * @inheritdoc IProfile
+   */
+  function getId2Consensus(address id) external view returns (TConsensus) {
+    return _id2Profile[id].consensus;
+  }
+
+  /**
+   * @inheritdoc IProfile
+   */
+  function getId2VRFKeyHash(address id) external view returns (bytes32) {
+    return _id2Profile[id].vrfKeyHash;
+  }
+
+  /**
+   * @inheritdoc IProfile
+   */
   function getManyId2Consensus(address[] calldata idList) external view returns (TConsensus[] memory consensusList) {
     consensusList = new TConsensus[](idList.length);
     unchecked {
       for (uint i; i < idList.length; ++i) {
         consensusList[i] = _id2Profile[idList[i]].consensus;
       }
+    }
+  }
+
+  function getManyId2RegisteredAt(address[] calldata idList) external view returns (uint256[] memory registeredAtList) {
+    uint256 length = idList.length;
+    registeredAtList = new uint256[](length);
+
+    for (uint256 i; i < length; ++i) {
+      registeredAtList[i] = _id2Profile[idList[i]].registeredAt;
     }
   }
 
@@ -237,6 +313,14 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     _verifyPubkey(pubkey, proofOfPossession);
     _requireCooldownPassedAndStartCooldown(_profile);
     _setPubkey(_profile, pubkey);
+  }
+
+  function changeVRFKeyHash(address id, bytes32 vrfKeyHash) external {
+    CandidateProfile storage _profile = _getId2ProfileHelper(id);
+    _requireCandidateAdmin(_profile);
+    _requireNonDuplicatedVRFKeyHash(vrfKeyHash);
+    _requireCooldownPassedAndStartCooldown(_profile);
+    _setVRFKeyHash(_profile, vrfKeyHash);
   }
 
   function _requireCandidateAdmin(CandidateProfile storage sProfile) internal view {

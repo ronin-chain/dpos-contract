@@ -37,10 +37,13 @@ contract Profile_Unit_Test is Base_Test {
           admin: _validatorAdmin,
           treasury: payable(address(0x20000)),
           __reservedGovernor: address(0),
+          vrfKeyHash: 0x0,
           pubkey: "",
           profileLastChange: 0,
           oldPubkey: "",
-          oldConsensus: TConsensus.wrap(address(0))
+          oldConsensus: TConsensus.wrap(address(0)),
+          registeredAt: 0,
+          vrfKeyHashLastChange: 0
         })
       )
     );

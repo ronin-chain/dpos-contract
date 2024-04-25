@@ -15,6 +15,7 @@ abstract contract ProfileHandler is PCUVerifyBLSPublicKey, ProfileStorage {
     _requireNonZeroAndNonDuplicated(RoleAccess.CONSENSUS, TConsensus.unwrap(profile.consensus));
     _requireNonZeroAndNonDuplicated(RoleAccess.CANDIDATE_ADMIN, profile.admin);
     _requireNonZeroAndNonDuplicated(RoleAccess.TREASURY, profile.treasury);
+    _requireNonDuplicatedVRFKeyHash(profile.vrfKeyHash);
 
     // Currently skip check of governor because the address is address(0x00).
     // _requireNonDuplicated(RoleAccess.GOVERNOR, profile.__reservedGovernor);
@@ -43,8 +44,18 @@ abstract contract ProfileHandler is PCUVerifyBLSPublicKey, ProfileStorage {
     }
   }
 
+  function _requireNonDuplicatedVRFKeyHash(bytes32 vrfKeyHash) internal view {
+    if (_isRegisteredVRFKeyHash(vrfKeyHash)) {
+      revert ErrDuplicatedVRFKeyHash(vrfKeyHash);
+    }
+  }
+
   function _isRegisteredPubkey(bytes memory pubkey) internal view returns (bool) {
     return _registry[_hashPubkey(pubkey)];
+  }
+
+  function _isRegisteredVRFKeyHash(bytes32 vrfKeyHash) internal view returns (bool) {
+    return _registry[uint256(vrfKeyHash)];
   }
 
   function _verifyPubkey(bytes calldata publicKey, bytes calldata proofOfPossession) internal {
