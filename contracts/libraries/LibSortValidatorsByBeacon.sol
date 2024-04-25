@@ -218,10 +218,6 @@ library LibSortValidatorsByBeacon {
     if (nRV == 0) return nonRotatingValidators;
 
     RotatingValidatorStorage[] memory packedRVs = $sortedValidatorStorage._rotatingValidators;
-
-    uint256 length = packedRVs.length;
-    if (length == 0) return nonRotatingValidators;
-
     address[] memory pickedRotatingValidators = _pickTopKRotatingValidatorsByBeaconWeight(packedRVs, nRV, beacon, epoch);
 
     pickedValidatorIds = nonRotatingValidators.concat(pickedRotatingValidators);
