@@ -4,7 +4,7 @@ pragma solidity ^0.8.9;
 
 import "../../extensions/consumers/GlobalConfigConsumer.sol";
 import "../../extensions/consumers/PercentageConsumer.sol";
-import "../../libraries/AddressArrayUtils.sol";
+import "../../libraries/LibArray.sol";
 import "../../interfaces/staking/ICandidateStaking.sol";
 import "../../interfaces/IProfile.sol";
 import "./BaseStaking.sol";
@@ -226,7 +226,7 @@ abstract contract CandidateStaking is BaseStaking, ICandidateStaking, GlobalConf
     if (amount < _minValidatorStakingAmount) revert ErrInsufficientStakingAmount();
     if (poolAdmin != candidateAdmin || candidateAdmin != treasuryAddr) revert ErrThreeInteractionAddrsNotEqual();
 
-    if (poolAdmin == poolId) revert AddressArrayUtils.ErrDuplicated(msg.sig);
+    if (poolAdmin == poolId) revert LibArray.ErrDuplicated(msg.sig);
 
     IRoninValidatorSet(getContract(ContractType.VALIDATOR)).execApplyValidatorCandidate({
       candidateAdmin: candidateAdmin,

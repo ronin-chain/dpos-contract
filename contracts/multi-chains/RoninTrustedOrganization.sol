@@ -3,7 +3,7 @@
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
-import "../libraries/AddressArrayUtils.sol";
+import "../libraries/LibArray.sol";
 import "../interfaces/IRoninTrustedOrganization.sol";
 import "../interfaces/IProfile.sol";
 import "../extensions/collections/HasProxyAdmin.sol";
@@ -451,7 +451,7 @@ contract RoninTrustedOrganization is IRoninTrustedOrganization, HasProxyAdmin, H
     _addresses[1] = _v.governor;
     _addresses[2] = _v.__deprecatedBridgeVoter;
 
-    if (AddressArrayUtils.hasDuplicate(_addresses)) revert AddressArrayUtils.ErrDuplicated(msg.sig);
+    if (LibArray.hasDuplicate(_addresses)) revert LibArray.ErrDuplicated(msg.sig);
   }
 
   function __cid2css(address cid) internal view returns (TConsensus) {
