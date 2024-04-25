@@ -6,6 +6,10 @@ import { IBaseSlash } from "./IBaseSlash.sol";
 import { TConsensus } from "../../udvts/Types.sol";
 
 interface ISlashRandomBeacon is IBaseSlash {
+  struct SlashRandomBeaconConfig {
+    uint256 _slashAmount;
+  }
+
   /**
    * @dev Emitted when the configs to slash random beacon is updated. See the method `getRandomBeaconSlashingConfigs`
    * for param details.
@@ -14,24 +18,24 @@ interface ISlashRandomBeacon is IBaseSlash {
 
   /**
    * @dev Slashes for random beacon.
-   * @param validatorId The id of the validator.
-   * @param period The current period.
-   * @return slashed True if the validator is slashed successfully.
    *
    * Requirements:
    * - Only RandomBeacon contract is allowed to call.
    *
    * Emits the event `Slashed`.
+   *
+   * @param validatorId The id of the validator.
+   * @param period The current period.
    */
-  function slashRandomBeacon(address validatorId, uint256 period) external returns (bool slashed);
+  function slashRandomBeacon(address validatorId, uint256 period) external;
 
   /**
    * @dev Returns the configs related to block producer slashing.
    *
-   * @return slashRandomBeaconAmount The amount of RON to slash random beacon.
+   * @return config The random beacon slash configs.
    *
    */
-  function getRandomBeaconSlashingConfigs() external view returns (uint256 slashRandomBeaconAmount);
+  function getRandomBeaconSlashingConfigs() external view returns (SlashRandomBeaconConfig memory config);
 
   /**
    * @dev Sets the configs to slash block producers.
