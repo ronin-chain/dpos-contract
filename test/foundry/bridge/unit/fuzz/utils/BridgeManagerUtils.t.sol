@@ -4,13 +4,13 @@ pragma solidity ^0.8.0;
 import { Test } from "forge-std/Test.sol";
 import { Randomizer } from "@ronin/test/helpers/Randomizer.t.sol";
 import { Sorting } from "@ronin/contracts/mocks/libraries/Sorting.sol";
-import { AddressArrayUtils } from "@ronin/contracts/libraries/AddressArrayUtils.sol";
+import { LibArray } from "@ronin/contracts/libraries/LibArray.sol";
 import { IBridgeManager } from "@ronin/contracts/interfaces/bridge/IBridgeManager.sol";
 import { IBridgeManagerEvents } from "@ronin/contracts/interfaces/bridge/events/IBridgeManagerEvents.sol";
 
 abstract contract BridgeManagerUtils is Randomizer {
   using Sorting for uint256[];
-  using AddressArrayUtils for address[];
+  using LibArray for address[];
 
   uint256 internal constant DEFAULT_R1 = 1;
   uint256 internal constant DEFAULT_R2 = 2;
@@ -180,7 +180,7 @@ abstract contract BridgeManagerUtils is Randomizer {
     assembly {
       tmp := nullifyIndices
     }
-    vm.assume(!AddressArrayUtils.hasDuplicate(tmp));
+    vm.assume(!LibArray.hasDuplicate(tmp));
     assembly {
       outputs := inputs
     }
@@ -206,7 +206,7 @@ abstract contract BridgeManagerUtils is Randomizer {
     _ensureNonZero(uintGovernors);
     _ensureNonZero(uintBridgeOperators);
 
-    _ensureNonDuplicated(governors.extend(bridgeOperators));
+    _ensureNonDuplicated(governors.concat(bridgeOperators));
   }
 
   function _sort(address[] memory inputs) internal pure returns (address[] memory outputs) {

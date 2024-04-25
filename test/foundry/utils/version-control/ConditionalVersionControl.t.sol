@@ -9,7 +9,7 @@ import {
 import { ILogic, MockLogicV1, MockLogicV2 } from "@ronin/contracts/mocks/utils/version-control/MockLogic.sol";
 import { IConditionalImplementControl } from
   "@ronin/contracts/interfaces/version-control/IConditionalImplementControl.sol";
-import { AddressArrayUtils } from "@ronin/contracts/libraries/AddressArrayUtils.sol";
+import { LibArray } from "@ronin/contracts/libraries/LibArray.sol";
 import { ErrOnlySelfCall } from "@ronin/contracts/utils/CommonErrors.sol";
 import { MockActor } from "@ronin/contracts/mocks/utils/version-control/MockActor.sol";
 import {
@@ -85,7 +85,7 @@ contract ConditionalImplementControlTest is Test {
       if ((instruction >> i) & 1 == 1) inputs[i] = dupAddr;
     }
 
-    vm.expectRevert(AddressArrayUtils.ErrDuplicated.selector);
+    vm.expectRevert(LibArray.ErrDuplicated.selector);
     _createConditionalImplementControl(inputs);
   }
 

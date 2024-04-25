@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import { HasContracts } from "../collections/HasContracts.sol";
 import { IConditionalImplementControl } from "../../interfaces/version-control/IConditionalImplementControl.sol";
 import { ErrorHandler } from "../../libraries/ErrorHandler.sol";
-import { AddressArrayUtils } from "../../libraries/AddressArrayUtils.sol";
+import { LibArray } from "../../libraries/LibArray.sol";
 import { ErrOnlySelfCall, IdentityGuard } from "../../utils/IdentityGuard.sol";
 
 /**
@@ -13,7 +13,7 @@ import { ErrOnlySelfCall, IdentityGuard } from "../../utils/IdentityGuard.sol";
  */
 abstract contract ConditionalImplementControl is IConditionalImplementControl, IdentityGuard, HasContracts {
   using ErrorHandler for bool;
-  using AddressArrayUtils for address[];
+  using LibArray for address[];
 
   /**
    * @dev Storage slot with the address of the current implementation.
@@ -75,7 +75,7 @@ abstract contract ConditionalImplementControl is IConditionalImplementControl, I
     addrs[0] = proxyStorage;
     addrs[1] = prevImpl;
     addrs[2] = newImpl;
-    if (addrs.hasDuplicate()) revert AddressArrayUtils.ErrDuplicated(msg.sig);
+    if (addrs.hasDuplicate()) revert LibArray.ErrDuplicated(msg.sig);
 
     PROXY_STORAGE = proxyStorage;
     NEW_IMPL = newImpl;

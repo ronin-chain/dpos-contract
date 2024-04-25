@@ -14,7 +14,7 @@ import {
   MockLogicV1,
   MockLogicV2,
   IConditionalImplementControl,
-  AddressArrayUtils,
+  LibArray,
   ConditionalImplementControlTest,
   TransparentUpgradeableProxyV2
 } from "./ConditionalVersionControl.t.sol";
