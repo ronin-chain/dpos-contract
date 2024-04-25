@@ -16,7 +16,7 @@ import { ContractType } from "../../utils/ContractType.sol";
 import { ErrOncePerBlock, ErrCallerMustBeCoinbase } from "../../utils/CommonErrors.sol";
 
 contract FastFinalityTracking is IFastFinalityTracking, Initializable, HasContracts {
-  using LibArray for *;
+  using LibArray for uint256[];
 
   /// @dev Mapping from epoch number => candidate id => fast finality record
   mapping(uint256 epochNumber => mapping(address cid => Record)) internal _tracker;
@@ -73,9 +73,9 @@ contract FastFinalityTracking is IFastFinalityTracking, Initializable, HasContra
         IStaking staking = IStaking(getContract(ContractType.STAKING));
         RoninValidatorSet validator = RoninValidatorSet(getContract(ContractType.VALIDATOR));
 
-        (uint256 h, uint256 upper) = _loadOrRecordNormalizedSumAndUpperBound(staking, validator);
+        (uint256 h, uint256 pivot) = _loadOrRecordNormalizedSumAndPivot(staking, validator);
         uint256[] memory normalizedVotedStakeAmounts =
-          LibArray.inplaceClip({ values: staking.getManyStakingTotalsById(votedCids), lower: 0, upper: upper });
+          LibArray.inplaceClip({ values: staking.getManyStakingTotalsById(votedCids), lower: 0, upper: pivot });
         uint256 g = normalizedVotedStakeAmounts.sum();
 
         h /= 1 ether;
@@ -95,24 +95,24 @@ contract FastFinalityTracking is IFastFinalityTracking, Initializable, HasContra
     }
   }
 
-  function _loadOrRecordNormalizedSumAndUpperBound(
+  function _loadOrRecordNormalizedSumAndPivot(
     IStaking staking,
     RoninValidatorSet validator
   ) private returns (uint256 normalizedSum, uint256 upperBound) {
     uint256 currentPeriod = validator.currentPeriod();
     NormalizedData storage $normalizedData = _normalizedData[currentPeriod];
 
-    if ($normalizedData.upperBound == 0) {
-      (normalizedSum, upperBound) = LibArray.findNormalizedSumAndUpperBound({
+    if ($normalizedData.pivot == 0) {
+      (normalizedSum, upperBound) = LibArray.findNormalizedSumAndPivot({
         values: staking.getManyStakingTotalsById({ poolIds: validator.getValidatorCandidateIds() }),
         divisor: validator.maxValidatorNumber()
       });
 
-      $normalizedData.upperBound = upperBound;
+      $normalizedData.pivot = upperBound;
       $normalizedData.normalizedSum = normalizedSum;
     } else {
       normalizedSum = $normalizedData.normalizedSum;
-      upperBound = $normalizedData.upperBound;
+      upperBound = $normalizedData.pivot;
     }
   }
 

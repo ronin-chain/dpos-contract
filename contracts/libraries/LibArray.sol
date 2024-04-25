@@ -60,34 +60,34 @@ library LibArray {
     }
   }
 
-  function findNormalizedSumAndUpperBound(
+  function findNormalizedSumAndPivot(
     uint256[] memory values,
     uint256 divisor
-  ) internal pure returns (uint256 normSum, uint256 upperBound) {
-    values = inplaceSort(values);
+  ) internal pure returns (uint256 normSum, uint256 pivot) {
+    values = inplaceDescSort(values);
 
     bool shouldExit;
-    uint256 sumInBound;
-    uint256 sumOutBound;
-    uint256 outBoundCount;
+    uint256 sRight;
+    uint256 sLeft;
+    uint256 nLeft;
 
     normSum = sum(values);
-    upperBound = normSum / divisor;
+    pivot = normSum / divisor;
 
     while (!shouldExit) {
       shouldExit = true;
 
-      while (values[outBoundCount] > upperBound) {
-        sumOutBound += values[outBoundCount++];
+      while (values[nLeft] > pivot) {
+        sLeft += values[nLeft++];
         shouldExit = false;
       }
 
       if (shouldExit) break;
 
-      sumInBound = normSum - sumOutBound;
-      upperBound = sumInBound / (divisor - outBoundCount);
-      sumOutBound = upperBound * outBoundCount;
-      normSum = sumInBound + sumOutBound;
+      sRight = normSum - sLeft;
+      pivot = sRight / (divisor - nLeft);
+      sLeft = pivot * nLeft;
+      normSum = sRight + sLeft;
     }
   }
 
@@ -108,7 +108,7 @@ library LibArray {
     }
   }
 
-  function inplaceSort(uint256[] memory values) internal pure returns (uint256[] memory sorted) {
+  function inplaceDescSort(uint256[] memory values) internal pure returns (uint256[] memory sorted) {
     return inplaceQuickSort(values);
   }
 

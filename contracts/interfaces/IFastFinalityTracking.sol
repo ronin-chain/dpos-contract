@@ -13,7 +13,7 @@ interface IFastFinalityTracking {
   }
 
   struct NormalizedData {
-    uint256 upperBound;
+    uint256 pivot;
     uint256 normalizedSum;
   }
 
