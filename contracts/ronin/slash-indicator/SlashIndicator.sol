@@ -12,12 +12,14 @@ import "./DeprecatedSlashBridgeVoting.sol";
 import "./SlashDoubleSign.sol";
 import "./SlashFastFinality.sol";
 import "./SlashUnavailability.sol";
+import "./SlashRandomBeacon.sol";
 import "./CreditScore.sol";
 
 contract SlashIndicator is
   ISlashIndicator,
   SlashDoubleSign,
   SlashFastFinality,
+  SlashRandomBeacon,
   DeprecatedSlashBridgeVoting,
   DeprecatedSlashBridgeOperator,
   SlashUnavailability,
@@ -87,6 +89,10 @@ contract SlashIndicator is
   function initializeV3(address profileContract) external reinitializer(3) {
     _setContract(ContractType.PROFILE, profileContract);
     _setFastFinalitySlashingConfigs(_slashDoubleSignAmount, _doubleSigningJailUntilBlock);
+  }
+
+  function initializeV4(uint256 randomBeaconSlashAmount) external reinitializer(4) {
+    _setRandomBeaconSlashingConfigs(randomBeaconSlashAmount);
   }
 
   /**
