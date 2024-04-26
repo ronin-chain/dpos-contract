@@ -98,7 +98,7 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
     Beacon storage $beacon = _beaconPerPeriod[req.period];
 
     _requireValidRequest(req, $beacon, currPeriod, reqHash);
-    _requiredAuthorized(cid, profileRegisteredAt, currPeriod);
+    _requireAuthorized(cid, profileRegisteredAt, currPeriod);
     _requireValidProof(req, proof, currPeriod, currKeyHash, keyLastChange);
 
     // randomness should not be re-submitted
@@ -395,7 +395,7 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
    * - Sender is governing validator.
    * - Sender's profile is not newly registered.
    */
-  function _requiredAuthorized(address cid, uint256 profileRegisteredAt, uint256 currPeriod) internal {
+  function _requireAuthorized(address cid, uint256 profileRegisteredAt, uint256 currPeriod) internal {
     address trustedOrg = getContract(ContractType.RONIN_TRUSTED_ORGANIZATION);
 
     // only allow to fulfill if the sender is a governing validator
