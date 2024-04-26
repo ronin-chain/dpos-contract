@@ -17,7 +17,7 @@ interface IProfile {
     address id;
     /// @dev Consensus address.
     TConsensus consensus;
-    /// @dev Pool admin address.
+    /// @dev Validator’s admin address.
     address admin;
     /// @dev Treasury address.
     address payable treasury;
