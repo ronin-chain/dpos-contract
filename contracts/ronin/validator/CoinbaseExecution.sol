@@ -15,6 +15,7 @@ import "../../interfaces/random-beacon/IRandomBeacon.sol";
 import "../../interfaces/validator/ICoinbaseExecution.sol";
 import "../../libraries/EnumFlags.sol";
 import "../../libraries/Math.sol";
+import "../../libraries/LibArray.sol";
 import {
   HasStakingVestingDeprecated,
   HasBridgeTrackingDeprecated,
