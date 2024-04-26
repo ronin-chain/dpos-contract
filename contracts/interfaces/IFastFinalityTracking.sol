@@ -5,6 +5,19 @@ pragma solidity ^0.8.9;
 import { TConsensus } from "../udvts/Types.sol";
 
 interface IFastFinalityTracking {
+  struct Record {
+    // The number of votes for fast finality.
+    uint256 qcVoteCount;
+    // The fast finality score.
+    uint256 score;
+  }
+
+  // See {findNormalizedSumAndPivot}
+  struct NormalizedData {
+    uint256 pivot;
+    uint256 normalizedSum;
+  }
+
   /**
    * @dev Submit list of `voters` who vote for fast finality in the current block.
    *
@@ -20,6 +33,14 @@ interface IFastFinalityTracking {
   function getManyFinalityVoteCounts(
     uint256 period,
     TConsensus[] calldata addrs
+  ) external view returns (uint256[] memory voteCounts);
+
+  /**
+   * @dev Returns vote count of `addrs` in the `period`.
+   */
+  function getManyFinalityScoresById(
+    uint256 period,
+    address[] calldata cids
   ) external view returns (uint256[] memory voteCounts);
 
   /**

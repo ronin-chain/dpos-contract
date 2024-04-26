@@ -22,7 +22,7 @@ library LibArray {
   /**
    * @dev Calculates the sum of an array of uint256 values.
    *
-   * Modified from: https://docs.soliditylang.org/en/latest/assembly.html
+   * Modified from: https://docs.soliditylang.org/en/v0.8.25/assembly.html#example
    *
    * @param data The array of uint256 values for which the sum is calculated.
    * @return result The sum of the provided array.
@@ -58,8 +58,117 @@ library LibArray {
         }
       }
     }
+  }
 
-    return false;
+  /**
+   * @notice This method normalized the descending-sorted array `values` so that all elements in the `values`
+   * are still in correct order, have 'relative' diffs and not greater than `sum(normed(values))/divisor`.
+   * Returns the `normSum` and the `pivot` after normalizing the array.
+   *
+   * @dev Given a tuple of `(a, s, k)` and divisor `d` where:
+   *    - `a` is the array of values of length `n`,
+   *    - `s` is the sum of the array,
+   *    - `k` is the pivot value, `k = s / d` initially.
+   *
+   * This method normalizes `a` to `a'` such that:
+   *    (1) Elements in `a` and `a'` are decreased relatively
+   *    (2) `k' = (s' / d)` and `∀x ∈ a': x ≤ k'`
+   *
+   * Algorithm:
+   *    1. Init `s = sum(a)`, `k = s/d`.
+   *    2. While `k` changes:
+   *       * Replace all `a[i] > k` by `k`
+   *       * k := sum(unchanged(a[i])) / (d - count(changed(a[i])))
+   *
+   * For example:
+   *    Input:
+   *      a = [100, 70, 20, 15, 3]
+   *      d = 3
+   *    Calculation:
+   *      Init:    a = [ 100,  70,  20,  15,  3 ];    s = 208;   k = 69
+   *      Round 1: a = [  69,  69,  20,  15,  3 ];    s = 177;   k = 38
+   *      Round 2: a = [  38,  38,  20,  15,  3 ];    s = 114;   k = 38
+   *
+   *      The calculation stop since all elements in a is ≤ k, in other words, `k` is unchanged.
+   *    Output:
+   *      s = 114
+   *      k = 38
+   *
+   * Implementation denotes:
+   *    `pivot`: k
+   *    `left`:  to-be-changed elements
+   *    `right`: unchanged elements
+   *
+   *    Input:
+   *                     pivot
+   *                       v
+   *            --*-----*--|--------*---------*--------*------
+   *              ^     ^           ^         ^        ^
+   *              a[0]  a[1]        a[2]      a[3]     a[4]
+   *
+   *    Output:
+   *                         pivot = a[0] = a[1]
+   *                           v
+   *            ---------------|----*---------*--------*------
+   *                                ^         ^        ^
+   *                                a[2]      a[3]     a[4]
+   *
+   *
+   */
+  function findNormalizedSumAndPivot(
+    uint256[] memory values,
+    uint256 divisor
+  ) internal pure returns (uint256 normSum, uint256 pivot) {
+    values = inplaceDescSort(values);
+
+    uint256 sLeft;
+    uint256 nLeft;
+    uint256 sRight;
+    bool shouldExit;
+
+    normSum = sum(values);
+    pivot = normSum / divisor;
+
+    while (!shouldExit) {
+      shouldExit = true;
+
+      while (values[nLeft] > pivot) {
+        sLeft += values[nLeft++];
+        shouldExit = false;
+      }
+
+      if (shouldExit) break;
+
+      sRight = normSum - sLeft;
+      pivot = sRight / (divisor - nLeft); // Mathematically proven `divisor` is always larger than `nLeft`
+      sLeft = pivot * nLeft;
+      normSum = sRight + sLeft;
+    }
+  }
+
+  /**
+   * @dev Clips the values in the given array to be within the specified lower and upper bounds.
+   *
+   * - The input array is modified in place.
+   *
+   * - Examples:
+   * `inplaceClip([1, 2, 3, 4, 5], 2, 4)` => `[2, 2, 3, 4, 4]`
+   */
+  function inplaceClip(
+    uint256[] memory values,
+    uint256 lower,
+    uint256 upper
+  ) internal pure returns (uint256[] memory clippedValues) {
+    uint256 length = values.length;
+
+    for (uint256 i; i < length; ++i) {
+      if (values[i] < lower) values[i] = lower;
+      if (values[i] > upper) values[i] = upper;
+    }
+
+    assembly ("memory-safe") {
+      clippedValues := values
+    }
   }
 
   /**
@@ -103,7 +212,6 @@ library LibArray {
         c[i] = a[i];
         ++i;
       }
-
       for (uint256 j; j < lengthB;) {
         c[i] = b[j];
         ++i;
@@ -249,6 +357,67 @@ library LibArray {
   }
 
   /**
+   * @dev Sorts array of uint256 `values`.
+   *
+   * - Values are sorted in descending order.
+   *
+   * WARNING This function DOES modifies the original `values`.
+   */
+  function inplaceDescSort(uint256[] memory values) internal pure returns (uint256[] memory sorted) {
+    return inplaceDescQuickSort(values);
+  }
+
+  /**
+   * @dev Quick sort `values`.
+   *
+   * - Values are sorted in descending order.
+   *
+   * WARNING This function modify `values`
+   */
+  function inplaceDescQuickSort(uint256[] memory values) internal pure returns (uint256[] memory sorted) {
+    uint256 length = values.length;
+    unchecked {
+      if (length > 1) _inplaceDescQuickSort(values, 0, int256(length - 1));
+    }
+
+    assembly ("memory-safe") {
+      sorted := values
+    }
+  }
+
+  /**
+   * @dev Internal function to perform quicksort on an `values`.
+   *
+   * - Values are sorted in descending order.
+   *
+   * WARNING This function modify `values`
+   */
+  function _inplaceDescQuickSort(uint256[] memory values, int256 left, int256 right) private pure {
+    unchecked {
+      if (left < right) {
+        if (left == right) return;
+        int256 i = left;
+        int256 j = right;
+        uint256 pivot = values[uint256(left + right) >> 1];
+
+        while (i <= j) {
+          while (pivot < values[uint256(i)]) ++i;
+          while (pivot > values[uint256(j)]) --j;
+
+          if (i <= j) {
+            (values[uint256(i)], values[uint256(j)]) = (values[uint256(j)], values[uint256(i)]);
+            ++i;
+            --j;
+          }
+        }
+
+        if (left < j) _inplaceDescQuickSort(values, left, j);
+        if (i < right) _inplaceDescQuickSort(values, i, right);
+      }
+    }
+  }
+
+  /**
    * @dev Sorts array of addresses `self` based on `values`.
    *
    * - Values are sorted in descending order.
@@ -311,7 +480,7 @@ library LibArray {
     uint256 length = self.length;
     if (length != values.length) revert ErrLengthMismatch();
     unchecked {
-      if (length > 1) inplaceDescQuickSortByValue(self, values, 0, int256(length - 1));
+      if (length > 1) _inplaceDescQuickSortByValue(self, values, 0, int256(length - 1));
     }
 
     assembly ("memory-safe") {
@@ -326,7 +495,7 @@ library LibArray {
    *
    * WARNING This function modify `arr` and `values`
    */
-  function inplaceDescQuickSortByValue(
+  function _inplaceDescQuickSortByValue(
     uint256[] memory arr,
     uint256[] memory values,
     int256 left,
@@ -334,7 +503,6 @@ library LibArray {
   ) private pure {
     unchecked {
       if (left == right) return;
-
       int256 i = left;
       int256 j = right;
       uint256 pivot = values[uint256(left + right) >> 1];
@@ -351,8 +519,8 @@ library LibArray {
         }
       }
 
-      if (left < j) inplaceDescQuickSortByValue(arr, values, left, j);
-      if (i < right) inplaceDescQuickSortByValue(arr, values, i, right);
+      if (left < j) _inplaceDescQuickSortByValue(arr, values, left, j);
+      if (i < right) _inplaceDescQuickSortByValue(arr, values, i, right);
     }
   }
 }
