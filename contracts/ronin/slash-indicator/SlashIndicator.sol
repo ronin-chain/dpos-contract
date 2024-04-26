@@ -91,8 +91,9 @@ contract SlashIndicator is
     _setFastFinalitySlashingConfigs(_slashDoubleSignAmount, _doubleSigningJailUntilBlock);
   }
 
-  function initializeV4(uint256 randomBeaconSlashAmount) external reinitializer(4) {
+  function initializeV4(address randomBeaconContract, uint256 randomBeaconSlashAmount) external reinitializer(4) {
     _setRandomBeaconSlashingConfigs(randomBeaconSlashAmount);
+    _setContract(ContractType.RANDOM_BEACON, randomBeaconContract);
   }
 
   /**

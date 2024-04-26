@@ -11,6 +11,7 @@ import "../../interfaces/IRoninTrustedOrganization.sol";
 import "../../interfaces/IFastFinalityTracking.sol";
 import "../../interfaces/staking/IStaking.sol";
 import "../../interfaces/slash-indicator/ISlashIndicator.sol";
+import "../../interfaces/random-beacon/IRandomBeacon.sol";
 import "../../interfaces/validator/ICoinbaseExecution.sol";
 import "../../libraries/EnumFlags.sol";
 import "../../libraries/Math.sol";
@@ -21,8 +22,6 @@ import {
   HasMaintenanceDeprecated,
   HasSlashIndicatorDeprecated
 } from "../../utils/DeprecatedSlots.sol";
-import "../../precompile-usages/PCUSortValidators.sol";
-import "../../precompile-usages/PCUPickValidatorSet.sol";
 import "./storage-fragments/CommonStorage.sol";
 import { EmergencyExit } from "./EmergencyExit.sol";
 import { TPoolId } from "../../udvts/Types.sol";
@@ -31,8 +30,6 @@ import { ErrCallerMustBeCoinbase } from "../../utils/CommonErrors.sol";
 abstract contract CoinbaseExecution is
   ICoinbaseExecution,
   RONTransferHelper,
-  PCUSortValidators,
-  PCUPickValidatorSet,
   HasContracts,
   HasStakingVestingDeprecated,
   HasBridgeTrackingDeprecated,
@@ -117,15 +114,19 @@ abstract contract CoinbaseExecution is
     uint256 newPeriod = _computePeriod(block.timestamp);
     bool periodEnding = _isPeriodEnding(newPeriod);
 
-    address[] memory currValidatorIds = getValidatorIds();
-    address[] memory revokedCandidateIds;
+    uint256 lastPeriod = currentPeriod();
     uint256 epoch = epochOf(block.number);
     uint256 nextEpoch = epoch + 1;
-    uint256 lastPeriod = currentPeriod();
+    address[] memory currValidatorIds = getValidatorIds();
+
+    IRandomBeacon randomBeacon = IRandomBeacon(getContract(ContractType.RANDOM_BEACON));
+    // This request is actually only invoked at the first epoch of the period.
+    randomBeacon.execRequestRandomSeedForNextPeriod(lastPeriod);
 
     _syncFastFinalityReward(epoch, currValidatorIds);
 
     if (periodEnding) {
+      randomBeacon.execWrapUpBeaconPeriod(lastPeriod, newPeriod);
       (uint256 totalDelegatingReward, uint256[] memory delegatingRewards) =
         _distributeRewardToTreasuriesAndCalculateTotalDelegatingReward(lastPeriod, currValidatorIds);
       _settleAndTransferDelegatingRewards(lastPeriod, currValidatorIds, totalDelegatingReward, delegatingRewards);
@@ -134,14 +135,18 @@ abstract contract CoinbaseExecution is
 
       ISlashIndicator slashIndicatorContract = ISlashIndicator(getContract(ContractType.SLASH_INDICATOR));
       slashIndicatorContract.execUpdateCreditScores(currValidatorIds, lastPeriod);
-      (currValidatorIds, revokedCandidateIds) = _syncValidatorSet(newPeriod);
+      address[] memory revokedCandidateIds = _syncCandidateSet(newPeriod);
       if (revokedCandidateIds.length > 0) {
         slashIndicatorContract.execResetCreditScores(revokedCandidateIds);
       }
       _currentPeriodStartAtBlock = block.number + 1;
     }
+
+    currValidatorIds = _syncValidatorSet(randomBeacon, newPeriod, nextEpoch);
     _revampRoles(newPeriod, nextEpoch, currValidatorIds);
+
     emit WrappedUpEpoch(lastPeriod, epoch, periodEnding);
+
     _periodOf[nextEpoch] = newPeriod;
     _lastUpdatedPeriod = newPeriod;
   }
@@ -155,7 +160,8 @@ abstract contract CoinbaseExecution is
    * - This method is only called once each epoch.
    */
   function _syncFastFinalityReward(uint256 epoch, address[] memory validatorIds) private {
-    uint256[] memory scores = IFastFinalityTracking(getContract(ContractType.FAST_FINALITY_TRACKING)).getManyFinalityScoresById(epoch, validatorIds);
+    uint256[] memory scores = IFastFinalityTracking(getContract(ContractType.FAST_FINALITY_TRACKING))
+      .getManyFinalityScoresById(epoch, validatorIds);
     uint256 divisor = scores.sum();
     uint256 iReward;
     uint256 totalReward = _totalFastFinalityReward;
@@ -308,18 +314,13 @@ abstract contract CoinbaseExecution is
    * Note: This method should be called once in the end of each period.
    *
    */
-  function _syncValidatorSet(uint256 newPeriod)
-    private
-    returns (address[] memory newValidatorIds, address[] memory unsatisfiedCandidates)
-  {
-    unsatisfiedCandidates = _syncCandidateSet(newPeriod);
-    uint256[] memory weights = IStaking(getContract(ContractType.STAKING)).getManyStakingTotalsById(_candidateIds);
-    uint256[] memory trustedWeights = IRoninTrustedOrganization(getContract(ContractType.RONIN_TRUSTED_ORGANIZATION))
-      .getConsensusWeightsById(_candidateIds);
-    uint256 newValidatorCount;
-    (newValidatorIds, newValidatorCount) =
-      _pcPickValidatorSet(_candidateIds, weights, trustedWeights, _maxValidatorNumber, _maxPrioritizedValidatorNumber);
-    _setNewValidatorSet(newValidatorIds, newValidatorCount, newPeriod);
+  function _syncValidatorSet(
+    IRandomBeacon randomBeacon,
+    uint256 newPeriod,
+    uint256 nextEpoch
+  ) private returns (address[] memory newValidatorIds) {
+    newValidatorIds = randomBeacon.pickValidatorSet(nextEpoch);
+    _setNewValidatorSet(newValidatorIds, newValidatorIds.length, newPeriod);
   }
 
   /**
