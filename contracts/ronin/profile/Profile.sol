@@ -76,6 +76,21 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
   /**
    * @inheritdoc IProfile
    */
+  function getId2BeaconInfo(address id)
+    external
+    view
+    returns (bytes32 vrfKeyHash, uint256 vrfKeyHashLastChange, uint256 registeredAt)
+  {
+    CandidateProfile storage $ = _getId2ProfileHelper(id);
+  
+    vrfKeyHash = $.vrfKeyHash;
+    registeredAt = $.registeredAt;
+    vrfKeyHashLastChange = $.vrfKeyHashLastChange;
+  }
+
+  /**
+   * @inheritdoc IProfile
+   */
   function getId2PoolAdmin(address id) external view returns (address) {
     return _id2Profile[id].admin;
   }
