@@ -110,43 +110,41 @@ abstract contract CoinbaseExecution is
    * @inheritdoc ICoinbaseExecution
    */
   function wrapUpEpoch() external payable virtual override onlyCoinbase whenEpochEnding oncePerEpoch {
-    unchecked {
-      uint256 newPeriod = _computePeriod(block.timestamp);
-      bool periodEnding = _isPeriodEnding(newPeriod);
+    uint256 newPeriod = _computePeriod(block.timestamp);
+    bool periodEnding = _isPeriodEnding(newPeriod);
 
-      uint256 lastPeriod = currentPeriod();
-      uint256 epoch = epochOf(block.number);
-      uint256 nextEpoch = epoch + 1;
-      address[] memory currValidatorIds = getValidatorIds();
+    uint256 lastPeriod = currentPeriod();
+    uint256 epoch = epochOf(block.number);
+    uint256 nextEpoch = epoch + 1;
+    address[] memory currValidatorIds = getValidatorIds();
 
-      IRandomBeacon randomBeacon = IRandomBeacon(getContract(ContractType.RANDOM_BEACON));
-      randomBeacon.execWrapUpEpoch(lastPeriod, newPeriod);
-      _syncFastFinalityReward(epoch, currValidatorIds);
+    IRandomBeacon randomBeacon = IRandomBeacon(getContract(ContractType.RANDOM_BEACON));
+    randomBeacon.execWrapUpEpoch(lastPeriod, newPeriod);
+    _syncFastFinalityReward(epoch, currValidatorIds);
 
-      if (periodEnding) {
-        (uint256 totalDelegatingReward, uint256[] memory delegatingRewards) =
-          _distributeRewardToTreasuriesAndCalculateTotalDelegatingReward(lastPeriod, currValidatorIds);
-        _settleAndTransferDelegatingRewards(lastPeriod, currValidatorIds, totalDelegatingReward, delegatingRewards);
-        _tryRecycleLockedFundsFromEmergencyExits();
-        _recycleDeprecatedRewards();
+    if (periodEnding) {
+      (uint256 totalDelegatingReward, uint256[] memory delegatingRewards) =
+        _distributeRewardToTreasuriesAndCalculateTotalDelegatingReward(lastPeriod, currValidatorIds);
+      _settleAndTransferDelegatingRewards(lastPeriod, currValidatorIds, totalDelegatingReward, delegatingRewards);
+      _tryRecycleLockedFundsFromEmergencyExits();
+      _recycleDeprecatedRewards();
 
-        ISlashIndicator slashIndicatorContract = ISlashIndicator(getContract(ContractType.SLASH_INDICATOR));
-        slashIndicatorContract.execUpdateCreditScores(currValidatorIds, lastPeriod);
-        address[] memory revokedCandidateIds = _syncCandidateSet(newPeriod);
-        if (revokedCandidateIds.length > 0) {
-          slashIndicatorContract.execResetCreditScores(revokedCandidateIds);
-        }
-        _currentPeriodStartAtBlock = block.number + 1;
+      ISlashIndicator slashIndicatorContract = ISlashIndicator(getContract(ContractType.SLASH_INDICATOR));
+      slashIndicatorContract.execUpdateCreditScores(currValidatorIds, lastPeriod);
+      address[] memory revokedCandidateIds = _syncCandidateSet(newPeriod);
+      if (revokedCandidateIds.length > 0) {
+        slashIndicatorContract.execResetCreditScores(revokedCandidateIds);
       }
-
-      currValidatorIds = _syncValidatorSet(randomBeacon, newPeriod, nextEpoch);
-      _revampRoles(newPeriod, nextEpoch, currValidatorIds);
-
-      emit WrappedUpEpoch(lastPeriod, epoch, periodEnding);
-
-      _periodOf[nextEpoch] = newPeriod;
-      _lastUpdatedPeriod = newPeriod;
+      _currentPeriodStartAtBlock = block.number + 1;
     }
+
+    currValidatorIds = _syncValidatorSet(randomBeacon, newPeriod, nextEpoch);
+    _revampRoles(newPeriod, nextEpoch, currValidatorIds);
+
+    emit WrappedUpEpoch(lastPeriod, epoch, periodEnding);
+
+    _periodOf[nextEpoch] = newPeriod;
+    _lastUpdatedPeriod = newPeriod;
   }
 
   /**
