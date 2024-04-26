@@ -91,7 +91,7 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
   /**
    * @inheritdoc IProfile
    */
-  function getId2PoolAdmin(address id) external view returns (address) {
+  function getId2ValidatorAdmin(address id) external view returns (address) {
     return _id2Profile[id].admin;
   }
 
