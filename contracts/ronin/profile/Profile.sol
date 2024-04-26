@@ -82,7 +82,7 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     returns (bytes32 vrfKeyHash, uint256 vrfKeyHashLastChange, uint256 registeredAt)
   {
     CandidateProfile storage $ = _getId2ProfileHelper(id);
-  
+
     vrfKeyHash = $.vrfKeyHash;
     registeredAt = $.registeredAt;
     vrfKeyHashLastChange = $.vrfKeyHashLastChange;
@@ -137,6 +137,9 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     return _id2Profile[id].registeredAt;
   }
 
+  /**
+   * @inheritdoc IProfile
+   */
   function getId2VRFKeyHashLastChange(address id) external view returns (uint256) {
     return _id2Profile[id].vrfKeyHashLastChange;
   }
@@ -167,6 +170,9 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     }
   }
 
+  /**
+   * @inheritdoc IProfile
+   */
   function getManyId2RegisteredAt(address[] calldata idList) external view returns (uint256[] memory registeredAtList) {
     uint256 length = idList.length;
     registeredAtList = new uint256[](length);
@@ -330,6 +336,9 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     _setPubkey(_profile, pubkey);
   }
 
+  /**
+   * @inheritdoc IProfile
+   */
   function changeVRFKeyHash(address id, bytes32 vrfKeyHash) external {
     CandidateProfile storage _profile = _getId2ProfileHelper(id);
     _requireCandidateAdmin(_profile);
