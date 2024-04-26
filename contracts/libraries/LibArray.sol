@@ -77,8 +77,8 @@ library LibArray {
    * Algorithm:
    *    1. Init `s = sum(a)`, `k = s/d`.
    *    2. While `k` changes:
-   *       - Replace all `a[i] > k` by `k`
-   *       - k := sum(unchanged(a[i])) / (d - count(changed(a[i])))
+   *       * Replace all `a[i] > k` by `k`
+   *       * k := sum(unchanged(a[i])) / (d - count(changed(a[i])))
    *
    * For example:
    *    Input:
@@ -89,7 +89,7 @@ library LibArray {
    *      Round 1: a = [  69,  69,  20,  15,  3 ];    s = 177;   k = 38
    *      Round 2: a = [  38,  38,  20,  15,  3 ];    s = 114;   k = 38
    *
-   *      The calculation stop since all elements in `a ≤ k`, in other words, `k` is unchanged.
+   *      The calculation stop since all elements in a is ≤ k, in other words, `k` is unchanged.
    *    Output:
    *      s = 114
    *      k = 38
@@ -99,14 +99,14 @@ library LibArray {
    *    `left`:  to-be-changed elements
    *    `right`: unchanged elements
    *
-   *    Input
+   *    Input:
    *                     pivot
    *                       v
    *            --*-----*--|--------*---------*--------*------
    *              ^     ^           ^         ^        ^
    *              a[0]  a[1]        a[2]      a[3]     a[4]
    *
-   *    Output
+   *    Output:
    *                         pivot = a[0] = a[1]
    *                           v
    *            ---------------|----*---------*--------*------
@@ -140,7 +140,7 @@ library LibArray {
       if (shouldExit) break;
 
       sRight = normSum - sLeft;
-      pivot = sRight / (divisor - nLeft);
+      pivot = sRight / (divisor - nLeft); // Mathematically proven `divisor` is always larger than `nLeft`
       sLeft = pivot * nLeft;
       normSum = sRight + sLeft;
     }
