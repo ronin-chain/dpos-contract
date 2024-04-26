@@ -85,7 +85,7 @@ interface IProfile {
     returns (bytes32 vrfKeyHash, uint256 vrfKeyHashLastChange, uint256 registeredAt);
 
   /// @dev Getter to query `admin` from `id` address.
-  function getId2PoolAdmin(address id) external view returns (address);
+  function getId2ValidatorAdmin(address id) external view returns (address);
 
   /// @dev Getter to query `treasury` from `id` address.
   function getId2Treasury(address id) external view returns (address payable);
