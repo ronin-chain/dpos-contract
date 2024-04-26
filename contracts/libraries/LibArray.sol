@@ -22,7 +22,7 @@ library LibArray {
   /**
    * @dev Calculates the sum of an array of uint256 values.
    *
-   * Modified from: https://docs.soliditylang.org/en/latest/assembly.html
+   * Modified from: https://docs.soliditylang.org/en/v0.8.25/assembly.html#example
    *
    * @param data The array of uint256 values for which the sum is calculated.
    * @return result The sum of the provided array.
