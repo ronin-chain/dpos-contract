@@ -15,7 +15,6 @@ import "../../interfaces/random-beacon/IRandomBeacon.sol";
 import "../../interfaces/validator/ICoinbaseExecution.sol";
 import "../../libraries/EnumFlags.sol";
 import "../../libraries/Math.sol";
-import "../../libraries/LibArray.sol";
 import {
   HasStakingVestingDeprecated,
   HasBridgeTrackingDeprecated,
@@ -159,17 +158,20 @@ abstract contract CoinbaseExecution is
    * - This method is only called once each epoch.
    */
   function _syncFastFinalityReward(uint256 epoch, address[] memory validatorIds) private {
-    uint256[] memory scores = IFastFinalityTracking(getContract(ContractType.FAST_FINALITY_TRACKING)).getManyFinalityScoresById(epoch, validatorIds);
-    uint256 divisor = scores.sum();
+    uint256[] memory voteCounts = IFastFinalityTracking(getContract(ContractType.FAST_FINALITY_TRACKING))
+      .getManyFinalityVoteCountsById(epoch, validatorIds);
+    uint256 divisor = _numberOfBlocksInEpoch * validatorIds.length;
     uint256 iReward;
     uint256 totalReward = _totalFastFinalityReward;
     uint256 totalDispensedReward = 0;
-    uint256 length = validatorIds.length;
 
-    for (uint256 i; i < length; ++i) {
-      iReward = (totalReward * scores[i]) / divisor;
+    for (uint i; i < validatorIds.length;) {
+      iReward = (totalReward * voteCounts[i]) / divisor;
       _fastFinalityReward[validatorIds[i]] += iReward;
       totalDispensedReward += iReward;
+      unchecked {
+        ++i;
+      }
     }
 
     _totalDeprecatedReward += (totalReward - totalDispensedReward);
