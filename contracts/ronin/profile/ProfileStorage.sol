@@ -97,8 +97,9 @@ abstract contract ProfileStorage is IProfile, HasContracts {
 
   function _setVRFKeyHash(CandidateProfile storage _profile, bytes32 vrfKeyHash) internal {
     if (vrfKeyHash == bytes32(0x0)) return;
-    if (_registry[uint256(vrfKeyHash)]) revert ErrDuplicatedVRFKeyHash(vrfKeyHash);
+
     _profile.vrfKeyHash = vrfKeyHash;
+    _registry[uint256(vrfKeyHash)] = true;
     _profile.vrfKeyHashLastChange = block.timestamp;
 
     emit VRFKeyHashChanged(_profile.id, vrfKeyHash);

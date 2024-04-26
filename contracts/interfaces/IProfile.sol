@@ -78,6 +78,12 @@ interface IProfile {
   /// @dev Getter to query full `profile` from `id` address.
   function getId2Profile(address id) external view returns (CandidateProfile memory profile);
 
+  /// @dev Getter to query required random beacon info from `id` address.
+  function getId2BeaconInfo(address id)
+    external
+    view
+    returns (bytes32 vrfKeyHas, uint256 vrfKeyHashLastChange, uint256 registeredAt);
+
   /// @dev Getter to query `admin` from `id` address.
   function getId2PoolAdmin(address id) external view returns (address);
 
