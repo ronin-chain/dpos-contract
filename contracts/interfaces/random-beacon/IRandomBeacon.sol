@@ -26,6 +26,8 @@ interface IRandomBeacon {
   error ErrInvalidRandomRequest(bytes32 expected, bytes32 got);
   /// @dev Throws if the key hash is not match with the one in the profile
   error ErrInvalidKeyHash(bytes32 expected, bytes32 actual);
+  /// @dev Throws if sum of all validator types threshold is not equal to max validator number
+  error ErrInvalidThresholdConfig();
 
   /**
    * @dev The validator type.
