@@ -98,21 +98,21 @@ contract FastFinalityTracking is IFastFinalityTracking, Initializable, HasContra
   function _loadOrRecordNormalizedSumAndPivot(
     IStaking staking,
     RoninValidatorSet validator
-  ) private returns (uint256 normalizedSum, uint256 upperBound) {
+  ) private returns (uint256 normalizedSum, uint256 pivot) {
     uint256 currentPeriod = validator.currentPeriod();
     NormalizedData storage $normalizedData = _normalizedData[currentPeriod];
 
     if ($normalizedData.pivot == 0) {
-      (normalizedSum, upperBound) = LibArray.findNormalizedSumAndPivot({
+      (normalizedSum, pivot) = LibArray.findNormalizedSumAndPivot({
         values: staking.getManyStakingTotalsById({ poolIds: validator.getValidatorCandidateIds() }),
         divisor: validator.maxValidatorNumber()
       });
 
-      $normalizedData.pivot = upperBound;
       $normalizedData.normalizedSum = normalizedSum;
+      $normalizedData.pivot = pivot;
     } else {
       normalizedSum = $normalizedData.normalizedSum;
-      upperBound = $normalizedData.pivot;
+      pivot = $normalizedData.pivot;
     }
   }
 
