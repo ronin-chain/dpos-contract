@@ -12,6 +12,7 @@ interface IFastFinalityTracking {
     uint256 score;
   }
 
+  // See {findNormalizedSumAndPivot}
   struct NormalizedData {
     uint256 pivot;
     uint256 normalizedSum;
