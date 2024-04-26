@@ -98,11 +98,12 @@ interface IRandomBeacon {
 
   /**
    * @dev Callback function called at the end of an epoch to wrap up the current epoch and start a new one.
-   * @param lastPeriod The index of the last period in the current epoch.
-   * @param newPeriod The index of the first period in the new epoch.
    *
    * if period is ending, finalize the beacon and record the unavailability
    * if period is not ending and at the start of period, request the random seed for the next period
+   *
+   * @param lastPeriod The index of the last period in the current epoch.
+   * @param newPeriod The index of the first period in the new epoch.
    */
   function execWrapUpEpoch(uint256 lastPeriod, uint256 newPeriod) external;
 
