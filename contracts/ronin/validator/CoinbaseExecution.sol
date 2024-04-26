@@ -121,7 +121,7 @@ abstract contract CoinbaseExecution is
       address[] memory currValidatorIds = getValidatorIds();
 
       IRandomBeacon randomBeacon = IRandomBeacon(getContract(ContractType.RANDOM_BEACON));
-      randomBeacon.onWrapUpEpoch(lastPeriod, newPeriod);
+      randomBeacon.execWrapUpEpoch(lastPeriod, newPeriod);
       _syncFastFinalityReward(epoch, currValidatorIds);
 
       if (periodEnding) {
