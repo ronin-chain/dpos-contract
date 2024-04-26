@@ -22,7 +22,7 @@ interface IRandomBeacon {
   error ErrAlreadySubmitted();
   /// @dev Throws if the request is already finalized
   error ErrBeaconAlreadyFinalized(uint256 period);
-  /// @dev Throws if the random request is unexists
+  /// @dev Throws if the random request is inexistent
   error ErrInvalidRandomRequest(bytes32 expected, bytes32 got);
   /// @dev Throws if the key hash is not match with the one in the profile
   error ErrInvalidKeyHash(bytes32 expected, bytes32 actual);
@@ -102,37 +102,35 @@ interface IRandomBeacon {
    * if period is ending, finalize the beacon and record the unavailability
    * if period is not ending and at the start of period, request the random seed for the next period
    */
-  function onWrapUpEpoch(uint256 lastPeriod, uint256 newPeriod) external;
+  function execWrapUpEpoch(uint256 lastPeriod, uint256 newPeriod) external;
 
   /**
    * @dev Bulk set the pick thresholds for a given validator types.
-   * @param validatorTypes An array of validator types.
-   * @param thresholds An array of threshold values.
    *
    * Requirements:
    * - The method caller is admin.
    *
    * Emits the event `PickThresholdUpdated`.
    *
+   * @param validatorTypes An array of validator types.
+   * @param thresholds An array of threshold values.
    */
   function bulkSetValidatorThresholds(ValidatorType[] calldata validatorTypes, uint256[] calldata thresholds) external;
 
   /**
    * @dev Sets the unavailability slash threshold.
-   * @param slashThreshold The new value.
    *
    * Requirements:
    * - The method caller is admin.
    *
    * Emits the event `SlashUnavailabilityThresholdUpdated`.
    *
+   * @param slashThreshold The new value.
    */
   function setUnavailabilitySlashThreshold(uint256 slashThreshold) external;
 
   /**
    * @dev Fulfills the random seed.
-   * @param req The random request.
-   * @param proof The VRF proof.
    *
    * Requirements:
    * - The request is not finalized.
@@ -142,10 +140,12 @@ interface IRandomBeacon {
    * - The key hash is match with the one in the profile.
    * - The key hash changed cool down is ended.
    * - The method caller is governance validator.
-   * - The nethod caller is not newly joined.
+   * - The method caller is not newly joined.
    *
    * Emits the event `RandomSeedFulfilled`.
    *
+   * @param req The random request.
+   * @param proof The VRF proof.
    */
   function fulfillRandomSeed(RandomRequest calldata req, VRF.Proof calldata proof) external;
 
