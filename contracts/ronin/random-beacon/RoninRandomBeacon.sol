@@ -325,6 +325,13 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
 
       emit ValidatorThresholdUpdated(validatorType, threshold);
     }
+
+    if (
+      _validatorThreshold[ValidatorType.Governing] + _validatorThreshold[ValidatorType.Standard]
+        + _validatorThreshold[ValidatorType.Rotating] != _validatorThreshold[ValidatorType.All]
+    ) {
+      revert ErrInvalidThresholdConfig();
+    }
   }
 
   /**
