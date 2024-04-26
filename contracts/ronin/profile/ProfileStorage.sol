@@ -95,7 +95,13 @@ abstract contract ProfileStorage is IProfile, HasContracts {
     emit PubkeyChanged(_profile.id, pubkey);
   }
 
+  /**
+   * @dev Set VRF Key Hash for the profile.
+   */
   function _setVRFKeyHash(CandidateProfile storage _profile, bytes32 vrfKeyHash) internal {
+    //  Prevent reverting or registering null vrf key hash in `registry`,
+    //  in case normal candidate register for their profile,
+    //  since only Governing Validator can utilize VRF Key Hash
     if (vrfKeyHash == bytes32(0x0)) return;
 
     _profile.vrfKeyHash = vrfKeyHash;
