@@ -40,7 +40,7 @@ abstract contract CoinbaseExecution is
   HasSlashIndicatorDeprecated,
   EmergencyExit
 {
-  using LibArray for *;
+  using LibArray for uint256[];
   using EnumFlags for EnumFlags.ValidatorFlag;
 
   modifier onlyCoinbase() {
