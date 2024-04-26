@@ -97,15 +97,18 @@ interface IRandomBeacon {
   event RandomSeedRequested(uint256 indexed period, bytes32 indexed reqHash, RandomRequest req);
 
   /**
-   * @dev Callback function called at the end of an epoch to wrap up the current epoch and start a new one.
+   * @dev Request the random seed for the next period, at the first epoch of each period.
    *
-   * if period is ending, finalize the beacon and record the unavailability
-   * if period is not ending and at the start of period, request the random seed for the next period
-   *
-   * @param lastPeriod The index of the last period in the current epoch.
-   * @param newPeriod The index of the first period in the new epoch.
+   * Callback function of {RoninValidatorSet-wrapUpEpoch}, only called at the end of an period.
    */
-  function execWrapUpEpoch(uint256 lastPeriod, uint256 newPeriod) external;
+  function execRequestRandomSeedForNextPeriod(uint256 lastPeriod) external;
+
+  /**
+   * @dev Finalize the beacon and record the unavailability.
+   *
+   * Callback function of {RoninValidatorSet-wrapUpEpoch}, only called at the end of an period.
+   */
+  function execWrapUpBeaconPeriod(uint256 lastPeriod, uint256 newPeriod) external;
 
   /**
    * @dev Bulk set the pick thresholds for a given validator types.

@@ -120,10 +120,13 @@ abstract contract CoinbaseExecution is
     address[] memory currValidatorIds = getValidatorIds();
 
     IRandomBeacon randomBeacon = IRandomBeacon(getContract(ContractType.RANDOM_BEACON));
-    randomBeacon.execWrapUpEpoch(lastPeriod, newPeriod);
+    // This request is actually only invoked at the first epoch of the period.
+    randomBeacon.execRequestRandomSeedForNextPeriod(lastPeriod);
+
     _syncFastFinalityReward(epoch, currValidatorIds);
 
     if (periodEnding) {
+      randomBeacon.execWrapUpBeaconPeriod(lastPeriod, newPeriod);
       (uint256 totalDelegatingReward, uint256[] memory delegatingRewards) =
         _distributeRewardToTreasuriesAndCalculateTotalDelegatingReward(lastPeriod, currValidatorIds);
       _settleAndTransferDelegatingRewards(lastPeriod, currValidatorIds, totalDelegatingReward, delegatingRewards);
