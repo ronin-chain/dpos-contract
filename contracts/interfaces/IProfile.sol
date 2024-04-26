@@ -82,7 +82,7 @@ interface IProfile {
   function getId2BeaconInfo(address id)
     external
     view
-    returns (bytes32 vrfKeyHas, uint256 vrfKeyHashLastChange, uint256 registeredAt);
+    returns (bytes32 vrfKeyHash, uint256 vrfKeyHashLastChange, uint256 registeredAt);
 
   /// @dev Getter to query `admin` from `id` address.
   function getId2PoolAdmin(address id) external view returns (address);
