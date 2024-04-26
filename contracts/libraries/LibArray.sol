@@ -61,29 +61,59 @@ library LibArray {
   }
 
   /**
+   * @notice This method normalized the descending-sorted array `values` so that all elements in the `values`
+   * are still in correct order, have 'relative' diffs and not greater than `sum(normed(values))/divisor`.
+   * Returns the `normSum` and the `pivot` after normalizing the array.
    *
-   * @dev Find Normalized Sum and Pivot
+   * @dev Given a tuple of `(a, s, k)` and divisor `d` where:
+   *    - `a` is the array of values of length `n`,
+   *    - `s` is the sum of the array,
+   *    - `k` is the pivot value, `k = s / d` initially.
    *
-   * Given an (a, s, k) where:
+   * This method normalizes `a` to `a'` such that:
+   *    (1) Elements in `a` and `a'` are decreased relatively
+   *    (2) `k' = (s' / d)` and `∀x ∈ a': x ≤ k'`
    *
-   * - `a` is an array of values of length `n`
-   * - `s` is the sum of the array
-   * - `k` is the pivot value = (s / divisor)
+   * Algorithm:
+   *    1. Init `s = sum(a)`, `k = s/d`.
+   *    2. While `k` changes:
+   *       - Replace all `a[i] > k` by `k`
+   *       - k := sum(unchanged(a[i])) / (d - count(changed(a[i])))
    *
-   * Transforms `a` to `a'` such that: `k' = (s' / divisor)` and `∀x ∈ a': x ≤ k'`
+   * For example:
+   *    Input:
+   *      a = [100, 70, 20, 15, 3]
+   *      d = 3
+   *    Calculation:
+   *      Init:    a = [ 100,  70,  20,  15,  3 ];    s = 208;   k = 69
+   *      Round 1: a = [  69,  69,  20,  15,  3 ];    s = 177;   k = 38
+   *      Round 2: a = [  38,  38,  20,  15,  3 ];    s = 114;   k = 38
    *
-   * Example:
-   * - Input is an array that sorted in descending order
+   *      The calculation stop since all elements in `a ≤ k`, in other words, `k` is unchanged.
+   *    Output:
+   *      s = 114
+   *      k = 38
    *
-   *            | > pivot |                 <= pivot                         |
-   * - input =  |---------|--------------------------------------------------|
-   *           left     pivot                                             right
+   * Implementation denotes:
+   *    `pivot`: k
+   *    `left`:  to-be-changed elements
+   *    `right`: unchanged elements
    *
-   *            |                           <= pivot                         |
-   * - output = |------------------------------------------------------------|
-   *          pivot                                                       right
+   *    Input
+   *                     pivot
+   *                       v
+   *            --*-----*--|--------*---------*--------*------
+   *              ^     ^           ^         ^        ^
+   *              a[0]  a[1]        a[2]      a[3]     a[4]
    *
-   * More Information, please reach out to the author (phuctd95)
+   *    Output
+   *                         pivot = a[0] = a[1]
+   *                           v
+   *            ---------------|----*---------*--------*------
+   *                                ^         ^        ^
+   *                                a[2]      a[3]     a[4]
+   *
+   *
    */
   function findNormalizedSumAndPivot(
     uint256[] memory values,
