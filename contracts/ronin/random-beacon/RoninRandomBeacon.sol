@@ -118,9 +118,11 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
   /**
    * @inheritdoc IRandomBeacon
    */
-  function execRequestRandomSeedForNextPeriod(
-    uint256 lastUpdatedPeriod
-  ) external onlyContract(ContractType.VALIDATOR) onlyActivated(lastUpdatedPeriod) {
+  function execRequestRandomSeedForNextPeriod(uint256 lastUpdatedPeriod)
+    external
+    onlyContract(ContractType.VALIDATOR)
+    onlyActivated(lastUpdatedPeriod)
+  {
     // Request the next random seed if it has not been requested at the start epoch of the period
     uint256 nextPeriod = lastUpdatedPeriod + 1;
     if (_beaconPerPeriod[nextPeriod].reqHash == 0) {
@@ -137,7 +139,8 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
   ) external onlyContract(ContractType.VALIDATOR) onlyActivated(lastUpdatedPeriod) {
     Beacon storage $beacon = _beaconPerPeriod[newPeriod];
 
-    address[] memory cids = _filterOutNewlyJoinedValidators({ validatorContract: msg.sender, currPeriod: lastUpdatedPeriod });
+    address[] memory cids =
+      _filterOutNewlyJoinedValidators({ validatorContract: msg.sender, currPeriod: lastUpdatedPeriod });
     uint256[] memory trustedWeights =
       IRoninTrustedOrganization(getContract(ContractType.RONIN_TRUSTED_ORGANIZATION)).getConsensusWeightsById(cids);
 
@@ -182,7 +185,7 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
 
     Beacon storage $beacon = _beaconPerPeriod[period];
 
-    if (!$beacon.finalized) revert ErrBeaconNotFinalized(period);
+    // if (!$beacon.finalized) revert ErrBeaconNotFinalized(period);
 
     pickedCids = LibSortValidatorsByBeacon.pickValidatorSet(epochIndex, $beacon.value);
   }

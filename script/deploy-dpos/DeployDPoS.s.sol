@@ -15,6 +15,7 @@ import "./contracts/RoninValidatorSetDeploy.s.sol";
 import "./contracts/FastFinalityTrackingDeploy.s.sol";
 import "./contracts/RoninGovernanceAdminDeploy.s.sol";
 import "./contracts/RoninTrustedOrganizationDeploy.s.sol";
+import "./contracts/RoninRandomBeaconDeploy.s.sol";
 import "./DPoSMigration.s.sol";
 
 contract DeployDPoS is DPoSMigration {
@@ -24,12 +25,15 @@ contract DeployDPoS is DPoSMigration {
   // @dev Array to store proxy targets to change admin
   address[] internal _changeProxyTargets;
 
+  address payMaster;
+
   Profile profile;
   Staking staking;
   Maintenance maintenance;
   SlashIndicator slashIndicator;
   StakingVesting stakingVesting;
   RoninValidatorSet validatorSet;
+  RoninRandomBeacon randomBeacon;
   RoninTrustedOrganization trustedOrg;
   RoninGovernanceAdmin governanceAdmin;
   FastFinalityTracking fastFinalityTracking;
@@ -59,6 +63,7 @@ contract DeployDPoS is DPoSMigration {
     slashIndicator = new SlashIndicatorDeploy().run();
     stakingVesting = new StakingVestingDeploy().run();
     fastFinalityTracking = new FastFinalityTrackingDeploy().run();
+    randomBeacon = new RoninRandomBeaconDeploy().run();
 
     // change ProxyAdmin to RoninGovernanceAdmin
     vm.startBroadcast(initialOwner);
@@ -84,6 +89,66 @@ contract DeployDPoS is DPoSMigration {
     _initSlashIndicator(param.slashIndicator);
     _initStakingVesting(param.stakingVesting);
     _initFastFinalityTracking();
+    _initRoninRandomBeacon(param.roninRandomBeacon);
+
+    _applyValidatorCandidates();
+  }
+
+  function _applyValidatorCandidates() internal {
+    _fastForwardToNextDay();
+    _wrapUpEpoch();
+
+    uint256 maxValidatorCandidate = 70;
+
+    // apply validator candidates
+    console.log(">", StdStyle.green("Applying Validator Candidates"));
+
+    IRoninTrustedOrganization.TrustedOrganization[] memory allTrustedOrgs = trustedOrg.getAllTrustedOrganizations();
+
+    uint256 minValidatorStakingAmount = staking.minValidatorStakingAmount();
+    (uint256 min, uint256 max) = staking.getCommissionRateRange();
+    uint256 commissionRate = min + (max - min) / 2;
+
+    uint256 c;
+
+    for (uint256 i; i < allTrustedOrgs.length; ++i) {
+      bytes memory pubKey = bytes(string.concat("gv-pubKey-", vm.toString(allTrustedOrgs[i].governor)));
+      address candidateAdmin = makeAddr(string.concat("gv-candidate-admin-", vm.toString(allTrustedOrgs[i].governor)));
+      uint256 stakeAmount =
+        _bound(uint256(keccak256(abi.encode(vm.unixTime()))), minValidatorStakingAmount, type(uint96).max);
+      vm.deal(payMaster, stakeAmount);
+      vm.broadcast(payMaster);
+      payable(candidateAdmin).transfer(stakeAmount);
+
+      vm.broadcast(candidateAdmin);
+      staking.applyValidatorCandidate{ value: stakeAmount }(
+        candidateAdmin, allTrustedOrgs[i].consensusAddr, payable(candidateAdmin), commissionRate, pubKey, ""
+      );
+
+      c++;
+    }
+
+    for (uint256 i = c; i < maxValidatorCandidate; ++i) {
+      bytes memory pubKey = bytes(string.concat("sv-pubKey-", vm.toString(i)));
+      address candidateAdmin = makeAddr(string.concat("sv-candidate-admin-", vm.toString(i)));
+      TConsensus consensus = TConsensus.wrap(makeAddr(string.concat("sv-candidate-", vm.toString(i))));
+
+      uint256 stakeAmount =
+        _bound(uint256(keccak256(abi.encode(vm.unixTime()))), minValidatorStakingAmount, type(uint96).max);
+      vm.deal(payMaster, stakeAmount);
+      vm.broadcast(payMaster);
+      payable(candidateAdmin).transfer(stakeAmount);
+
+      vm.broadcast(candidateAdmin);
+      staking.applyValidatorCandidate{ value: stakeAmount }(
+        candidateAdmin, consensus, payable(candidateAdmin), commissionRate, pubKey, ""
+      );
+    }
+
+    console.log("Validator Count", validatorSet.getValidatorCandidates().length);
+
+    _fastForwardToNextDay();
+    _wrapUpEpoch();
   }
 
   function _postCheck() internal override {
@@ -130,6 +195,26 @@ contract DeployDPoS is DPoSMigration {
     vm.stopBroadcast();
   }
 
+  function _initRoninRandomBeacon(ISharedArgument.RoninRandomBeaconParam memory param)
+    internal
+    logFn("_initRoninRandomBeacon")
+  {
+    vm.startBroadcast(sender());
+    randomBeacon.initialize(
+      address(profile),
+      address(staking),
+      address(trustedOrg),
+      address(validatorSet),
+      address(slashIndicator),
+      param.slashThreshold,
+      param.initialSeed,
+      param.activatedAtPeriod,
+      param.validatorTypes,
+      param.thresholds
+    );
+    vm.stopBroadcast();
+  }
+
   function _initSlashIndicator(ISharedArgument.SlashIndicatorParam memory param) internal logFn("_initSlashIndicator") {
     uint256[4] memory bridgeOperatorSlashingConfig;
     uint256[2] memory bridgeVotingSlashingConfig;
@@ -165,6 +250,7 @@ contract DeployDPoS is DPoSMigration {
     );
     // slashIndicator.initializeV2(address(validatorSet));
     slashIndicator.initializeV3(address(profile));
+    slashIndicator.initializeV4(address(randomBeacon), param.slashRandomBeacon.randomBeaconSlashAmount);
     vm.stopBroadcast();
   }
 
@@ -201,6 +287,7 @@ contract DeployDPoS is DPoSMigration {
     // validatorSet.initializeV2();
     validatorSet.initializeV3(address(fastFinalityTracking));
     validatorSet.initializeV4(address(profile));
+    validatorSet.initializeV5(address(randomBeacon));
     vm.stopBroadcast();
   }
 

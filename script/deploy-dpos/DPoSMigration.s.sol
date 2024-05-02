@@ -35,11 +35,28 @@ contract DPoSMigration is RoninMigration {
       _setGovernanceAdminParam(param.governanceAdmin);
       _setRoninValidatorSetParam(param.roninValidatorSet);
       _setTrustedOrganizationParam(param.trustedOrganization);
+      _setRoninRandomBeaconParam(param.roninRandomBeacon);
     } else {
       revert("DPoSMigration: Other network unsupported");
     }
 
     rawArgs = abi.encode(param);
+  }
+
+  function _setRoninRandomBeaconParam(ISharedArgument.RoninRandomBeaconParam memory param) internal view {
+    param.slashThreshold = vm.envOr("RANDOM_BEACON_SLASH_THRESHOLD", uint256(3));
+    param.initialSeed = vm.envOr("INITIAL_SEED", uint256(1432));
+    param.activatedAtPeriod = vm.envOr("RANDOM_BEACON_ACTIVATED_AT_PERIOD", uint256(0));
+    param.validatorTypes = new IRandomBeacon.ValidatorType[](4);
+    param.validatorTypes[0] = IRandomBeacon.ValidatorType.Governing;
+    param.validatorTypes[1] = IRandomBeacon.ValidatorType.Standard;
+    param.validatorTypes[2] = IRandomBeacon.ValidatorType.Rotating;
+    param.validatorTypes[3] = IRandomBeacon.ValidatorType.All;
+    param.thresholds = new uint256[](4);
+    param.thresholds[0] = vm.envOr("GOVERNING_VALIDATOR_THRESHOLD", uint256(12));
+    param.thresholds[1] = vm.envOr("STANDARD_VALIDATOR_THRESHOLD", uint256(5));
+    param.thresholds[2] = vm.envOr("ROTATING_VALIDATOR_THRESHOLD", uint256(5));
+    param.thresholds[3] = vm.envOr("ALL_VALIDATOR_THRESHOLD", uint256(22));
   }
 
   function _setMaintenanceParam(ISharedArgument.MaintenanceParam memory param) internal view {
@@ -93,6 +110,9 @@ contract DPoSMigration is RoninMigration {
     param.slashUnavailability.jailDurationForUnavailabilityTier2Threshold =
       vm.envOr("JAIL_DURATION_FOR_UNAVAILABILITY_TIER2_THRESHOLD", uint256(28800 * 2));
 
+    // Slash random beacon
+    param.slashRandomBeacon.randomBeaconSlashAmount = vm.envOr("SLASH_RANDOM_BEACON_AMOUNT", uint256(10 ether));
+
     // Credit score
     param.creditScore.gainCreditScore = vm.envOr("GAIN_CREDIT_SCORE", uint256(50));
     param.creditScore.maxCreditScore = vm.envOr("MAX_CREDIT_SCORE", uint256(600));
@@ -100,39 +120,27 @@ contract DPoSMigration is RoninMigration {
     param.creditScore.cutOffPercentageAfterBailout = vm.envOr("CUT_OFF_PERCENTAGE_AFTER_BAILOUT", uint256(50_00)); // 50%
   }
 
-  function _setTrustedOrganizationParam(ISharedArgument.RoninTrustedOrganizationParam memory param) internal view {
-    param.trustedOrganizations = new IRoninTrustedOrganization.TrustedOrganization[](3);
-    param.trustedOrganizations[0].weight = vm.envOr("TRUSTED_ORGANIZATION_0_WEIGHT", uint256(100));
-    param.trustedOrganizations[1].weight = vm.envOr("TRUSTED_ORGANIZATION_1_WEIGHT", uint256(100));
-    param.trustedOrganizations[2].weight = vm.envOr("TRUSTED_ORGANIZATION_2_WEIGHT", uint256(100));
+  function _setTrustedOrganizationParam(ISharedArgument.RoninTrustedOrganizationParam memory param) internal {
+    param.trustedOrganizations = new IRoninTrustedOrganization.TrustedOrganization[](12);
 
-    param.trustedOrganizations[0].governor =
-      vm.envOr("TRUSTED_ORGANIZATION_0_GOVERNOR", address(0x529502C69356E9f48C8D5427B030020941F9ef42));
-    param.trustedOrganizations[0].consensusAddr = TConsensus.wrap(
-      vm.envOr("TRUSTED_ORGANIZATION_0_CONSENSUS_ADDR", address(0x6D863059CF618cC03d314cfbC41707105DD3BB3d))
-    );
-
-    param.trustedOrganizations[1].governor =
-      vm.envOr("TRUSTED_ORGANIZATION_1_GOVERNOR", address(0x85C5dBfadcBc36AeE39DD32365183c5E38A67E37));
-    param.trustedOrganizations[1].consensusAddr = TConsensus.wrap(
-      vm.envOr("TRUSTED_ORGANIZATION_1_CONSENSUS_ADDR", address(0x412cA41498e0522f054ebBA32fCaf59C9e55F099))
-    );
-
-    param.trustedOrganizations[2].governor =
-      vm.envOr("TRUSTED_ORGANIZATION_2_GOVERNOR", address(0x947AB99ad90302b5ec1840c9b5CF4205554C72af));
-    param.trustedOrganizations[2].consensusAddr = TConsensus.wrap(
-      vm.envOr("TRUSTED_ORGANIZATION_2_CONSENSUS_ADDR", address(0x7CcE47da0E161BE6fA1c7D09A9d12986b03621A3))
-    );
+    for (uint256 i; i < param.trustedOrganizations.length; i++) {
+      param.trustedOrganizations[i].weight = vm.envOr("TRUSTED_ORGANIZATION_WEIGHT", uint256(100));
+      param.trustedOrganizations[i].governor =
+        vm.envOr("TRUSTED_ORGANIZATION_GOVERNOR", makeAddr(string.concat("governor-", vm.toString(i))));
+      param.trustedOrganizations[i].consensusAddr = TConsensus.wrap(
+        vm.envOr("TRUSTED_ORGANIZATION_CONSENSUS_ADDR", makeAddr(string.concat("consensus-", vm.toString(i))))
+      );
+    }
 
     param.numerator = vm.envOr("TRUSTED_ORGANIZATION_NUMERATOR", uint256(0));
     param.denominator = vm.envOr("TRUSTED_ORGANIZATION_DENOMINATOR", uint256(1));
   }
 
   function _setRoninValidatorSetParam(ISharedArgument.RoninValidatorSetParam memory param) internal view {
-    param.maxValidatorNumber = vm.envOr("MAX_VALIDATOR_NUMBER", uint256(4));
-    param.maxPrioritizedValidatorNumber = vm.envOr("MAX_PRIORITIZED_VALIDATOR_NUMBER", uint256(0));
+    param.maxValidatorNumber = vm.envOr("MAX_VALIDATOR_NUMBER", uint256(22));
+    param.maxPrioritizedValidatorNumber = vm.envOr("MAX_PRIORITIZED_VALIDATOR_NUMBER", uint256(12));
     param.numberOfBlocksInEpoch = vm.envOr("NUMBER_OF_BLOCKS_IN_EPOCH", uint256(200));
-    param.maxValidatorCandidate = vm.envOr("MAX_VALIDATOR_CANDIDATE", uint256(10));
+    param.maxValidatorCandidate = vm.envOr("MAX_VALIDATOR_CANDIDATE", uint256(100));
     param.minEffectiveDaysOnwards = vm.envOr("MIN_EFFECTIVE_DAYS_ONWARDS", uint256(7));
     param.emergencyExitLockedAmount = vm.envOr("EMERGENCY_EXIT_LOCKED_AMOUNT", uint256(500));
     param.emergencyExpiryDuration = vm.envOr("EMERGENCY_EXPIRY_DURATION", uint256(14 days));

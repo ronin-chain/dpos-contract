@@ -38,26 +38,28 @@ contract GeneralConfig is BaseGeneralConfig {
   }
 
   function _setUpContracts() internal virtual override {
-    _mapContractname(Contract.Profile);
-    _mapContractname(Contract.Staking);
-    _mapContractname(Contract.Maintenance);
-    _mapContractname(Contract.BridgeSlash);
-    _mapContractname(Contract.BridgeReward);
-    _mapContractname(Contract.RoninGatewayV3);
-    _mapContractname(Contract.SlashIndicator);
-    _mapContractname(Contract.NotifiedMigrator);
-    _mapContractname(Contract.MockPrecompile);
-    _mapContractname(Contract.BridgeTracking);
-    _mapContractname(Contract.StakingVesting);
-    _mapContractname(Contract.RoninValidatorSet);
-    _mapContractname(Contract.MainchainGatewayV3);
-    _mapContractname(Contract.RoninBridgeManager);
-    _mapContractname(Contract.RoninGovernanceAdmin);
-    _mapContractname(Contract.FastFinalityTracking);
-    _mapContractname(Contract.MainchainBridgeManager);
-    _mapContractname(Contract.MainchainGovernanceAdmin);
-    _mapContractname(Contract.RoninTrustedOrganization);
-    _mapContractname(Contract.RoninValidatorSetTimedMigrator);
+    _mapContractName(Contract.Profile);
+    _mapContractName(Contract.Staking);
+    _mapContractName(Contract.Maintenance);
+    _mapContractName(Contract.BridgeSlash);
+    _mapContractName(Contract.BridgeReward);
+    _mapContractName(Contract.RoninGatewayV3);
+    _mapContractName(Contract.SlashIndicator);
+    _mapContractName(Contract.NotifiedMigrator);
+    _mapContractName(Contract.MockPrecompile);
+    _mapContractName(Contract.BridgeTracking);
+    _mapContractName(Contract.StakingVesting);
+    _mapContractName(Contract.RoninValidatorSet);
+    _mapContractName(Contract.MainchainGatewayV3);
+    _mapContractName(Contract.RoninBridgeManager);
+    _mapContractName(Contract.RoninGovernanceAdmin);
+    _mapContractName(Contract.FastFinalityTracking);
+    _mapContractName(Contract.MainchainBridgeManager);
+    _mapContractName(Contract.MainchainGovernanceAdmin);
+    _mapContractName(Contract.RoninTrustedOrganization);
+    _mapContractName(Contract.RoninValidatorSetTimedMigrator);
+    _mapContractName(Contract.RoninRandomBeacon);
+    _mapContractName(Contract.PostChecker);
 
     // override artifact name with contract name
     _contractNameMap[Contract.RoninGatewayPauseEnforcer.key()] = "PauseEnforcer";
@@ -71,7 +73,7 @@ contract GeneralConfig is BaseGeneralConfig {
     }
   }
 
-  function _mapContractname(Contract contractEnum) internal {
+  function _mapContractName(Contract contractEnum) internal {
     _contractNameMap[contractEnum.key()] = contractEnum.name();
   }
 }

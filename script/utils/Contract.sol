@@ -27,7 +27,9 @@ enum Contract {
   HardForkRoninGovernanceAdmin,
   TemporalRoninTrustedOrganization,
   RoninValidatorSetTimedMigrator,
-  Profile_Mainnet
+  Profile_Mainnet,
+  PostChecker,
+  RoninRandomBeacon
 }
 
 using { key, name } for Contract global;
@@ -61,5 +63,7 @@ function name(Contract contractEnum) pure returns (string memory) {
   if (contractEnum == Contract.HardForkRoninGovernanceAdmin) return "HardForkGovernanceAdmin";
   if (contractEnum == Contract.TemporalRoninTrustedOrganization) return "TemporalTrustedOrganization";
   if (contractEnum == Contract.RoninValidatorSetTimedMigrator) return "RoninValidatorSetTimedMigrator";
+  if (contractEnum == Contract.RoninRandomBeacon) return "RoninRandomBeacon";
+  if (contractEnum == Contract.PostChecker) return "PostChecker";
   revert("Contract: Unknown contract");
 }

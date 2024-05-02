@@ -3,6 +3,7 @@ pragma solidity ^0.8.19;
 
 import { IGeneralConfig } from "foundry-deployment-kit/interfaces/IGeneralConfig.sol";
 import { IRoninTrustedOrganization } from "@ronin/contracts/interfaces/IRoninTrustedOrganization.sol";
+import { IRandomBeacon } from "@ronin/contracts/interfaces/random-beacon/IRandomBeacon.sol";
 
 interface ISharedArgument is IGeneralConfig {
   struct SlashBridgeOperatorParam {
@@ -10,6 +11,10 @@ interface ISharedArgument is IGeneralConfig {
     uint256 missingVotesRatioTier2;
     uint256 jailDurationForMissingVotesRatioTier2;
     uint256 skipBridgeOperatorSlashingThreshold;
+  }
+
+  struct SlashRandomBeaconParam {
+    uint256 randomBeaconSlashAmount;
   }
 
   struct SlashBridgeVotingParam {
@@ -84,10 +89,19 @@ interface ISharedArgument is IGeneralConfig {
     uint256 cooldown;
   }
 
+  struct RoninRandomBeaconParam {
+    uint256 slashThreshold;
+    uint256 initialSeed;
+    uint256 activatedAtPeriod;
+    IRandomBeacon.ValidatorType[] validatorTypes;
+    uint256[] thresholds;
+  }
+
   struct SlashIndicatorParam {
     CreditScoreParam creditScore;
     SlashDoubleSignParam slashDoubleSign;
     SlashUnavailabilityParam slashUnavailability;
+    SlashRandomBeaconParam slashRandomBeacon;
     SlashBridgeVotingParam __deprecatedSlashBridgeVoting;
     SlashBridgeOperatorParam __deprecatedSlashBridgeOperator;
   }
@@ -102,6 +116,7 @@ interface ISharedArgument is IGeneralConfig {
     GovernanceAdminParam governanceAdmin;
     RoninValidatorSetParam roninValidatorSet;
     RoninTrustedOrganizationParam trustedOrganization;
+    RoninRandomBeaconParam roninRandomBeacon;
   }
 
   function sharedArguments() external view returns (SharedParameter memory param);

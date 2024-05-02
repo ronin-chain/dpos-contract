@@ -75,6 +75,10 @@ contract RoninValidatorSet is Initializable, CoinbaseExecution, SlashingExecutio
     _setContract(ContractType.PROFILE, profileContract);
   }
 
+  function initializeV5(address randomBeacon) external reinitializer(5) {
+    _setContract(ContractType.RANDOM_BEACON, randomBeacon);
+  }
+
   /**
    * @dev Only receives RON from staking vesting contract (for topping up bonus), and from staking contract (for transferring
    * deducting amount on slashing).

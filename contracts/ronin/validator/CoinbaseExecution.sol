@@ -163,6 +163,9 @@ abstract contract CoinbaseExecution is
     uint256[] memory scores = IFastFinalityTracking(getContract(ContractType.FAST_FINALITY_TRACKING))
       .getManyFinalityScoresById(epoch, validatorIds);
     uint256 divisor = scores.sum();
+    
+    if (divisor == 0) return;
+
     uint256 iReward;
     uint256 totalReward = _totalFastFinalityReward;
     uint256 totalDispensedReward = 0;
