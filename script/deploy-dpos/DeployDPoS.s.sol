@@ -128,6 +128,19 @@ contract DeployDPoS is DPoSMigration {
       c++;
     }
 
+    vm.deal(payMaster, minValidatorStakingAmount + 1);
+    vm.broadcast(payMaster);
+    payable(makeAddr("sv-candidate-admin-min")).transfer(minValidatorStakingAmount + 1);
+    vm.broadcast(makeAddr("sv-candidate-admin-min"));
+    staking.applyValidatorCandidate{ value: minValidatorStakingAmount + 1 }(
+      makeAddr("sv-candidate-admin-min"),
+      TConsensus.wrap(makeAddr("sv-candidate-min")),
+      payable(makeAddr("sv-candidate-admin-min")),
+      commissionRate,
+      bytes("sv-pubKey-min"),
+      ""
+    );
+
     for (uint256 i = c; i < maxValidatorCandidate; ++i) {
       bytes memory pubKey = bytes(string.concat("sv-pubKey-", vm.toString(i)));
       address candidateAdmin = makeAddr(string.concat("sv-candidate-admin-", vm.toString(i)));
@@ -139,10 +152,11 @@ contract DeployDPoS is DPoSMigration {
       vm.broadcast(payMaster);
       payable(candidateAdmin).transfer(stakeAmount);
 
-      vm.broadcast(candidateAdmin);
+      vm.startBroadcast(candidateAdmin);
       staking.applyValidatorCandidate{ value: stakeAmount }(
         candidateAdmin, consensus, payable(candidateAdmin), commissionRate, pubKey, ""
       );
+      vm.stopBroadcast();
     }
 
     console.log("Validator Count", validatorSet.getValidatorCandidates().length);

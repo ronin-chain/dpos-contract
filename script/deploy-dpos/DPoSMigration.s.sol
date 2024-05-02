@@ -114,9 +114,9 @@ contract DPoSMigration is RoninMigration {
     param.slashRandomBeacon.randomBeaconSlashAmount = vm.envOr("SLASH_RANDOM_BEACON_AMOUNT", uint256(10 ether));
 
     // Credit score
-    param.creditScore.gainCreditScore = vm.envOr("GAIN_CREDIT_SCORE", uint256(50));
-    param.creditScore.maxCreditScore = vm.envOr("MAX_CREDIT_SCORE", uint256(600));
-    param.creditScore.bailOutCostMultiplier = vm.envOr("BAIL_OUT_COST_MULTIPLIER", uint256(5));
+    param.creditScore.gainCreditScore = vm.envOr("GAIN_CREDIT_SCORE", uint256(100));
+    param.creditScore.maxCreditScore = vm.envOr("MAX_CREDIT_SCORE", uint256(2400));
+    param.creditScore.bailOutCostMultiplier = vm.envOr("BAIL_OUT_COST_MULTIPLIER", uint256(2));
     param.creditScore.cutOffPercentageAfterBailout = vm.envOr("CUT_OFF_PERCENTAGE_AFTER_BAILOUT", uint256(50_00)); // 50%
   }
 
