@@ -71,7 +71,7 @@ contract DPoSMigration is RoninMigration {
   function _setStakingParam(ISharedArgument.StakingParam memory param) internal view {
     param.maxCommissionRate = vm.envOr("MAX_COMMISSION_RATE", uint256(100_00));
     param.waitingSecsToRevoke = vm.envOr("WAITING_SECS_TO_REVOKE", uint256(7 days));
-    param.minValidatorStakingAmount = vm.envOr("MIN_VALIDATOR_STAKING_AMOUNT", uint256(100));
+    param.minValidatorStakingAmount = vm.envOr("MIN_VALIDATOR_STAKING_AMOUNT", uint256(100 ether));
     param.cooldownSecsToUndelegate = vm.envOr("COOLDOWN_SECS_TO_UNDELEGATE", uint256(3 days));
   }
 

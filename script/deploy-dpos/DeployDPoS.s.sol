@@ -111,7 +111,20 @@ contract DeployDPoS is DPoSMigration {
 
     uint256 c;
 
-    for (uint256 i; i < allTrustedOrgs.length; ++i) {
+    vm.deal(payMaster, minValidatorStakingAmount + 1);
+    vm.broadcast(payMaster);
+    payable(makeAddr("gv-candidate-admin-min")).transfer(minValidatorStakingAmount + 1);
+    vm.broadcast(makeAddr("gv-candidate-admin-min"));
+    staking.applyValidatorCandidate{ value: minValidatorStakingAmount + 1 }(
+      makeAddr("gv-candidate-admin-min"),
+      allTrustedOrgs[0].consensusAddr,
+      payable(makeAddr("gv-candidate-admin-min")),
+      commissionRate,
+      bytes("gv-pubKey-min"),
+      ""
+    );
+
+    for (uint256 i = 1; i < allTrustedOrgs.length; ++i) {
       bytes memory pubKey = bytes(string.concat("gv-pubKey-", vm.toString(allTrustedOrgs[i].governor)));
       address candidateAdmin = makeAddr(string.concat("gv-candidate-admin-", vm.toString(allTrustedOrgs[i].governor)));
       uint256 stakeAmount =
@@ -127,19 +140,6 @@ contract DeployDPoS is DPoSMigration {
 
       c++;
     }
-
-    vm.deal(payMaster, minValidatorStakingAmount + 1);
-    vm.broadcast(payMaster);
-    payable(makeAddr("sv-candidate-admin-min")).transfer(minValidatorStakingAmount + 1);
-    vm.broadcast(makeAddr("sv-candidate-admin-min"));
-    staking.applyValidatorCandidate{ value: minValidatorStakingAmount + 1 }(
-      makeAddr("sv-candidate-admin-min"),
-      TConsensus.wrap(makeAddr("sv-candidate-min")),
-      payable(makeAddr("sv-candidate-admin-min")),
-      commissionRate,
-      bytes("sv-pubKey-min"),
-      ""
-    );
 
     for (uint256 i = c; i < maxValidatorCandidate; ++i) {
       bytes memory pubKey = bytes(string.concat("sv-pubKey-", vm.toString(i)));
