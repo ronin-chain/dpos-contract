@@ -10,23 +10,26 @@ import { ITimingInfo } from "../../interfaces/validator/info-fragments/ITimingIn
 
 abstract contract ProfileStorage is IProfile, HasContracts {
   /// @dev Mapping from id address => candidate profile.
-  mapping(address => CandidateProfile) internal _id2Profile;
+  mapping(address id => CandidateProfile) internal _id2Profile;
 
   /**
    * @dev Mapping from any address or keccak256(pubkey) => whether it is already registered.
    * This registry can only be toggled to `true` and NOT vice versa. All registered values
    * cannot be reused.
    */
-  mapping(uint256 => bool) internal _registry;
+  mapping(uint256 => bool registered) internal _registry;
 
   /// @dev Mapping from consensus address => id address.
-  mapping(TConsensus => address) internal _consensus2Id;
+  mapping(TConsensus => address id) internal _consensus2Id;
 
   /// @dev The cooldown time to change any info in the profile.
   uint256 internal _profileChangeCooldown;
 
+  /// @dev Mapping from vrf key hash => id address.
+  mapping(bytes32 vrfKeyHash => address cid) internal _vrfKeyHash2Id;
+
   /// @dev Upgradeable gap.
-  bytes32[47] __gap;
+  bytes32[46] __gap;
 
   /**
    * @dev Add a profile from memory to storage.
@@ -104,6 +107,11 @@ abstract contract ProfileStorage is IProfile, HasContracts {
     //  since only Governing Validator can utilize VRF Key Hash
     if (vrfKeyHash == bytes32(0x0)) return;
 
+    // Delete old consensus in mapping
+    delete _vrfKeyHash2Id[_profile.vrfKeyHash];
+    _vrfKeyHash2Id[vrfKeyHash] = _profile.id;
+
+    // Set new vrf key hash
     _profile.vrfKeyHash = vrfKeyHash;
     _registry[uint256(vrfKeyHash)] = true;
     _profile.vrfKeyHashLastChange = block.timestamp;

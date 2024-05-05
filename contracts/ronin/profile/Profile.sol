@@ -91,6 +91,21 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
   /**
    * @inheritdoc IProfile
    */
+  function getVRFKeyHash2BeaconInfo(bytes32 vrfKeyHash)
+    external
+    view
+    returns (address id, uint256 vrfKeyHashLastChange, uint256 registeredAt)
+  {
+    id = _getVRFKeyHash2Id(vrfKeyHash);
+    CandidateProfile storage $ = _getId2ProfileHelper(id);
+
+    registeredAt = $.registeredAt;
+    vrfKeyHashLastChange = $.vrfKeyHashLastChange;
+  }
+
+  /**
+   * @inheritdoc IProfile
+   */
   function getId2Admin(address id) external view returns (address) {
     return _id2Profile[id].admin;
   }
@@ -190,11 +205,34 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
   }
 
   /**
+   * @inheritdoc IProfile
+   */
+  function getVRFKeyHash2Id(bytes32 vrfKeyHash) external view returns (address) {
+    return _getVRFKeyHash2Id(vrfKeyHash);
+  }
+
+  /**
+   * @inheritdoc IProfile
+   */
+  function tryGetVRFKeyHash2Id(bytes32 vrfKeyHash) external view returns (bool found, address id) {
+    return _tryGetVRFKeyHash2Id(vrfKeyHash);
+  }
+
+  /**
    * @dev Look up the `id` by `consensus`, revert if not found.
    */
   function _getConsensus2Id(TConsensus consensus) internal view returns (address) {
     (bool found, address id) = _tryGetConsensus2Id(consensus);
     if (!found) revert ErrLookUpIdFailed(consensus);
+    return id;
+  }
+
+  /**
+   * @dev Look up the `id` by `vrfKeyHash`, revert if not found.
+   */
+  function _getVRFKeyHash2Id(bytes32 vrfKeyHash) internal view returns (address) {
+    (bool found, address id) = _tryGetVRFKeyHash2Id(vrfKeyHash);
+    if (!found) revert ErrLookUpIdFromVRFKeyFailed(vrfKeyHash);
     return id;
   }
 
@@ -210,6 +248,14 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
    */
   function _tryGetConsensus2Id(TConsensus consensus) internal view returns (bool found, address id) {
     id = _consensus2Id[consensus];
+    found = id != address(0);
+  }
+
+  /**
+   * @dev Try Look up the `id` by `vrfKeyHash`, return a boolean indicating whether the query success.
+   */
+  function _tryGetVRFKeyHash2Id(bytes32 vrfKeyHash) internal view returns (bool found, address id) {
+    id = _vrfKeyHash2Id[vrfKeyHash];
     found = id != address(0);
   }
 
