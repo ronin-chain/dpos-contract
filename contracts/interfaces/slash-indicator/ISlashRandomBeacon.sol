@@ -7,6 +7,7 @@ import { IBaseSlash } from "./IBaseSlash.sol";
 interface ISlashRandomBeacon is IBaseSlash {
   struct SlashRandomBeaconConfig {
     uint256 _slashAmount;
+    uint256 _activatedAtPeriod;
   }
 
   /**
@@ -45,6 +46,7 @@ interface ISlashRandomBeacon is IBaseSlash {
    * Emits the event `RandomBeaconSlashingConfigsUpdated`.
    *
    * @param slashAmount The amount of RON to slash random beacon.
+   * @param activatedAtPeriod The period to activate the slashing.
    */
-  function setRandomBeaconSlashingConfigs(uint256 slashAmount) external;
+  function setRandomBeaconSlashingConfigs(uint256 slashAmount, uint256 activatedAtPeriod) external;
 }
