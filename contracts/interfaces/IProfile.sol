@@ -73,10 +73,17 @@ interface IProfile {
   error ErrZeroPubkey();
   error ErrInvalidProofOfPossession(bytes pubkey, bytes proofOfPossession);
   error ErrLookUpIdFailed(TConsensus consensus);
+  error ErrLookUpIdFromVRFKeyFailed(bytes32 vrfKeyHash);
   error ErrValidatorOnRenunciation(address cid);
 
   /// @dev Getter to query full `profile` from `id` address.
   function getId2Profile(address id) external view returns (CandidateProfile memory profile);
+
+  /// @dev Getter to query required random beacon info from `vrfKeyHash`.
+  function getVRFKeyHash2BeaconInfo(bytes32 vrfKeyHash)
+    external
+    view
+    returns (address id, uint256 vrfKeyHashLastChange, uint256 registeredAt);
 
   /// @dev Getter to query required random beacon info from `id` address.
   function getId2BeaconInfo(address id)
@@ -123,8 +130,14 @@ interface IProfile {
   /// @dev Getter to backward query from `consensus` address to `id` address, revert if not found.
   function getConsensus2Id(TConsensus consensus) external view returns (address id);
 
+  /// @dev Getter to backward query from `vrfKeyHash` to `id` address, revert if not found.
+  function getVRFKeyHash2Id(bytes32 vrfKeyHash) external view returns (address id);
+
   /// @dev Getter to backward query from `consensus` address to `id` address.
   function tryGetConsensus2Id(TConsensus consensus) external view returns (bool found, address id);
+
+  /// @dev Getter to backward query from `vrfKeyHash` to `id` address.
+  function tryGetVRFKeyHash2Id(bytes32 vrfKeyHash) external view returns (bool found, address id);
 
   /// @dev Getter to backward batch query from `consensus` address to `id` address.
   function getManyConsensus2Id(TConsensus[] memory consensus) external view returns (address[] memory);
