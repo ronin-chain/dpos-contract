@@ -16,6 +16,7 @@ interface IFastFinalityTracking {
   struct NormalizedData {
     uint256 pivot;
     uint256 normalizedSum;
+    mapping(address cid => uint256 normalizedStake) normalizedStake;
   }
 
   /**
