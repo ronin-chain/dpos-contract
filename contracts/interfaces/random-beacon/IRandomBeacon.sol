@@ -101,7 +101,7 @@ interface IRandomBeacon {
    *
    * Callback function of {RoninValidatorSet-wrapUpEpoch}, only called at the end of an period.
    */
-  function execRequestRandomSeedForNextPeriod(uint256 lastPeriod) external;
+  function execRequestRandomSeedForNextPeriod(uint256 lastPeriod, uint256 newPeriod) external;
 
   /**
    * @dev Finalize the beacon and record the unavailability.
