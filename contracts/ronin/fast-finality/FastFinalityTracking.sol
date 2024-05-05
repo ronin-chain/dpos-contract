@@ -73,10 +73,10 @@ contract FastFinalityTracking is IFastFinalityTracking, Initializable, HasContra
         IStaking staking = IStaking(getContract(ContractType.STAKING));
         RoninValidatorSet validator = RoninValidatorSet(getContract(ContractType.VALIDATOR));
 
-        (uint256 h, uint256 pivot) = _loadOrRecordNormalizedSumAndPivot(staking, validator);
-        uint256[] memory normalizedVotedStakeAmounts =
-          LibArray.inplaceClip({ values: staking.getManyStakingTotalsById(votedCids), lower: 0, upper: pivot });
-        uint256 g = normalizedVotedStakeAmounts.sum();
+        (uint256 h, uint256 pivot, uint256[] memory normalizedVoterStakeAmounts) =
+          _loadOrRecordNormalizedSumAndPivot(staking, validator, votedCids);
+
+        uint256 g = normalizedVoterStakeAmounts.sum();
 
         h /= 1 ether;
         g /= 1 ether;
@@ -89,7 +89,7 @@ contract FastFinalityTracking is IFastFinalityTracking, Initializable, HasContra
           $record = _tracker[epoch][votedCids[i]];
 
           ++$record.qcVoteCount;
-          $record.score += normalizedVotedStakeAmounts[i] * (g * g) / (h * h);
+          $record.score += normalizedVoterStakeAmounts[i] * (g * g) / (h * h);
         }
       }
     }
@@ -97,22 +97,34 @@ contract FastFinalityTracking is IFastFinalityTracking, Initializable, HasContra
 
   function _loadOrRecordNormalizedSumAndPivot(
     IStaking staking,
-    RoninValidatorSet validator
-  ) private returns (uint256 normalizedSum, uint256 pivot) {
+    RoninValidatorSet validator,
+    address[] memory voterCids
+  ) private returns (uint256 normalizedSum, uint256 pivot, uint256[] memory normalizedVoterStakes) {
     uint256 currentPeriod = validator.currentPeriod();
+    normalizedVoterStakes = new uint256[](voterCids.length);
     NormalizedData storage $normalizedData = _normalizedData[currentPeriod];
 
     if ($normalizedData.pivot == 0) {
-      (normalizedSum, pivot) = LibArray.findNormalizedSumAndPivot({
-        values: staking.getManyStakingTotalsById({ poolIds: validator.getValidatorCandidateIds() }),
-        divisor: validator.maxValidatorNumber()
-      });
+      address[] memory cids = validator.getValidatorCandidateIds();
+      uint256[] memory stakeAmounts = staking.getManyStakingTotalsById({ poolIds: cids });
+      (normalizedSum, pivot) =
+        LibArray.findNormalizedSumAndPivot({ values: stakeAmounts, divisor: validator.maxValidatorNumber() });
 
-      $normalizedData.normalizedSum = normalizedSum;
+      uint256[] memory normalizedStakeAmounts = LibArray.inplaceClip({ values: stakeAmounts, lower: 0, upper: pivot });
+      uint256 length = normalizedStakeAmounts.length;
+      for (uint256 i; i < length; ++i) {
+        $normalizedData.normalizedStake[cids[i]] = normalizedStakeAmounts[i];
+      }
+
       $normalizedData.pivot = pivot;
+      $normalizedData.normalizedSum = normalizedSum;
     } else {
-      normalizedSum = $normalizedData.normalizedSum;
       pivot = $normalizedData.pivot;
+      normalizedSum = $normalizedData.normalizedSum;
+    }
+
+    for (uint256 i; i < voterCids.length; ++i) {
+      normalizedVoterStakes[i] = $normalizedData.normalizedStake[voterCids[i]];
     }
   }
 
