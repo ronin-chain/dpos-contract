@@ -21,7 +21,10 @@ abstract contract SlashRandomBeacon is ISlashRandomBeacon, HasContracts {
     SlashRandomBeaconConfig memory config = _getSlashRandomBeaconConfig();
     uint256 currPeriod = ITimingInfo(address(validatorContract)).currentPeriod();
 
-    if (currPeriod < config._activatedAtPeriod) return;
+    if (currPeriod < config._activatedAtPeriod) {
+      emit SlashingBeaconSkipped(period, validatorId);
+      return;
+    }
 
     emit Slashed(validatorId, SlashType.RANDOM_BEACON, period);
 

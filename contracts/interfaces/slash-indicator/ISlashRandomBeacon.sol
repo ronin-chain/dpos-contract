@@ -17,6 +17,11 @@ interface ISlashRandomBeacon is IBaseSlash {
   event RandomBeaconSlashingConfigsUpdated(uint256 slashRandomBeaconAmount);
 
   /**
+   * @dev Emitted when current period is less than `activatedAtPeriod` and validator is not slashed.
+   */
+  event SlashingBeaconSkipped(uint256 indexed period, address indexed validatorId);
+
+  /**
    * @dev Slashes for random beacon.
    *
    * Requirements:
