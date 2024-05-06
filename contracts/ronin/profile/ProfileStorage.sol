@@ -107,7 +107,7 @@ abstract contract ProfileStorage is IProfile, HasContracts {
     //  since only Governing Validator can utilize VRF Key Hash
     if (vrfKeyHash == bytes32(0x0)) return;
 
-    // Delete old consensus in mapping
+    // Delete old VRF key hash in mapping
     delete _vrfKeyHash2Id[_profile.vrfKeyHash];
     _vrfKeyHash2Id[vrfKeyHash] = _profile.id;
 
