@@ -87,7 +87,7 @@ abstract contract ConditionalImplementControl is
 
     _disableInitializers();
 
-    emit SetUp(proxyStorage, prevImpl, newImpl);
+    emit Constructed(proxyStorage, prevImpl, newImpl);
   }
 
   /**
