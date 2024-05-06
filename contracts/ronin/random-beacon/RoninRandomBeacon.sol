@@ -382,7 +382,7 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
     uint256 currPeriod,
     bytes32 keyHash,
     uint256 keyLastChange
-  ) internal {
+  ) internal pure {
     // key hash should not be changed within the cooldown period
     if (_computePeriod(keyLastChange) + COOLDOWN_PERIOD_THRESHOLD > currPeriod) {
       revert ErrKeyHashChangeCooldownNotEnded();
@@ -398,7 +398,7 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
    * - Sender is governing validator.
    * - Sender's profile is not newly registered.
    */
-  function _requireAuthorized(address cid, uint256 profileRegisteredAt, uint256 currPeriod) internal {
+  function _requireAuthorized(address cid, uint256 profileRegisteredAt, uint256 currPeriod) internal view {
     address trustedOrg = getContract(ContractType.RONIN_TRUSTED_ORGANIZATION);
 
     // only allow to fulfill if the sender is a governing validator
@@ -425,7 +425,7 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
     Beacon storage $beacon,
     uint256 currPeriod,
     bytes32 reqHash
-  ) internal {
+  ) internal view {
     // period should be valid
     if (req.period <= currPeriod) revert ErrInvalidPeriod();
     if (req.period <= _activatedAtPeriod) revert ErrNotActivated(req.period);
@@ -443,7 +443,7 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
    *
    * This duplicates the implementation in {RoninValidatorSet-_computePeriod} to reduce external calls.
    */
-  function _computePeriod(uint256 timestamp) internal view returns (uint256) {
+  function _computePeriod(uint256 timestamp) internal pure returns (uint256) {
     return timestamp / PERIOD_DURATION;
   }
 }
