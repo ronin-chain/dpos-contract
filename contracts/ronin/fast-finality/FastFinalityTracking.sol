@@ -99,32 +99,32 @@ contract FastFinalityTracking is IFastFinalityTracking, Initializable, HasContra
     IStaking staking,
     RoninValidatorSet validator,
     address[] memory voterCids
-  ) private returns (uint256 normalizedSum, uint256 pivot, uint256[] memory normalizedVoterStakes) {
+  ) private returns (uint256 normalizedSum_, uint256 pivot_, uint256[] memory normalizedVoterStakes_) {
     uint256 currentPeriod = validator.currentPeriod();
-    normalizedVoterStakes = new uint256[](voterCids.length);
+    uint256 length = voterCids.length;
+    normalizedVoterStakes_ = new uint256[](length);
     NormalizedData storage $normalizedData = _normalizedData[currentPeriod];
 
     if ($normalizedData.pivot == 0) {
       address[] memory cids = validator.getValidatorCandidateIds();
       uint256[] memory stakeAmounts = staking.getManyStakingTotalsById({ poolIds: cids });
-      (normalizedSum, pivot) =
+      (normalizedSum_, pivot_) =
         LibArray.findNormalizedSumAndPivot({ values: stakeAmounts, divisor: validator.maxValidatorNumber() });
 
-      uint256[] memory normalizedStakeAmounts = LibArray.inplaceClip({ values: stakeAmounts, lower: 0, upper: pivot });
-      uint256 length = normalizedStakeAmounts.length;
+      uint256[] memory normalizedStakeAmounts = LibArray.inplaceClip({ values: stakeAmounts, lower: 0, upper: pivot_ });
       for (uint256 i; i < length; ++i) {
         $normalizedData.normalizedStake[cids[i]] = normalizedStakeAmounts[i];
       }
 
-      $normalizedData.pivot = pivot;
-      $normalizedData.normalizedSum = normalizedSum;
+      $normalizedData.pivot = pivot_;
+      $normalizedData.normalizedSum = normalizedSum_;
     } else {
-      pivot = $normalizedData.pivot;
-      normalizedSum = $normalizedData.normalizedSum;
+      pivot_ = $normalizedData.pivot;
+      normalizedSum_ = $normalizedData.normalizedSum;
     }
 
-    for (uint256 i; i < voterCids.length; ++i) {
-      normalizedVoterStakes[i] = $normalizedData.normalizedStake[voterCids[i]];
+    for (uint256 i; i < length; ++i) {
+      normalizedVoterStakes_[i] = $normalizedData.normalizedStake[voterCids[i]];
     }
   }
 
