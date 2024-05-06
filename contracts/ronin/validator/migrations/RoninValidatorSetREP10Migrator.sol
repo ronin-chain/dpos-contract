@@ -12,21 +12,20 @@ import { ContractType } from "../../../utils/ContractType.sol";
  * @dev A contract that supports migration for RoninValidatorSet to REP-10.
  */
 contract RoninValidatorSetREP10Migrator is ConditionalImplementControl {
+  /// @dev The period when the new implementation was activated.
+  uint256 public immutable ACTIVATED_AT_PERIOD;
+
   /**
    * @dev Modifier that executes the function when conditions are met.
    * If the function is {wrapUpEpoch} from {ICoinbaseExecution},
-   * it checks the current period before and after execution.
-   * If they differ, it triggers the {selfUpgrade} function.
+   * Check if the current period is greater than or equal to {ACTIVATED_AT_PERIOD}.
+   * If true, self call upgrade the contract to the new implementation.
    */
   modifier whenConditionsAreMet() override {
-    if (msg.sig == ICoinbaseExecution.wrapUpEpoch.selector) {
-      uint256 currentPeriod = _getCurrentPeriod();
-      _;
-      if (currentPeriod != _getCurrentPeriod()) {
-        this.selfUpgrade();
-      }
-    } else {
-      _;
+    _;
+
+    if (msg.sig == ICoinbaseExecution.wrapUpEpoch.selector && _getCurrentPeriod() >= ACTIVATED_AT_PERIOD) {
+      this.selfUpgrade();
     }
   }
 
@@ -35,16 +34,20 @@ contract RoninValidatorSetREP10Migrator is ConditionalImplementControl {
    * @param proxyStorage The address of the proxy storage contract.
    * @param prevImpl The address of the current contract implementation.
    * @param newImpl The address of the new contract implementation.
+   * @param activatedAtPeriod The period when the new implementation was activated.
    */
   constructor(
     address proxyStorage,
     address prevImpl,
-    address newImpl
-  ) ConditionalImplementControl(proxyStorage, prevImpl, newImpl) { }
+    address newImpl,
+    uint256 activatedAtPeriod
+  ) ConditionalImplementControl(proxyStorage, prevImpl, newImpl) {
+    ACTIVATED_AT_PERIOD = activatedAtPeriod;
+  }
 
   /**
    * @dev Initializes the contract with @openzepppelin-v0.5.2-Initializable.
-   * @notice This function is called while deploying middle layer migrator and {_initialized} slot is customized.
+   * This function is called while deploying middle layer migrator and {_initialized} slot is customized.
    * @param randomBeacon The address of the RandomBeacon contract.
    */
   function initialize(address randomBeacon) external initializer {
@@ -71,6 +74,9 @@ contract RoninValidatorSetREP10Migrator is ConditionalImplementControl {
     return ITimingInfo(address(this)).currentPeriod();
   }
 
+  /**
+   * @dev See {ConditionalImplementControl-_requireSelfCall}.
+   */
   function _requireSelfCall() internal view override {
     ConditionalImplementControl._requireSelfCall();
   }
