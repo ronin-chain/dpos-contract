@@ -97,6 +97,9 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
     bytes32 keyHash = proof.pk.calcKeyHash();
 
     IProfile profile = IProfile(getContract(ContractType.PROFILE));
+    // Already checked in Profile:
+    // 1. If `cid` not exit, revert the whole tx,
+    // 2. Allow both GV and SV to submit the seed.
     (address cid, uint256 keyLastChange, uint256 profileRegisteredAt) =
       profile.getVRFKeyHash2BeaconInfo({ vrfKeyHash: keyHash });
     uint256 currPeriod = ITimingInfo(getContract(ContractType.VALIDATOR)).currentPeriod();
