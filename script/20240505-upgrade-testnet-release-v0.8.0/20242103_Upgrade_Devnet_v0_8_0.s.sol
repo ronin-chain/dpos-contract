@@ -45,7 +45,7 @@ contract Migration__20250505_Upgrade_Devnet_Release_V0_8_0 is RoninMigration {
     RoninTrustedOrganization trustedOrg =
       RoninTrustedOrganization(loadContract(Contract.RoninTrustedOrganization.key()));
 
-    ISharedArgument.SharedParameter param = config.sharedArguments();
+    ISharedArgument.SharedParameter memory param = config.sharedArguments();
 
     address payable[] memory allContracts = config.getAllAddresses(network());
 
@@ -79,7 +79,7 @@ contract Migration__20250505_Upgrade_Devnet_Release_V0_8_0 is RoninMigration {
     LibProposal.executeProposal(governanceAdmin, trustedOrg, proposal);
   }
 
-  function _buildProposalData(ISharedArgument.SharedParameter param)
+  function _buildProposalData(ISharedArgument.SharedParameter memory param)
     internal
     returns (address[] memory targets, uint256[] memory values, bytes[] memory callDatas)
   {
