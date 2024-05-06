@@ -30,14 +30,12 @@ import {
   RoninValidatorSetREP10MigratorLogicDeploy
 } from "script/contracts/RoninValidatorSetREP10MigratorLogicDeploy.s.sol";
 
-contract Migration__20250505_Upgrade_Devnet_Release_V0_7_8 is RoninMigration {
+contract Migration__20250505_Upgrade_Devnet_Release_V0_8_0 is RoninMigration {
   using LibProxy for *;
   using StdStyle for *;
 
   address[] private contractsToUpgrade;
   TContract[] private contractTypesToUpgrade;
-
-  ISharedArgument.SharedParameter private param;
 
   RoninRandomBeacon private randomBeacon;
   address private roninValidatorSetREP10LogicMigrator;
@@ -47,7 +45,7 @@ contract Migration__20250505_Upgrade_Devnet_Release_V0_7_8 is RoninMigration {
     RoninTrustedOrganization trustedOrg =
       RoninTrustedOrganization(loadContract(Contract.RoninTrustedOrganization.key()));
 
-    param = config.sharedArguments();
+    ISharedArgument.SharedParameter param = config.sharedArguments();
 
     address payable[] memory allContracts = config.getAllAddresses(network());
 
@@ -74,14 +72,14 @@ contract Migration__20250505_Upgrade_Devnet_Release_V0_7_8 is RoninMigration {
 
     _recordContractToUpgrade(address(governanceAdmin), allContracts); // Record contracts to upgrade
 
-    (address[] memory targets, uint256[] memory values, bytes[] memory callDatas) = _buildProposalData();
+    (address[] memory targets, uint256[] memory values, bytes[] memory callDatas) = _buildProposalData(param);
 
     Proposal.ProposalDetail memory proposal =
       LibProposal.buildProposal(governanceAdmin, block.timestamp + 14 days, targets, values, callDatas);
     LibProposal.executeProposal(governanceAdmin, trustedOrg, proposal);
   }
 
-  function _buildProposalData()
+  function _buildProposalData(ISharedArgument.SharedParameter param)
     internal
     returns (address[] memory targets, uint256[] memory values, bytes[] memory callDatas)
   {
