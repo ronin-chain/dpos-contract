@@ -4,6 +4,7 @@ pragma solidity ^0.8.9;
 
 import { HasContracts } from "../../extensions/collections/HasContracts.sol";
 import { IRoninValidatorSet } from "../../interfaces/validator/IRoninValidatorSet.sol";
+import { ITimingInfo } from "../../interfaces/validator/info-fragments/ITimingInfo.sol";
 import { ISlashRandomBeacon } from "../../interfaces/slash-indicator/ISlashRandomBeacon.sol";
 import { ContractType } from "../../utils/ContractType.sol";
 
@@ -18,6 +19,12 @@ abstract contract SlashRandomBeacon is ISlashRandomBeacon, HasContracts {
   function slashRandomBeacon(address validatorId, uint256 period) external onlyContract(ContractType.RANDOM_BEACON) {
     IRoninValidatorSet validatorContract = IRoninValidatorSet(getContract(ContractType.VALIDATOR));
     SlashRandomBeaconConfig memory config = _getSlashRandomBeaconConfig();
+    uint256 currPeriod = ITimingInfo(address(validatorContract)).currentPeriod();
+
+    if (currPeriod < config._activatedAtPeriod) {
+      emit SlashingBeaconSkipped(period, validatorId);
+      return;
+    }
 
     emit Slashed(validatorId, SlashType.RANDOM_BEACON, period);
 
@@ -39,16 +46,19 @@ abstract contract SlashRandomBeacon is ISlashRandomBeacon, HasContracts {
   /**
    * @inheritdoc ISlashRandomBeacon
    */
-  function setRandomBeaconSlashingConfigs(uint256 slashAmount) external onlyAdmin {
-    _setRandomBeaconSlashingConfigs(slashAmount);
+  function setRandomBeaconSlashingConfigs(uint256 slashAmount, uint256 activatedAtPeriod) external onlyAdmin {
+    _setRandomBeaconSlashingConfigs(slashAmount, activatedAtPeriod);
   }
 
   /**
    * @dev See `ISlashRandomBeacon-setRandomBeaconSlashingConfigs`.
    */
-  function _setRandomBeaconSlashingConfigs(uint256 slashAmount) internal {
+  function _setRandomBeaconSlashingConfigs(uint256 slashAmount, uint256 activatedAtPeriod) internal {
     SlashRandomBeaconConfig storage $ = _getSlashRandomBeaconConfig();
+
     $._slashAmount = slashAmount;
+    $._activatedAtPeriod = activatedAtPeriod;
+
     emit RandomBeaconSlashingConfigsUpdated(slashAmount);
   }
 
