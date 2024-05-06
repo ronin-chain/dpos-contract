@@ -125,7 +125,7 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
   ) external onlyContract(ContractType.VALIDATOR) onlyActivated(lastUpdatedPeriod) {
     bool isPeriodEnding = lastUpdatedPeriod < newPeriod;
     if (isPeriodEnding) return;
-  
+
     // Request the next random seed if it has not been requested at the start epoch of the period
     uint256 nextPeriod = lastUpdatedPeriod + 1;
     if (_beaconPerPeriod[nextPeriod].reqHash == 0) {
@@ -142,7 +142,8 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
   ) external onlyContract(ContractType.VALIDATOR) onlyActivated(lastUpdatedPeriod) {
     Beacon storage $beacon = _beaconPerPeriod[newPeriod];
 
-    address[] memory cids = _filterOutNewlyJoinedValidators({ validatorContract: msg.sender, currPeriod: lastUpdatedPeriod });
+    address[] memory cids =
+      _filterOutNewlyJoinedValidators({ validatorContract: msg.sender, currPeriod: lastUpdatedPeriod });
     uint256[] memory trustedWeights =
       IRoninTrustedOrganization(getContract(ContractType.RONIN_TRUSTED_ORGANIZATION)).getConsensusWeightsById(cids);
 
@@ -391,7 +392,7 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
     }
 
     // proof should be valid
-    if (req.calcProofSeed(keyHash, msg.sender) != proof.seed) revert ErrInvalidProof();
+    if (req.calcProofSeed(keyHash) != proof.seed) revert ErrInvalidProof();
   }
 
   /**

@@ -26,8 +26,8 @@ library LibSLA {
   /**
    * @dev Calculates the proof seed
    */
-  function calcProofSeed(RandomRequest memory req, bytes32 keyHash, address oracle) internal pure returns (uint256) {
-    return uint256(keccak256(abi.encode(req.period, req.prevBeacon, keyHash, oracle)));
+  function calcProofSeed(RandomRequest memory req, bytes32 keyHash) internal pure returns (uint256) {
+    return uint256(keccak256(abi.encode(req.period, req.prevBeacon, keyHash)));
   }
 
   /**
