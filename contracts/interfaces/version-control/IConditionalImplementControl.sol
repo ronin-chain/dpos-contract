@@ -8,7 +8,7 @@ interface IConditionalImplementControl {
   /**
    * @dev Emitted when migrator logic is deployed.
    */
-  event SetUp(address indexed proxy, address indexed prevImpl, address indexed newImpl);
+  event Constructed(address indexed proxy, address indexed prevImpl, address indexed newImpl);
 
   /**
    * @dev Emitted when the implementation is upgraded.
