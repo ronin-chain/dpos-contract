@@ -177,23 +177,17 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
     uint256 currPeriod = ITimingInfo(validator).currentPeriod();
 
     uint256 period;
-    uint256 epochIndex;
 
+    // use beacon value of the next period if the current period is ending
     if (ITimingInfo(validator).isPeriodEnding()) {
-      epochIndex = 0;
       period = currPeriod + 1;
-    } else {
-      period = currPeriod;
-      uint256 startBlock = ITimingInfo(validator).currentPeriodStartAtBlock();
-      uint256 startEpoch = ITimingInfo(validator).epochOf(startBlock);
-      epochIndex = epoch - startEpoch - 1;
     }
 
     Beacon storage $beacon = _beaconPerPeriod[period];
 
     if (!$beacon.finalized) revert ErrBeaconNotFinalized(period);
 
-    pickedCids = LibSortValidatorsByBeacon.pickValidatorSet(epochIndex, $beacon.value);
+    pickedCids = LibSortValidatorsByBeacon.pickValidatorSet(epoch, $beacon.value);
   }
 
   /**
