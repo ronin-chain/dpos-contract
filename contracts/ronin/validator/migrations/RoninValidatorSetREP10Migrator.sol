@@ -18,18 +18,14 @@ contract RoninValidatorSetREP10Migrator is ConditionalImplementControl {
   /**
    * @dev Modifier that executes the function when conditions are met.
    * If the function is {wrapUpEpoch} from {ICoinbaseExecution},
-   * it checks the current period before and after execution.
-   * If they differ, it triggers the {selfUpgrade} function.
+   * Check if the current period is greater than or equal to {ACTIVATED_AT_PERIOD}.
+   * If true, self call upgrade the contract to the new implementation.
    */
   modifier whenConditionsAreMet() override {
-    if (msg.sig == ICoinbaseExecution.wrapUpEpoch.selector) {
-      _;
+    _;
 
-      if (_getCurrentPeriod() >= ACTIVATED_AT_PERIOD) {
-        this.selfUpgrade();
-      }
-    } else {
-      _;
+    if (msg.sig == ICoinbaseExecution.wrapUpEpoch.selector && _getCurrentPeriod() >= ACTIVATED_AT_PERIOD) {
+      this.selfUpgrade();
     }
   }
 
