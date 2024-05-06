@@ -73,7 +73,7 @@ contract FastFinalityTracking is IFastFinalityTracking, Initializable, HasContra
         IStaking staking = IStaking(getContract(ContractType.STAKING));
         RoninValidatorSet validator = RoninValidatorSet(getContract(ContractType.VALIDATOR));
 
-        (uint256 h, uint256 pivot, uint256[] memory normalizedVoterStakeAmounts) =
+        (uint256 h, uint256[] memory normalizedVoterStakeAmounts) =
           _loadOrRecordNormalizedSumAndPivot(staking, validator, votedCids);
 
         uint256 g = normalizedVoterStakeAmounts.sum();
@@ -99,27 +99,27 @@ contract FastFinalityTracking is IFastFinalityTracking, Initializable, HasContra
     IStaking staking,
     RoninValidatorSet validator,
     address[] memory voterCids
-  ) private returns (uint256 normalizedSum_, uint256 pivot_, uint256[] memory normalizedVoterStakes_) {
+  ) private returns (uint256 normalizedSum_, uint256[] memory normalizedVoterStakes_) {
     uint256 currentPeriod = validator.currentPeriod();
     uint256 length = voterCids.length;
     normalizedVoterStakes_ = new uint256[](length);
     NormalizedData storage $normalizedData = _normalizedData[currentPeriod];
 
-    if ($normalizedData.pivot == 0) {
+    if ($normalizedData.normalizedSum == 0) {
       address[] memory cids = validator.getValidatorCandidateIds();
       uint256[] memory stakeAmounts = staking.getManyStakingTotalsById({ poolIds: cids });
-      (normalizedSum_, pivot_) =
+      uint256 pivot;
+      
+      (normalizedSum_, pivot) =
         LibArray.findNormalizedSumAndPivot({ values: stakeAmounts, divisor: validator.maxValidatorNumber() });
 
-      uint256[] memory normalizedStakeAmounts = LibArray.inplaceClip({ values: stakeAmounts, lower: 0, upper: pivot_ });
+      uint256[] memory normalizedStakeAmounts = LibArray.inplaceClip({ values: stakeAmounts, lower: 0, upper: pivot });
       for (uint256 i; i < length; ++i) {
         $normalizedData.normalizedStake[cids[i]] = normalizedStakeAmounts[i];
       }
 
-      $normalizedData.pivot = pivot_;
       $normalizedData.normalizedSum = normalizedSum_;
     } else {
-      pivot_ = $normalizedData.pivot;
       normalizedSum_ = $normalizedData.normalizedSum;
     }
 
