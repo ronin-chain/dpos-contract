@@ -94,17 +94,21 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
    */
   function fulfillRandomSeed(RandomRequest calldata req, Proof calldata proof) external {
     bytes32 reqHash = req.hash();
+    bytes32 keyHash = proof.pk.calcKeyHash();
 
     IProfile profile = IProfile(getContract(ContractType.PROFILE));
-    address cid = profile.getConsensus2Id({ consensus: TConsensus.wrap(msg.sender) });
+    // Already checked in Profile:
+    // 1. If `cid` not exit, revert the whole tx,
+    // 2. Allow both GV and SV to submit the seed.
+    (address cid, uint256 keyLastChange, uint256 profileRegisteredAt) =
+      profile.getVRFKeyHash2BeaconInfo({ vrfKeyHash: keyHash });
     uint256 currPeriod = ITimingInfo(getContract(ContractType.VALIDATOR)).currentPeriod();
-    (bytes32 currKeyHash, uint256 keyLastChange, uint256 profileRegisteredAt) = profile.getId2BeaconInfo(cid);
 
     Beacon storage $beacon = _beaconPerPeriod[req.period];
 
     _requireValidRequest(req, $beacon, currPeriod, reqHash);
     _requireAuthorized(cid, profileRegisteredAt, currPeriod);
-    _requireValidProof(req, proof, currPeriod, currKeyHash, keyLastChange);
+    _requireValidProof(req, proof, currPeriod, keyHash, keyLastChange);
 
     // randomness should not be re-submitted
     if ($beacon.submitted[cid]) revert ErrAlreadySubmitted();
@@ -119,8 +123,12 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
    * @inheritdoc IRandomBeacon
    */
   function execRequestRandomSeedForNextPeriod(
-    uint256 lastUpdatedPeriod
+    uint256 lastUpdatedPeriod,
+    uint256 newPeriod
   ) external onlyContract(ContractType.VALIDATOR) onlyActivated(lastUpdatedPeriod) {
+    bool isPeriodEnding = lastUpdatedPeriod < newPeriod;
+    if (isPeriodEnding) return;
+
     // Request the next random seed if it has not been requested at the start epoch of the period
     uint256 nextPeriod = lastUpdatedPeriod + 1;
     if (_beaconPerPeriod[nextPeriod].reqHash == 0) {
@@ -137,7 +145,8 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
   ) external onlyContract(ContractType.VALIDATOR) onlyActivated(lastUpdatedPeriod) {
     Beacon storage $beacon = _beaconPerPeriod[newPeriod];
 
-    address[] memory cids = _filterOutNewlyJoinedValidators({ validatorContract: msg.sender, currPeriod: lastUpdatedPeriod });
+    address[] memory cids =
+      _filterOutNewlyJoinedValidators({ validatorContract: msg.sender, currPeriod: lastUpdatedPeriod });
     uint256[] memory trustedWeights =
       IRoninTrustedOrganization(getContract(ContractType.RONIN_TRUSTED_ORGANIZATION)).getConsensusWeightsById(cids);
 
@@ -168,23 +177,17 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
     uint256 currPeriod = ITimingInfo(validator).currentPeriod();
 
     uint256 period;
-    uint256 epochIndex;
 
+    // use beacon value of the next period if the current period is ending
     if (ITimingInfo(validator).isPeriodEnding()) {
-      epochIndex = 1;
       period = currPeriod + 1;
-    } else {
-      period = currPeriod;
-      uint256 startBlock = ITimingInfo(validator).currentPeriodStartAtBlock();
-      uint256 startEpoch = ITimingInfo(validator).epochOf(startBlock);
-      epochIndex = epoch - startEpoch;
     }
 
     Beacon storage $beacon = _beaconPerPeriod[period];
 
     if (!$beacon.finalized) revert ErrBeaconNotFinalized(period);
 
-    pickedCids = LibSortValidatorsByBeacon.pickValidatorSet(epochIndex, $beacon.value);
+    pickedCids = LibSortValidatorsByBeacon.pickValidatorSet(epoch, $beacon.value);
   }
 
   /**
@@ -371,28 +374,22 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
    * @dev Requirements for valid proof:
    *
    * - Key hash should not be changed within the cooldown period.
-   * - Key hash should be the same as the one in the profile.
    * - Proof should be valid.
    */
   function _requireValidProof(
     RandomRequest calldata req,
     Proof calldata proof,
     uint256 currPeriod,
-    bytes32 currKeyHash,
+    bytes32 keyHash,
     uint256 keyLastChange
   ) internal {
-    bytes32 calculatedKeyHash = proof.pk.calcKeyHash();
-
     // key hash should not be changed within the cooldown period
     if (_computePeriod(keyLastChange) + COOLDOWN_PERIOD_THRESHOLD > currPeriod) {
       revert ErrKeyHashChangeCooldownNotEnded();
     }
 
-    // key hash should be the same as the one in the profile
-    if (currKeyHash != calculatedKeyHash) revert ErrInvalidKeyHash(currKeyHash, calculatedKeyHash);
-
     // proof should be valid
-    if (req.calcProofSeed(currKeyHash, msg.sender) != proof.seed) revert ErrInvalidProof();
+    if (req.calcProofSeed(keyHash) != proof.seed) revert ErrInvalidProof();
   }
 
   /**
@@ -422,7 +419,6 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
    * - Period in Request must be greater than current period.
    * - Period in Request must be greater than the `_activatedAtPeriod`.
    * - Submitted Request hash must match the hash in storage.
-   *
    */
   function _requireValidRequest(
     RandomRequest calldata req,

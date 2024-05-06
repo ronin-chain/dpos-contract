@@ -121,7 +121,7 @@ abstract contract CoinbaseExecution is
 
     IRandomBeacon randomBeacon = IRandomBeacon(getContract(ContractType.RANDOM_BEACON));
     // This request is actually only invoked at the first epoch of the period.
-    randomBeacon.execRequestRandomSeedForNextPeriod(lastPeriod);
+    randomBeacon.execRequestRandomSeedForNextPeriod(lastPeriod, newPeriod);
 
     _syncFastFinalityReward(epoch, currValidatorIds);
 
