@@ -180,13 +180,13 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
     uint256 epochIndex;
 
     if (ITimingInfo(validator).isPeriodEnding()) {
-      epochIndex = 1;
+      epochIndex = 0;
       period = currPeriod + 1;
     } else {
       period = currPeriod;
       uint256 startBlock = ITimingInfo(validator).currentPeriodStartAtBlock();
       uint256 startEpoch = ITimingInfo(validator).epochOf(startBlock);
-      epochIndex = epoch - startEpoch;
+      epochIndex = epoch - startEpoch - 1;
     }
 
     Beacon storage $beacon = _beaconPerPeriod[period];
