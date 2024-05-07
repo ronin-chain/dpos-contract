@@ -39,8 +39,8 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
   /// @dev The maximum pick threshold for validator type.
   mapping(ValidatorType validatorType => uint256 threshold) internal _validatorThreshold;
 
-  modifier onlyActivated(uint256 lastUpdatedPeriod) {
-    if (lastUpdatedPeriod < _activatedAtPeriod) return;
+  modifier onlyActivated(uint256 period) {
+    if (period < _activatedAtPeriod) return;
     _;
   }
 
