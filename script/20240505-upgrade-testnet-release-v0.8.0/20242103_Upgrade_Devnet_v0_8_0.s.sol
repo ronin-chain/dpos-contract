@@ -40,7 +40,7 @@ contract Migration__20250505_Upgrade_Devnet_Release_V0_8_0 is RoninMigration {
   RoninRandomBeacon private randomBeacon;
   address private roninValidatorSetREP10LogicMigrator;
 
-  function run() public onlyOn(Network.RoninDevnet.key()) {
+  function run() public {
     RoninGovernanceAdmin governanceAdmin = RoninGovernanceAdmin(loadContract(Contract.RoninGovernanceAdmin.key()));
     RoninTrustedOrganization trustedOrg =
       RoninTrustedOrganization(loadContract(Contract.RoninTrustedOrganization.key()));
