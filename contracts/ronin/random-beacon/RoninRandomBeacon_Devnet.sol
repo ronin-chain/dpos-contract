@@ -12,4 +12,8 @@ contract RoninRandomBeacon_Devnet is RoninRandomBeacon {
   function manualRequestRandomSeed(uint256 period) external {
     _requestRandomSeed(period, _beaconPerPeriod[period - 1].value);
   }
+
+  function _cooldownPeriodThreshold() internal pure override returns (uint256) {
+    return 0;
+  }
 }
