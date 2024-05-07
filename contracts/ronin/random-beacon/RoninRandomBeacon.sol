@@ -352,7 +352,7 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
   ) internal view returns (address[] memory validCids) {
     unchecked {
       uint256 count;
-      uint256 threshold = COOLDOWN_PERIOD_THRESHOLD;
+      uint256 threshold = _cooldownPeriodThreshold();
       address[] memory allCids = ICandidateManager(validatorContract).getValidatorCandidateIds();
       uint256[] memory registeredAts = IProfile(getContract(ContractType.PROFILE)).getManyId2RegisteredAt(allCids);
       uint256 length = allCids.length;
@@ -384,7 +384,7 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
     uint256 keyLastChange
   ) internal pure {
     // key hash should not be changed within the cooldown period
-    if (_computePeriod(keyLastChange) + COOLDOWN_PERIOD_THRESHOLD > currPeriod) {
+    if (_computePeriod(keyLastChange) + _cooldownPeriodThreshold() > currPeriod) {
       revert ErrKeyHashChangeCooldownNotEnded();
     }
 
@@ -407,7 +407,7 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
     }
 
     // only allow to fulfill if the candidate is not newly registered
-    if (_computePeriod(profileRegisteredAt) + COOLDOWN_PERIOD_THRESHOLD > currPeriod) {
+    if (_computePeriod(profileRegisteredAt) + _cooldownPeriodThreshold() > currPeriod) {
       revert ErrRegisterCoolDownNotEnded();
     }
   }
@@ -436,6 +436,13 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
     bytes32 expectedReqHash = $beacon.reqHash;
     // request hash should be valid
     if (expectedReqHash != reqHash) revert ErrInvalidRandomRequest(expectedReqHash, reqHash);
+  }
+
+  /**
+   * @dev Returns the cooldown period threshold.
+   */
+  function _cooldownPeriodThreshold() internal pure virtual returns (uint256) {
+    return COOLDOWN_PERIOD_THRESHOLD;
   }
 
   /**
