@@ -4,7 +4,7 @@ pragma solidity ^0.8.9;
 
 import "../../extensions/consumers/GlobalConfigConsumer.sol";
 import "../../extensions/consumers/PercentageConsumer.sol";
-import "../../libraries/LibArray.sol";
+import { LibArray } from "../../libraries/LibArray.sol";
 import "../../interfaces/staking/ICandidateStaking.sol";
 import "../../interfaces/IProfile.sol";
 import "./BaseStaking.sol";
