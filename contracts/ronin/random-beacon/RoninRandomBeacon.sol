@@ -26,18 +26,18 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
   uint256[50] private __gap;
 
   /// @dev The threshold of cooldown period for key hash change and newly register candidates.
-  uint256 private constant COOLDOWN_PERIOD_THRESHOLD = 1;
+  uint256 internal constant COOLDOWN_PERIOD_THRESHOLD = 1;
 
   /// @dev Period of the beacon validator selection is activated.
-  uint256 private _activatedAtPeriod;
+  uint256 internal _activatedAtPeriod;
   /// @dev The threshold of unavailability to slash.
-  uint256 private _unavailabilitySlashThreshold;
+  uint256 internal _unavailabilitySlashThreshold;
   /// @dev Mapping of consecutive unavailable count per validator.
-  mapping(address gvId => uint256 count) private _unavailableCount;
+  mapping(address gvId => uint256 count) internal _unavailableCount;
   /// @dev Mapping of beacon per period.
-  mapping(uint256 period => Beacon beacon) private _beaconPerPeriod;
+  mapping(uint256 period => Beacon beacon) internal _beaconPerPeriod;
   /// @dev The maximum pick threshold for validator type.
-  mapping(ValidatorType validatorType => uint256 threshold) private _validatorThreshold;
+  mapping(ValidatorType validatorType => uint256 threshold) internal _validatorThreshold;
 
   modifier onlyActivated(uint256 lastUpdatedPeriod) {
     if (lastUpdatedPeriod < _activatedAtPeriod) return;
