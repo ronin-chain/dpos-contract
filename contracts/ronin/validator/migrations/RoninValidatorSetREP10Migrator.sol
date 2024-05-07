@@ -17,16 +17,12 @@ contract RoninValidatorSetREP10Migrator is ConditionalImplementControl {
 
   /**
    * @dev Modifier that executes the function when conditions are met.
-   * If the function is {wrapUpEpoch} from {ICoinbaseExecution},
-   * Check if the current period is greater than or equal to {ACTIVATED_AT_PERIOD}.
+   * Peak to see if current period will changed and msg.sig is {ICoinbaseExecution.wrapUpEpoch} and next period is greater than or equal to {ACTIVATED_AT_PERIOD}.
    * If true, self call upgrade the contract to the new implementation.
    */
   modifier whenConditionsAreMet() override {
+    if (_isConditionMet()) this.selfUpgrade();
     _;
-
-    if (msg.sig == ICoinbaseExecution.wrapUpEpoch.selector && _getCurrentPeriod() >= ACTIVATED_AT_PERIOD) {
-      this.selfUpgrade();
-    }
   }
 
   /**
@@ -59,11 +55,14 @@ contract RoninValidatorSetREP10Migrator is ConditionalImplementControl {
   }
 
   /**
-   * @dev Internal function to choose the current version of the contract implementation.
-   * @return The address of the current version implementation.
+   * @dev see {ConditionalImplementControl-_isConditionMet}.
+   * Peak to see if current period will changed and next period is greater than or equal to {ACTIVATED_AT_PERIOD}, return true.
+   * {_getConditionedImplementation} will return {NEW_IMPL}.
+   * Call will be forwarded to {NEW_IMPL}.
    */
-  function _getConditionedImplementation() internal view override returns (address) {
-    return PREV_IMPL;
+  function _isConditionMet() internal view virtual override returns (bool) {
+    if (msg.sig != ICoinbaseExecution.wrapUpEpoch.selector) return false;
+    return _isPeriodEnding() && _getCurrentPeriod() + 1 >= ACTIVATED_AT_PERIOD;
   }
 
   /**
@@ -72,6 +71,14 @@ contract RoninValidatorSetREP10Migrator is ConditionalImplementControl {
    */
   function _getCurrentPeriod() private view returns (uint256) {
     return ITimingInfo(address(this)).currentPeriod();
+  }
+
+  /**
+   * @dev Internal function to check if the period is ending.
+   * @return True if the period is ending.
+   */
+  function _isPeriodEnding() private view returns (bool) {
+    return ITimingInfo(address(this)).isPeriodEnding();
   }
 
   /**
