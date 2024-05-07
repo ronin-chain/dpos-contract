@@ -173,7 +173,6 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
     onlyContract(ContractType.VALIDATOR)
     returns (address[] memory pickedCids)
   {
-    address validator = getContract(ContractType.VALIDATOR);
     uint256 period = _computePeriod(block.timestamp);
 
     Beacon storage $beacon = _beaconPerPeriod[period];
