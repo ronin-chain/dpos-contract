@@ -10,6 +10,18 @@ import { ContractType } from "../../../utils/ContractType.sol";
 /**
  * @title RoninValidatorSetREP10Migrator
  * @dev A contract that supports migration for RoninValidatorSet to REP-10.
+ *
+ * Period:
+ *                     |              proposal executed                                          ACTIVATED_AT_PERIOD
+ *                     |                                                           end of period
+ *                     |                                  v                                    v v
+ *                     |----------------------------------*-----------------------------------------------------*-*-------------------------|
+ * Proxy:
+ * └─ → delegatecall
+ * Logic:         └─ → | Prev Implementation              | REP-10 Migrator                                     | New Implementation
+ *                     |----------------------------------|-----------------------------------------------------|---------------------------|
+ *                                                        └─→ delegatecall
+ *                                                         └─→ |               Prev Implementation              | New Implementation        |
  */
 contract RoninValidatorSetREP10Migrator is ConditionalImplementControl {
   /// @dev The period when the new implementation was activated.
