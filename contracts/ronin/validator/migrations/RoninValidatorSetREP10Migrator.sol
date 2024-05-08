@@ -17,7 +17,7 @@ contract RoninValidatorSetREP10Migrator is ConditionalImplementControl {
 
   /**
    * @dev Modifier that executes the function when conditions are met.
-   * Peak to see if current period will changed and msg.sig is {ICoinbaseExecution.wrapUpEpoch} and next period is greater than or equal to {ACTIVATED_AT_PERIOD}.
+   * Peek to see if current period will changed and msg.sig is {ICoinbaseExecution.wrapUpEpoch} and next period is greater than or equal to {ACTIVATED_AT_PERIOD}.
    * If true, self call upgrade the contract to the new implementation.
    */
   modifier whenConditionsAreMet() override {
@@ -56,7 +56,7 @@ contract RoninValidatorSetREP10Migrator is ConditionalImplementControl {
 
   /**
    * @dev see {ConditionalImplementControl-_isConditionMet}.
-   * Peak to see if current period will changed and next period is greater than or equal to {ACTIVATED_AT_PERIOD}, return true.
+   * Peek to see if current period will changed and next period is greater than or equal to {ACTIVATED_AT_PERIOD}, return true.
    * {_getConditionedImplementation} will return {NEW_IMPL}.
    * Call will be forwarded to {NEW_IMPL}.
    */
