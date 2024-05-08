@@ -55,8 +55,8 @@ contract RoninValidatorSetREP10Migrator is ConditionalImplementControl {
   }
 
   /**
-   * @dev see {ConditionalImplementControl-_isConditionMet}.
-   * Peek to see if current period will changed and next period is greater than or equal to {ACTIVATED_AT_PERIOD}, return true.
+   * @dev See {ConditionalImplementControl-_isConditionMet}.
+   * Peak to see if the current period will be changed and the next period is ≥ {ACTIVATED_AT_PERIOD}, return true.
    * {_getConditionedImplementation} will return {NEW_IMPL}.
    * Call will be forwarded to {NEW_IMPL}.
    */
