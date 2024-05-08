@@ -16,7 +16,7 @@ import { ContractType } from "../../../utils/ContractType.sol";
  *                     |----------------------------------*------------------------------*-----------------------*--*------------------------|
  *                     |                                  |                              |                       ^                           |
  *                     |                                  |                              |           end of period  ^                        |   
- *                     |                                  |                              |                       | first epoch of             |
+ *                     |                                  |                              |                       | first epoch of            |
  *                     |                                  |                              |                       | ACTIVATED_AT_PERIOD       |
  * Proxy:              |                                  |                              |                       |                           |
  * └─→ delegatecall    |                                  |                              |                       |                           |
