@@ -13,9 +13,11 @@ import { ContractType } from "../../../utils/ContractType.sol";
  *
  * Action:             |                            proposal executed              wrap up period       wrap up activated period             |
  *                     |                                  v                              v                       v                           |
- *                     |----------------------------------*------------------------------*-----------------------*-*-------------------------|
- *                     |                                  |                              |                       ^ ^                         |
- *                     |                                  |                              |           end of period ACTIVATED_AT_PERIOD       |
+ *                     |----------------------------------*------------------------------*-----------------------*--*------------------------|
+ *                     |                                  |                              |                       ^                           |
+ *                     |                                  |                              |           end of period  ^                        |   
+ *                     |                                  |                              |                       | first epoch of             |
+ *                     |                                  |                              |                       | ACTIVATED_AT_PERIOD       |
  * Proxy:              |                                  |                              |                       |                           |
  * └─→ delegatecall    |                                  |                              |                       |                           |
  * Logic:          └─→ |       Prev Implementation        |                              |                       |                           |
