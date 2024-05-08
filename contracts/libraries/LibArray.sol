@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 import { IndexMap } from "./LibIndexMap.sol";
+import { Math } from "@openzeppelin/contracts/utils/math/Math.sol";
 
 /**
  * @title LibArray
@@ -121,6 +122,7 @@ library LibArray {
     uint256[] memory values,
     uint256 divisor
   ) internal pure returns (uint256 normSum, uint256 pivot) {
+    divisor = Math.min(values.length, divisor);
     values = inplaceDescSort(values);
 
     uint256 sLeft;
