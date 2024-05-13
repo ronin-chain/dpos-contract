@@ -39,8 +39,8 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
   /// @dev The maximum pick threshold for validator type.
   mapping(ValidatorType validatorType => uint256 threshold) internal _validatorThreshold;
 
-  modifier onlyActivated(uint256 lastUpdatedPeriod) {
-    if (lastUpdatedPeriod < _activatedAtPeriod) return;
+  modifier onlyActivated(uint256 period) {
+    if (period < _activatedAtPeriod) return;
     _;
   }
 
@@ -125,7 +125,7 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
   function execRequestRandomSeedForNextPeriod(
     uint256 lastUpdatedPeriod,
     uint256 newPeriod
-  ) external onlyContract(ContractType.VALIDATOR) onlyActivated(lastUpdatedPeriod) {
+  ) external onlyContract(ContractType.VALIDATOR) onlyActivated(newPeriod) {
     bool isPeriodEnding = lastUpdatedPeriod < newPeriod;
     if (isPeriodEnding) return;
 
@@ -142,7 +142,7 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
   function execWrapUpBeaconPeriod(
     uint256 lastUpdatedPeriod,
     uint256 newPeriod
-  ) external onlyContract(ContractType.VALIDATOR) onlyActivated(lastUpdatedPeriod) {
+  ) external onlyContract(ContractType.VALIDATOR) onlyActivated(newPeriod) {
     Beacon storage $beacon = _beaconPerPeriod[newPeriod];
 
     address[] memory cids =
@@ -173,18 +173,9 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
     onlyContract(ContractType.VALIDATOR)
     returns (address[] memory pickedCids)
   {
-    address validator = getContract(ContractType.VALIDATOR);
-    uint256 currPeriod = ITimingInfo(validator).currentPeriod();
-
-    uint256 period;
-
-    // use beacon value of the next period if the current period is ending
-    if (ITimingInfo(validator).isPeriodEnding()) {
-      period = currPeriod + 1;
-    }
+    uint256 period = _computePeriod(block.timestamp);
 
     Beacon storage $beacon = _beaconPerPeriod[period];
-
     if (!$beacon.finalized) revert ErrBeaconNotFinalized(period);
 
     pickedCids = LibSortValidatorsByBeacon.pickValidatorSet(epoch, $beacon.value);
@@ -280,7 +271,7 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
     uint256 lastUpdatedPeriod,
     address[] memory cids,
     uint256[] memory trustedWeights
-  ) internal {
+  ) internal onlyActivated(lastUpdatedPeriod) {
     unchecked {
       ISlashRandomBeacon slashIndicator = ISlashRandomBeacon(getContract(ContractType.SLASH_INDICATOR));
 
