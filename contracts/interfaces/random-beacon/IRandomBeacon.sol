@@ -164,7 +164,7 @@ interface IRandomBeacon {
   function isSubmittedAt(uint256 period, address oracle) external view returns (bool);
 
   /**
-   * @dev Get last finalized period.
+   * @dev Get lastest finalized period.
    */
   function getLastFinalizedPeriod() external view returns (uint256);
 
