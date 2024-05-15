@@ -23,6 +23,7 @@ import { Network } from "script/utils/Network.sol";
 import { Contract } from "script/utils/Contract.sol";
 import { Maintenance } from "@ronin/contracts/ronin/Maintenance.sol";
 import { LibProposal } from "script/shared/libraries/LibProposal.sol";
+import { FastFinalityTracking } from "@ronin/contracts/ronin/fast-finality/FastFinalityTracking.sol";
 import { SlashIndicator } from "@ronin/contracts/ronin/slash-indicator/SlashIndicator.sol";
 import { RoninRandomBeacon, RoninRandomBeaconDeploy } from "script/contracts/RoninRandomBeaconDeploy.s.sol";
 import {
@@ -107,8 +108,13 @@ contract Migration__20250505_Upgrade_Devnet_Release_V0_8_0 is RoninMigration {
             abi.encodeCall(RoninValidatorSetREP10Migrator.initialize, (address(randomBeacon)))
           )
         );
+      }
 
-        continue;
+      if (contractTypesToUpgrade[i] == Contract.FastFinalityTracking.key()) {
+        callDatas[i] = abi.encodeCall(
+          TransparentUpgradeableProxyV2.upgradeToAndCall,
+          (logics[i], abi.encodeCall(FastFinalityTracking.initializeV2, (loadContract(Contract.Staking.key()))))
+        );
       }
 
       if (contractTypesToUpgrade[i] == Contract.SlashIndicator.key()) {
