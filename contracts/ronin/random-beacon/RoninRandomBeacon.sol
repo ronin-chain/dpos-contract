@@ -6,15 +6,15 @@ import { VRF } from "@chainlink/contracts/src/v0.8/VRF.sol";
 import { Initializable } from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import { HasContracts } from "../../extensions/collections/HasContracts.sol";
 import { GlobalConfigConsumer } from "../../extensions/consumers/GlobalConfigConsumer.sol";
-import { IProfile } from "../../interfaces/IProfile.sol";
+import { LibSortValidatorsByBeacon } from "../../libraries/LibSortValidatorsByBeacon.sol";
 import { IStaking } from "../../interfaces/staking/IStaking.sol";
+import { IProfile } from "../../interfaces/IProfile.sol";
 import { IRandomBeacon } from "../../interfaces/random-beacon/IRandomBeacon.sol";
 import { ICandidateManager } from "../../interfaces/validator/ICandidateManager.sol";
 import { ITimingInfo } from "../../interfaces/validator/info-fragments/ITimingInfo.sol";
 import { IRoninTrustedOrganization } from "../../interfaces/IRoninTrustedOrganization.sol";
 import { ISlashRandomBeacon } from "../../interfaces/slash-indicator/ISlashRandomBeacon.sol";
 import { LibSLA, RandomRequest } from "../../libraries/LibSLA.sol";
-import { LibSortValidatorsByBeacon } from "../../libraries/LibSortValidatorsByBeacon.sol";
 import { TConsensus } from "../../udvts/Types.sol";
 import { ContractType } from "../../utils/ContractType.sol";
 import { ErrLengthMismatch, ErrUnauthorizedCall } from "../../utils/CommonErrors.sol";
@@ -30,12 +30,10 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
 
   /// @dev Period of the beacon validator selection is activated.
   uint256 internal _activatedAtPeriod;
-  /// @dev Latest period where random beacon is finalized.
-  uint256 internal _lastFinalizedPeriod;
   /// @dev The threshold of unavailability to slash.
   uint256 internal _unavailabilitySlashThreshold;
   /// @dev Mapping of consecutive unavailable count per validator.
-  mapping(address gvCid => uint256 count) internal _unavailableCount;
+  mapping(address gvId => uint256 count) internal _unavailableCount;
   /// @dev Mapping of beacon per period.
   mapping(uint256 period => Beacon beacon) internal _beaconPerPeriod;
   /// @dev The maximum pick threshold for validator type.
@@ -99,7 +97,6 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
     bytes32 keyHash = proof.pk.calcKeyHash();
 
     IProfile profile = IProfile(getContract(ContractType.PROFILE));
-
     // Already checked in Profile:
     // 1. If `cid` not exit, revert the whole tx,
     // 2. Allow both GV and SV to submit the seed.
@@ -194,13 +191,6 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
   /**
    * @inheritdoc IRandomBeacon
    */
-  function getLastFinalizedPeriod() external view returns (uint256) {
-    return _lastFinalizedPeriod;
-  }
-
-  /**
-   * @inheritdoc IRandomBeacon
-   */
   function isSubmittedAt(uint256 period, address oracle) external view returns (bool submitted) {
     IProfile profile = IProfile(getContract(ContractType.PROFILE));
     address cid = profile.getConsensus2Id({ consensus: TConsensus.wrap(oracle) });
@@ -258,7 +248,6 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
    */
   function _finalizeBeacon(Beacon storage $beacon, uint256 period) internal {
     $beacon.finalized = true;
-    _lastFinalizedPeriod = period;
 
     emit BeaconFinalized(period, $beacon.value);
   }
