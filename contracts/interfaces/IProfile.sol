@@ -124,6 +124,9 @@ interface IProfile {
   /// @dev Getter to batch query from `id` to `registeredAt`.
   function getManyId2RegisteredAt(address[] calldata idList) external view returns (uint256[] memory);
 
+  /// @dev Getter to batch query from `id` to `admin`, return address(0) if the profile not exist.
+  function getManyId2Admin(address[] calldata idList) external view returns (address[] memory);
+
   /// @dev Getter to batch query from `id` to `consensus`, return address(0) if the profile not exist.
   function getManyId2Consensus(address[] calldata idList) external view returns (TConsensus[] memory consensusList);
 
