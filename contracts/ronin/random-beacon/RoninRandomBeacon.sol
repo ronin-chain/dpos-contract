@@ -201,9 +201,23 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
   /**
    * @inheritdoc IRandomBeacon
    */
-  function isSubmittedAt(uint256 period, address oracle) external view returns (bool submitted) {
+  function getRequestHash(uint256 period) external view returns (bytes32 reqHash) {
+    reqHash = _beaconPerPeriod[period].reqHash;
+  }
+
+  /**
+   * @inheritdoc IRandomBeacon
+   */
+  function isSubmittedAt(uint256 period, TConsensus consensus) external view returns (bool submitted) {
     IProfile profile = IProfile(getContract(ContractType.PROFILE));
-    address cid = profile.getConsensus2Id({ consensus: TConsensus.wrap(oracle) });
+    address cid = profile.getConsensus2Id({ consensus: consensus });
+    return isSubmittedAtById(period, cid);
+  }
+
+  /**
+   * @inheritdoc IRandomBeacon
+   */
+  function isSubmittedAtById(uint256 period, address cid) public view returns (bool submitted) {
     submitted = _beaconPerPeriod[period].submitted[cid];
   }
 
