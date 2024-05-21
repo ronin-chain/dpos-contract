@@ -4,6 +4,7 @@ pragma solidity ^0.8.9;
 
 import { RandomRequest } from "../../libraries/LibSLA.sol";
 import { VRF } from "@chainlink/contracts/src/v0.8/VRF.sol";
+import { TConsensus } from "../../udvts/Types.sol";
 
 interface IRandomBeacon {
   /// @dev Throws if current period is less than the target activation period
@@ -158,10 +159,23 @@ interface IRandomBeacon {
   /**
    * @dev Checks if a submission has been made by a specific oracle for a given period.
    * @param period The period to check for the submission.
-   * @param oracle The address of the oracle/consensus to check for the submission.
+   * @param consensus The consensus address of validator.
    * @return A boolean indicating whether the submission has been made or not.
    */
-  function isSubmittedAt(uint256 period, address oracle) external view returns (bool);
+  function isSubmittedAt(uint256 period, TConsensus consensus) external view returns (bool);
+
+  /**
+   * @dev Checks if a submission has been made by a specific oracle for a given period.
+   * @param period The period to check for the submission.
+   * @param cid The candidate id of validator.
+   * @return A boolean indicating whether the submission has been made or not.
+   */
+  function isSubmittedAtById(uint256 period, address cid) external view returns (bool);
+
+  /**
+   * @dev Get request hash for a given period.
+   */
+  function getRequestHash(uint256 period) external view returns (bytes32 reqHash);
 
   /**
    * @dev Get last finalized period.
