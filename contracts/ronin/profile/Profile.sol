@@ -176,12 +176,21 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
   /**
    * @inheritdoc IProfile
    */
+  function getManyId2Admin(address[] calldata idList) external view returns (address[] memory adminList) {
+    adminList = new address[](idList.length);
+
+    for (uint i; i < idList.length; ++i) {
+      adminList[i] = _id2Profile[idList[i]].admin;
+    }
+  }
+
+  /**
+   * @inheritdoc IProfile
+   */
   function getManyId2Consensus(address[] calldata idList) external view returns (TConsensus[] memory consensusList) {
     consensusList = new TConsensus[](idList.length);
-    unchecked {
-      for (uint i; i < idList.length; ++i) {
-        consensusList[i] = _id2Profile[idList[i]].consensus;
-      }
+    for (uint i; i < idList.length; ++i) {
+      consensusList[i] = _id2Profile[idList[i]].consensus;
     }
   }
 
