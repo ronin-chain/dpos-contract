@@ -248,6 +248,12 @@ library LibSortValidatorsByBeacon {
       mstore(ptr, beacon)
       // pre store the epoch value since it is used in the loop
       mstore(add(ptr, 0x20), epoch)
+      // update the free memory pointer
+      //    ptr + 0x00 = beacon
+      //    ptr + 0x20 = epoch
+      //    ptr + 0x40 = id
+      // => ptr + 0x60 = new_free_memory_pointer
+      mstore(0x40, add(ptr, 0x60))
     }
 
     for (uint256 i; i < length; ++i) {
