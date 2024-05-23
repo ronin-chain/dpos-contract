@@ -444,7 +444,7 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
   ) internal view {
     // period should be valid
     if (req.period <= currPeriod) revert ErrInvalidPeriod();
-    if (req.period <= _activatedAtPeriod) revert ErrNotActivated(req.period);
+    if (req.period < _activatedAtPeriod) revert ErrNotActivated(req.period);
 
     // beacon should not be finalized
     if ($beacon.finalized) revert ErrBeaconAlreadyFinalized(req.period);
