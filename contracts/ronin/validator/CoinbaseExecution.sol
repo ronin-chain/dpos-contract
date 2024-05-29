@@ -126,15 +126,17 @@ abstract contract CoinbaseExecution is
     _syncFastFinalityReward(epoch, currValidatorIds);
 
     if (periodEnding) {
+      // Get all candidate ids
+      address[] memory allCids = _candidateIds;
       randomBeacon.execWrapUpBeaconPeriod(lastPeriod, newPeriod);
       (uint256 totalDelegatingReward, uint256[] memory delegatingRewards) =
-        _distributeRewardToTreasuriesAndCalculateTotalDelegatingReward(lastPeriod, currValidatorIds);
-      _settleAndTransferDelegatingRewards(lastPeriod, currValidatorIds, totalDelegatingReward, delegatingRewards);
+        _distributeRewardToTreasuriesAndCalculateTotalDelegatingReward(lastPeriod, allCids);
+      _settleAndTransferDelegatingRewards(lastPeriod, allCids, totalDelegatingReward, delegatingRewards);
       _tryRecycleLockedFundsFromEmergencyExits();
       _recycleDeprecatedRewards();
 
       ISlashIndicator slashIndicatorContract = ISlashIndicator(getContract(ContractType.SLASH_INDICATOR));
-      slashIndicatorContract.execUpdateCreditScores(currValidatorIds, lastPeriod);
+      slashIndicatorContract.execUpdateCreditScores(allCids, lastPeriod);
       address[] memory revokedCandidateIds = _syncCandidateSet(newPeriod);
       if (revokedCandidateIds.length > 0) {
         slashIndicatorContract.execResetCreditScores(revokedCandidateIds);
