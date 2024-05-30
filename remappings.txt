@@ -9,3 +9,4 @@ hardhat/=./node_modules/hardhat/
 solady/=lib/solady/src
 foundry-deployment-kit/=lib/foundry-deployment-kit/script
 contract-libs/=lib/contract-libs/src
+safe-smart-account/contracts/=lib/safe-smart-account/contracts/
