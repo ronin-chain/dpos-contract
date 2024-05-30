@@ -169,10 +169,21 @@ contract FastFinalityTracking is IFastFinalityTracking, Initializable, HasContra
   /**
    * @inheritdoc IFastFinalityTracking
    */
+  function getManyFinalityScores(
+    uint256 epoch,
+    TConsensus[] calldata addrs
+  ) external view returns (uint256[] memory scores) {
+    address[] memory cids = __css2cidBatch(addrs);
+    return getManyFinalityScoresById(epoch, cids);
+  }
+
+  /**
+   * @inheritdoc IFastFinalityTracking
+   */
   function getManyFinalityScoresById(
     uint256 epoch,
-    address[] calldata cids
-  ) external view returns (uint256[] memory scores) {
+    address[] memory cids
+  ) public view returns (uint256[] memory scores) {
     uint256 length = cids.length;
     scores = new uint256[](length);
     mapping(address => Record) storage $epochTracker = _tracker[epoch];
