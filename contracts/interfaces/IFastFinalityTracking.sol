@@ -36,6 +36,16 @@ interface IFastFinalityTracking {
   ) external view returns (uint256[] memory voteCounts);
 
   /**
+   * @dev Returns normalized data for given period.
+   */
+  function getNormalizedSum(uint256 period) external view returns (uint256 normalizedSum);
+
+  /**
+   * @dev Returns normalized stake of `cid` in the `period`.
+   */
+  function getNormalizedStake(uint256 period, address cid) external view returns (uint256 normalizedStake);
+
+  /**
    * @dev Returns vote count of `addrs` in the `period`.
    */
   function getManyFinalityScoresById(
