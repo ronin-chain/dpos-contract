@@ -28,10 +28,10 @@ interface IFastFinalityTracking {
   function recordFinality(TConsensus[] calldata voters) external;
 
   /**
-   * @dev Returns vote count of `addrs` in the `period`.
+   * @dev Returns vote count of `addrs` in the `epoch`.
    */
   function getManyFinalityVoteCounts(
-    uint256 period,
+    uint256 epoch,
     TConsensus[] calldata addrs
   ) external view returns (uint256[] memory voteCounts);
 
@@ -46,18 +46,26 @@ interface IFastFinalityTracking {
   function getNormalizedStake(uint256 period, address cid) external view returns (uint256 normalizedStake);
 
   /**
-   * @dev Returns vote count of `addrs` in the `period`.
+   * @dev Returns vote count of `consensuses` in the `epoch`.
+   */
+  function getManyFinalityScores(
+    uint256 epoch,
+    TConsensus[] calldata consensuses
+  ) external view returns (uint256[] memory voteCounts);
+
+  /**
+   * @dev Returns vote count of `addrs` in the `epoch`.
    */
   function getManyFinalityScoresById(
-    uint256 period,
+    uint256 epoch,
     address[] calldata cids
   ) external view returns (uint256[] memory voteCounts);
 
   /**
-   * @dev Returns vote count of `cids` in the `period`.
+   * @dev Returns vote count of `cids` in the `epoch`.
    */
   function getManyFinalityVoteCountsById(
-    uint256 period,
+    uint256 epoch,
     address[] calldata cids
   ) external view returns (uint256[] memory voteCounts);
 }
