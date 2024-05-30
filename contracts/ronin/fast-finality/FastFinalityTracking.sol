@@ -171,7 +171,7 @@ contract FastFinalityTracking is IFastFinalityTracking, Initializable, HasContra
    */
   function getManyFinalityScores(
     uint256 epoch,
-    TConsensus[] calldata addrs
+    TConsensus[] calldata consensuses
   ) external view returns (uint256[] memory scores) {
     address[] memory cids = __css2cidBatch(addrs);
     return getManyFinalityScoresById(epoch, cids);
