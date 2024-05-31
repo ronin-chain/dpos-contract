@@ -85,7 +85,7 @@ library LibVRFProof {
     RandomRequest memory req
   ) internal returns (VRF.Proof memory proof) {
     string memory configFileName = string.concat(CONFIG_PATH, "config");
-    vm.copyFile("config/config.example.json", string.concat(configFileName, ".json"));
+    vm.copyFile("config/config.json.example", string.concat(configFileName, ".json"));
 
     vm.writeJson(vm.toString(block.chainid), string.concat(configFileName, ".json"), ".chainId");
     vm.writeJson(vm.toString(key.secretKey), string.concat(configFileName, ".json"), ".secret_key");
