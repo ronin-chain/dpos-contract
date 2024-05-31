@@ -24,3 +24,5 @@ script/data/*
 *.env
 logs/temp.log
 deployments/**/exported_address
+config/config.json
+config/config.yaml
