@@ -72,19 +72,16 @@ contract Simulation__20231003_UpgradeREP002AndREP003_Base is RoninMigration, Map
       vm.makePersistent(address(0x68));
     }
 
-    _staking = Staking(config.getAddressFromCurrentNetwork(Contract.Staking.key()));
-    _roninGateway = RoninGatewayV3(config.getAddressFromCurrentNetwork(Contract.RoninGatewayV3.key()));
-    _bridgeTracking = BridgeTracking(config.getAddressFromCurrentNetwork(Contract.BridgeTracking.key()));
-    _slashIndicator = SlashIndicator(config.getAddressFromCurrentNetwork(Contract.SlashIndicator.key()));
-    _stakingVesting = StakingVesting(config.getAddressFromCurrentNetwork(Contract.StakingVesting.key()));
-    _validatorSet = RoninValidatorSet(config.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key()));
-    _trustedOrgs =
-      RoninTrustedOrganization(config.getAddressFromCurrentNetwork(Contract.RoninTrustedOrganization.key()));
-    _fastFinalityTracking =
-      FastFinalityTracking(config.getAddressFromCurrentNetwork(Contract.FastFinalityTracking.key()));
-    _roninGovernanceAdmin =
-      RoninGovernanceAdmin(config.getAddressFromCurrentNetwork(Contract.RoninGovernanceAdmin.key()));
-    _roninBridgeManager = RoninBridgeManager(config.getAddressFromCurrentNetwork(Contract.RoninBridgeManager.key()));
+    _staking = Staking(loadContract(Contract.Staking.key()));
+    _roninGateway = RoninGatewayV3(loadContract(Contract.RoninGatewayV3.key()));
+    _bridgeTracking = BridgeTracking(loadContract(Contract.BridgeTracking.key()));
+    _slashIndicator = SlashIndicator(loadContract(Contract.SlashIndicator.key()));
+    _stakingVesting = StakingVesting(loadContract(Contract.StakingVesting.key()));
+    _validatorSet = RoninValidatorSet(loadContract(Contract.RoninValidatorSet.key()));
+    _trustedOrgs = RoninTrustedOrganization(loadContract(Contract.RoninTrustedOrganization.key()));
+    _fastFinalityTracking = FastFinalityTracking(loadContract(Contract.FastFinalityTracking.key()));
+    _roninGovernanceAdmin = RoninGovernanceAdmin(loadContract(Contract.RoninGovernanceAdmin.key()));
+    _roninBridgeManager = RoninBridgeManager(loadContract(Contract.RoninBridgeManager.key()));
 
     _depositCount = _hookSetDepositCount();
   }

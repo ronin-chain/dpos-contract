@@ -16,7 +16,7 @@ contract Proposal__Full_20240220_MikoHardfork_ProposeProposal is
 {
   modifier resetBroadcastStatus() {
     _;
-    CONFIG.setPostCheckingStatus(false);
+    vme.setPostCheckingStatus(false);
   }
 
   function run()
@@ -34,16 +34,16 @@ contract Proposal__Full_20240220_MikoHardfork_ProposeProposal is
   {
     Proposal__Base_20240220_MikoHardfork.run();
 
-    // CONFIG.setPostCheckingStatus(true);
+    // vme.setPostCheckingStatus(true);
     // Proposal__20240220_MikoHardfork_Before._run_unchained(); // BAO_EOA
 
-    // CONFIG.setPostCheckingStatus(false);
+    // vme.setPostCheckingStatus(false);
     // Proposal__20240220_MikoHardfork_ProposeProposal._run_unchained(); // Governor
 
-    CONFIG.setPostCheckingStatus(false);
+    vme.setPostCheckingStatus(false);
     Proposal__20240220_MikoHardfork_After._run_unchained(); // DOCTOR
 
-    CONFIG.setPostCheckingStatus(true);
+    vme.setPostCheckingStatus(true);
     Proposal__20240220_MikoHardfork_Stable._run_unchained(); // MIGRATOR
 
     Proposal__20240220_PostCheck._run_unchained();

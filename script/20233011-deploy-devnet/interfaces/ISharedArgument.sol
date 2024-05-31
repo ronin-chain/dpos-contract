@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { IGeneralConfig } from "foundry-deployment-kit/interfaces/IGeneralConfig.sol";
+import { IGeneralConfig } from "@fdk/interfaces/IGeneralConfig.sol";
 import { IRoninTrustedOrganization } from "@ronin/contracts/interfaces/IRoninTrustedOrganization.sol";
 
 interface ISharedArgument is IGeneralConfig {

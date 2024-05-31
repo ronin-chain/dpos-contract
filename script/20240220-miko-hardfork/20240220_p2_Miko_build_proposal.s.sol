@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { TContract } from "foundry-deployment-kit/types/Types.sol";
-import { LibProxy } from "foundry-deployment-kit/libraries/LibProxy.sol";
+import { TContract } from "@fdk/types/Types.sol";
+import { LibProxy } from "@fdk/libraries/LibProxy.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
 
 import {
@@ -22,6 +22,7 @@ import { AccessControl } from "@openzeppelin/contracts/access/AccessControl.sol"
 
 import "./ArrayReplaceLib.sol";
 import "./20240220_Base_Miko_Hardfork.s.sol";
+import { LibProposal } from "script/shared/libraries/LibProposal.sol";
 
 abstract contract Proposal__20240220_MikoHardfork_BuildProposal is Proposal__Base_20240220_MikoHardfork {
   using LibProxy for *;
@@ -108,7 +109,8 @@ abstract contract Proposal__20240220_MikoHardfork_BuildProposal is Proposal__Bas
       mstore(values, prCnt)
     }
 
-    proposal = _buildProposal(roninGovernanceAdmin, block.timestamp + PROPOSAL_DURATION, tos, values, callDatas);
+    proposal =
+      LibProposal.buildProposal(roninGovernanceAdmin, vm.getBlockTimestamp() + PROPOSAL_DURATION, tos, values, callDatas);
   }
 
   function _ga__changeAdminBridgeTracking()
@@ -153,7 +155,7 @@ abstract contract Proposal__20240220_MikoHardfork_BuildProposal is Proposal__Bas
         revert();
       } else {
         address implementation = allContracts[i].getProxyImplementation();
-        TContract contractType = config.getContractTypeFromCurrentNetwok(allContracts[i]);
+        TContract contractType = config.getContractTypeFromCurrentNetwork(allContracts[i]);
 
         if (implementation.codehash != keccak256(vm.getDeployedCode(config.getContractAbsolutePath(contractType)))) {
           console.log(
@@ -304,7 +306,7 @@ abstract contract Proposal__20240220_MikoHardfork_BuildProposal is Proposal__Bas
   {
     address payable[] memory allContracts = allDPoSContracts;
 
-    bool shouldPrankOnly = CONFIG.isPostChecking();
+    bool shouldPrankOnly = vme.isPostChecking();
 
     if (shouldPrankOnly) {
       vm.prank(DEPLOYER);

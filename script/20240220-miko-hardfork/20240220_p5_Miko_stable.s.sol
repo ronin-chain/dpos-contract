@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { TContract } from "foundry-deployment-kit/types/Types.sol";
-import { LibProxy } from "foundry-deployment-kit/libraries/LibProxy.sol";
+import { TContract } from "@fdk/types/Types.sol";
+import { LibProxy } from "@fdk/libraries/LibProxy.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
 
 import {
@@ -42,7 +42,7 @@ contract Proposal__20240220_MikoHardfork_Stable is Proposal__Base_20240220_MikoH
   }
 
   function _migrator__disableMigrate() internal {
-    bool shouldPrankOnly = CONFIG.isPostChecking();
+    bool shouldPrankOnly = vme.isPostChecking();
     if (shouldPrankOnly) {
       vm.prank(STAKING_MIGRATOR);
     } else {

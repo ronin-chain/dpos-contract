@@ -11,8 +11,8 @@ contract Simulation__20231003_UpgradeREP002AndREP003_RON_NonConditional_Wrapup2P
     super.run();
 
     // submit block reward for one epoch
-    vm.warp(block.timestamp + 3 seconds);
-    vm.roll(block.number + 1);
+    vm.warp(vm.getBlockTimestamp() + 3 seconds);
+    vm.roll(vm.getBlockNumber() + 1);
     vm.prank(block.coinbase);
     _validatorSet.submitBlockReward{ value: 1_000_000 }();
 
@@ -22,12 +22,11 @@ contract Simulation__20231003_UpgradeREP002AndREP003_RON_NonConditional_Wrapup2P
     _fastFinalityTracking.recordFinality(finalityList);
 
     // wrap up period for second day after upgrade
-    _fastForwardToNextDay();
-    _wrapUpEpoch();
+    LibWrapUpEpoch.wrapUpPeriod();
 
     // // test `RoninValidatorSet` functionality
-    // _fastForwardToNextDay();
-    // _wrapUpEpoch();
+    // LibWrapUpEpoch.fastForwardToNextDay();
+    // LibWrapUpEpoch.wrapUpPeriod();
 
     // // test `RoninGatewayV3` functionality
     // _depositFor("after-upgrade-user");

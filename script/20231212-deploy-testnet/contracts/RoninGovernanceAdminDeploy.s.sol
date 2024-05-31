@@ -11,8 +11,8 @@ contract RoninGovernanceAdminDeploy is TestnetMigration {
 
     args = abi.encode(
       block.chainid,
-      config.getAddressFromCurrentNetwork(Contract.RoninTrustedOrganization.key()),
-      config.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key()),
+      loadContract(Contract.RoninTrustedOrganization.key()),
+      loadContract(Contract.RoninValidatorSet.key()),
       param.expiryDuration
     );
   }
