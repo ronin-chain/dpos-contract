@@ -18,7 +18,7 @@ interface IHasContracts {
    * @param contractType The role of the contract to retrieve.
    * @return contract_ The address of the contract with the specified role.
    */
-  function getContract(ContractType contractType) external view returns (address contract_);
+  function getContract(ContractType contractType) external view returns (address payable contract_);
 
   /**
    * @dev Sets the address of a contract with a specific role.

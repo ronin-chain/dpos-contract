@@ -1,6 +1,7 @@
 ds-test/=lib/forge-std/lib/ds-test/src/
 forge-std/=lib/forge-std/src/
 @openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/
+@openzeppelin-v5/contracts/=lib/oz-v5/contracts/
 hardhat/=./node_modules/hardhat/
 @ronin/contracts/=./contracts/
 @ronin/test/=./test/foundry/
@@ -9,3 +10,5 @@ hardhat/=./node_modules/hardhat/
 solady/=lib/solady/src
 foundry-deployment-kit/=lib/foundry-deployment-kit/script
 contract-libs/=lib/contract-libs/src
+safe-smart-account/contracts/=lib/safe-smart-account/contracts/
+@chainlink/contracts/=lib/chainlink/contracts/

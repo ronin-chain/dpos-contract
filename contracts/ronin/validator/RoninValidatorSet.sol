@@ -30,9 +30,9 @@ contract RoninValidatorSet is Initializable, CoinbaseExecution, SlashingExecutio
     address __maintenanceContract,
     address __roninTrustedOrganizationContract,
     address, /* __bridgeTrackingContract */
-    uint256 __maxValidatorNumber,
+    uint256, /* __maxValidatorNumber */
     uint256 __maxValidatorCandidate,
-    uint256 __maxPrioritizedValidatorNumber,
+    uint256, /* __maxPrioritizedValidatorNumber */
     uint256 __minEffectiveDaysOnwards,
     uint256 __numberOfBlocksInEpoch,
     // __emergencyExitConfigs[0]: emergencyExitLockedAmount
@@ -45,9 +45,7 @@ contract RoninValidatorSet is Initializable, CoinbaseExecution, SlashingExecutio
     _setContract(ContractType.MAINTENANCE, __maintenanceContract);
     _setContract(ContractType.RONIN_TRUSTED_ORGANIZATION, __roninTrustedOrganizationContract);
 
-    _setMaxValidatorNumber(__maxValidatorNumber);
     _setMaxValidatorCandidate(__maxValidatorCandidate);
-    _setMaxPrioritizedValidatorNumber(__maxPrioritizedValidatorNumber);
     _setMinEffectiveDaysOnwards(__minEffectiveDaysOnwards);
     _setEmergencyExitLockedAmount(__emergencyExitConfigs[0]);
     _setEmergencyExpiryDuration(__emergencyExitConfigs[1]);
