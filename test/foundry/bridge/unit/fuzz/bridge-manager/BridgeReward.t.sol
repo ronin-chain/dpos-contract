@@ -13,7 +13,7 @@ import { TransparentUpgradeableProxy } from "@openzeppelin/contracts/proxy/trans
 import {
   RoleAccess,
   ContractType,
-  AddressArrayUtils,
+  LibArray,
   MockBridgeManager
 } from "@ronin/contracts/mocks/ronin/MockBridgeManager.sol";
 import { IBridgeSlash, MockBridgeSlash, BridgeSlash } from "@ronin/contracts/mocks/ronin/MockBridgeSlash.sol";

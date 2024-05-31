@@ -13,10 +13,7 @@ import { IBridgeManager, BridgeManagerUtils } from "../utils/BridgeManagerUtils.
 import { RoninBridgeManager } from "@ronin/contracts/ronin/gateway/RoninBridgeManager.sol";
 import { Math } from "@ronin/contracts/libraries/Math.sol";
 import {
-  RoleAccess,
-  ContractType,
-  AddressArrayUtils,
-  MockBridgeManager
+  RoleAccess, ContractType, LibArray, MockBridgeManager
 } from "@ronin/contracts/mocks/ronin/MockBridgeManager.sol";
 import { ErrProxyCallFailed, ErrorHandler } from "@ronin/contracts/libraries/ErrorHandler.sol";
 import { IBridgeSlashEvents } from "@ronin/contracts/interfaces/bridge/events/IBridgeSlashEvents.sol";
@@ -24,7 +21,8 @@ import { IBridgeSlashEvents } from "@ronin/contracts/interfaces/bridge/events/IB
 contract BridgeSlashTest is IBridgeSlashEvents, BridgeManagerUtils {
   using ErrorHandler for bool;
   using LibArrayUtils for *;
-  using AddressArrayUtils for *;
+  using LibArray for uint256[];
+  using LibArray for address[];
 
   uint256 internal constant MIN_PERIOD_DURATION = 1;
   uint256 internal constant MAX_PERIOD_DURATION = 20;
@@ -201,7 +199,7 @@ contract BridgeSlashTest is IBridgeSlashEvents, BridgeManagerUtils {
       // Execute slashBridgeOperators for all operators
       vm.prank(_bridgeTrackingContract, _bridgeTrackingContract);
       IBridgeSlash(_bridgeSlashContract).execSlashBridgeOperators(
-        bridgeOperators.extend(newlyAddedOperators), ballots, ballots.sum(), ballots.sum(), period
+        bridgeOperators.concat(newlyAddedOperators), ballots, LibArray.sum(ballots), LibArray.sum(ballots), period
       );
 
       // Check that the slashUntilPeriods and newlyAddedAtPeriods are correctly set
@@ -247,7 +245,7 @@ contract BridgeSlashTest is IBridgeSlashEvents, BridgeManagerUtils {
     for (uint256 i; i < duration;) {
       // Generate random ballots for bridge operators
       ballots = _createRandomNumbers(r1, bridgeOperators.length, 0, MAX_FUZZ_INPUTS);
-      totalBallotForPeriod = ballots.sum();
+      totalBallotForPeriod = LibArray.sum(ballots);
 
       // Set the current period in the mock validator contract
       validatorContract.setCurrentPeriod(period);
