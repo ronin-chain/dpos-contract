@@ -8,8 +8,8 @@ import { Maintenance } from "@ronin/contracts/ronin/Maintenance.sol";
 import { TConsensus, Profile, IProfile } from "@ronin/contracts/ronin/profile/Profile.sol";
 import { RoninValidatorSet } from "@ronin/contracts/ronin/validator/RoninValidatorSet.sol";
 import { TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
-import { LibSharedAddress } from "foundry-deployment-kit/libraries/LibSharedAddress.sol";
-import { ISharedArgument } from "script/deploy-dpos/interfaces/ISharedArgument.sol";
+import { LibSharedAddress } from "@fdk/libraries/LibSharedAddress.sol";
+import { ISharedArgument } from "script/interfaces/ISharedArgument.sol";
 import { DeployDPoS } from "script/deploy-dpos/DeployDPoS.s.sol";
 import { Contract } from "script/utils/Contract.sol";
 
@@ -19,7 +19,7 @@ contract MaintenanceTest is Test {
   Staking staking;
   Maintenance maintenance;
   RoninValidatorSet validatorSet;
-  ISharedArgument config = ISharedArgument(LibSharedAddress.CONFIG);
+  ISharedArgument config = ISharedArgument(LibSharedAddress.VME);
 
   function setUp() public {
     coinbase = makeAddr("coinbase");
@@ -64,7 +64,6 @@ contract MaintenanceTest is Test {
     uint startBlock = latestEpochBlock + numberOfBlocksInEpoch + 1
       + ((minOffset + numberOfBlocksInEpoch) / numberOfBlocksInEpoch) * numberOfBlocksInEpoch;
     uint endBlock = startBlock - 1 + (durationInBlock / numberOfBlocksInEpoch + 1) * numberOfBlocksInEpoch;
-
 
     vm.prank(admin);
     maintenance.schedule(consensus, startBlock, endBlock);

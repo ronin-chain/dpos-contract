@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { console2 as console } from "forge-std/console2.sol";
+import { console } from "forge-std/console.sol";
 import { Proposal, RoninMigration } from "script/RoninMigration.s.sol";
 import { Contract } from "script/utils/Contract.sol";
-import { DefaultNetwork } from "foundry-deployment-kit/utils/DefaultNetwork.sol";
-import { DefaultContract } from "foundry-deployment-kit/utils/DefaultContract.sol";
+import { DefaultNetwork } from "@fdk/utils/DefaultNetwork.sol";
+import { DefaultContract } from "@fdk/utils/DefaultContract.sol";
 import { BridgeTracking } from "@ronin/contracts/ronin/gateway/BridgeTracking.sol";
 import { GovernanceAdmin, RoninGovernanceAdmin } from "@ronin/contracts/ronin/RoninGovernanceAdmin.sol";
 import { BridgeTrackingRecoveryLogic } from "./contracts/BridgeTrackingRecoveryLogic.sol";
@@ -17,6 +17,7 @@ import {
   IRoninTrustedOrganization,
   RoninTrustedOrganization
 } from "@ronin/contracts/multi-chains/RoninTrustedOrganization.sol";
+import { LibProposal } from "script/shared/libraries/LibProposal.sol";
 
 contract Simulation__20231019_RecoverFund is RoninMigration {
   BridgeReward public constant DEPRECATED_BRIDGE_REWARD = BridgeReward(0x1C952D6717eBFd2E92E5f43Ef7C1c3f7677F007D);
@@ -34,11 +35,10 @@ contract Simulation__20231019_RecoverFund is RoninMigration {
 
     address deployer = 0xFE490b68E64B190B415Bb92F8D2F7566243E6ea0; // Mainnet Shadow deployer address
 
-    RoninGovernanceAdmin roninGovernanceAdmin =
-      RoninGovernanceAdmin(config.getAddressFromCurrentNetwork(Contract.RoninGovernanceAdmin.key()));
+    RoninGovernanceAdmin roninGovernanceAdmin = RoninGovernanceAdmin(loadContract(Contract.RoninGovernanceAdmin.key()));
     RoninTrustedOrganization trustedOrgContract =
-      RoninTrustedOrganization(config.getAddressFromCurrentNetwork(Contract.RoninTrustedOrganization.key()));
-    address bridgeTracking = config.getAddressFromCurrentNetwork(Contract.BridgeTracking.key());
+      RoninTrustedOrganization(loadContract(Contract.RoninTrustedOrganization.key()));
+    address bridgeTracking = loadContract(Contract.BridgeTracking.key());
 
     // _initBalanceForUser(trustedOrgContract);
 
@@ -57,11 +57,11 @@ contract Simulation__20231019_RecoverFund is RoninMigration {
     callDatas[1] = abi.encodeCall(BridgeReward.initializeREP2, ());
 
     Proposal.ProposalDetail memory proposal =
-      _buildProposal(roninGovernanceAdmin, block.timestamp + 20 minutes, tos, values, callDatas);
-    _executeProposal(roninGovernanceAdmin, trustedOrgContract, proposal);
+      LibProposal.buildProposal(roninGovernanceAdmin, vm.getBlockTimestamp() + 20 minutes, tos, values, callDatas);
+    LibProposal.executeProposal(roninGovernanceAdmin, trustedOrgContract, proposal);
 
     // Step 3
-    bool shouldPrankOnly = CONFIG.isPostChecking();
+    bool shouldPrankOnly = vme.isPostChecking();
 
     if (shouldPrankOnly) {
       vm.prank(deployer);
@@ -94,7 +94,7 @@ contract Simulation__20231019_RecoverFund is RoninMigration {
 
   function _initBalanceForUser(RoninTrustedOrganization trustedOrgContract) internal {
     address genesisUser = sender();
-    bool shouldPrankOnly = CONFIG.isPostChecking();
+    bool shouldPrankOnly = vme.isPostChecking();
 
     IRoninTrustedOrganization.TrustedOrganization[] memory allTrustedOrgs =
       trustedOrgContract.getAllTrustedOrganizations();

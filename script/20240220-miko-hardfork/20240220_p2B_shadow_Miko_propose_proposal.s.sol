@@ -19,9 +19,9 @@ contract Proposal__20240220_MikoHardfork_ProposeProposal is Proposal__20240220_M
 
   function _run_unchained() internal virtual {
     Proposal.ProposalDetail memory proposal = _buildFinalProposal();
-    _proposeProposal(roninGovernanceAdmin, trustedOrgContract, proposal, address(0));
-    _voteProposalUntilSuccess(roninGovernanceAdmin, trustedOrgContract, proposal);
+    LibProposal.proposeProposal(roninGovernanceAdmin, trustedOrgContract, proposal, address(0));
+    LibProposal.voteProposalUntilSuccess(roninGovernanceAdmin, trustedOrgContract, proposal);
 
-    CONFIG.setAddress(network(), Contract.RoninGovernanceAdmin.key(), address(_newGA));
+    vme.setAddress(network(), Contract.RoninGovernanceAdmin.key(), address(_newGA));
   }
 }

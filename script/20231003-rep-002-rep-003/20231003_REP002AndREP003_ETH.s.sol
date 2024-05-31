@@ -15,11 +15,11 @@ contract Simulation__20231003_UpgradeREP002AndREP003_ETH is RoninMigration, Mapp
   MainchainBridgeManager internal _mainchainBridgeManager;
 
   function run() public virtual {
-    _mainchainGatewayV3 = MainchainGatewayV3(config.getAddressFromCurrentNetwork(Contract.MainchainGatewayV3.key()));
+    _mainchainGatewayV3 = MainchainGatewayV3(loadContract(Contract.MainchainGatewayV3.key()));
     _mainchainBridgeManager =
-      MainchainBridgeManager(config.getAddressFromCurrentNetwork(Contract.MainchainBridgeManager.key()));
+      MainchainBridgeManager(loadContract(Contract.MainchainBridgeManager.key()));
     _mainchainGovernanceAdmin =
-      RoninGovernanceAdmin(config.getAddressFromCurrentNetwork(Contract.MainchainGovernanceAdmin.key()));
+      RoninGovernanceAdmin(loadContract(Contract.MainchainGovernanceAdmin.key()));
 
     _upgradeProxy(
       Contract.MainchainGatewayV3.key(),

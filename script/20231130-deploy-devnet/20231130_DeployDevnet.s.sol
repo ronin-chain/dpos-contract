@@ -2,10 +2,10 @@
 pragma solidity ^0.8.19;
 
 import "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
-import { console2 as console } from "forge-std/console2.sol";
+import { console } from "forge-std/console.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
-import { TContract } from "foundry-deployment-kit/types/Types.sol";
-import { LibProxy } from "foundry-deployment-kit/libraries/LibProxy.sol";
+import { TContract } from "@fdk/types/Types.sol";
+import { LibProxy } from "@fdk/libraries/LibProxy.sol";
 import "./contracts/ProfileDeploy.s.sol";
 import "./contracts/StakingDeploy.s.sol";
 import "./contracts/MaintenanceDeploy.s.sol";
@@ -16,6 +16,7 @@ import "./contracts/FastFinalityTrackingDeploy.s.sol";
 import "./contracts/RoninGovernanceAdminDeploy.s.sol";
 import "./contracts/RoninTrustedOrganizationDeploy.s.sol";
 import "./DevnetMigration.s.sol";
+import { LibWrapUpEpoch } from "script/shared/libraries/LibWrapUpEpoch.sol";
 
 contract Migration__20231130_DeployDevnet is DevnetMigration {
   using LibProxy for *;
@@ -35,7 +36,7 @@ contract Migration__20231130_DeployDevnet is DevnetMigration {
   FastFinalityTracking fastFinalityTracking;
 
   function run() public onlyOn(Network.RoninDevnet.key()) {
-    console.log("current block number:", block.number);
+    console.log("current block number:", vm.getBlockNumber());
 
     ISharedArgument.SharedParameter memory param = devnetConfig.sharedArguments();
     address initialOwner = param.initialOwner;
@@ -89,10 +90,8 @@ contract Migration__20231130_DeployDevnet is DevnetMigration {
       vm.makePersistent(address(0x68));
     }
 
-    _fastForwardToNextDay();
-    _wrapUpEpoch();
-    _fastForwardToNextDay();
-    _wrapUpEpoch();
+    LibWrapUpEpoch.wrapUpPeriod();
+    LibWrapUpEpoch.wrapUpPeriod();
 
     console.log(">", StdStyle.green("Validate Validator {wrapUpEpoch} successful"));
   }
@@ -110,9 +109,9 @@ contract Migration__20231130_DeployDevnet is DevnetMigration {
     }
     address[] memory targets = _changeProxyTargets;
     for (uint256 i; i < targets.length; ++i) {
-      TContract contractType = config.getContractTypeFromCurrentNetwok(targets[i]);
+      TContract contractType = config.getContractTypeFromCurrentNetwork(targets[i]);
       console.log("Upgrading contract:", vm.getLabel(targets[i]));
-      _upgradeProxy(contractType, EMPTY_ARGS);
+      _upgradeProxy(contractType);
     }
 
     console.log(">", StdStyle.green("Validate Governance Admin Upgrade Proposal successful"));
