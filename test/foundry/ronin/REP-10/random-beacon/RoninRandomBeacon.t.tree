@@ -1,0 +1,18 @@
+RoninRandomBeacon
+    execRequestRandomSeedForNextPeriod
+        emit RandomSeedRequested
+    execWrapUpBeaconPeriod
+        emit BeaconFinalized
+        slash if exceed threshold
+        record unavailability if not submit beacon
+        filter out newly joined validator
+    fulfillRandomSeed
+        revert if
+            re-submit random seed
+            change vrf key cooldown threshold not met
+            vrf key hash's id is not governing validator
+            newly joined governing validator submit beacon
+        can submit seed if is governing validator
+        can submit seed if is newly joined governing validator and pass cooldown threshold
+    pickValidatorSet
+        always contains all gvs
