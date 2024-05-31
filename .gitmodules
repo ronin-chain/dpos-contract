@@ -19,3 +19,7 @@
 	path = lib/foundry-deployment-kit
 	url = https://github.com/axieinfinity/foundry-deployment-kit
 	branch = v0.2.0
+[submodule "lib/safe-smart-account"]
+	path = lib/safe-smart-account
+	url = https://github.com/safe-global/safe-smart-account
+	branch = v1.4.1
