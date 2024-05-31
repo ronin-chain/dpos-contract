@@ -173,7 +173,7 @@ contract FastFinalityTracking is IFastFinalityTracking, Initializable, HasContra
     uint256 epoch,
     TConsensus[] calldata consensuses
   ) external view returns (uint256[] memory scores) {
-    address[] memory cids = __css2cidBatch(addrs);
+    address[] memory cids = __css2cidBatch(consensuses);
     return getManyFinalityScoresById(epoch, cids);
   }
 
