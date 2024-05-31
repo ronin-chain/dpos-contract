@@ -2,7 +2,7 @@
 
 # Set the log file path
 log_file="logs/temp.log"
-./ronin-random-beacon generate-key &> $log_file;
+./bin/ronin-random-beacon generate-key &> $log_file;
 
 # Extract the generated public key, key hash, and secret key using grep and awk
 public_key=$(grep "Generated public key is" "$log_file" | awk '{print $7}')

@@ -104,7 +104,7 @@ library LibVRFProof {
 
     cmdInput = new string[](7);
 
-    cmdInput[0] = "./ronin-random-beacon";
+    cmdInput[0] = "./bin/ronin-random-beacon";
     cmdInput[1] = "random";
     cmdInput[2] = "--config-file";
     cmdInput[3] = CONFIG_PATH;
