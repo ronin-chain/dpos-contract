@@ -22,7 +22,6 @@ contract RONTransferHelperTest is Test {
 
   function testFuzz_RevertIf_SendIstanbulGasStipened_ToMultisigWallet_OnBerlin(uint256 value) public {
     vm.deal(address(istanbulRONTransfer), value);
-    address sender = vm.addr(0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80);
 
     vm.expectRevert();
     istanbulRONTransfer.sendRONLimitGas(payable(multisig), value);
@@ -30,7 +29,6 @@ contract RONTransferHelperTest is Test {
 
   function testFuzz_SendBerlinGasStipened_ToMultisigWallet_OnBerlin(uint256 value) public {
     vm.deal(address(berlinRONTransfer), value);
-    address sender = vm.addr(0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80);
 
     berlinRONTransfer.sendRONLimitGas(payable(multisig), value);
   }
