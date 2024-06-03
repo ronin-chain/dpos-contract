@@ -1,0 +1,7 @@
+NUM_GV=12                              # (Number of governing validator to pick)
+NUM_SV=10                               # (Number of standard validator to pick)
+NUM_RV=?                               # (Number of rotating validator to pick)
+ACTIVATED_AT_PERIOD=19879              # (Period to activate the REP-10)
+SLASH_RANDOM_BEACON_AMOUNT=10_000 RON  # (Amount of RON to slash for random beacon)
+SLASH_UNAVAILABILITY_AMOUNT=50_000 RON # (Amount of RON to slash for unavailability)
+WAITING_SECS_REVOKE=1 days             # (Seconds to wait to revoke validator)
