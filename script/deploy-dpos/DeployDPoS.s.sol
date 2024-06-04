@@ -349,6 +349,8 @@ contract DeployDPoS is RoninMigration {
   function _initFastFinalityTracking() internal logFn("_initFastFinalityTracking") {
     vm.startBroadcast(sender());
     fastFinalityTracking.initialize(address(validatorSet));
+    fastFinalityTracking.initializeV2(address(profile));
+    fastFinalityTracking.initializeV3(address(staking));
     vm.stopBroadcast();
   }
 }
