@@ -214,6 +214,15 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
     return isSubmittedAtById(period, cid);
   }
 
+   /**
+   * @inheritdoc IRandomBeacon
+   */
+  function isSubmittedAtByKeyHash(uint256 period, bytes32 keyHash) external view returns (bool submitted) {
+    IProfile profile = IProfile(getContract(ContractType.PROFILE));
+    address cid = profile.getVRFKeyHash2Id({ vrfKeyHash: keyHash });
+    submitted = isSubmittedAtById(period, cid);
+  }
+
   /**
    * @inheritdoc IRandomBeacon
    */
