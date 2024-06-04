@@ -12,6 +12,7 @@ import { LibSharedAddress } from "@fdk/libraries/LibSharedAddress.sol";
 import { ISharedArgument } from "script/interfaces/ISharedArgument.sol";
 import { DeployDPoS } from "script/deploy-dpos/DeployDPoS.s.sol";
 import { Contract } from "script/utils/Contract.sol";
+import { LibPrecompile } from "script/shared/libraries/LibPrecompile.sol";
 
 contract MaintenanceTest is Test {
   address coinbase;
@@ -29,6 +30,8 @@ contract MaintenanceTest is Test {
     vm.warp(block.timestamp + 3000);
 
     new DeployDPoS().run();
+
+    LibPrecompile.deployPrecompile();
 
     profile = Profile(config.getAddressFromCurrentNetwork(Contract.Profile.key()));
     staking = Staking(config.getAddressFromCurrentNetwork(Contract.Staking.key()));
