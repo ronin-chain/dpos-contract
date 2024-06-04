@@ -9,7 +9,7 @@ import { ISharedArgument, IRoninTrustedOrganization } from "./interfaces/IShared
 import { TConsensus } from "@ronin/contracts/udvts/Types.sol";
 
 contract DevnetMigration is RoninMigration {
-  ISharedArgument internal constant devnetConfig = ISharedArgument(address(CONFIG));
+  ISharedArgument internal constant devnetConfig = ISharedArgument(address(vme));
 
   function _getProxyAdminFromCurrentNetwork() internal view virtual override returns (address proxyAdmin) {
     proxyAdmin = super._getProxyAdminFromCurrentNetwork();

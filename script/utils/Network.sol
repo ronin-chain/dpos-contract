@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { LibString, TNetwork } from "foundry-deployment-kit/types/Types.sol";
+import { LibString, TNetwork } from "@fdk/types/Types.sol";
+import { INetworkConfig } from "@fdk/interfaces/configs/INetworkConfig.sol";
 
 enum Network {
   Goerli,
@@ -9,17 +10,36 @@ enum Network {
   RoninDevnet
 }
 
-using { key, name, chainId, chainAlias, envLabel, deploymentDir, explorer } for Network global;
+using { key, name, chainId, chainAlias, envLabel, deploymentDir, explorer, data } for Network global;
+
+function data(Network network) pure returns (INetworkConfig.NetworkData memory) {
+  return INetworkConfig.NetworkData({
+    network: key(network),
+    chainId: chainId(network),
+    chainAlias: chainAlias(network),
+    blockTime: blockTime(network),
+    deploymentDir: deploymentDir(network),
+    privateKeyEnvLabel: envLabel(network),
+    explorer: explorer(network)
+  });
+}
+
+function blockTime(Network network) pure returns (uint256) {
+  if (network == Network.Goerli) return 15;
+  if (network == Network.EthMainnet) return 15;
+  if (network == Network.RoninDevnet) return 3;
+  revert("Network: Unknown block time");
+}
 
 function chainId(Network network) pure returns (uint256) {
   if (network == Network.Goerli) return 5;
   if (network == Network.EthMainnet) return 1;
-  if (network == Network.RoninDevnet) return 2022;
+  if (network == Network.RoninDevnet) return 2021;
   revert("Network: Unknown chain id");
 }
 
 function key(Network network) pure returns (TNetwork) {
-  return TNetwork.wrap(LibString.packOne(name(network)));
+  return TNetwork.wrap(LibString.packOne(chainAlias(network)));
 }
 
 function explorer(Network network) pure returns (string memory link) {

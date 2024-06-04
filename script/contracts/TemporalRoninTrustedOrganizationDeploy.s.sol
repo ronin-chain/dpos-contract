@@ -7,8 +7,10 @@ import { Contract } from "../utils/Contract.sol";
 
 contract TemporalRoninTrustedOrganizationDeploy is RoninMigration {
   function _defaultArguments() internal view override returns (bytes memory args) {
-    ISharedArgument.SharedParameter memory param = config.sharedArguments();
-    args = abi.encodeCall(RoninTrustedOrganization.initialize, (param.trustedOrgs, param.num, param.denom));
+    ISharedArgument.RoninTrustedOrganizationParam memory param = config.sharedArguments().roninTrustedOrganization;
+    args = abi.encodeCall(
+      RoninTrustedOrganization.initialize, (param.trustedOrganizations, param.numerator, param.denominator)
+    );
   }
 
   function run() public returns (RoninTrustedOrganization) {

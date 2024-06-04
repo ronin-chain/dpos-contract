@@ -22,11 +22,11 @@ contract Simulation_20231003_REP002AndREP003_RON_NonConditional_GatewayUpgrade i
     _deployGatewayContracts();
 
     // -------------- Day #2 (execute proposal on ronin) --------------------
-    // _fastForwardToNextDay();
-    // _wrapUpEpoch();
+    // LibWrapUpEpoch.fastForwardToNextDay();
+    // LibWrapUpEpoch.wrapUpPeriod();
 
-    vm.warp(block.timestamp + 3 seconds);
-    vm.roll(block.number + 1);
+    vm.warp(vm.getBlockTimestamp() + 3 seconds);
+    vm.roll(vm.getBlockNumber() + 1);
 
     _upgradeDPoSContracts();
     _upgradeGatewayContracts();
@@ -36,47 +36,45 @@ contract Simulation_20231003_REP002AndREP003_RON_NonConditional_GatewayUpgrade i
     // -- done execute proposal
 
     // Deposit for
-    vm.warp(block.timestamp + 3 seconds);
-    vm.roll(block.number + 1);
+    vm.warp(vm.getBlockTimestamp() + 3 seconds);
+    vm.roll(vm.getBlockNumber() + 1);
     // _depositFor("after-upgrade-REP2");
     // _dummySwitchNetworks();
     _depositForOnlyOnRonin("after-upgrade-REP2");
 
-    _fastForwardToNextDay();
-    vm.warp(block.timestamp + 3 seconds);
-    vm.roll(block.number + 1);
+    LibWrapUpEpoch.fastForwardToNextDay();
+    vm.warp(vm.getBlockTimestamp() + 3 seconds);
+    vm.roll(vm.getBlockNumber() + 1);
     _depositForOnlyOnRonin("after-upgrade-REP2_a");
 
-    _fastForwardToNextDay();
-    vm.warp(block.timestamp + 3 seconds);
-    vm.roll(block.number + 1);
+    LibWrapUpEpoch.fastForwardToNextDay();
+    vm.warp(vm.getBlockTimestamp() + 3 seconds);
+    vm.roll(vm.getBlockNumber() + 1);
     _depositForOnlyOnRonin("after-upgrade-REP2_b");
 
     // -------------- End of Day #2 --------------------
 
     // - wrap up period
-    _fastForwardToNextDay();
-    _wrapUpEpoch();
+    LibWrapUpEpoch.wrapUpPeriod();
 
-    vm.warp(block.timestamp + 3 seconds);
-    vm.roll(block.number + 1);
+    vm.warp(vm.getBlockTimestamp() + 3 seconds);
+    vm.roll(vm.getBlockNumber() + 1);
     _depositForOnlyOnRonin("after-wrapup-Day2"); // share bridge reward here
     // _depositFor("after-DAY2");
 
-    _fastForwardToNextDay();
-    vm.warp(block.timestamp + 3 seconds);
-    vm.roll(block.number + 1);
+    LibWrapUpEpoch.fastForwardToNextDay();
+    vm.warp(vm.getBlockTimestamp() + 3 seconds);
+    vm.roll(vm.getBlockNumber() + 1);
     _depositForOnlyOnRonin("after-wrapup-Day2_a");
 
     // - deposit for
 
     // -------------- End of Day #3 --------------------
     // - wrap up period
-    _fastForwardToNextDay();
-    _wrapUpEpoch();
+    LibWrapUpEpoch.wrapUpPeriod();
 
-    vm.warp(block.timestamp + 3 seconds);
-    vm.roll(block.number + 1);
+    vm.warp(vm.getBlockTimestamp() + 3 seconds);
+    vm.roll(vm.getBlockNumber() + 1);
     _depositForOnlyOnRonin("after-wrapup-Day3"); // share bridge reward here
   }
 

@@ -159,7 +159,7 @@ interface IRandomBeacon {
   /**
    * @dev Checks if a submission has been made by a specific oracle for a given period.
    * @param period The period to check for the submission.
-   * @param consensus The consensus address of validator.
+   * @param consensus The consensus address of governing validator.
    * @return A boolean indicating whether the submission has been made or not.
    */
   function isSubmittedAt(uint256 period, TConsensus consensus) external view returns (bool);
@@ -167,10 +167,18 @@ interface IRandomBeacon {
   /**
    * @dev Checks if a submission has been made by a specific oracle for a given period.
    * @param period The period to check for the submission.
-   * @param cid The candidate id of validator.
+   * @param cid The candidate id of governing validator.
    * @return A boolean indicating whether the submission has been made or not.
    */
   function isSubmittedAtById(uint256 period, address cid) external view returns (bool);
+
+  /**
+   * @dev Checks if a submission has been made by a specific key hash for a given period.
+   * @param period The period to check for the submission.
+   * @param keyHash The key hash of the governing validator.
+   * @return A boolean indicating whether the submission has been made or not.
+   */
+  function isSubmittedAtByKeyHash(uint256 period, bytes32 keyHash) external view returns (bool);
 
   /**
    * @dev Get request hash for a given period.

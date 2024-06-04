@@ -2,13 +2,13 @@
 pragma solidity ^0.8.19;
 
 import { StdStyle } from "forge-std/StdStyle.sol";
-import { console2 as console } from "forge-std/console2.sol";
+import { console } from "forge-std/console.sol";
 
 import { LibErrorHandler } from "contract-libs/LibErrorHandler.sol";
-import { TContract } from "foundry-deployment-kit/types/Types.sol";
-import { LibProxy } from "foundry-deployment-kit/libraries/LibProxy.sol";
-import { LibSharedAddress } from "foundry-deployment-kit/libraries/LibSharedAddress.sol";
-import { BaseMigration } from "foundry-deployment-kit/BaseMigration.s.sol";
+import { TContract } from "@fdk/types/Types.sol";
+import { LibProxy } from "@fdk/libraries/LibProxy.sol";
+import { LibSharedAddress } from "@fdk/libraries/LibSharedAddress.sol";
+import { BaseMigration } from "@fdk/BaseMigration.s.sol";
 import { Contract } from "../utils/Contract.sol";
 
 import { ICandidateStaking } from "@ronin/contracts/interfaces/staking/ICandidateStaking.sol";
@@ -34,9 +34,9 @@ abstract contract PostChecker_Maintenance is BaseMigration, PostChecker_Helper {
   uint256 private _delegatingValue;
 
   function _postCheck__Maintenance() internal {
-    _validatorSet = CONFIG.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key());
-    _staking = CONFIG.getAddressFromCurrentNetwork(Contract.Staking.key());
-    _maintenance = CONFIG.getAddressFromCurrentNetwork(Contract.Maintenance.key());
+    _validatorSet = loadContract(Contract.RoninValidatorSet.key());
+    _staking = loadContract(Contract.Staking.key());
+    _maintenance = loadContract(Contract.Maintenance.key());
 
     {
       (, bytes memory returnedData) =
