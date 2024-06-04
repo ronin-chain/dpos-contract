@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { DefaultNetwork } from "foundry-deployment-kit/utils/DefaultNetwork.sol";
+import { DefaultNetwork } from "@fdk/utils/DefaultNetwork.sol";
 import { Network } from "script/utils/Network.sol";
 import { Contract } from "script/utils/Contract.sol";
 import { RoninMigration } from "script/RoninMigration.s.sol";
@@ -9,7 +9,7 @@ import { ISharedArgument, IRoninTrustedOrganization } from "./interfaces/IShared
 import { TConsensus } from "@ronin/contracts/udvts/Types.sol";
 
 contract TestnetMigration is RoninMigration {
-  ISharedArgument internal constant testnetConfig = ISharedArgument(address(CONFIG));
+  ISharedArgument internal constant testnetConfig = ISharedArgument(address(vme));
 
   function _getProxyAdminFromCurrentNetwork() internal view virtual override returns (address proxyAdmin) {
     if (network() == DefaultNetwork.RoninTestnet.key()) {

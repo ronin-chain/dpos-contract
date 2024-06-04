@@ -2,6 +2,7 @@
 pragma solidity ^0.8.19;
 
 import "./20231003_REP002AndREP003_Base.s.sol";
+import { LibWrapUpEpoch } from "script/shared/libraries/LibWrapUpEpoch.sol";
 
 contract Simulation__20231003_UpgradeREP002AndREP003_RON_NonConditional is
   Simulation__20231003_UpgradeREP002AndREP003_Base
@@ -15,12 +16,11 @@ contract Simulation__20231003_UpgradeREP002AndREP003_RON_NonConditional is
     // _depositFor("before-upgrade-user");
 
     // trigger conditional migration
-    _fastForwardToNextDay();
-    _wrapUpEpoch();
+    LibWrapUpEpoch.wrapUpPeriod();
 
     // // test `RoninValidatorSet` functionality
-    // _fastForwardToNextDay();
-    // _wrapUpEpoch();
+    // LibWrapUpEpoch.fastForwardToNextDay();
+    // LibWrapUpEpoch.wrapUpPeriod();
 
     // // test `RoninGatewayV3` functionality
     // _depositFor("after-upgrade-user");
@@ -52,7 +52,7 @@ contract Simulation__20231003_UpgradeREP002AndREP003_RON_NonConditional is
 
     {
       // upgrade `RoninTrustedOrganization`
-      _upgradeProxy(Contract.RoninTrustedOrganization.key(), EMPTY_ARGS);
+      _upgradeProxy(Contract.RoninTrustedOrganization.key());
     }
 
     {

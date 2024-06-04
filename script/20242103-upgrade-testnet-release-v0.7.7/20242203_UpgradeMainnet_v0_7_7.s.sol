@@ -7,15 +7,16 @@ import {
   TransparentUpgradeableProxyV2
 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
-import { console2 as console } from "forge-std/console2.sol";
-import { TContract } from "foundry-deployment-kit/types/Types.sol";
-import { LibProxy } from "foundry-deployment-kit/libraries/LibProxy.sol";
-import { DefaultNetwork } from "foundry-deployment-kit/utils/DefaultNetwork.sol";
+import { console } from "forge-std/console.sol";
+import { TContract } from "@fdk/types/Types.sol";
+import { LibProxy } from "@fdk/libraries/LibProxy.sol";
+import { DefaultNetwork } from "@fdk/utils/DefaultNetwork.sol";
 import { RoninTrustedOrganization, Proposal, RoninMigration, RoninGovernanceAdmin } from "script/RoninMigration.s.sol";
 import { Contract } from "script/utils/Contract.sol";
 import { Maintenance } from "@ronin/contracts/ronin/Maintenance.sol";
 import { Staking } from "@ronin/contracts/ronin/staking/Staking.sol";
 import "@ronin/contracts/ronin/profile/Profile_Mainnet.sol";
+import { LibProposal } from "script/shared/libraries/LibProposal.sol";
 
 contract Migration__20242103_UpgradeReleaseV0_7_7_Mainnet is RoninMigration {
   using LibProxy for *;
@@ -52,7 +53,7 @@ contract Migration__20242103_UpgradeReleaseV0_7_7_Mainnet is RoninMigration {
         );
       } else {
         address implementation = allContracts[i].getProxyImplementation();
-        TContract contractType = config.getContractTypeFromCurrentNetwok(allContracts[i]);
+        TContract contractType = config.getContractTypeFromCurrentNetwork(allContracts[i]);
 
         if (implementation.codehash != keccak256(vm.getDeployedCode(config.getContractAbsolutePath(contractType)))) {
           console.log(
@@ -93,15 +94,15 @@ contract Migration__20242103_UpgradeReleaseV0_7_7_Mainnet is RoninMigration {
     }
 
     Proposal.ProposalDetail memory proposal =
-      _buildProposal(governanceAdmin, block.timestamp + 14 days, targets, values, callDatas);
+      LibProposal.buildProposal(governanceAdmin, vm.getBlockTimestamp() + 14 days, targets, values, callDatas);
 
-    _proposeProposal(governanceAdmin, trustedOrg, proposal, SKY_MAVIS_GOVERNOR);
+    LibProposal.proposeProposal(governanceAdmin, trustedOrg, proposal, SKY_MAVIS_GOVERNOR);
 
-    v0_7_7Precheck();
+    v0_7_7_Precheck();
 
-    CONFIG.setPostCheckingStatus(true);
-    _voteProposalUntilSuccess(governanceAdmin, trustedOrg, proposal);
-    CONFIG.setPostCheckingStatus(false);
+    vme.setPostCheckingStatus(true);
+    LibProposal.voteProposalUntilSuccess(governanceAdmin, trustedOrg, proposal);
+    vme.setPostCheckingStatus(false);
 
     v0_7_7Postcheck();
   }
@@ -143,7 +144,7 @@ contract Migration__20242103_UpgradeReleaseV0_7_7_Mainnet is RoninMigration {
     );
   }
 
-  function v0_7_7Precheck() internal {
+  function v0_7_7_Precheck() internal {
     TConsensus[] memory lostAddr = new TConsensus[](3);
     lostAddr[0] = TConsensus.wrap(0x454f6C34F0cfAdF1733044Fdf8B06516BD1E9529);
     lostAddr[1] = TConsensus.wrap(0xD7fEf73d95ccEdb26483fd3C6C48393e50708159);
