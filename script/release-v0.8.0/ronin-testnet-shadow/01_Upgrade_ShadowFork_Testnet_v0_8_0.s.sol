@@ -31,7 +31,7 @@ import {
   RoninValidatorSetREP10MigratorLogicDeploy
 } from "script/contracts/RoninValidatorSetREP10MigratorLogicDeploy.s.sol";
 
-contract Migration__20250505_Upgrade_Devnet_Release_V0_8_0 is RoninMigration {
+contract Migration_01_Upgrade_ShadowForkTestnet_Release_V0_8_0 is RoninMigration {
   using LibProxy for *;
   using StdStyle for *;
 

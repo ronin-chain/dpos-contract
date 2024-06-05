@@ -51,7 +51,7 @@ contract RoninMigration is BaseMigration {
 
     if (
       network() == DefaultNetwork.Local.key() || network() == DefaultNetwork.RoninTestnet.key()
-        || network() == Network.RoninDevnet.key()
+        || network() == Network.RoninDevnet.key() || network() == Network.ShadowForkMainnet.key()
     ) {
       param.initialOwner = makeAddr("initial-owner");
       _setStakingParam(param.staking);
@@ -277,6 +277,7 @@ contract RoninMigration is BaseMigration {
       if (
         currentNetwork == DefaultNetwork.RoninTestnet.key() || currentNetwork == DefaultNetwork.RoninMainnet.key()
           || currentNetwork == Network.RoninDevnet.key() || currentNetwork == DefaultNetwork.Local.key()
+          || currentNetwork == Network.ShadowForkMainnet.key()
       ) {
         // handle for ronin network
         console.log(StdStyle.yellow("Voting on RoninGovernanceAdmin for upgrading..."));

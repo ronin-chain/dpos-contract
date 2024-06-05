@@ -6,6 +6,7 @@ import { TransparentUpgradeableProxy } from "@openzeppelin/contracts/proxy/trans
 import { StdStyle } from "forge-std/StdStyle.sol";
 import { console } from "forge-std/console.sol";
 
+import { Staking } from "@ronin/contracts/ronin/staking/Staking.sol";
 import { RoninValidatorSetREP10Migrator } from
   "@ronin/contracts/ronin/validator/migrations/RoninValidatorSetREP10Migrator.sol";
 import { RoninGovernanceAdmin } from "@ronin/contracts/ronin/RoninGovernanceAdmin.sol";
@@ -14,6 +15,7 @@ import { SlashIndicator } from "@ronin/contracts/ronin/slash-indicator/SlashIndi
 import { RoninRandomBeacon } from "@ronin/contracts/ronin/random-beacon/RoninRandomBeacon.sol";
 import { FastFinalityTracking } from "@ronin/contracts/ronin/fast-finality/FastFinalityTracking.sol";
 import { RoninTrustedOrganization } from "@ronin/contracts/multi-chains/RoninTrustedOrganization.sol";
+import { IRoninTrustedOrganization } from "@ronin/contracts/interfaces/IRoninTrustedOrganization.sol";
 import { IBaseStaking } from "@ronin/contracts/interfaces/staking/IBaseStaking.sol";
 import { IRandomBeacon } from "@ronin/contracts/interfaces/random-beacon/IRandomBeacon.sol";
 import { ICandidateManager } from "@ronin/contracts/interfaces/validator/ICandidateManager.sol";
@@ -21,6 +23,7 @@ import { ISlashUnavailability } from "@ronin/contracts/interfaces/slash-indicato
 import { TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
 import { Proposal } from "@ronin/contracts/libraries/Proposal.sol";
 import { ContractType } from "@ronin/contracts/utils/ContractType.sol";
+import { TConsensus } from "@ronin/contracts/udvts/Types.sol";
 
 import { RoninMigration } from "script/RoninMigration.s.sol";
 import { RoninRandomBeaconDeploy } from "script/contracts/RoninRandomBeaconDeploy.s.sol";
@@ -36,19 +39,18 @@ import { LibProposal } from "script/shared/libraries/LibProposal.sol";
 import { LibVRFProof } from "script/shared/libraries/LibVRFProof.sol";
 import { LibWrapUpEpoch } from "script/shared/libraries/LibWrapUpEpoch.sol";
 
-contract Migration__20242205_Upgrade_Testnet_Release_V0_8_0 is RoninMigration {
+contract Migration__01_Upgrade_ShadowForkMainnet_Release_V0_8_0 is RoninMigration {
   using LibProxy for *;
   using StdStyle for *;
 
-  uint256 private constant MAX_GV = 7;
-  uint256 private constant MAX_RV = 4;
+  uint256 private constant MAX_GV = 12;
+  uint256 private constant MAX_RV = 10;
   uint256 private constant MAX_SV = 0;
 
   uint256 private constant RANDOM_BEACON_SLASH_THRESHOLD = 3;
-  uint256 private constant REP10_ACTIVATION_PERIOD = 19867; // Friday, 2024-May-24 00:00:00 UTC
-  uint256 private constant NEW_MAX_VALIDATOR_CANDIDATE = 64;
+  uint256 private constant REP10_ACTIVATION_PERIOD = 19879; // Wed, 2024-Jun-5 00:00:00 UTC
   uint256 private constant SLASH_RANDOM_BEACON_AMOUNT = 10_000 ether;
-  uint256 private constant NEW_SLASH_UNAVAILABILITY_AMOUNT = 50_000 ether;
+  uint256 private constant WAITING_SECS_TO_REVOKE = 1 days;
 
   address[] private contractsToUpgrade;
   TContract[] private contractTypesToUpgrade;
@@ -59,67 +61,40 @@ contract Migration__20242205_Upgrade_Testnet_Release_V0_8_0 is RoninMigration {
 
   address private roninValidatorSetREP10LogicMigrator;
 
+  Staking private staking;
   SlashIndicator private slashIndicator;
   RoninValidatorSet private roninValidatorSet;
   RoninRandomBeacon private roninRandomBeacon;
   RoninGovernanceAdmin private roninGovernanceAdmin;
   RoninTrustedOrganization private roninTrustedOrganization;
 
-  function run() public {
+  function run() public onlyOn(Network.ShadowForkMainnet.key()) {
+    staking = Staking(loadContract(Contract.Staking.key()));
     slashIndicator = SlashIndicator(loadContract(Contract.SlashIndicator.key()));
     roninValidatorSet = RoninValidatorSet(loadContract(Contract.RoninValidatorSet.key()));
     roninGovernanceAdmin = RoninGovernanceAdmin(loadContract(Contract.RoninGovernanceAdmin.key()));
     roninTrustedOrganization = RoninTrustedOrganization(loadContract(Contract.RoninTrustedOrganization.key()));
 
-    ISharedArgument.SharedParameter memory param = config.sharedArguments();
-    _updateConfig(param);
-
     address payable[] memory allContracts = config.getAllAddresses(network());
 
     _deployRoninValidatorSetREP10MigratorLogic();
-    _deployAndInitializeRoninRandomBeacon(param.roninRandomBeacon);
+    _deployAndInitializeRoninRandomBeacon();
 
     _recordContractToUpgrade(address(roninGovernanceAdmin), allContracts); // Record contracts to upgrade
 
-    (_targets, _values, _callDatas) = _buildProposalData(param);
-    _updateProposalResetMaxValidatorCandidate();
-    _updateProposalResetUnavailabilitySlashingConfig();
+    (_targets, _values, _callDatas) = _buildProposalData();
+    _updateProposalUpdateWaitingSecsToRevoke();
 
     Proposal.ProposalDetail memory proposal =
       LibProposal.buildProposal(roninGovernanceAdmin, vm.getBlockTimestamp() + 14 days, _targets, _values, _callDatas);
     LibProposal.executeProposal(roninGovernanceAdmin, roninTrustedOrganization, proposal);
-  }
 
-  function _updateConfig(ISharedArgument.SharedParameter memory param) internal pure {
-    param.slashIndicator.slashRandomBeacon.randomBeaconSlashAmount = SLASH_RANDOM_BEACON_AMOUNT;
-  }
+    IRoninTrustedOrganization.TrustedOrganization[] memory trustedOrgs =
+      roninTrustedOrganization.getAllTrustedOrganizations();
 
-  function _updateProposalResetUnavailabilitySlashingConfig() internal {
-    (uint256 tier1Threshold, uint256 tier2Threshold,, uint256 jailDuration) =
-      slashIndicator.getUnavailabilitySlashingConfigs();
-
-    _targets.push(address(slashIndicator));
-    _values.push(0);
-    _callDatas.push(
-      abi.encodeCall(
-        TransparentUpgradeableProxyV2.functionDelegateCall,
-        abi.encodeCall(
-          ISlashUnavailability.setUnavailabilitySlashingConfigs,
-          (tier1Threshold, tier2Threshold, NEW_SLASH_UNAVAILABILITY_AMOUNT, jailDuration)
-        )
-      )
-    );
-  }
-
-  function _updateProposalResetMaxValidatorCandidate() internal {
-    _targets.push(address(roninValidatorSet));
-    _values.push(0);
-    _callDatas.push(
-      abi.encodeCall(
-        TransparentUpgradeableProxyV2.functionDelegateCall,
-        abi.encodeCall(ICandidateManager.setMaxValidatorCandidate, (NEW_MAX_VALIDATOR_CANDIDATE))
-      )
-    );
+    for (uint256 i; i < trustedOrgs.length; i++) {
+      console.log("[Trusted Organization]", "Governor:".yellow(), trustedOrgs[i].governor);
+    }
   }
 
   function _postCheck() internal virtual override {
@@ -163,6 +138,10 @@ contract Migration__20242205_Upgrade_Testnet_Release_V0_8_0 is RoninMigration {
     );
     console.log("[Ronin Validator Set] Max Validator Candidate".yellow(), roninValidatorSet.maxValidatorCandidate());
     console.log("[Ronin Validator Set] Max Validator Number:".yellow(), roninValidatorSet.maxValidatorNumber());
+    console.log(
+      "[Staking] Waiting Secs To Revoke:".yellow(),
+      IBaseStaking(loadContract(Contract.Staking.key())).waitingSecsToRevoke()
+    );
 
     assertTrue(rep10ActivationPeriod > roninValidatorSet.currentPeriod(), "Invalid activated period for random beacon");
     assertEq(
@@ -170,13 +149,9 @@ contract Migration__20242205_Upgrade_Testnet_Release_V0_8_0 is RoninMigration {
       RoninValidatorSetREP10Migrator(payable(address(roninValidatorSetREP10LogicMigrator))).ACTIVATED_AT_PERIOD(),
       "[RoninValidatorSet] Invalid REP-10 activation period"
     );
-    assertEq(roninValidatorSet.maxValidatorNumber(), 11, "[RoninValidatorSet] Invalid max validator number");
+    assertEq(roninValidatorSet.maxValidatorNumber(), 22, "[RoninValidatorSet] Invalid max validator number");
     assertEq(rep10ActivationPeriod, REP10_ACTIVATION_PERIOD, "[RoninRandomBeacon] Invalid activated period");
-    assertEq(
-      NEW_MAX_VALIDATOR_CANDIDATE,
-      roninValidatorSet.maxValidatorCandidate(),
-      "[RoninValidatorSet] Invalid max validator candidate"
-    );
+
     assertEq(
       roninRandomBeacon.getUnavailabilitySlashThreshold(),
       RANDOM_BEACON_SLASH_THRESHOLD,
@@ -187,7 +162,6 @@ contract Migration__20242205_Upgrade_Testnet_Release_V0_8_0 is RoninMigration {
       slashIndicator.getRandomBeaconSlashingConfigs()._activatedAtPeriod,
       "[SlashIndicator] Invalid activated period for random beacon"
     );
-    assertEq(NEW_SLASH_UNAVAILABILITY_AMOUNT, slashAmount, "[SlashIndicator] Invalid slash amount for unavailability");
     assertEq(
       SLASH_RANDOM_BEACON_AMOUNT,
       slashIndicator.getRandomBeaconSlashingConfigs()._slashAmount,
@@ -196,9 +170,21 @@ contract Migration__20242205_Upgrade_Testnet_Release_V0_8_0 is RoninMigration {
     assertEq(
       roninRandomBeacon.getActivatedAtPeriod(), REP10_ACTIVATION_PERIOD, "Invalid activated period for random beacon"
     );
+    assertEq(staking.waitingSecsToRevoke(), WAITING_SECS_TO_REVOKE, "[Staking] Invalid waiting secs to revoke");
 
-    // super._postCheck();
     LibWrapUpEpoch.wrapUpEpoch();
+    super._postCheck();
+  }
+
+  function _updateProposalUpdateWaitingSecsToRevoke() internal {
+    _targets.push(loadContract(Contract.Staking.key()));
+    _callDatas.push(
+      abi.encodeCall(
+        TransparentUpgradeableProxyV2.functionDelegateCall,
+        (abi.encodeCall(IBaseStaking.setWaitingSecsToRevoke, (WAITING_SECS_TO_REVOKE)))
+      )
+    );
+    _values.push(0);
   }
 
   function _deployRoninValidatorSetREP10MigratorLogic() internal {
@@ -206,7 +192,7 @@ contract Migration__20242205_Upgrade_Testnet_Release_V0_8_0 is RoninMigration {
       new RoninValidatorSetREP10MigratorLogicDeploy().overrideActivatedAtPeriod(REP10_ACTIVATION_PERIOD).run();
   }
 
-  function _deployAndInitializeRoninRandomBeacon(ISharedArgument.RoninRandomBeaconParam memory param) internal {
+  function _deployAndInitializeRoninRandomBeacon() internal {
     roninRandomBeacon = new RoninRandomBeaconDeploy().run();
 
     IRandomBeacon.ValidatorType[] memory validatorTypes = new IRandomBeacon.ValidatorType[](4);
@@ -240,16 +226,7 @@ contract Migration__20242205_Upgrade_Testnet_Release_V0_8_0 is RoninMigration {
     vm.stopBroadcast();
   }
 
-  //   function _postCheck() internal virtual override {
-  //     // assertEq(
-  //     //   roninRandomBeacon.getActivatedAtPeriod(),
-  //     //   roninValidatorSet.currentPeriod() + 1,
-  //     //   "Invalid activated period for random beacon"
-  //     // );
-  //     //  assertEq(roninValidatorSet.)
-  //   }
-
-  function _buildProposalData(ISharedArgument.SharedParameter memory param)
+  function _buildProposalData()
     internal
     returns (address[] memory targets, uint256[] memory values, bytes[] memory callDatas)
   {
@@ -291,11 +268,7 @@ contract Migration__20242205_Upgrade_Testnet_Release_V0_8_0 is RoninMigration {
             logics[i],
             abi.encodeCall(
               SlashIndicator.initializeV4,
-              (
-                address(roninRandomBeacon),
-                param.slashIndicator.slashRandomBeacon.randomBeaconSlashAmount,
-                REP10_ACTIVATION_PERIOD
-              )
+              (address(roninRandomBeacon), SLASH_RANDOM_BEACON_AMOUNT, REP10_ACTIVATION_PERIOD)
             )
           )
         );
