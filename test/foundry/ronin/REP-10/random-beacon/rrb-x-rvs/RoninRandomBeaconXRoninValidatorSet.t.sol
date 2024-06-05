@@ -4,8 +4,7 @@ pragma solidity ^0.8.13;
 import "../../REP-10_Base.t.sol";
 
 contract RoninRandomBeaconXRoninValidatorSetTest is REP10_BaseTest {
-  function testFuzz_NotIncludeRevokedCandidates_execWrapUpBeaconPeriod() public {
-    uint256 revokeCount = 2;
+  function testFuzz_NotIncludeRevokedCandidates_execWrapUpBeaconPeriod(uint256 revokeCount) public {
     vm.deal(address(roninValidatorSet), 10_000_000 ether);
     vm.deal(address(stakingVesting), 100_000_000 ether);
 
@@ -16,7 +15,7 @@ contract RoninRandomBeaconXRoninValidatorSetTest is REP10_BaseTest {
     address[] memory allCids = roninValidatorSet.getValidatorCandidateIds();
     address[] memory admins = profile.getManyId2Admin(allCids);
 
-    revokeCount = bound(revokeCount, 1, allCids.length);
+    revokeCount = bound(revokeCount, 1, 10);
     // Randomly choose revoke admins
     address[] memory revokedCids = new address[](revokeCount);
     address[] memory revokedAdmins = new address[](revokeCount);
