@@ -16,7 +16,6 @@ contract RoninRandomBeaconXRoninValidatorSetTest is REP10_BaseTest {
     address[] memory admins = profile.getManyId2Admin(allCids);
 
     revokeCount = bound(revokeCount, 1, 10);
-    // Randomly choose revoke admins
     address[] memory revokedCids = new address[](revokeCount);
     address[] memory revokedAdmins = new address[](revokeCount);
     TConsensus[] memory revokedConsensuses = new TConsensus[](revokeCount);
