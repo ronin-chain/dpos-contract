@@ -128,7 +128,6 @@ abstract contract CoinbaseExecution is
     if (periodEnding) {
       // Get all candidate ids
       address[] memory allCids = _candidateIds;
-      randomBeacon.execWrapUpBeaconPeriod(lastPeriod, newPeriod);
       (uint256 totalDelegatingReward, uint256[] memory delegatingRewards) =
         _distributeRewardToTreasuriesAndCalculateTotalDelegatingReward(lastPeriod, allCids);
       _settleAndTransferDelegatingRewards(lastPeriod, allCids, totalDelegatingReward, delegatingRewards);
@@ -142,6 +141,7 @@ abstract contract CoinbaseExecution is
         slashIndicatorContract.execResetCreditScores(revokedCandidateIds);
       }
       _currentPeriodStartAtBlock = block.number + 1;
+      randomBeacon.execWrapUpBeaconPeriod(lastPeriod, newPeriod);
     }
 
     currValidatorIds = _syncValidatorSet(randomBeacon, newPeriod, nextEpoch);

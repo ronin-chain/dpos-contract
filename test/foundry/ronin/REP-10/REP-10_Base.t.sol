@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
+import { VmSafe } from "forge-std/Vm.sol";
 import { Test, console } from "forge-std/Test.sol";
 import { DeployDPoS } from "script/deploy-dpos/DeployDPoS.s.sol";
 import { vme } from "@fdk/utils/Constants.sol";
@@ -9,11 +10,14 @@ import { Contract } from "script/utils/Contract.sol";
 import { loadContract } from "@fdk/utils/Helpers.sol";
 import { LibWrapUpEpoch } from "script/shared/libraries/LibWrapUpEpoch.sol";
 import { IRandomBeacon } from "@ronin/contracts/interfaces/random-beacon/IRandomBeacon.sol";
+import { ICandidateManager } from "@ronin/contracts/interfaces/validator/ICandidateManager.sol";
 import { RoninValidatorSet } from "@ronin/contracts/ronin/validator/RoninValidatorSet.sol";
 import { GlobalConfigConsumer } from "@ronin/contracts/extensions/consumers/GlobalConfigConsumer.sol";
 import { RoninRandomBeacon } from "@ronin/contracts/ronin/random-beacon/RoninRandomBeacon.sol";
 import { LibPrecompile } from "script/shared/libraries/LibPrecompile.sol";
 import { Profile } from "@ronin/contracts/ronin/profile/Profile.sol";
+import { LibArray } from "@ronin/contracts/libraries/LibArray.sol";
+import { LibSortValidatorsByBeacon } from "@ronin/contracts/libraries/LibSortValidatorsByBeacon.sol";
 import { IRoninTrustedOrganization } from "@ronin/contracts/interfaces/IRoninTrustedOrganization.sol";
 import { RoninTrustedOrganization } from "@ronin/contracts/multi-chains/RoninTrustedOrganization.sol";
 import { ISlashRandomBeacon } from "@ronin/contracts/interfaces/slash-indicator/ISlashRandomBeacon.sol";
