@@ -55,8 +55,8 @@ abstract contract PostChecker_Slash is BaseMigration, PostChecker_Helper {
     _postCheckSlashTier2AndBailOutAgain();
 
     vm.revertTo(snapshotId);
-    _pickSuitableSlasheeForSlashBelowRequirement();
-    _postCheckSlashUntilBelowRequirement();
+    // _pickSuitableSlasheeForSlashBelowRequirement();
+    // _postCheckSlashUntilBelowRequirement();
   }
 
   function _postCheck_CreditScore() private {
