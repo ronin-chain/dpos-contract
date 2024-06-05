@@ -37,6 +37,8 @@ interface IProfile {
     bytes32 vrfKeyHash;
     /// @dev Timestamp of last change of VRF key hash. Only used in the logic of Beacon. Not used for checking for cooldown of updating the profile.
     uint256 vrfKeyHashLastChange;
+    /// @dev Address used for sequencer in zk-rollup.
+    address sequencer;
   }
 
   /// @dev Event emitted when a profile with `id` is added.
@@ -121,6 +123,9 @@ interface IProfile {
   /// @dev Getter to query `vrfKeyHashLastChange` from `id` address.
   function getId2VRFKeyHashLastChange(address id) external view returns (uint256);
 
+  /// @dev Getter to query `sequencer` from `id` address.
+  function getId2Sequencer(address id) external view returns (address);
+
   /// @dev Getter to batch query from `id` to `registeredAt`.
   function getManyId2RegisteredAt(address[] calldata idList) external view returns (uint256[] memory);
 
@@ -138,6 +143,9 @@ interface IProfile {
 
   /// @dev Getter to backward query from `consensus` address to `id` address.
   function tryGetConsensus2Id(TConsensus consensus) external view returns (bool found, address id);
+
+  /// @dev Getter to backward query from `sequencer` address to `id` address.
+  function tryGetSequencer2Id(address sequencer) external view returns (bool found, address id);
 
   /// @dev Getter to backward query from `vrfKeyHash` to `id` address.
   function tryGetVRFKeyHash2Id(bytes32 vrfKeyHash) external view returns (bool found, address id);
@@ -203,6 +211,16 @@ interface IProfile {
    * - The VRF key hash change cooldown must be ended.
    */
   function changeVRFKeyHash(address id, bytes32 vrfKeyHash) external;
+
+  /**
+   * @notice The candidate admin changes the sequencer address.
+
+   * @dev Requirements:
+   * - The profile must be existed.
+   * - Only user with candidate admin role can call this method.
+   * - New sequencer must not be duplicated or zero address.
+   */
+  function changeSequencer(address id, address sequencer) external;
 
   /**
    * @dev Cross-contract function to for slash indicator to check the list of public

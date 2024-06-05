@@ -21,7 +21,7 @@ contract Migration__20242103_UpgradeReleaseV0_7_7_Testnet is RoninMigration {
   using StdStyle for *;
 
   uint256 private constant NEW_MIN_OFFSET_TO_START_SCHEDULE = 1;
-  
+
   address[] private contractsToUpgrade;
   TContract[] private contractTypesToUpgrade;
 

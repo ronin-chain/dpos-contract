@@ -23,5 +23,7 @@ enum RoleAccess {
   /* 9 */
   CONSENSUS,
   /* 10 */
-  TREASURY
+  TREASURY,
+  /* 11 */
+  SEQUENCER
 }

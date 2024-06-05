@@ -28,8 +28,11 @@ abstract contract ProfileStorage is IProfile, HasContracts {
   /// @dev Mapping from vrf key hash => id address.
   mapping(bytes32 vrfKeyHash => address cid) internal _vrfKeyHash2Id;
 
+  /// @dev Mapping from sequencer address => id address.
+  mapping(address sequencer => address id) internal _sequencer2Id;
+
   /// @dev Upgradeable gap.
-  bytes32[46] __gap;
+  bytes32[45] __gap;
 
   /**
    * @dev Add a profile from memory to storage.
@@ -102,9 +105,9 @@ abstract contract ProfileStorage is IProfile, HasContracts {
    * @dev Set VRF Key Hash for the profile.
    */
   function _setVRFKeyHash(CandidateProfile storage _profile, bytes32 vrfKeyHash) internal {
-    //  Prevent reverting or registering null vrf key hash in `registry`,
-    //  in case normal candidate register for their profile,
-    //  since only Governing Validator can utilize VRF Key Hash
+    // Prevent reverting or registering null vrf key hash in `registry`,
+    // in case normal candidate register for their profile,
+    // since only Governing Validator can utilize VRF Key Hash
     if (vrfKeyHash == bytes32(0x0)) return;
 
     // Delete old VRF key hash in mapping
@@ -117,6 +120,18 @@ abstract contract ProfileStorage is IProfile, HasContracts {
     _profile.vrfKeyHashLastChange = block.timestamp;
 
     emit VRFKeyHashChanged(_profile.id, vrfKeyHash);
+  }
+
+  function _setSequencer(CandidateProfile storage _profile, address sequencer) internal {
+    // Delete old sequencer in mapping
+    delete _sequencer2Id[_profile.sequencer];
+    _sequencer2Id[sequencer] = _profile.id;
+
+    // Set new sequencer
+    _profile.sequencer = sequencer;
+    _registry[uint256(uint160(address(sequencer)))] = true;
+
+    emit ProfileAddressChanged(_profile.id, RoleAccess.SEQUENCER, sequencer);
   }
 
   function _startCooldown(CandidateProfile storage _profile) internal {

@@ -176,6 +176,13 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
   /**
    * @inheritdoc IProfile
    */
+  function getId2Sequencer(address id) external view returns (address) {
+    return _id2Profile[id].sequencer;
+  }
+
+  /**
+   * @inheritdoc IProfile
+   */
   function getManyId2Admin(address[] calldata idList) external view returns (address[] memory adminList) {
     adminList = new address[](idList.length);
 
@@ -250,6 +257,11 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
    */
   function tryGetConsensus2Id(TConsensus consensus) external view returns (bool found, address id) {
     return _tryGetConsensus2Id(consensus);
+  }
+
+  function tryGetSequencer2Id(address sequencer) external view returns (bool found, address id) {
+    id = _sequencer2Id[sequencer];
+    found = id != address(0);
   }
 
   /**
@@ -400,6 +412,17 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     _requireNonDuplicatedVRFKeyHash(vrfKeyHash);
     _requireCooldownPassedAndStartCooldown(_profile);
     _setVRFKeyHash(_profile, vrfKeyHash);
+  }
+
+  /**
+   * @inheritdoc IProfile
+   */
+  function changeSequencer(address id, address sequencer) external {
+    CandidateProfile storage _profile = _getId2ProfileHelper(id);
+    _requireCandidateAdmin(_profile);
+    _requireNonZeroAndNonDuplicated(RoleAccess.SEQUENCER, sequencer);
+    _requireCooldownPassedAndStartCooldown(_profile);
+    _setSequencer(_profile, sequencer);
   }
 
   function _requireCandidateAdmin(CandidateProfile storage sProfile) internal view {

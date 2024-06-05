@@ -43,7 +43,8 @@ contract Profile_Unit_Test is Base_Test {
           oldPubkey: "",
           oldConsensus: TConsensus.wrap(address(0)),
           registeredAt: 0,
-          vrfKeyHashLastChange: 0
+          vrfKeyHashLastChange: 0,
+          sequencer: address(0)
         })
       )
     );

@@ -35,7 +35,8 @@ abstract contract ProfileXComponents is IProfile, ProfileHandler {
       oldConsensus: TConsensus.wrap(address(0)),
       registeredAt: block.timestamp,
       vrfKeyHash: 0x0,
-      vrfKeyHashLastChange: 0
+      vrfKeyHashLastChange: 0,
+      sequencer: address(0)
     });
 
     _requireNonDuplicatedInRegistry(profile);
