@@ -140,8 +140,8 @@ abstract contract CoinbaseExecution is
       if (revokedCandidateIds.length > 0) {
         slashIndicatorContract.execResetCreditScores(revokedCandidateIds);
       }
-      _currentPeriodStartAtBlock = block.number + 1;
       randomBeacon.execWrapUpBeaconPeriod(lastPeriod, newPeriod);
+      _currentPeriodStartAtBlock = block.number + 1;
     }
 
     currValidatorIds = _syncValidatorSet(randomBeacon, newPeriod, nextEpoch);
