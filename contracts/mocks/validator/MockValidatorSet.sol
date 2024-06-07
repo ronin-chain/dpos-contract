@@ -148,6 +148,4 @@ contract MockValidatorSet is
   function isOperatingBridge(TConsensus) external view returns (bool) { }
 
   function _emergencyExitLockedFundReleased(address _consensusAddr) internal virtual override returns (bool) { }
-
-  function _isTrustedOrg(address validatorId) internal virtual override returns (bool) { }
 }

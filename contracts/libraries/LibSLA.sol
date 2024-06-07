@@ -11,6 +11,10 @@ struct RandomRequest {
   uint256 period;
   // The previous beacon value.
   uint256 prevBeacon;
+  // The chain ID of the request.
+  uint256 chainId;
+  // The address that emits the request.
+  address verifyingContract;
 }
 
 using LibSLA for RandomRequest global;
