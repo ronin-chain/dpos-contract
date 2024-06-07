@@ -140,7 +140,10 @@ abstract contract CoinbaseExecution is
       if (revokedCandidateIds.length > 0) {
         slashIndicatorContract.execResetCreditScores(revokedCandidateIds);
       }
-      // WARNING: alter this line could affect slash random beacon logic.
+
+      // Wrap up the beacon period includes (1) finalizing the beacon proof, (2) slashing validators on
+      // submitting beacon proof, and (3) determining the validator list for the next period by new proof.
+      // Should wrap up the beacon after unsatisfied candidates get removed. 
       randomBeacon.execWrapUpBeaconPeriod(lastPeriod, newPeriod);
       _currentPeriodStartAtBlock = block.number + 1;
     }
