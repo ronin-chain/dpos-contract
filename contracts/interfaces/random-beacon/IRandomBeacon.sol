@@ -102,14 +102,26 @@ interface IRandomBeacon {
    *
    * Callback function of {RoninValidatorSet-wrapUpEpoch}, only called at the end of an period.
    */
-  function execRequestRandomSeedForNextPeriod(uint256 lastPeriod, uint256 newPeriod) external;
+  function execRequestRandomSeedForNextPeriod(uint256 lastUpdatedPeriod, uint256 newPeriod) external;
 
   /**
    * @dev Finalize the beacon and record the unavailability.
    *
    * Callback function of {RoninValidatorSet-wrapUpEpoch}, only called at the end of an period.
    */
-  function execWrapUpBeaconPeriod(uint256 lastPeriod, uint256 newPeriod) external;
+  function execWrapUpBeaconPeriod(uint256 lastUpdatedPeriod, uint256 newPeriod, address[] calldata allCids) external;
+
+  /**
+   * @dev Record the unavailability and slash the validator.
+   *
+   * Callback function of {RoninValidatorSet-wrapUpEpoch}, only called at the end of an period.
+   */
+  function execRecordAndSlashUnavailability(
+    uint256 lastUpdatedPeriod,
+    uint256 newPeriod,
+    address slashIndicator,
+    address[] calldata allCids
+  ) external;
 
   /**
    * @dev Bulk set the pick thresholds for a given validator types.

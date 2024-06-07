@@ -9,7 +9,12 @@ contract RoninRandomBeacon_ExecRequestRandomSeedForNextPeriod_Test is REP10_Base
 
     uint256 currPeriod = _computePeriod(vm.getBlockTimestamp());
     (uint256 prevBeacon,) = roninRandomBeacon.getBeacon(currPeriod);
-    RandomRequest memory req = RandomRequest({ period: currPeriod + 1, prevBeacon: prevBeacon });
+    RandomRequest memory req = RandomRequest({
+      period: currPeriod + 1,
+      prevBeacon: prevBeacon,
+      chainId: block.chainid,
+      verifyingContract: address(roninRandomBeacon)
+    });
 
     vm.expectEmit(address(roninRandomBeacon));
     emit IRandomBeacon.RandomSeedRequested(currPeriod + 1, req.hash(), req);

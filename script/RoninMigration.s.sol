@@ -294,7 +294,7 @@ contract RoninMigration is BaseMigration {
 
         Proposal.ProposalDetail memory proposal = LibProposal.buildProposal({
           governanceAdmin: roninGovernanceAdmin,
-          expiry: vm.getBlockTimestamp() + 15 minutes,
+          expiry: vm.getBlockTimestamp() + 1 hours,
           targets: targets,
           values: values,
           callDatas: callDatas

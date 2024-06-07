@@ -7,7 +7,6 @@ import "../../extensions/RONTransferHelper.sol";
 import "../../interfaces/IProfile.sol";
 import "../../interfaces/IStakingVesting.sol";
 import "../../interfaces/IMaintenance.sol";
-import "../../interfaces/IRoninTrustedOrganization.sol";
 import "../../interfaces/IFastFinalityTracking.sol";
 import "../../interfaces/staking/IStaking.sol";
 import "../../interfaces/slash-indicator/ISlashIndicator.sol";
@@ -135,16 +134,21 @@ abstract contract CoinbaseExecution is
       _recycleDeprecatedRewards();
 
       ISlashIndicator slashIndicatorContract = ISlashIndicator(getContract(ContractType.SLASH_INDICATOR));
+      // Slash submit random beacon proof unavailability first, then update credit scores.
+      randomBeacon.execRecordAndSlashUnavailability(lastPeriod, newPeriod, address(slashIndicatorContract), allCids);
       slashIndicatorContract.execUpdateCreditScores(allCids, lastPeriod);
+
       address[] memory revokedCandidateIds = _syncCandidateSet(newPeriod);
       if (revokedCandidateIds.length > 0) {
+        // Re-update `allCids` after unsatisfied candidates get removed.
+        allCids = _candidateIds;
         slashIndicatorContract.execResetCreditScores(revokedCandidateIds);
       }
 
-      // Wrap up the beacon period includes (1) finalizing the beacon proof, (2) slashing validators on
-      // submitting beacon proof, and (3) determining the validator list for the next period by new proof.
-      // Should wrap up the beacon after unsatisfied candidates get removed. 
-      randomBeacon.execWrapUpBeaconPeriod(lastPeriod, newPeriod);
+      // Wrap up the beacon period includes (1) finalizing the beacon proof, and (2) determining the validator list for the next period by new proof.
+      // Should wrap up the beacon after unsatisfied candidates get removed.
+      randomBeacon.execWrapUpBeaconPeriod(lastPeriod, newPeriod, allCids);
+
       _currentPeriodStartAtBlock = block.number + 1;
     }
 
@@ -407,14 +411,5 @@ abstract contract CoinbaseExecution is
       }
     }
     emit BlockProducerSetUpdated(_newPeriod, _nextEpoch, getBlockProducerIds());
-  }
-
-  /**
-   * @dev Override `CandidateManager-_isTrustedOrg`.
-   */
-  function _isTrustedOrg(address validatorId) internal view override returns (bool) {
-    return IRoninTrustedOrganization(getContract(ContractType.RONIN_TRUSTED_ORGANIZATION)).getConsensusWeightById(
-      validatorId
-    ) > 0;
   }
 }

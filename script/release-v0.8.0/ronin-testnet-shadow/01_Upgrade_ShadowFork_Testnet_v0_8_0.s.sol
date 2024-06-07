@@ -61,7 +61,6 @@ contract Migration_01_Upgrade_ShadowForkTestnet_Release_V0_8_0 is RoninMigration
       staking: loadContract(Contract.Staking.key()),
       trustedOrg: address(trustedOrg),
       validatorSet: loadContract(Contract.RoninValidatorSet.key()),
-      slashIndicator: loadContract(Contract.SlashIndicator.key()),
       slashThreshold: param.roninRandomBeacon.slashThreshold,
       initialSeed: param.roninRandomBeacon.initialSeed,
       activatedAtPeriod: param.roninRandomBeacon.activatedAtPeriod,

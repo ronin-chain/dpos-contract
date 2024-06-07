@@ -215,7 +215,6 @@ contract Migration__01_Upgrade_ShadowForkMainnet_Release_V0_8_0 is RoninMigratio
       staking: loadContract(Contract.Staking.key()),
       trustedOrg: address(roninTrustedOrganization),
       validatorSet: loadContract(Contract.RoninValidatorSet.key()),
-      slashIndicator: address(slashIndicator),
       slashThreshold: RANDOM_BEACON_SLASH_THRESHOLD,
       initialSeed: uint256(keccak256(abi.encode(vm.unixTime()))),
       activatedAtPeriod: REP10_ACTIVATION_PERIOD,

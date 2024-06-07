@@ -78,7 +78,7 @@ contract RoninRandomBeaconXRoninValidatorSetTest is REP10_BaseTest {
       ) {
         (,, nonRotatingValidators, rotatingValidators,) =
           abi.decode(logs[i].data, (bool, uint256, address[], address[], address));
-          break
+          break;
       }
     }
 

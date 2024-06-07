@@ -14,7 +14,7 @@ libs = ['lib', 'node_modules/@openzeppelin', 'node_modules/hardhat']
 solc = '0.8.25'
 use_literal_content = true
 extra_output = ["devdoc", "userdoc", "storagelayout"]
-evm_version = 'berlin'
+evm_version = 'london'
 cache_path = 'cache_foundry'
 fs_permissions = [{ access = "read-write", path = "./" }]
 
