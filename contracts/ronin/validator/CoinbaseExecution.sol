@@ -127,16 +127,17 @@ abstract contract CoinbaseExecution is
     if (periodEnding) {
       // Get all candidate ids
       address[] memory allCids = _candidateIds;
-      (uint256 totalDelegatingReward, uint256[] memory delegatingRewards) =
-        _distributeRewardToTreasuriesAndCalculateTotalDelegatingReward(lastPeriod, allCids);
-      _settleAndTransferDelegatingRewards(lastPeriod, allCids, totalDelegatingReward, delegatingRewards);
-      _tryRecycleLockedFundsFromEmergencyExits();
-      _recycleDeprecatedRewards();
 
       ISlashIndicator slashIndicatorContract = ISlashIndicator(getContract(ContractType.SLASH_INDICATOR));
       // Slash submit random beacon proof unavailability first, then update credit scores.
       randomBeacon.execRecordAndSlashUnavailability(lastPeriod, newPeriod, address(slashIndicatorContract), allCids);
       slashIndicatorContract.execUpdateCreditScores(allCids, lastPeriod);
+
+      (uint256 totalDelegatingReward, uint256[] memory delegatingRewards) =
+        _distributeRewardToTreasuriesAndCalculateTotalDelegatingReward(lastPeriod, allCids);
+      _settleAndTransferDelegatingRewards(lastPeriod, allCids, totalDelegatingReward, delegatingRewards);
+      _tryRecycleLockedFundsFromEmergencyExits();
+      _recycleDeprecatedRewards();
 
       address[] memory revokedCandidateIds = _syncCandidateSet(newPeriod);
       if (revokedCandidateIds.length > 0) {
@@ -332,7 +333,7 @@ abstract contract CoinbaseExecution is
     uint256 newPeriod,
     uint256 nextEpoch
   ) private returns (address[] memory newValidatorIds) {
-    newValidatorIds = randomBeacon.pickValidatorSet(nextEpoch);
+    newValidatorIds = randomBeacon.pickValidatorSetForCurrentPeriod(nextEpoch);
     _setNewValidatorSet(newValidatorIds, newValidatorIds.length, newPeriod);
   }
 
