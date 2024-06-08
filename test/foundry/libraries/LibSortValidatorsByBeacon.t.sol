@@ -20,7 +20,6 @@ contract LibSortValidatorsByBeaconTest is Test {
     uint96(1450000 ether),
     uint96(830900 ether),
     uint96(550000 ether),
-   
     uint96(500000 ether),
     uint96(500000 ether),
     uint96(500000 ether),
@@ -65,7 +64,7 @@ contract LibSortValidatorsByBeaconTest is Test {
     counts = new uint256[](11);
 
     for (uint256 i; i < numSamples; ++i) {
-      address[] memory pickedWeights = LibSortValidatorsByBeacon._pickTopKRotatingValidatorsByBeaconWeight(
+      address[] memory pickedWeights = LibSortValidatorsByBeacon.pickTopKRotatingValidatorsByBeaconWeight(
         packedRVs, numRv, beaconValues[0], epochValues[0] + i
       );
 
@@ -209,11 +208,12 @@ contract LibSortValidatorsByBeaconTest is Test {
     r = _bound(r, MIN_EPOCH, MAX_EPOCH);
 
     bool duplicated;
-    address[] memory pickeds = LibSortValidatorsByBeacon.pickValidatorSet(r, 1);
+    address[] memory pickeds = LibSortValidatorsByBeacon.pickValidatorSet(1, r, 1);
     for (uint256 i; i < pickeds.length; i++) {
       for (uint256 j; j < ids.length; j++) {
         if (pickeds[i] == ids[j]) {
           duplicated = true;
+          console.log("Duplicated address:", pickeds[i]);
           break;
         }
       }
@@ -260,7 +260,7 @@ contract LibSortValidatorsByBeaconTest is Test {
     console.log("Reads:", reads.length, "Writes:", writes.length);
 
     for (uint256 i = MIN_EPOCH; i <= MAX_EPOCH; i++) {
-      address[] memory picked = LibSortValidatorsByBeacon.pickValidatorSet(i, beacon);
+      address[] memory picked = LibSortValidatorsByBeacon.pickValidatorSet(1, i, beacon);
       uint256 numNonRotatingValidator = picked.length - 1;
       assertEq(numNonRotatingValidator, 4, "Invalid number of non-rotating validators");
       // Non-rotating: address: 1, 2, 6, 5
@@ -526,7 +526,7 @@ contract LibSortValidatorsByBeaconTest is Test {
     );
 
     for (uint256 i = MIN_EPOCH; i <= MAX_EPOCH; i++) {
-      LibSortValidatorsByBeacon.pickValidatorSet(i, r);
+      LibSortValidatorsByBeacon.pickValidatorSet(1, i, r);
     }
   }
 
@@ -600,7 +600,7 @@ contract LibSortValidatorsByBeaconTest is Test {
 
     vm.record();
     vm.resumeGasMetering();
-    LibSortValidatorsByBeacon.pickValidatorSet(pickEpoch, r);
+    LibSortValidatorsByBeacon.pickValidatorSet(0, pickEpoch, r);
     vm.pauseGasMetering();
     (bytes32[] memory reads, bytes32[] memory writes) = vm.accesses(address(this));
     console.log("Reads:", reads.length, "Writes:", writes.length);

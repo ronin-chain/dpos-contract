@@ -230,7 +230,6 @@ contract Migration__01_Upgrade_Testnet_Release_V0_8_0 is RoninMigration {
       trustedOrg: address(roninTrustedOrganization),
       validatorSet: loadContract(Contract.RoninValidatorSet.key()),
       slashThreshold: RANDOM_BEACON_SLASH_THRESHOLD,
-      initialSeed: uint256(keccak256(abi.encode(vm.unixTime()))),
       activatedAtPeriod: REP10_ACTIVATION_PERIOD,
       validatorTypes: validatorTypes,
       thresholds: thresholds

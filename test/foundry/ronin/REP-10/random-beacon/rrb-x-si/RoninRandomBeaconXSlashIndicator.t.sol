@@ -15,7 +15,7 @@ contract RoninRandomBeaconXSlashIndicatorTest is REP10_BaseTest {
     }
 
     for (uint256 i; i < cids.length; ++i) {
-      assertEq(roninRandomBeacon.getUnavailabilityCount(cids[i]), 1);
+      assertEq(roninRandomBeacon.getUnavailabilityCountById(cids[i]), 1);
     }
   }
 
@@ -36,12 +36,12 @@ contract RoninRandomBeaconXSlashIndicatorTest is REP10_BaseTest {
     LibWrapUpEpoch.wrapUpPeriods({ times: threshold - 1, shouldSubmitBeacon: true });
 
     assertTrue(
-      roninRandomBeacon.getUnavailabilityCount(cidToBeSlash) == threshold - 1,
+      roninRandomBeacon.getUnavailabilityCountById(cidToBeSlash) == threshold - 1,
       "Unavailability count should be threshold - 1"
     );
     for (uint256 i; i < keys.length; ++i) {
       assertTrue(
-        roninRandomBeacon.getUnavailabilityCount(profile.getVRFKeyHash2Id(keys[i].keyHash)) == 0,
+        roninRandomBeacon.getUnavailabilityCountById(profile.getVRFKeyHash2Id(keys[i].keyHash)) == 0,
         "Unavailability count should be 0"
       );
     }
@@ -52,6 +52,6 @@ contract RoninRandomBeaconXSlashIndicatorTest is REP10_BaseTest {
 
     LibWrapUpEpoch.wrapUpPeriods({ times: 1, shouldSubmitBeacon: true });
 
-    assertTrue(roninRandomBeacon.getUnavailabilityCount(cidToBeSlash) == 0, "Unavailability count should be reset to 0");
+    assertTrue(roninRandomBeacon.getUnavailabilityCountById(cidToBeSlash) == 0, "Unavailability count should be reset to 0");
   }
 }

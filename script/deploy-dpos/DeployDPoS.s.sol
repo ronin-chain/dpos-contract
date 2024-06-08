@@ -173,7 +173,6 @@ contract DeployDPoS is RoninMigration {
       trustedOrg: address(trustedOrg),
       validatorSet: address(validatorSet),
       slashThreshold: param.slashThreshold,
-      initialSeed: param.initialSeed,
       activatedAtPeriod: param.activatedAtPeriod,
       validatorTypes: param.validatorTypes,
       thresholds: param.thresholds

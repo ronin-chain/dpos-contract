@@ -24,14 +24,14 @@ library LibSLA {
    * @dev Hashes the random request.
    */
   function hash(RandomRequest memory req) internal pure returns (bytes32) {
-    return keccak256(abi.encode(req.period, req.prevBeacon));
+    return keccak256(abi.encode(req.period, req.prevBeacon, req.chainId, req.verifyingContract));
   }
 
   /**
    * @dev Calculates the proof seed
    */
   function calcProofSeed(RandomRequest memory req, bytes32 keyHash) internal pure returns (uint256) {
-    return uint256(keccak256(abi.encode(req.period, req.prevBeacon, keyHash)));
+    return uint256(keccak256(abi.encode(req.period, req.prevBeacon, req.chainId, req.verifyingContract, keyHash)));
   }
 
   /**

@@ -6,7 +6,7 @@ import "../REP-10_Base.t.sol";
 contract RoninRandomBeacon_ExecWrapUpBeaconPeriod_Test is REP10_BaseTest {
   function testConcrete_EmitBeaconFinalizedEvent_WhenWrapUpAtTheEndOfPeriod() external {
     uint256 currPeriod = _computePeriod(vm.getBlockTimestamp());
-    (uint256 beaconValue,) = roninRandomBeacon.getBeacon(currPeriod);
+    (uint256 beaconValue,,) = roninRandomBeacon.getBeaconData(currPeriod);
 
     vm.expectEmit(address(roninRandomBeacon));
     emit IRandomBeacon.BeaconFinalized(currPeriod + 1, beaconValue);
