@@ -351,7 +351,7 @@ abstract contract CoinbaseExecution is
       emit EmptyValidatorSet(newPeriod, nextEpoch, newValidatorIds);
     }
 
-    _setNewValidatorSet(newValidatorIds, newValidatorIds.length, newPeriod);
+    _setNewValidatorSet(newValidatorIds, newPeriod, nextEpoch);
   }
 
   /**
@@ -362,39 +362,30 @@ abstract contract CoinbaseExecution is
    * Note: This method should be called once in the end of each period.
    *
    */
-  function _setNewValidatorSet(address[] memory _newValidators, uint256 _newValidatorCount, uint256 _newPeriod) private {
+  function _setNewValidatorSet(address[] memory newValidators, uint256 newPeriod, uint256 nextEpoch) private {
+    uint256 newValidatorCount = newValidators.length;
+    uint256 prevValidatorCount = _validatorCount;
+
     // Remove exceeding validators in the current set
-    for (uint256 _i = _newValidatorCount; _i < _validatorCount;) {
-      delete _validatorMap[_validatorIds[_i]];
-      delete _validatorIds[_i];
-
-      unchecked {
-        ++_i;
-      }
-    }
-
-    // Remove flag for all validator in the current set
-    for (uint _i; _i < _newValidatorCount;) {
-      delete _validatorMap[_validatorIds[_i]];
-
-      unchecked {
-        ++_i;
-      }
+    for (uint256 i = newValidatorCount; i < prevValidatorCount; ++i) {
+      delete _validatorMap[_validatorIds[i]];
+      delete _validatorIds[i];
     }
 
     // Update new validator set and set flag correspondingly.
-    for (uint256 _i; _i < _newValidatorCount;) {
-      address _newValidator = _newValidators[_i];
-      _validatorMap[_newValidator] = EnumFlags.ValidatorFlag.Both;
-      _validatorIds[_i] = _newValidator;
+    for (uint256 i; i < newValidatorCount; ++i) {
+      // Remove the flag for the validator in the previous set
+      delete _validatorMap[_validatorIds[i]];
 
-      unchecked {
-        ++_i;
-      }
+      address newValidator = newValidators[i];
+
+      _validatorMap[newValidator] = EnumFlags.ValidatorFlag.Both;
+      _validatorIds[i] = newValidator;
     }
 
-    _validatorCount = _newValidatorCount;
-    emit ValidatorSetUpdated(_newPeriod, _newValidators);
+    _validatorCount = newValidatorCount;
+
+    emit ValidatorSetUpdated(newPeriod, nextEpoch, newValidators);
   }
 
   /**

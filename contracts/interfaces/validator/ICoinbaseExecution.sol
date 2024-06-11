@@ -14,7 +14,7 @@ interface ICoinbaseExecution is ISlashingExecution {
   /// @dev Emitted when the validator set is returned empty from `RoninRandomBeacon` contract. Fallback to Governing Validator Set.
   event EmptyValidatorSet(uint256 indexed period, uint256 indexed epoch, address[] fallbackCis);
   /// @dev Emitted when the validator set is updated
-  event ValidatorSetUpdated(uint256 indexed period, address[] cids);
+  event ValidatorSetUpdated(uint256 indexed period, uint256 indexed epoch, address[] cids);
   /// @dev Emitted when the bridge operator set is updated, to mirror the in-jail and maintaining status of the validator.
   event BlockProducerSetUpdated(uint256 indexed period, uint256 indexed epoch, address[] cids);
   /// @dev Emitted when the bridge operator set is updated.
