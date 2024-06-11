@@ -203,8 +203,7 @@ library LibSortValidatorsByBeacon {
    * @dev Returns the saved validator set for a given period.
    */
   function getSavedValidatorSet(uint256 period) internal pure returns (ValidatorStorage memory savedValidatorSet) {
-    ValidatorStorage storage $ = getValidatorPerPeriodLocation(period);
-    savedValidatorSet = $;
+    savedValidatorSet = getValidatorPerPeriodLocation(period);
   }
 
   /**

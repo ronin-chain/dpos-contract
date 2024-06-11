@@ -77,27 +77,6 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
     _setContract(ContractType.RONIN_TRUSTED_ORGANIZATION, trustedOrg);
   }
 
-  event Migrated(LibSortValidatorsByBeacon.ValidatorStorage curr);
-
-  function initializeV2() external reinitializer(2) {
-    require(block.chainid == 2021, "[RoninRandomBeacon]: Only on ronin testnet");
-    LibSortValidatorsByBeacon.ValidatorStorage storage prev =
-      LibSortValidatorsByBeacon.getStorageAt(LibSortValidatorsByBeacon.$$_SortedValidatorByBeaconStorageLocation);
-
-    LibSortValidatorsByBeacon.ValidatorStorage storage curr =
-      LibSortValidatorsByBeacon.getValidatorPerPeriodLocation({ period: _computePeriod(block.timestamp) });
-
-    curr = prev;
-
-    require(
-      keccak256(abi.encode(curr._sorted._nonRotatingValidators))
-        == keccak256(abi.encode(prev._sorted._nonRotatingValidators)),
-      "[RoninRandomBeacon]: Copy data failed"
-    );
-
-    emit Migrated(curr);
-  }
-
   /**
    * @inheritdoc IRandomBeacon
    */
@@ -241,7 +220,7 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
     Beacon storage $beacon = _beaconPerPeriod[period];
     if (!$beacon.finalized) revert ErrNotFinalizedBeacon(period);
 
-    return LibSortValidatorsByBeacon.getSavedValidatorSet($beacon.value);
+    return LibSortValidatorsByBeacon.getSavedValidatorSet({ period: period });
   }
 
   /**

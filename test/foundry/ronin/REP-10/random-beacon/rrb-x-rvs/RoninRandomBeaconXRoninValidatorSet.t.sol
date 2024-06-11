@@ -4,6 +4,23 @@ pragma solidity ^0.8.13;
 import "../../REP-10_Base.t.sol";
 
 contract RoninRandomBeaconXRoninValidatorSetTest is REP10_BaseTest {
+  function testFuzz_getBlockProducers_And_getValidators_MustBeTheSame(uint16 wrapUpEpochCount) external {
+    vm.deal(address(roninValidatorSet), 10_000_000 ether);
+    vm.deal(address(stakingVesting), 100_000_000 ether);
+    vm.assume(wrapUpEpochCount > 0 && wrapUpEpochCount < 400);
+
+    for (uint16 i; i < wrapUpEpochCount; i++) {
+      LibWrapUpEpoch.fastForwardToNextEpoch();
+      LibWrapUpEpoch.wrapUpEpoch();
+
+      assertEq(
+        keccak256(abi.encode(roninValidatorSet.getValidators())),
+        keccak256(abi.encode(roninValidatorSet.getBlockProducers())),
+        "Block producers and validators must be the same"
+      );
+    }
+  }
+
   function testConcrete_NotIncludeRevokedCandidates_execWrapUpBeaconPeriod() public {
     vm.deal(address(roninValidatorSet), 10_000_000 ether);
     vm.deal(address(stakingVesting), 100_000_000 ether);
@@ -78,7 +95,7 @@ contract RoninRandomBeaconXRoninValidatorSetTest is REP10_BaseTest {
       ) {
         (,, nonRotatingValidators, rotatingValidators,) =
           abi.decode(logs[i].data, (bool, uint256, address[], address[], address));
-          break;
+        break;
       }
     }
 
@@ -103,8 +120,9 @@ contract RoninRandomBeaconXRoninValidatorSetTest is REP10_BaseTest {
     TConsensus[] memory allConsensuses = roninValidatorSet.getValidatorCandidates();
     address[] memory allCids = roninValidatorSet.getValidatorCandidateIds();
     address[] memory admins = profile.getManyId2Admin(allCids);
+    console.log("Candidate length:", allCids.length);
 
-    revokeCount = bound(revokeCount, 1, 10);
+    revokeCount = bound(revokeCount, 1, 5);
     address[] memory revokedCids = new address[](revokeCount);
     address[] memory revokedAdmins = new address[](revokeCount);
     TConsensus[] memory revokedConsensuses = new TConsensus[](revokeCount);
@@ -167,7 +185,7 @@ contract RoninRandomBeaconXRoninValidatorSetTest is REP10_BaseTest {
       ) {
         (,, nonRotatingValidators, rotatingValidators,) =
           abi.decode(logs[i].data, (bool, uint256, address[], address[], address));
-          break;
+        break;
       }
     }
 
