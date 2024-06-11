@@ -149,7 +149,7 @@ abstract contract CoinbaseExecution is
 
       // Wrap up the beacon period includes (1) finalizing the beacon proof, and (2) determining the validator list for the next period by new proof.
       // Should wrap up the beacon after unsatisfied candidates get removed.
-      randomBeacon.execWrapUpBeaconAndPendingCids(lastPeriod, newPeriod, allCids);
+      randomBeacon.execFinalizeBeaconAndPendingCids(lastPeriod, newPeriod, allCids);
 
       _currentPeriodStartAtBlock = block.number + 1;
     }
@@ -359,7 +359,7 @@ abstract contract CoinbaseExecution is
    *
    * Emits the `ValidatorSetUpdated` event.
    *
-   * Note: This method should be called once in the end of each period.
+   * Note: This method should be called once in the end of each `epoch`.
    *
    */
   function _setNewValidatorSet(address[] memory newValidators, uint256 newPeriod, uint256 nextEpoch) private {
@@ -418,14 +418,15 @@ abstract contract CoinbaseExecution is
         _validatorMap[prevBlockProducerId].removeFlag(EnumFlags.ValidatorFlag.BlockProducer);
     }
 
+    // Add block producer flag for applicable validators 
     length = currValidatorIds.length;
     for (uint256 i; i < length; ++i) {
       address validatorId = currValidatorIds[i];
       bool emergencyExitRequested = block.timestamp <= _emergencyExitJailedTimestamp[validatorId];
-      bool isNotKickedAfter =
+      bool isApplicable =
         !(_isJailedAtBlockById(validatorId, nextBlock) || maintainedList[i] || emergencyExitRequested);
 
-      if (isNotKickedAfter) {
+      if (isApplicable) {
         _validatorMap[validatorId] = _validatorMap[validatorId].addFlag(EnumFlags.ValidatorFlag.BlockProducer);
       }
     }

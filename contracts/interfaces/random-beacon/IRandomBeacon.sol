@@ -119,7 +119,7 @@ interface IRandomBeacon {
    *
    * Callback function of {RoninValidatorSet-wrapUpEpoch}, only called at the end of an period.
    */
-  function execWrapUpBeaconAndPendingCids(
+  function execFinalizeBeaconAndPendingCids(
     uint256 lastUpdatedPeriod,
     uint256 newPeriod,
     address[] calldata allCids
