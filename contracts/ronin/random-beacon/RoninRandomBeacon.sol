@@ -150,7 +150,7 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
   /**
    * @inheritdoc IRandomBeacon
    */
-  function execWrapUpBeaconPeriod(
+  function execWrapUpBeaconAndPendingCids(
     uint256 lastUpdatedPeriod,
     uint256 newPeriod,
     address[] calldata allCids

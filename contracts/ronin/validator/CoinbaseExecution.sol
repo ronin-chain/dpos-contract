@@ -149,7 +149,7 @@ abstract contract CoinbaseExecution is
 
       // Wrap up the beacon period includes (1) finalizing the beacon proof, and (2) determining the validator list for the next period by new proof.
       // Should wrap up the beacon after unsatisfied candidates get removed.
-      randomBeacon.execWrapUpBeaconPeriod(lastPeriod, newPeriod, allCids);
+      randomBeacon.execWrapUpBeaconAndPendingCids(lastPeriod, newPeriod, allCids);
 
       _currentPeriodStartAtBlock = block.number + 1;
     }
@@ -372,12 +372,13 @@ abstract contract CoinbaseExecution is
       delete _validatorIds[i];
     }
 
+    address newValidator;
     // Update new validator set and set flag correspondingly.
     for (uint256 i; i < newValidatorCount; ++i) {
       // Remove the flag for the validator in the previous set
       delete _validatorMap[_validatorIds[i]];
 
-      address newValidator = newValidators[i];
+      newValidator = newValidators[i];
 
       _validatorMap[newValidator] = EnumFlags.ValidatorFlag.Both;
       _validatorIds[i] = newValidator;
