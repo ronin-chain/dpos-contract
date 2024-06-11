@@ -9,6 +9,7 @@ import "../../interfaces/IStakingVesting.sol";
 import "../../interfaces/IMaintenance.sol";
 import "../../interfaces/IFastFinalityTracking.sol";
 import "../../interfaces/staking/IStaking.sol";
+import "../../interfaces/IRoninTrustedOrganization.sol";
 import "../../interfaces/slash-indicator/ISlashIndicator.sol";
 import "../../interfaces/random-beacon/IRandomBeacon.sol";
 import "../../interfaces/validator/ICoinbaseExecution.sol";
@@ -154,7 +155,7 @@ abstract contract CoinbaseExecution is
     }
 
     currValidatorIds = _syncValidatorSet(randomBeacon, newPeriod, nextEpoch);
-    _revampRoles(newPeriod, nextEpoch, currValidatorIds);
+    _removeInapplicableAndUpdateNewBlockProducers(newPeriod, nextEpoch, currValidatorIds);
 
     emit WrappedUpEpoch(lastPeriod, epoch, periodEnding);
 
@@ -334,6 +335,22 @@ abstract contract CoinbaseExecution is
     uint256 nextEpoch
   ) private returns (address[] memory newValidatorIds) {
     newValidatorIds = randomBeacon.pickValidatorSetForCurrentPeriod(nextEpoch);
+
+    // Fallback to all governing validators if the retrieved validator set is empty.
+    if (newValidatorIds.length == 0) {
+      IProfile profile = IProfile(getContract(ContractType.PROFILE));
+      IRoninTrustedOrganization.TrustedOrganization[] memory allTrustedOrgs =
+        IRoninTrustedOrganization(getContract(ContractType.RONIN_TRUSTED_ORGANIZATION)).getAllTrustedOrganizations();
+
+      uint256 length = allTrustedOrgs.length;
+      newValidatorIds = new address[](length);
+      for (uint256 i; i < length; ++i) {
+        newValidatorIds[i] = profile.getConsensus2Id(allTrustedOrgs[i].consensusAddr);
+      }
+
+      emit EmptyValidatorSet(newPeriod, nextEpoch, newValidatorIds);
+    }
+
     _setNewValidatorSet(newValidatorIds, newValidatorIds.length, newPeriod);
   }
 
@@ -390,27 +407,37 @@ abstract contract CoinbaseExecution is
    * Emits the `BridgeOperatorSetUpdated` event.
    *
    */
-  function _revampRoles(uint256 _newPeriod, uint256 _nextEpoch, address[] memory currValidatorIds) private {
-    bool[] memory _maintainedList =
-      IMaintenance(getContract(ContractType.MAINTENANCE)).checkManyMaintainedById(currValidatorIds, block.number + 1);
+  function _removeInapplicableAndUpdateNewBlockProducers(
+    uint256 newPeriod,
+    uint256 nextEpoch,
+    address[] memory currValidatorIds
+  ) private {
+    uint256 nextBlock = block.number + 1;
+    bool[] memory maintainedList =
+      IMaintenance(getContract(ContractType.MAINTENANCE)).checkManyMaintainedById(currValidatorIds, nextBlock);
 
-    for (uint _i; _i < currValidatorIds.length;) {
-      address validatorId = currValidatorIds[_i];
+    // Remove block producer flag for all validators in the previous set
+    address[] memory prevBlockProducers = getBlockProducerIds();
+    uint256 length = prevBlockProducers.length;
+    for (uint256 i; i < length; ++i) {
+      address prevBlockProducerId = prevBlockProducers[i];
+
+      _validatorMap[prevBlockProducerId] =
+        _validatorMap[prevBlockProducerId].removeFlag(EnumFlags.ValidatorFlag.BlockProducer);
+    }
+
+    length = currValidatorIds.length;
+    for (uint256 i; i < length; ++i) {
+      address validatorId = currValidatorIds[i];
       bool emergencyExitRequested = block.timestamp <= _emergencyExitJailedTimestamp[validatorId];
-      bool isProducerBefore = _isBlockProducerById(validatorId);
-      bool isProducerAfter =
-        !(_isJailedAtBlockById(validatorId, block.number + 1) || _maintainedList[_i] || emergencyExitRequested);
+      bool isNotKickedAfter =
+        !(_isJailedAtBlockById(validatorId, nextBlock) || maintainedList[i] || emergencyExitRequested);
 
-      if (!isProducerBefore && isProducerAfter) {
+      if (isNotKickedAfter) {
         _validatorMap[validatorId] = _validatorMap[validatorId].addFlag(EnumFlags.ValidatorFlag.BlockProducer);
-      } else if (isProducerBefore && !isProducerAfter) {
-        _validatorMap[validatorId] = _validatorMap[validatorId].removeFlag(EnumFlags.ValidatorFlag.BlockProducer);
-      }
-
-      unchecked {
-        ++_i;
       }
     }
-    emit BlockProducerSetUpdated(_newPeriod, _nextEpoch, getBlockProducerIds());
+
+    emit BlockProducerSetUpdated(newPeriod, nextEpoch, getBlockProducerIds());
   }
 }
