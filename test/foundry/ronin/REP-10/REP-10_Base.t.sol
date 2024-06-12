@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
+import { StdStyle } from "forge-std/StdStyle.sol";
 import { VmSafe } from "forge-std/Vm.sol";
 import { Test, console } from "forge-std/Test.sol";
 import { DeployDPoS } from "script/deploy-dpos/DeployDPoS.s.sol";
