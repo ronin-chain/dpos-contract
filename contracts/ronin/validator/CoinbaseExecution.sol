@@ -117,13 +117,12 @@ abstract contract CoinbaseExecution is
     uint256 lastPeriod = currentPeriod();
     uint256 epoch = epochOf(block.number);
     uint256 nextEpoch = epoch + 1;
-    address[] memory currValidatorIds = getValidatorIds();
 
     IRandomBeacon randomBeacon = IRandomBeacon(getContract(ContractType.RANDOM_BEACON));
     // This request is actually only invoked at the first epoch of the period.
     randomBeacon.execRequestRandomSeedForNextPeriod(lastPeriod, newPeriod);
 
-    _syncFastFinalityReward(epoch, currValidatorIds);
+    _syncFastFinalityReward({ epoch: epoch, validatorIds: getValidatorIds() });
 
     if (periodEnding) {
       // Get all candidate ids
@@ -154,8 +153,13 @@ abstract contract CoinbaseExecution is
       _currentPeriodStartAtBlock = block.number + 1;
     }
 
-    currValidatorIds = _syncValidatorSet(randomBeacon, newPeriod, nextEpoch);
-    _removeInapplicableAndUpdateNewBlockProducers(newPeriod, nextEpoch, currValidatorIds);
+    // Remove the previous validator set and block producer set
+    _removePreviousValidatorSetAndBlockProducerSet();
+    // Query the new validator set for upcoming epoch from the random beacon contract.
+    // Save new set into the contract storage.
+    address[] memory newValidatorIds = _syncValidatorSet(randomBeacon, newPeriod, nextEpoch);
+    // Activate applicable validators into the block producer set.
+    _updateApplicableValidatorToBlockProducerSet(newPeriod, nextEpoch, newValidatorIds);
 
     emit WrappedUpEpoch(lastPeriod, epoch, periodEnding);
 
@@ -351,7 +355,22 @@ abstract contract CoinbaseExecution is
       emit EmptyValidatorSet(newPeriod, nextEpoch, newValidatorIds);
     }
 
-    _setNewValidatorSet(newValidatorIds, newPeriod, nextEpoch);
+    _updateNewValidatorSet(newValidatorIds, newPeriod, nextEpoch);
+  }
+
+  /**
+   * @dev Removes the previous validator set and block producer set.
+   * This method is called at the end of each epoch.
+   */
+  function _removePreviousValidatorSetAndBlockProducerSet() private {
+    uint256 length = _validatorCount;
+
+    for (uint256 i; i < length; ++i) {
+      delete _validatorMap[_validatorIds[i]];
+      delete _validatorIds[i];
+    }
+
+    delete _validatorCount;
   }
 
   /**
@@ -362,35 +381,21 @@ abstract contract CoinbaseExecution is
    * Note: This method should be called once in the end of each `epoch`.
    *
    */
-  function _setNewValidatorSet(address[] memory newValidators, uint256 newPeriod, uint256 nextEpoch) private {
-    uint256 newValidatorCount = newValidators.length;
-    uint256 prevValidatorCount = _validatorCount;
-
-    // Remove exceeding validators in the current set
-    for (uint256 i = newValidatorCount; i < prevValidatorCount; ++i) {
-      delete _validatorMap[_validatorIds[i]];
-      delete _validatorIds[i];
-    }
-
+  function _updateNewValidatorSet(address[] memory newValidatorIds, uint256 newPeriod, uint256 nextEpoch) private {
+    uint256 newValidatorCount = newValidatorIds.length;
     address newValidator;
-    // Update new validator set and set flag correspondingly.
+
     for (uint256 i; i < newValidatorCount; ++i) {
-      // Remove the flag for the validator in the previous set
-      delete _validatorMap[_validatorIds[i]];
-
-      newValidator = newValidators[i];
-
-      _validatorMap[newValidator] = true;
-      _validatorIds[i] = newValidator;
+      _validatorIds[i] = newValidatorIds[i];
     }
 
     _validatorCount = newValidatorCount;
 
-    emit ValidatorSetUpdated(newPeriod, nextEpoch, newValidators);
+    emit ValidatorSetUpdated(newPeriod, nextEpoch, newValidatorIds);
   }
 
   /**
-   * @dev Activate/Deactivate the validators from producing blocks, based on their in jail status and maintenance status.
+   * @dev Activate the validators from producing blocks, based on their in jail status and maintenance status.
    *
    * Requirements:
    * - This method is called at the end of each epoch
@@ -399,28 +404,20 @@ abstract contract CoinbaseExecution is
    * Emits the `BridgeOperatorSetUpdated` event.
    *
    */
-  function _removeInapplicableAndUpdateNewBlockProducers(
+  function _updateApplicableValidatorToBlockProducerSet(
     uint256 newPeriod,
     uint256 nextEpoch,
-    address[] memory currValidatorIds
+    address[] memory newValidatorIds
   ) private {
     uint256 nextBlock = block.number + 1;
     bool[] memory maintainedList =
-      IMaintenance(getContract(ContractType.MAINTENANCE)).checkManyMaintainedById(currValidatorIds, nextBlock);
-
-    // Remove block producer flag for all validators in the previous set
-    address[] memory prevBlockProducers = getBlockProducerIds();
-    uint256 length = prevBlockProducers.length;
-    for (uint256 i; i < length; ++i) {
-      address prevBlockProducerId = prevBlockProducers[i];
-
-      delete _validatorMap[prevBlockProducerId];
-    }
+      IMaintenance(getContract(ContractType.MAINTENANCE)).checkManyMaintainedById(newValidatorIds, nextBlock);
 
     // Add block producer flag for applicable validators
-    length = currValidatorIds.length;
+    uint256 length = newValidatorIds.length;
+
     for (uint256 i; i < length; ++i) {
-      address validatorId = currValidatorIds[i];
+      address validatorId = newValidatorIds[i];
       bool emergencyExitRequested = block.timestamp <= _emergencyExitJailedTimestamp[validatorId];
       bool isApplicable = !(_isJailedAtBlockById(validatorId, nextBlock) || maintainedList[i] || emergencyExitRequested);
 
