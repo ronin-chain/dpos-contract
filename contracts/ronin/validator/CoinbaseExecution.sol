@@ -153,8 +153,8 @@ abstract contract CoinbaseExecution is
       _currentPeriodStartAtBlock = block.number + 1;
     }
 
-    // Remove the previous validator set and block producer set
-    _removePreviousValidatorSetAndBlockProducerSet();
+    // Clear the previous validator set and block producer set before sync the new set from beacon.
+    _clearPreviousValidatorSetAndBlockProducerSet();
     // Query the new validator set for upcoming epoch from the random beacon contract.
     // Save new set into the contract storage.
     address[] memory newValidatorIds = _syncValidatorSet(randomBeacon, newPeriod, nextEpoch);
@@ -362,7 +362,7 @@ abstract contract CoinbaseExecution is
    * @dev Removes the previous validator set and block producer set.
    * This method is called at the end of each epoch.
    */
-  function _removePreviousValidatorSetAndBlockProducerSet() private {
+  function _clearPreviousValidatorSetAndBlockProducerSet() private {
     uint256 length = _validatorCount;
 
     for (uint256 i; i < length; ++i) {
@@ -383,7 +383,6 @@ abstract contract CoinbaseExecution is
    */
   function _updateNewValidatorSet(address[] memory newValidatorIds, uint256 newPeriod, uint256 nextEpoch) private {
     uint256 newValidatorCount = newValidatorIds.length;
-    address newValidator;
 
     for (uint256 i; i < newValidatorCount; ++i) {
       _validatorIds[i] = newValidatorIds[i];
