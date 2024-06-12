@@ -380,7 +380,7 @@ abstract contract CoinbaseExecution is
 
       newValidator = newValidators[i];
 
-      _validatorMap[newValidator] = EnumFlags.ValidatorFlag.Both;
+      _validatorMap[newValidator] = true;
       _validatorIds[i] = newValidator;
     }
 
@@ -414,21 +414,17 @@ abstract contract CoinbaseExecution is
     for (uint256 i; i < length; ++i) {
       address prevBlockProducerId = prevBlockProducers[i];
 
-      _validatorMap[prevBlockProducerId] =
-        _validatorMap[prevBlockProducerId].removeFlag(EnumFlags.ValidatorFlag.BlockProducer);
+      delete _validatorMap[prevBlockProducerId];
     }
 
-    // Add block producer flag for applicable validators 
+    // Add block producer flag for applicable validators
     length = currValidatorIds.length;
     for (uint256 i; i < length; ++i) {
       address validatorId = currValidatorIds[i];
       bool emergencyExitRequested = block.timestamp <= _emergencyExitJailedTimestamp[validatorId];
-      bool isApplicable =
-        !(_isJailedAtBlockById(validatorId, nextBlock) || maintainedList[i] || emergencyExitRequested);
+      bool isApplicable = !(_isJailedAtBlockById(validatorId, nextBlock) || maintainedList[i] || emergencyExitRequested);
 
-      if (isApplicable) {
-        _validatorMap[validatorId] = _validatorMap[validatorId].addFlag(EnumFlags.ValidatorFlag.BlockProducer);
-      }
+      if (isApplicable) _validatorMap[validatorId] = true;
     }
 
     emit BlockProducerSetUpdated(newPeriod, nextEpoch, getBlockProducerIds());
