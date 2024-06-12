@@ -80,8 +80,8 @@
 | MockRONTransferHelperConsumer_Istanbul  |      442 |     24,134 |
 | MockRoninBridgeManager                  |   26,319 |     -1,743 |
 | MockRoninGatewayV3Extended              |   21,372 |      3,204 |
-| MockRoninValidatorSetExtended           |   28,825 |     -4,249 |
-| MockRoninValidatorSetOverridePrecompile |   28,048 |     -3,472 |
+| MockRoninValidatorSetExtended           |   28,681 |     -4,105 |
+| MockRoninValidatorSetOverridePrecompile |   27,904 |     -3,328 |
 | MockSlashIndicatorExtended              |   19,067 |      5,509 |
 | MockSorting                             |    3,165 |     21,411 |
 | MockStaking                             |    4,859 |     19,717 |
@@ -104,7 +104,7 @@
 | RoninRandomBeacon_Mainnet               |   17,619 |      6,957 |
 | RoninRandomBeacon_Testnet               |   19,987 |      4,589 |
 | RoninTrustedOrganization                |   10,372 |     14,204 |
-| RoninValidatorSet                       |   23,975 |        601 |
+| RoninValidatorSet                       |   23,831 |        745 |
 | RoninValidatorSetREP10Migrator          |    2,957 |     21,619 |
 | RoninValidatorSetTimedMigrator          |    3,602 |     20,974 |
 | Safe                                    |   13,651 |     10,925 |
