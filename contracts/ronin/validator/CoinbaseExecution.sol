@@ -180,7 +180,10 @@ abstract contract CoinbaseExecution is
       .getManyFinalityScoresById(epoch, validatorIds);
     uint256 divisor = scores.sum();
 
-    if (divisor == 0) return;
+    if (divisor == 0) {
+      emit ZeroSumFastFinalityScore(epoch, validatorIds);
+      return;
+    }
 
     uint256 iReward;
     uint256 totalReward = _totalFastFinalityReward;
