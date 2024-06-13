@@ -257,7 +257,7 @@ library LibSortValidatorsByBeacon {
   }
 
   /**
-   * @dev Picks the top `k` rotating validators based on their corresponding beacon weight.
+   * @dev Picks the top `k` rotating validators based on their corresponding beacon weight, epoch number and staked amount.
    */
   function pickTopKRotatingValidatorsByBeaconWeight(
     RotatingValidatorStorage[] memory packedRVs,
@@ -317,7 +317,7 @@ library LibSortValidatorsByBeacon {
   }
 
   /**
-   * @dev Private function to get the storage location of the validator set for a given slot.
+   * @dev Internal function to get the storage location of the validator set for a given slot.
    * @return $ The storage mapping for the validator set.
    */
   function getStorageAt(bytes32 slot) internal pure returns (ValidatorStorage storage $) {
@@ -327,7 +327,7 @@ library LibSortValidatorsByBeacon {
   }
 
   /**
-   * @dev Private function to get the storage location of the sorted validator mapping.
+   * @dev Internal function to get the storage location of the sorted validator mapping.
    * @return $ The storage mapping for the sorted validator.
    */
   function getValidatorPerPeriodLocation(uint256 period) internal pure returns (ValidatorStorage storage $) {

@@ -19,7 +19,7 @@ import { TConsensus } from "../../udvts/Types.sol";
 import { ContractType } from "../../utils/ContractType.sol";
 import { ErrLengthMismatch, ErrUnauthorizedCall } from "../../utils/CommonErrors.sol";
 
-contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigConsumer, IRandomBeacon {
+abstract contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigConsumer, IRandomBeacon {
   using LibSLA for uint256[2];
 
   /// @dev Storage gap for future upgrades.

@@ -41,6 +41,26 @@ interface IRoninGatewayV3 is MappedTokenConsumer {
   /// @dev Emitted when a deposit is voted
   event DepositVoted(address indexed bridgeOperator, uint256 indexed id, uint256 indexed chainId, bytes32 receiptHash);
 
+  function initialize(
+    address _roleSetter,
+    uint256 _numerator,
+    uint256 _denominator,
+    uint256 _trustedNumerator,
+    uint256 _trustedDenominator,
+    address[] calldata, /* _withdrawalMigrators */
+    // _packedAddresses[0]: roninTokens
+    // _packedAddresses[1]: mainchainTokens
+    address[][2] calldata _packedAddresses,
+    // _packedNumbers[0]: chainIds
+    // _packedNumbers[1]: minimumThresholds
+    uint256[][2] calldata _packedNumbers,
+    Token.Standard[] calldata _standards
+  ) external;
+
+  function initializeV2() external;
+
+  function initializeV3(address bridgeAdmin) external;
+
   /**
    * @dev Returns withdrawal count.
    */
