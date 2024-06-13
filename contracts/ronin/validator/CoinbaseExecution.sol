@@ -150,6 +150,7 @@ abstract contract CoinbaseExecution is
       // Should wrap up the beacon after unsatisfied candidates get removed.
       randomBeacon.execFinalizeBeaconAndPendingCids(lastPeriod, newPeriod, allCids);
 
+      _periodEndBlock[lastPeriod] = block.number;
       _currentPeriodStartAtBlock = block.number + 1;
     }
 

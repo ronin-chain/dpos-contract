@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.9;
 
-import "../../../extensions/consumers/GlobalConfigConsumer.sol";
-import "../../../interfaces/validator/info-fragments/ITimingInfo.sol";
+import { GlobalConfigConsumer } from "../../../extensions/consumers/GlobalConfigConsumer.sol";
+import { ITimingInfo } from "../../../interfaces/validator/info-fragments/ITimingInfo.sol";
 
 abstract contract TimingStorage is ITimingInfo, GlobalConfigConsumer {
   /// @dev The number of blocks in a epoch
@@ -16,13 +16,23 @@ abstract contract TimingStorage is ITimingInfo, GlobalConfigConsumer {
   uint256 internal _currentPeriodStartAtBlock;
 
   /// @dev Mapping from epoch index => period index
-  mapping(uint256 => uint256) internal _periodOf;
-
+  mapping(uint256 epoch => uint256 period) internal _periodOf;
+  /// @dev Mapping from period index => ending block
+  mapping(uint256 period => uint256 endedAtBlock) internal _periodEndBlock;
   /**
    * @dev This empty reserved space is put in place to allow future versions to add new
    * variables without shifting down storage in the inheritance chain.
    */
-  uint256[49] private ______gap;
+  uint256[48] private ______gap;
+
+  /**
+   * @inheritdoc ITimingInfo
+   */
+  function getPeriodEndBlock(uint256 period) external view returns (uint256 endedAtBlock) {
+    if (period > _lastUpdatedPeriod) revert ErrPeriodNotEndedYet(period);
+    endedAtBlock = _periodEndBlock[period];
+    if (endedAtBlock == 0) revert ErrPeriodEndingBlockNotExist(period);
+  }
 
   /**
    * @inheritdoc ITimingInfo
