@@ -1,15 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { HasContracts } from "@ronin/contracts/extensions/collections/HasContracts.sol";
 import { ICandidateStaking } from "@ronin/contracts/interfaces/staking/ICandidateStaking.sol";
 import { IProfile } from "@ronin/contracts/interfaces/IProfile.sol";
 import { IRoninTrustedOrganization } from "@ronin/contracts/interfaces/IRoninTrustedOrganization.sol";
-import { RoninValidatorSet } from "@ronin/contracts/ronin/validator/RoninValidatorSet.sol";
-import { RoninRandomBeacon } from "@ronin/contracts/ronin/random-beacon/RoninRandomBeacon.sol";
 import { TConsensus } from "@ronin/contracts/udvts/Types.sol";
 import { ContractType } from "contracts/utils/ContractType.sol";
-import { TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
+import { ITransparentUpgradeableProxyV2 } from
+  "@ronin/contracts/interfaces/extensions/ITransparentUpgradeableProxyV2.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
 import { console } from "forge-std/console.sol";
 import { LibErrorHandler } from "contract-libs/LibErrorHandler.sol";
@@ -117,7 +115,7 @@ contract PostChecker is
       }
 
       vm.prank(governanceAdmin);
-      TransparentUpgradeableProxyV2(payable(address(trustedOrg))).functionDelegateCall(
+      ITransparentUpgradeableProxyV2(address(trustedOrg)).functionDelegateCall(
         abi.encodeCall(trustedOrg.removeTrustedOrganizations, (consensusesToRemove))
       );
     }

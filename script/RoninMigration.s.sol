@@ -2,13 +2,9 @@
 pragma solidity ^0.8.19;
 
 import { ProxyAdmin } from "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
-import { RoninGovernanceAdmin } from "@ronin/contracts/ronin/RoninGovernanceAdmin.sol";
-import { TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
+import { IRoninGovernanceAdmin } from "@ronin/contracts/interfaces/IRoninGovernanceAdmin.sol";
 import { TransparentUpgradeableProxy } from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
-import {
-  IRoninTrustedOrganization,
-  RoninTrustedOrganization
-} from "@ronin/contracts/multi-chains/RoninTrustedOrganization.sol";
+import { IRoninTrustedOrganization } from "@ronin/contracts/interfaces/IRoninTrustedOrganization.sol";
 import { IRandomBeacon } from "@ronin/contracts/interfaces/random-beacon/IRandomBeacon.sol";
 import { TConsensus } from "@ronin/contracts/udvts/Types.sol";
 import { Proposal } from "@ronin/contracts/libraries/Proposal.sol";
@@ -24,7 +20,6 @@ import { IPostCheck } from "./interfaces/IPostCheck.sol";
 import { BaseMigration } from "@fdk/BaseMigration.s.sol";
 import { vme } from "@fdk/utils/Constants.sol";
 import { LibString } from "@solady/utils/LibString.sol";
-import { GeneralConfig } from "script/GeneralConfig.sol";
 import { LibDeploy, DeployInfo, ProxyInterface, UpgradeInfo } from "@fdk/libraries/LibDeploy.sol";
 import { LibProposal } from "script/shared/libraries/LibProposal.sol";
 import { LibWrapUpEpoch } from "script/shared/libraries/LibWrapUpEpoch.sol";
@@ -37,7 +32,7 @@ contract RoninMigration is BaseMigration {
   ISharedArgument internal constant config = ISharedArgument(address(vme));
 
   function _configByteCode() internal virtual override returns (bytes memory) {
-    return type(GeneralConfig).creationCode;
+    return vm.getCode("out/GeneralConfig.sol/GeneralConfig.json");
   }
 
   function _postCheck() internal virtual override {
@@ -280,7 +275,7 @@ contract RoninMigration is BaseMigration {
         // handle for ronin network
         console.log(StdStyle.yellow("Voting on RoninGovernanceAdmin for upgrading..."));
 
-        RoninGovernanceAdmin roninGovernanceAdmin = RoninGovernanceAdmin(governanceAdmin);
+        IRoninGovernanceAdmin roninGovernanceAdmin = IRoninGovernanceAdmin(governanceAdmin);
         bytes[] memory callDatas = new bytes[](1);
         uint256[] memory values = new uint256[](1);
         address[] memory targets = new address[](1);
@@ -300,7 +295,7 @@ contract RoninMigration is BaseMigration {
 
         LibProposal.executeProposal(
           roninGovernanceAdmin,
-          RoninTrustedOrganization(loadContract(Contract.RoninTrustedOrganization.key())),
+          IRoninTrustedOrganization(loadContract(Contract.RoninTrustedOrganization.key())),
           proposal
         );
 
@@ -315,8 +310,8 @@ contract RoninMigration is BaseMigration {
       // in case proxyAdmin is an eoa
       console.log(StdStyle.yellow("Upgrading with EOA wallet..."));
       vm.broadcast(address(proxyAdmin));
-      if (callData.length == 0) TransparentUpgradeableProxyV2(payable(proxy)).upgradeTo(logic);
-      else TransparentUpgradeableProxyV2(payable(proxy)).upgradeToAndCall(logic, callData);
+      if (callData.length == 0) TransparentUpgradeableProxy(payable(proxy)).upgradeTo(logic);
+      else TransparentUpgradeableProxy(payable(proxy)).upgradeToAndCall(logic, callData);
     } else {
       console.log(StdStyle.yellow("Upgrading with owner of ProxyAdmin contract..."));
       // in case proxyAdmin is a ProxyAdmin contract

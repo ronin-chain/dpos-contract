@@ -1,9 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { RoninTrustedOrganization } from "@ronin/contracts/multi-chains/RoninTrustedOrganization.sol";
 import { IRoninTrustedOrganization } from "@ronin/contracts/interfaces/IRoninTrustedOrganization.sol";
-import { Profile } from "@ronin/contracts/ronin/profile/Profile.sol";
+import { IProfile } from "@ronin/contracts/interfaces/IProfile.sol";
 import { TConsensus } from "@ronin/contracts/udvts/Types.sol";
 
 import { console } from "forge-std/console.sol";
@@ -21,11 +20,12 @@ contract Migration_ShadowForkMainnet_Upgrade_RoninValidatorSet is RoninMigration
   using LibVRFProof for *;
   using StdStyle for *;
 
-  Profile private profile;
-  RoninTrustedOrganization private trustedOrg;
+  IProfile private profile;
+  IRoninTrustedOrganization private trustedOrg;
   LibVRFProof.VRFKey[] private keys;
 
   function run() public {
-    _upgradeProxy(Contract.RoninValidatorSet.key());
+    _deployLogic(Contract.RoninValidatorSet.key());
+    _deployLogic(Contract.RoninRandomBeacon.key());
   }
 }

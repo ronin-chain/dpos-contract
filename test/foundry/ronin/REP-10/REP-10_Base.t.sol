@@ -12,7 +12,7 @@ import { loadContract } from "@fdk/utils/Helpers.sol";
 import { LibWrapUpEpoch } from "script/shared/libraries/LibWrapUpEpoch.sol";
 import { IRandomBeacon } from "@ronin/contracts/interfaces/random-beacon/IRandomBeacon.sol";
 import { ICandidateManager } from "@ronin/contracts/interfaces/validator/ICandidateManager.sol";
-import { RoninValidatorSet } from "@ronin/contracts/ronin/validator/RoninValidatorSet.sol";
+import { IRoninValidatorSet } from "@ronin/contracts/interfaces/validator/IRoninValidatorSet.sol";
 import { GlobalConfigConsumer } from "@ronin/contracts/extensions/consumers/GlobalConfigConsumer.sol";
 import { RoninRandomBeacon } from "@ronin/contracts/ronin/random-beacon/RoninRandomBeacon.sol";
 import { LibPrecompile } from "script/shared/libraries/LibPrecompile.sol";
@@ -41,12 +41,13 @@ contract REP10_BaseTest is Test, GlobalConfigConsumer {
   StakingVesting public stakingVesting;
   SlashIndicator public slashIndicator;
   RoninRandomBeacon public roninRandomBeacon;
-  RoninValidatorSet public roninValidatorSet;
+  IRoninValidatorSet public roninValidatorSet;
   FastFinalityTracking public fastFinalityTracking;
   RoninTrustedOrganization public roninTrustedOrganization;
 
   function setUp() public virtual {
     DeployDPoS dposDeployHelper = new DeployDPoS();
+    dposDeployHelper.setUp();
     param = vme.getRawSharedArguments();
     dposDeployHelper.run();
     LibPrecompile.deployPrecompile();
@@ -56,7 +57,7 @@ contract REP10_BaseTest is Test, GlobalConfigConsumer {
     staking = Staking(loadContract(Contract.Staking.key()));
     stakingVesting = StakingVesting(loadContract(Contract.StakingVesting.key()));
     slashIndicator = SlashIndicator(loadContract(Contract.SlashIndicator.key()));
-    roninValidatorSet = RoninValidatorSet(loadContract(Contract.RoninValidatorSet.key()));
+    roninValidatorSet = IRoninValidatorSet(loadContract(Contract.RoninValidatorSet.key()));
     fastFinalityTracking = FastFinalityTracking(loadContract(Contract.FastFinalityTracking.key()));
     roninRandomBeacon = RoninRandomBeacon(loadContract(Contract.RoninRandomBeacon.key()));
     roninTrustedOrganization = RoninTrustedOrganization(loadContract(Contract.RoninTrustedOrganization.key()));

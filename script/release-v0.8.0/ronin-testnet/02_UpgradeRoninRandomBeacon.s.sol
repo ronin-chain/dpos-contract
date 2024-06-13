@@ -1,39 +1,31 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { RoninTrustedOrganization } from "@ronin/contracts/multi-chains/RoninTrustedOrganization.sol";
 import { IRoninTrustedOrganization } from "@ronin/contracts/interfaces/IRoninTrustedOrganization.sol";
 import { TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
-import { Profile } from "@ronin/contracts/ronin/profile/Profile.sol";
-import { TConsensus } from "@ronin/contracts/udvts/Types.sol";
-import { RoninGovernanceAdmin } from "@ronin/contracts/ronin/RoninGovernanceAdmin.sol";
-import { RoninTrustedOrganization } from "@ronin/contracts/multi-chains/RoninTrustedOrganization.sol";
+import { IProfile } from "@ronin/contracts/interfaces/IProfile.sol";
+import { IRoninGovernanceAdmin } from "@ronin/contracts/interfaces/IRoninGovernanceAdmin.sol";
+
 import { Proposal } from "@ronin/contracts/libraries/Proposal.sol";
 
-
-import { console } from "forge-std/console.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
 import { RoninMigration } from "script/RoninMigration.s.sol";
 import { Contract } from "script/utils/Contract.sol";
-import { Network } from "script/utils/Network.sol";
 
-import { LibString } from "@solady/utils/LibString.sol";
 import { LibProposal } from "script/shared/libraries/LibProposal.sol";
 import { LibVRFProof } from "script/shared/libraries/LibVRFProof.sol";
-import { LibPrecompile } from "script/shared/libraries/LibPrecompile.sol";
-import { LibWrapUpEpoch } from "script/shared/libraries/LibWrapUpEpoch.sol";
 import { IRandomBeacon } from "@ronin/contracts/interfaces/random-beacon/IRandomBeacon.sol";
 
 contract Migration_Testnet_Upgrade_RoninRandomBeacon is RoninMigration {
   using LibVRFProof for *;
   using StdStyle for *;
 
-  Profile private profile;
-  RoninTrustedOrganization private trustedOrg;
+  IProfile private profile;
+  IRoninTrustedOrganization private trustedOrg;
   LibVRFProof.VRFKey[] private keys;
 
-  RoninGovernanceAdmin private roninGovernanceAdmin;
-  RoninTrustedOrganization private roninTrustedOrganization;
+  IRoninGovernanceAdmin private roninGovernanceAdmin;
+  IRoninTrustedOrganization private roninTrustedOrganization;
 
   uint256 private constant MAX_GV = 4;
   uint256 private constant MAX_RV = 7;
@@ -44,8 +36,8 @@ contract Migration_Testnet_Upgrade_RoninRandomBeacon is RoninMigration {
   bytes[] private _callDatas;
 
   function run() public {
-    roninGovernanceAdmin = RoninGovernanceAdmin(loadContract(Contract.RoninGovernanceAdmin.key()));
-    roninTrustedOrganization = RoninTrustedOrganization(loadContract(Contract.RoninTrustedOrganization.key()));
+    roninGovernanceAdmin = IRoninGovernanceAdmin(loadContract(Contract.RoninGovernanceAdmin.key()));
+    roninTrustedOrganization = IRoninTrustedOrganization(loadContract(Contract.RoninTrustedOrganization.key()));
 
     IRandomBeacon.ValidatorType[] memory validatorTypes = new IRandomBeacon.ValidatorType[](4);
     uint256[] memory thresholds = new uint256[](4);

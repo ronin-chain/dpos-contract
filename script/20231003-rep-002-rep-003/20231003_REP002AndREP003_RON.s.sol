@@ -35,8 +35,8 @@ contract Simulation__20231003_UpgradeREP002AndREP003_RON is Simulation__20231003
       // upgrade `Staking` to `NotifiedMigrator`
       // bump `Staking` to V2
       bytes[] memory stakingCallDatas = new bytes[](1);
-      stakingCallDatas[0] = abi.encodeCall(Staking.initializeV2, ());
-      Staking(new NotifiedMigratorUpgrade().run(Contract.Staking, stakingCallDatas));
+      stakingCallDatas[0] = abi.encodeCall(IStaking.initializeV2, ());
+      IStaking(new NotifiedMigratorUpgrade().run(Contract.Staking, stakingCallDatas));
     }
 
     {
@@ -44,9 +44,9 @@ contract Simulation__20231003_UpgradeREP002AndREP003_RON is Simulation__20231003
       // bump `SlashIndicator` to V2, V3
       bytes[] memory slashIndicatorDatas = new bytes[](2);
       slashIndicatorDatas[0] =
-        abi.encodeCall(SlashIndicator.initializeV2, (loadContract(Contract.RoninGovernanceAdmin.key())));
+        abi.encodeCall(ISlashIndicator.initializeV2, (loadContract(Contract.RoninGovernanceAdmin.key())));
       slashIndicatorDatas[1] =
-        abi.encodeCall(SlashIndicator.initializeV3, (loadContractOrDeploy(Contract.Profile.key())));
+        abi.encodeCall(ISlashIndicator.initializeV3, (loadContractOrDeploy(Contract.Profile.key())));
       new NotifiedMigratorUpgrade().run(Contract.SlashIndicator, slashIndicatorDatas);
     }
 
@@ -60,8 +60,8 @@ contract Simulation__20231003_UpgradeREP002AndREP003_RON is Simulation__20231003
       // upgrade `BridgeTracking` to `NotifiedMigrator`
       // bump `BridgeTracking` to V2
       bytes[] memory bridgeTrackingDatas = new bytes[](1);
-      bridgeTrackingDatas[0] = abi.encodeCall(BridgeTracking.initializeV2, ());
-      _bridgeTracking = BridgeTracking(new NotifiedMigratorUpgrade().run(Contract.BridgeTracking, bridgeTrackingDatas));
+      bridgeTrackingDatas[0] = abi.encodeCall(IBridgeTracking.initializeV2, ());
+      _bridgeTracking = IBridgeTracking(new NotifiedMigratorUpgrade().run(Contract.BridgeTracking, bridgeTrackingDatas));
     }
   }
 }

@@ -11,9 +11,10 @@ import { console } from "forge-std/console.sol";
 import { TContract } from "@fdk/types/Types.sol";
 import { LibProxy } from "@fdk/libraries/LibProxy.sol";
 import { DefaultNetwork } from "@fdk/utils/DefaultNetwork.sol";
-import { RoninTrustedOrganization, Proposal, RoninMigration, RoninGovernanceAdmin } from "script/RoninMigration.s.sol";
+import { IRoninTrustedOrganization, Proposal, RoninMigration } from "script/RoninMigration.s.sol";
+import { IRoninGovernanceAdmin } from "@ronin/contracts/interfaces/IRoninGovernanceAdmin.sol";
 import { Contract } from "script/utils/Contract.sol";
-import { Maintenance } from "@ronin/contracts/ronin/Maintenance.sol";
+import { IMaintenance } from "@ronin/contracts/interfaces/IMaintenance.sol";
 import { LibProposal } from "script/shared/libraries/LibProposal.sol";
 
 contract Migration__20242103_UpgradeReleaseV0_7_7_Testnet is RoninMigration {
@@ -21,14 +22,14 @@ contract Migration__20242103_UpgradeReleaseV0_7_7_Testnet is RoninMigration {
   using StdStyle for *;
 
   uint256 private constant NEW_MIN_OFFSET_TO_START_SCHEDULE = 1;
-  
+
   address[] private contractsToUpgrade;
   TContract[] private contractTypesToUpgrade;
 
   function run() public onlyOn(DefaultNetwork.RoninTestnet.key()) {
-    RoninGovernanceAdmin governanceAdmin = RoninGovernanceAdmin(loadContract(Contract.RoninGovernanceAdmin.key()));
-    RoninTrustedOrganization trustedOrg =
-      RoninTrustedOrganization(loadContract(Contract.RoninTrustedOrganization.key()));
+    IRoninGovernanceAdmin governanceAdmin = IRoninGovernanceAdmin(loadContract(Contract.RoninGovernanceAdmin.key()));
+    IRoninTrustedOrganization trustedOrg =
+      IRoninTrustedOrganization(loadContract(Contract.RoninTrustedOrganization.key()));
     address payable[] memory allContracts = config.getAllAddresses(network());
 
     for (uint256 i; i < allContracts.length; ++i) {
@@ -80,7 +81,7 @@ contract Migration__20242103_UpgradeReleaseV0_7_7_Testnet is RoninMigration {
 
       if (contractTypesToUpgrade[i] == Contract.Maintenance.key()) {
         callDatas[i] = abi.encodeCall(
-          TransparentUpgradeableProxy.upgradeToAndCall, (logics[i], abi.encodeCall(Maintenance.initializeV4, ()))
+          TransparentUpgradeableProxy.upgradeToAndCall, (logics[i], abi.encodeCall(IMaintenance.initializeV4, ()))
         );
       }
     }
@@ -95,13 +96,13 @@ contract Migration__20242103_UpgradeReleaseV0_7_7_Testnet is RoninMigration {
     bytes[] memory callDatas,
     uint256 at
   ) internal view {
-    Maintenance maintenance = Maintenance(loadContract(Contract.Maintenance.key()));
+    IMaintenance maintenance = IMaintenance(loadContract(Contract.Maintenance.key()));
     targets[at] = address(maintenance);
     callDatas[at] = abi.encodeCall(
       TransparentUpgradeableProxyV2.functionDelegateCall,
       (
         abi.encodeCall(
-          Maintenance.setMaintenanceConfig,
+          IMaintenance.setMaintenanceConfig,
           (
             maintenance.minMaintenanceDurationInBlock(),
             maintenance.maxMaintenanceDurationInBlock(),

@@ -2,11 +2,9 @@
 pragma solidity ^0.8.19;
 
 import { console } from "forge-std/console.sol";
-import { TContract } from "@fdk/types/Types.sol";
 import { BaseGeneralConfig } from "@fdk/BaseGeneralConfig.sol";
 import { Network } from "./utils/Network.sol";
 import { Contract } from "./utils/Contract.sol";
-import { LibVRFProof } from "script/shared/libraries/LibVRFProof.sol";
 
 contract GeneralConfig is BaseGeneralConfig {
   constructor() BaseGeneralConfig("", "deployments/") { }
@@ -46,6 +44,7 @@ contract GeneralConfig is BaseGeneralConfig {
     setContractAbsolutePathMap(Contract.PostChecker.key(), "out/PostChecker.sol/PostChecker.json");
 
     // override artifact name with contract name
+    _contractNameMap[Contract.Profile.key()] = "Profile";
     _contractNameMap[Contract.RoninGatewayPauseEnforcer.key()] = "PauseEnforcer";
     _contractNameMap[Contract.HardForkRoninGovernanceAdmin.key()] = Contract.RoninGovernanceAdmin.name();
     _contractNameMap[Contract.TemporalRoninTrustedOrganization.key()] = Contract.RoninTrustedOrganization.name();

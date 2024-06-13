@@ -6,6 +6,26 @@ import { IBridgeSlash } from "@ronin/contracts/interfaces/bridge/IBridgeSlash.so
 contract MockBridgeSlash is IBridgeSlash {
   mapping(address => uint256) internal _slashMap;
 
+  function initialize(
+    address validatorContract,
+    address bridgeManagerContract,
+    address bridgeTrackingContract,
+    address dposGA
+  ) external { }
+  function initializeV2() external { }
+
+  function initializeV3(address bridgeManager, address bridgeSlash, address bridgeReward, address dposGA) external { }
+
+  /**
+   * @dev Helper for running upgrade script, required to only revoked once by the DPoS's governance admin.
+   * The following must be assured after initializing REP2:
+   * `_lastSyncPeriod`
+   *    == `{BridgeReward}.latestRewardedPeriod + 1`
+   *    == `{BridgeSlash}._startedAtPeriod - 1`
+   *    == `currentPeriod()`
+   */
+  function initializeREP2() external { }
+
   function MINIMUM_VOTE_THRESHOLD() external view returns (uint256) { }
 
   function REMOVE_DURATION_THRESHOLD() external view returns (uint256) { }

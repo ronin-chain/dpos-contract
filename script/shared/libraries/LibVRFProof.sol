@@ -2,7 +2,6 @@
 pragma solidity ^0.8.19;
 
 import { console } from "forge-std/console.sol";
-import { StdStyle } from "forge-std/StdStyle.sol";
 import { VRF } from "@chainlink/contracts/src/v0.8/VRF.sol";
 import { Vm, VmSafe } from "forge-std/Vm.sol";
 import { LibSharedAddress } from "@fdk/libraries/LibSharedAddress.sol";

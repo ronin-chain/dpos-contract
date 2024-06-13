@@ -79,7 +79,6 @@ contract LibSortValidatorsByBeaconTest is Test {
     beaconValues[0] = 0;
     uint256[] memory epochValues = random(numSamples, uint256(keccak256("epochValues")));
 
-
     for (uint256 i; i < numSamples; ++i) {
       address[] memory cids =
         LibSortValidatorsByBeacon.pickTopKRotatingValidatorsByBeaconWeight(packedRVs, numRv, 0, epochValues[0] + i);
