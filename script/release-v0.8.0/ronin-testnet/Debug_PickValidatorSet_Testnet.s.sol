@@ -3,12 +3,12 @@ pragma solidity ^0.8.19;
 
 import { console } from "forge-std/console.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
-import { Staking } from "@ronin/contracts/ronin/staking/Staking.sol";
-import { RoninValidatorSet } from "@ronin/contracts/ronin/validator/RoninValidatorSet.sol";
-import { RoninRandomBeacon } from "@ronin/contracts/ronin/random-beacon/RoninRandomBeacon.sol";
-import { RoninTrustedOrganization } from "@ronin/contracts/multi-chains/RoninTrustedOrganization.sol";
+import { IStaking } from "@ronin/contracts/interfaces/staking/IStaking.sol";
+import { IRoninValidatorSet } from "@ronin/contracts/interfaces/validator/IRoninValidatorSet.sol";
+import { IRandomBeacon } from "@ronin/contracts/interfaces/random-beacon/IRandomBeacon.sol";
+
 import { IRoninTrustedOrganization } from "@ronin/contracts/interfaces/IRoninTrustedOrganization.sol";
-import { Profile } from "@ronin/contracts/ronin/profile/Profile.sol";
+import { IProfile } from "@ronin/contracts/interfaces/IProfile.sol";
 import { TConsensus } from "@ronin/contracts/udvts/Types.sol";
 
 import { console } from "forge-std/console.sol";
@@ -26,20 +26,20 @@ contract Debug_PickValidatorSet_Testnet is RoninMigration {
   using LibVRFProof for *;
   using StdStyle for *;
 
-  Profile private profile;
-  Staking private staking;
-  RoninRandomBeacon private randomBeacon;
-  RoninValidatorSet private validatorSet;
-  RoninTrustedOrganization private trustedOrg;
+  IProfile private profile;
+  IStaking private staking;
+  IRandomBeacon private randomBeacon;
+  IRoninValidatorSet private validatorSet;
+  IRoninTrustedOrganization private trustedOrg;
   LibVRFProof.VRFKey[] private keys;
 
   mapping(address => uint256) private pickCount;
 
   function run() public {
-    profile = Profile(loadContract(Contract.Profile.key()));
-    staking = Staking(loadContract(Contract.Staking.key()));
-    randomBeacon = RoninRandomBeacon(loadContract(Contract.RoninRandomBeacon.key()));
-    validatorSet = RoninValidatorSet(loadContract(Contract.RoninValidatorSet.key()));
+    profile = IProfile(loadContract(Contract.Profile.key()));
+    staking = IStaking(loadContract(Contract.Staking.key()));
+    randomBeacon = IRandomBeacon(loadContract(Contract.RoninRandomBeacon.key()));
+    validatorSet = IRoninValidatorSet(loadContract(Contract.RoninValidatorSet.key()));
 
     uint256 currentPeriodStartAtBlock = validatorSet.currentPeriodStartAtBlock();
     uint256 startEpoch = validatorSet.epochOf(currentPeriodStartAtBlock);
@@ -56,7 +56,7 @@ contract Debug_PickValidatorSet_Testnet is RoninMigration {
     // Log pick count
     address[] memory allCids = validatorSet.getValidatorCandidateIds();
     console.log("Number of Candidates:", allCids.length);
-    
+
     for (uint256 i; i < allCids.length; ++i) {
       (, uint256 staked,) = staking.getPoolDetail(profile.getId2Consensus(allCids[i]));
       string memory log = string.concat(

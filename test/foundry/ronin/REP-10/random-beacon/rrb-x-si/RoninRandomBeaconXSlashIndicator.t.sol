@@ -52,6 +52,8 @@ contract RoninRandomBeaconXSlashIndicatorTest is REP10_BaseTest {
 
     LibWrapUpEpoch.wrapUpPeriods({ times: 1, shouldSubmitBeacon: true });
 
-    assertTrue(roninRandomBeacon.getUnavailabilityCountById(cidToBeSlash) == 0, "Unavailability count should be reset to 0");
+    assertTrue(
+      roninRandomBeacon.getUnavailabilityCountById(cidToBeSlash) == 0, "Unavailability count should be reset to 0"
+    );
   }
 }

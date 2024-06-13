@@ -13,6 +13,14 @@ contract MockBridgeTracking is IBridgeTracking {
   // Mapping from period number => period tracking
   mapping(uint256 => PeriodTracking) _tracks;
 
+  function initialize(address bridgeContract, address validatorContract, uint256 startedAtBlock_) external { }
+
+  function initializeV2() external { }
+
+  function initializeV3(address bridgeManager, address bridgeSlash, address bridgeReward, address dposGA) external { }
+
+  function initializeREP2() external { }
+
   function setPeriodTracking(
     uint256 period,
     address[] memory operators,

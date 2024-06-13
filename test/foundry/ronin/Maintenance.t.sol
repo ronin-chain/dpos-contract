@@ -6,7 +6,7 @@ import { Test, console } from "forge-std/Test.sol";
 import { IStaking, Staking } from "@ronin/contracts/ronin/staking/Staking.sol";
 import { Maintenance } from "@ronin/contracts/ronin/Maintenance.sol";
 import { TConsensus, Profile, IProfile } from "@ronin/contracts/ronin/profile/Profile.sol";
-import { RoninValidatorSet } from "@ronin/contracts/ronin/validator/RoninValidatorSet.sol";
+import { IRoninValidatorSet } from "@ronin/contracts/interfaces/validator/IRoninValidatorSet.sol";
 import { TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
 import { LibSharedAddress } from "@fdk/libraries/LibSharedAddress.sol";
 import { ISharedArgument } from "script/interfaces/ISharedArgument.sol";
@@ -19,7 +19,7 @@ contract MaintenanceTest is Test {
   Profile profile;
   Staking staking;
   Maintenance maintenance;
-  RoninValidatorSet validatorSet;
+  IRoninValidatorSet validatorSet;
   ISharedArgument config = ISharedArgument(LibSharedAddress.VME);
 
   function setUp() public {
@@ -29,14 +29,16 @@ contract MaintenanceTest is Test {
     vm.roll(block.number + 1000);
     vm.warp(block.timestamp + 3000);
 
-    new DeployDPoS().run();
+    DeployDPoS dposDeployHelper = new DeployDPoS();
+    dposDeployHelper.setUp();
+    dposDeployHelper.run();
 
     LibPrecompile.deployPrecompile();
 
     profile = Profile(config.getAddressFromCurrentNetwork(Contract.Profile.key()));
     staking = Staking(config.getAddressFromCurrentNetwork(Contract.Staking.key()));
     maintenance = Maintenance(config.getAddressFromCurrentNetwork(Contract.Maintenance.key()));
-    validatorSet = RoninValidatorSet(config.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key()));
+    validatorSet = IRoninValidatorSet(config.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key()));
 
     _applyValidatorCandidate();
   }

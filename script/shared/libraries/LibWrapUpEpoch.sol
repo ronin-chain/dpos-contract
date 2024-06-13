@@ -6,9 +6,7 @@ import { console } from "forge-std/console.sol";
 import { Contract } from "script/utils/Contract.sol";
 import { IGeneralConfig } from "@fdk/interfaces/IGeneralConfig.sol";
 import { LibSharedAddress } from "@fdk/libraries/LibSharedAddress.sol";
-import { RoninValidatorSet } from "@ronin/contracts/ronin/validator/RoninValidatorSet.sol";
-import { RoninRandomBeacon } from "@ronin/contracts/ronin/random-beacon/RoninRandomBeacon.sol";
-import { RandomRequest } from "@ronin/contracts/libraries/LibSLA.sol";
+import { IRoninValidatorSet } from "@ronin/contracts/interfaces/validator/IRoninValidatorSet.sol";
 import { VRF, LibVRFProof } from "./LibVRFProof.sol";
 
 library LibWrapUpEpoch {
@@ -58,7 +56,7 @@ library LibWrapUpEpoch {
 
   function wrapUpEpoch(address caller) private {
     vm.startPrank(caller);
-    RoninValidatorSet(config.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key())).wrapUpEpoch();
+    IRoninValidatorSet(config.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key())).wrapUpEpoch();
     vm.stopPrank();
   }
 
@@ -72,8 +70,8 @@ library LibWrapUpEpoch {
     vm.roll(vm.getBlockNumber() + 1);
     vm.warp(vm.getBlockTimestamp() + 3);
 
-    RoninValidatorSet validatorSet =
-      RoninValidatorSet(config.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key()));
+    IRoninValidatorSet validatorSet =
+      IRoninValidatorSet(config.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key()));
 
     uint256 diff;
     uint256 startBlock = validatorSet.currentPeriodStartAtBlock();
@@ -104,8 +102,8 @@ library LibWrapUpEpoch {
     vm.roll(vm.getBlockNumber() + 1);
     vm.warp(vm.getBlockTimestamp() + 3);
 
-    RoninValidatorSet validatorSet =
-      RoninValidatorSet(config.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key()));
+    IRoninValidatorSet validatorSet =
+      IRoninValidatorSet(config.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key()));
 
     uint256 diff;
     uint256 startBlock = validatorSet.currentPeriodStartAtBlock();

@@ -6,8 +6,7 @@ import { console } from "forge-std/console.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
 import { IGeneralConfig } from "@fdk/interfaces/IGeneralConfig.sol";
 import { LibSharedAddress } from "@fdk/libraries/LibSharedAddress.sol";
-import { RoninGovernanceAdmin } from "@ronin/contracts/ronin/RoninGovernanceAdmin.sol";
-import { RoninTrustedOrganization } from "@ronin/contracts/multi-chains/RoninTrustedOrganization.sol";
+import { IRoninGovernanceAdmin } from "@ronin/contracts/interfaces/IRoninGovernanceAdmin.sol";
 import { IRoninTrustedOrganization } from "@ronin/contracts/interfaces/IRoninTrustedOrganization.sol";
 import { Proposal } from "@ronin/contracts/libraries/Proposal.sol";
 import { Ballot } from "@ronin/contracts/libraries/Ballot.sol";
@@ -23,8 +22,8 @@ library LibProposal {
   IGeneralConfig internal constant config = IGeneralConfig(LibSharedAddress.VME);
 
   function executeProposal(
-    RoninGovernanceAdmin governanceAdmin,
-    RoninTrustedOrganization roninTrustedOrg,
+    IRoninGovernanceAdmin governanceAdmin,
+    IRoninTrustedOrganization roninTrustedOrg,
     Proposal.ProposalDetail memory proposal
   ) internal {
     proposeProposal(governanceAdmin, roninTrustedOrg, proposal, address(0));
@@ -32,8 +31,8 @@ library LibProposal {
   }
 
   function voteProposalUntilSuccess(
-    RoninGovernanceAdmin governanceAdmin,
-    RoninTrustedOrganization roninTrustedOrg,
+    IRoninGovernanceAdmin governanceAdmin,
+    IRoninTrustedOrganization roninTrustedOrg,
     Proposal.ProposalDetail memory proposal
   ) internal {
     Ballot.VoteType support = Ballot.VoteType.For;
@@ -73,8 +72,8 @@ library LibProposal {
   }
 
   function proposeProposal(
-    RoninGovernanceAdmin governanceAdmin,
-    RoninTrustedOrganization roninTrustedOrg,
+    IRoninGovernanceAdmin governanceAdmin,
+    IRoninTrustedOrganization roninTrustedOrg,
     Proposal.ProposalDetail memory proposal,
     address proposer
   ) internal {
@@ -102,8 +101,8 @@ library LibProposal {
   }
 
   function executeProposal(
-    RoninGovernanceAdmin governanceAdmin,
-    RoninTrustedOrganization roninTrustedOrg,
+    IRoninGovernanceAdmin governanceAdmin,
+    IRoninTrustedOrganization roninTrustedOrg,
     Proposal.ProposalDetail memory proposal,
     address proposer
   ) internal {
@@ -112,7 +111,7 @@ library LibProposal {
   }
 
   function buildProposal(
-    RoninGovernanceAdmin governanceAdmin,
+    IRoninGovernanceAdmin governanceAdmin,
     uint256 expiry,
     address[] memory targets,
     uint256[] memory values,

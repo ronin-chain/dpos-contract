@@ -6,7 +6,8 @@ import { console } from "forge-std/console.sol";
 import { JSONParserLib } from "@solady/utils/JSONParserLib.sol";
 import { RoninMigration } from "script/RoninMigration.s.sol";
 import { Contract } from "script/utils/Contract.sol";
-import { Staking } from "@ronin/contracts/ronin/staking/Staking.sol";
+import { IStaking } from "@ronin/contracts/interfaces/staking/IStaking.sol";
+import { IAccessControlEnumerable } from "@openzeppelin/contracts/access/IAccessControlEnumerable.sol";
 
 contract Migration__20240123_MigrateAdmin_Staking is RoninMigration {
   using StdStyle for *;
@@ -15,8 +16,8 @@ contract Migration__20240123_MigrateAdmin_Staking is RoninMigration {
   string internal constant MIGRATE_DATA_PATH = "script/data/cid.json";
 
   function run() external {
-    Staking staking = Staking(loadContract(Contract.Staking.key()));
-    address migrator = staking.getRoleMember(staking.MIGRATOR_ROLE(), 0);
+    IStaking staking = IStaking(loadContract(Contract.Staking.key()));
+    address migrator = IAccessControlEnumerable(address(staking)).getRoleMember(staking.MIGRATOR_ROLE(), 0);
     console.log("migrator:".yellow(), migrator);
     (address[] memory poolIds, address[] memory admins, bool[] memory flags) = _parseMigrateData(MIGRATE_DATA_PATH);
 

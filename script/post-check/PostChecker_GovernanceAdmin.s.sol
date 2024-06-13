@@ -5,21 +5,19 @@ import { StdStyle } from "forge-std/StdStyle.sol";
 import { console } from "forge-std/console.sol";
 
 import { LibErrorHandler } from "contract-libs/LibErrorHandler.sol";
-import { TContract } from "@fdk/types/Types.sol";
 import { LibProxy } from "@fdk/libraries/LibProxy.sol";
 import { BaseMigration } from "@fdk/BaseMigration.s.sol";
 import { Contract } from "../utils/Contract.sol";
 import { TransparentUpgradeableProxy } from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
-import { AccessControl } from "@openzeppelin/contracts/access/AccessControl.sol";
-
+import { IAccessControl } from "@openzeppelin/contracts/access/IAccessControl.sol";
+import { TContract } from "@fdk/types/TContract.sol";
 import { ICandidateManager } from "@ronin/contracts/interfaces/validator/ICandidateManager.sol";
 import { ICandidateStaking } from "@ronin/contracts/interfaces/staking/ICandidateStaking.sol";
 import { IStaking } from "@ronin/contracts/interfaces/staking/IStaking.sol";
-import { RoninValidatorSet } from "@ronin/contracts/ronin/validator/RoninValidatorSet.sol";
+import { IRoninTrustedOrganization } from "@ronin/contracts/interfaces/IRoninTrustedOrganization.sol";
+import { IRoninValidatorSet } from "@ronin/contracts/interfaces/validator/IRoninValidatorSet.sol";
 import { Proposal } from "@ronin/contracts/libraries/Proposal.sol";
-
 import { RoninGovernanceAdmin } from "@ronin/contracts/ronin/RoninGovernanceAdmin.sol";
-import { RoninTrustedOrganization } from "@ronin/contracts/multi-chains/RoninTrustedOrganization.sol";
 
 import "./PostChecker_Helper.sol";
 import { vme } from "@fdk/utils/Constants.sol";
@@ -114,7 +112,7 @@ abstract contract PostChecker_GovernanceAdmin is BaseMigration, PostChecker_Help
 
         // Change default admin role if it exist in the proxy
         (bool success, bytes memory returnData) =
-          addrs[i].call(abi.encodeCall(AccessControl.hasRole, (DEFAULT_ADMIN_ROLE, __governanceAdmin)));
+          addrs[i].call(abi.encodeCall(IAccessControl.hasRole, (DEFAULT_ADMIN_ROLE, __governanceAdmin)));
 
         if (success && abi.decode(returnData, (bool))) {
           console.log("Target Proxy to change default admin role:", vm.getLabel(addrs[i]));
@@ -139,10 +137,10 @@ abstract contract PostChecker_GovernanceAdmin is BaseMigration, PostChecker_Help
       for (uint i; i < _proxyACTargets.length; ++i) {
         uint j = _proxyTargets.length + i;
         targets[j] = _proxyACTargets[i];
-        callDatas[j] = abi.encodeCall(AccessControl.grantRole, (DEFAULT_ADMIN_ROLE, address(__newGovernanceAdmin)));
+        callDatas[j] = abi.encodeCall(IAccessControl.grantRole, (DEFAULT_ADMIN_ROLE, address(__newGovernanceAdmin)));
 
         targets[j + 1] = _proxyACTargets[i];
-        callDatas[j + 1] = abi.encodeCall(AccessControl.renounceRole, (DEFAULT_ADMIN_ROLE, address(__governanceAdmin)));
+        callDatas[j + 1] = abi.encodeCall(IAccessControl.renounceRole, (DEFAULT_ADMIN_ROLE, address(__governanceAdmin)));
       }
 
       Proposal.ProposalDetail memory proposal = LibProposal.buildProposal(
@@ -151,7 +149,7 @@ abstract contract PostChecker_GovernanceAdmin is BaseMigration, PostChecker_Help
 
       // // Execute the proposal
       LibProposal.executeProposal(
-        RoninGovernanceAdmin(__governanceAdmin), RoninTrustedOrganization(__trustedOrg), proposal
+        RoninGovernanceAdmin(__governanceAdmin), IRoninTrustedOrganization(__trustedOrg), proposal
       );
       delete _proxyTargets;
       delete _proxyACTargets;

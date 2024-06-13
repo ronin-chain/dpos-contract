@@ -49,7 +49,7 @@ contract RoninRandomBeaconXRoninValidatorSetTest is REP10_BaseTest {
       vm.roll(vm.getBlockNumber() + 1);
       vm.prank(address(slashIndicator));
       roninValidatorSet.execSlash({
-        validatorId: revokedCids[i],
+        cid: revokedCids[i],
         newJailedUntil: 0,
         slashAmount: stakingAmount - minValidatorStakingAmount + 1 ether,
         cannotBailout: false
@@ -139,7 +139,7 @@ contract RoninRandomBeaconXRoninValidatorSetTest is REP10_BaseTest {
       vm.roll(vm.getBlockNumber() + 1);
       vm.prank(address(slashIndicator));
       roninValidatorSet.execSlash({
-        validatorId: revokedCids[i],
+        cid: revokedCids[i],
         newJailedUntil: 0,
         slashAmount: stakingAmount - minValidatorStakingAmount + 1 ether,
         cannotBailout: false
