@@ -2,7 +2,6 @@
 
 pragma solidity ^0.8.9;
 
-import "../../../libraries/EnumFlags.sol";
 import { HasTrustedOrgDeprecated } from "../../../utils/DeprecatedSlots.sol";
 import "../../../extensions/collections/HasContracts.sol";
 import "../../../interfaces/validator/info-fragments/IValidatorInfoV2.sol";
@@ -11,17 +10,15 @@ import { IRandomBeacon } from "../../../interfaces/random-beacon/IRandomBeacon.s
 import { TConsensus } from "../../../udvts/Types.sol";
 
 abstract contract ValidatorInfoStorageV2 is IValidatorInfoV2, HasContracts, HasTrustedOrgDeprecated {
-  using EnumFlags for EnumFlags.ValidatorFlag;
-
   /// @dev The maximum number of validator.
   uint256 internal __deprecatedMaxValidatorNumber;
 
   /// @dev The total of validators
   uint256 internal _validatorCount;
   /// @dev Mapping from validator index => validator id address
-  mapping(uint256 => address) internal _validatorIds;
-  /// @dev Mapping from validator id => flag indicating the validator ability: producing block, operating bridge
-  mapping(address => EnumFlags.ValidatorFlag) internal _validatorMap;
+  mapping(uint256 idx => address cid) internal _validatorIds;
+  /// @dev Mapping from validator id => boolean indicating whether the validator is a block producer
+  mapping(address cid => bool isBlockProducer) internal _validatorMap;
   /// @dev The number of slot that is reserved for prioritized validators
   uint256 internal __deprecatedMaxPrioritizedValidatorNumber;
 
@@ -98,8 +95,8 @@ abstract contract ValidatorInfoStorageV2 is IValidatorInfoV2, HasContracts, HasT
     return _isBlockProducerById(id);
   }
 
-  function _isBlockProducerById(address id) internal view returns (bool) {
-    return _validatorMap[id].hasFlag(EnumFlags.ValidatorFlag.BlockProducer);
+  function _isBlockProducerById(address id) internal view returns (bool yes) {
+    yes = _validatorMap[id];
   }
 
   /**

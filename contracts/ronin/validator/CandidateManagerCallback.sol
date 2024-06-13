@@ -5,7 +5,9 @@ pragma solidity ^0.8.9;
 import { CandidateManager } from "./CandidateManager.sol";
 import { IProfile } from "../../interfaces/IProfile.sol";
 import { IStaking } from "../../interfaces/staking/IStaking.sol";
+import { IRoninTrustedOrganization } from "../../interfaces/IRoninTrustedOrganization.sol";
 import { ICandidateManagerCallback } from "../../interfaces/validator/ICandidateManagerCallback.sol";
+
 import { TConsensus } from "../../udvts/Types.sol";
 import { ContractType } from "../../utils/ContractType.sol";
 
@@ -111,5 +113,14 @@ abstract contract CandidateManagerCallback is ICandidateManagerCallback, Candida
    */
   function execChangeTreasuryAddr(address cid, address payable newTreasury) external onlyContract(ContractType.PROFILE) {
     _candidateInfo[cid].__shadowedTreasury = newTreasury;
+  }
+
+  /**
+   * @dev Override `CandidateManager-_isTrustedOrg`.
+   */
+  function _isTrustedOrg(address validatorId) internal view override returns (bool) {
+    return IRoninTrustedOrganization(getContract(ContractType.RONIN_TRUSTED_ORGANIZATION)).getConsensusWeightById(
+      validatorId
+    ) > 0;
   }
 }

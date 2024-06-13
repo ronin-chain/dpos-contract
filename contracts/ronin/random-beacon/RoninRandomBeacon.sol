@@ -26,7 +26,9 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
   uint256[50] private __gap;
 
   /// @dev The threshold of cooldown period for key hash change and newly register candidates.
-  uint256 internal constant COOLDOWN_PERIOD_THRESHOLD = 1;
+  uint256 internal constant _COOLDOWN_PERIOD_THRESHOLD = 1;
+  /// @dev The block number where the logic contract is deployed.
+  uint256 private immutable _LOGIC_DEPLOYED_AT_BLOCK;
 
   /// @dev Period of the beacon validator selection is activated.
   uint256 internal _activatedAtPeriod;
@@ -48,6 +50,7 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
 
   constructor() {
     _disableInitializers();
+    _LOGIC_DEPLOYED_AT_BLOCK = block.number;
   }
 
   function initialize(
@@ -55,22 +58,22 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
     address staking,
     address trustedOrg,
     address validatorSet,
-    address slashIndicator,
     uint256 slashThreshold,
-    uint256 initialSeed,
     uint256 activatedAtPeriod,
     ValidatorType[] calldata validatorTypes,
     uint256[] calldata thresholds
   ) external initializer {
+    bytes32 initialSeed =
+      keccak256(abi.encode(blockhash(_LOGIC_DEPLOYED_AT_BLOCK), block.coinbase, block.timestamp, block.chainid));
+
     _activatedAtPeriod = activatedAtPeriod;
     _setUnavailabilitySlashThreshold(slashThreshold);
-    _requestRandomSeed(activatedAtPeriod, initialSeed);
     _bulkSetValidatorThresholds(validatorTypes, thresholds);
+    _requestRandomSeed(activatedAtPeriod, uint256(initialSeed));
 
     _setContract(ContractType.PROFILE, profile);
     _setContract(ContractType.STAKING, staking);
     _setContract(ContractType.VALIDATOR, validatorSet);
-    _setContract(ContractType.SLASH_INDICATOR, slashIndicator);
     _setContract(ContractType.RONIN_TRUSTED_ORGANIZATION, trustedOrg);
   }
 
@@ -95,31 +98,34 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
    * @inheritdoc IRandomBeacon
    */
   function fulfillRandomSeed(RandomRequest calldata req, Proof calldata proof) external {
-    bytes32 reqHash = req.hash();
-    bytes32 keyHash = proof.pk.calcKeyHash();
+    unchecked {
+      bytes32 reqHash = req.hash();
+      bytes32 keyHash = proof.pk.calcKeyHash();
 
-    IProfile profile = IProfile(getContract(ContractType.PROFILE));
+      IProfile profile = IProfile(getContract(ContractType.PROFILE));
 
-    // Already checked in Profile:
-    // 1. If `cid` not exit, revert the whole tx,
-    // 2. Allow both GV and SV to submit the seed.
-    (address cid, uint256 keyLastChange, uint256 profileRegisteredAt) =
-      profile.getVRFKeyHash2BeaconInfo({ vrfKeyHash: keyHash });
-    uint256 currPeriod = ITimingInfo(getContract(ContractType.VALIDATOR)).currentPeriod();
+      // Already checked in Profile:
+      // 1. If `cid` not exit, revert the whole tx,
+      // 2. Allow both GV and SV to submit the seed.
+      (address cid, uint256 keyLastChange, uint256 profileRegisteredAt) =
+        profile.getVRFKeyHash2BeaconInfo({ vrfKeyHash: keyHash });
+      uint256 currPeriod = ITimingInfo(getContract(ContractType.VALIDATOR)).currentPeriod();
 
-    Beacon storage $beacon = _beaconPerPeriod[req.period];
+      Beacon storage $beacon = _beaconPerPeriod[req.period];
 
-    _requireValidRequest(req, $beacon, currPeriod, reqHash);
-    _requireAuthorized(cid, profileRegisteredAt, currPeriod);
-    _requireValidProof(req, proof, currPeriod, keyHash, keyLastChange);
+      _requireValidRequest(req, $beacon, currPeriod, reqHash);
+      _requireAuthorized(cid, profileRegisteredAt, currPeriod);
+      _requireValidProof(req, proof, currPeriod, keyHash, keyLastChange);
 
-    // randomness should not be re-submitted
-    if ($beacon.submitted[cid]) revert ErrAlreadySubmitted();
+      // randomness should not be re-submitted
+      if ($beacon.submitted[cid]) revert ErrAlreadySubmitted();
 
-    $beacon.submitted[cid] = true;
-    $beacon.value ^= VRF.randomValueFromVRFProof(proof, proof.seed);
+      $beacon.submissionCount++;
+      $beacon.submitted[cid] = true;
+      $beacon.value ^= VRF.randomValueFromVRFProof(proof, proof.seed);
 
-    emit RandomSeedFulfilled(msg.sender, req.period, reqHash);
+      emit RandomSeedFulfilled(msg.sender, req.period, reqHash);
+    }
   }
 
   /**
@@ -129,32 +135,33 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
     uint256 lastUpdatedPeriod,
     uint256 newPeriod
   ) external onlyContract(ContractType.VALIDATOR) onlyActivated(newPeriod) {
-    bool isPeriodEnding = lastUpdatedPeriod < newPeriod;
-    if (isPeriodEnding) return;
+    unchecked {
+      bool isPeriodEnding = lastUpdatedPeriod < newPeriod;
+      if (isPeriodEnding) return;
 
-    // Request the next random seed if it has not been requested at the start epoch of the period
-    uint256 nextPeriod = lastUpdatedPeriod + 1;
-    if (_beaconPerPeriod[nextPeriod].reqHash == 0) {
-      _requestRandomSeed(nextPeriod, _beaconPerPeriod[lastUpdatedPeriod].value);
+      // Request the next random seed if it has not been requested at the start epoch of the period
+      uint256 nextPeriod = lastUpdatedPeriod + 1;
+      if (_beaconPerPeriod[nextPeriod].reqHash == 0) {
+        _requestRandomSeed(nextPeriod, _beaconPerPeriod[lastUpdatedPeriod].value);
+      }
     }
   }
 
   /**
    * @inheritdoc IRandomBeacon
    */
-  function execWrapUpBeaconPeriod(
+  function execFinalizeBeaconAndPendingCids(
     uint256 lastUpdatedPeriod,
-    uint256 newPeriod
+    uint256 newPeriod,
+    address[] calldata allCids
   ) external onlyContract(ContractType.VALIDATOR) onlyActivated(newPeriod) {
     Beacon storage $beacon = _beaconPerPeriod[newPeriod];
 
-    address[] memory cids =
-      _filterOutNewlyJoinedValidators({ validatorContract: msg.sender, currPeriod: lastUpdatedPeriod });
+    address[] memory cids = _filterOutNewlyJoinedValidators({ currPeriod: lastUpdatedPeriod, allCids: allCids });
     uint256[] memory trustedWeights =
       IRoninTrustedOrganization(getContract(ContractType.RONIN_TRUSTED_ORGANIZATION)).getConsensusWeightsById(cids);
 
     _finalizeBeacon($beacon, newPeriod);
-    _recordAndSlashUnavailability($beacon, lastUpdatedPeriod, cids, trustedWeights);
 
     LibSortValidatorsByBeacon.filterAndSaveValidators({
       period: newPeriod,
@@ -170,18 +177,50 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
   /**
    * @inheritdoc IRandomBeacon
    */
-  function pickValidatorSet(uint256 epoch)
+  function execRecordAndSlashUnavailability(
+    uint256 lastUpdatedPeriod,
+    uint256 newPeriod,
+    address slashIndicator,
+    address[] calldata allCids
+  ) external onlyContract(ContractType.VALIDATOR) onlyActivated(lastUpdatedPeriod) {
+    Beacon storage $beacon = _beaconPerPeriod[newPeriod];
+
+    address[] memory cids = _filterOutNewlyJoinedValidators({ currPeriod: lastUpdatedPeriod, allCids: allCids });
+    uint256[] memory trustedWeights =
+      IRoninTrustedOrganization(getContract(ContractType.RONIN_TRUSTED_ORGANIZATION)).getConsensusWeightsById(cids);
+
+    _recordAndSlashUnavailability($beacon, lastUpdatedPeriod, slashIndicator, cids, trustedWeights);
+  }
+
+  /**
+   * @inheritdoc IRandomBeacon
+   */
+  function pickValidatorSetForCurrentPeriod(uint256 epoch) external view returns (address[] memory pickedCids) {
+    pickedCids = getSelectedValidatorSet({ period: _computePeriod(block.timestamp), epoch: epoch });
+  }
+
+  /**
+   * @inheritdoc IRandomBeacon
+   */
+  function getSelectedValidatorSet(uint256 period, uint256 epoch) public view returns (address[] memory pickedCids) {
+    Beacon storage $beacon = _beaconPerPeriod[period];
+    if (!$beacon.finalized) revert ErrNotFinalizedBeacon(period);
+
+    pickedCids = LibSortValidatorsByBeacon.pickValidatorSet(period, epoch, $beacon.value);
+  }
+
+  /**
+   * @inheritdoc IRandomBeacon
+   */
+  function getSavedValidatorSet(uint256 period)
     external
     view
-    onlyContract(ContractType.VALIDATOR)
-    returns (address[] memory pickedCids)
+    returns (LibSortValidatorsByBeacon.ValidatorStorage memory)
   {
-    uint256 period = _computePeriod(block.timestamp);
-
     Beacon storage $beacon = _beaconPerPeriod[period];
-    if (!$beacon.finalized) revert ErrBeaconNotFinalized(period);
+    if (!$beacon.finalized) revert ErrNotFinalizedBeacon(period);
 
-    pickedCids = LibSortValidatorsByBeacon.pickValidatorSet(epoch, $beacon.value);
+    return LibSortValidatorsByBeacon.getSavedValidatorSet({ period: period });
   }
 
   /**
@@ -209,12 +248,10 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
    * @inheritdoc IRandomBeacon
    */
   function isSubmittedAt(uint256 period, TConsensus consensus) external view returns (bool submitted) {
-    IProfile profile = IProfile(getContract(ContractType.PROFILE));
-    address cid = profile.getConsensus2Id({ consensus: consensus });
-    return isSubmittedAtById(period, cid);
+    submitted = isSubmittedAtById({ period: period, cid: _convertToCid(consensus) });
   }
 
-   /**
+  /**
    * @inheritdoc IRandomBeacon
    */
   function isSubmittedAtByKeyHash(uint256 period, bytes32 keyHash) external view returns (bool submitted) {
@@ -233,31 +270,53 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
   /**
    * @inheritdoc IRandomBeacon
    */
-  function getBeacon(uint256 period) public view returns (uint256 value, bool finalized) {
+  function getBeaconData(uint256 period) external view returns (uint256 value, bool finalized, uint256 submissionCount) {
     Beacon storage $beacon = _beaconPerPeriod[period];
     value = $beacon.value;
     finalized = $beacon.finalized;
+    submissionCount = $beacon.submissionCount;
   }
 
   /**
    * @inheritdoc IRandomBeacon
    */
-  function getUnavailabilityCount(address cid) external view returns (uint256) {
-    return _unavailableCount[cid];
+  function COOLDOWN_PERIOD_THRESHOLD() public pure virtual returns (uint256 threshold) {
+    threshold = _COOLDOWN_PERIOD_THRESHOLD;
   }
 
   /**
    * @inheritdoc IRandomBeacon
    */
-  function getValidatorThreshold(ValidatorType validatorType) external view returns (uint256) {
-    return _validatorThreshold[validatorType];
+  function getUnavailabilityCount(TConsensus consensus) external view returns (uint256 count) {
+    count = getUnavailabilityCountById({ cid: _convertToCid(consensus) });
   }
 
   /**
    * @inheritdoc IRandomBeacon
    */
-  function getUnavailabilitySlashThreshold() external view returns (uint256) {
-    return _unavailabilitySlashThreshold;
+  function getUnavailabilityCountById(address cid) public view returns (uint256 count) {
+    count = _unavailableCount[cid];
+  }
+
+  /**
+   * @inheritdoc IRandomBeacon
+   */
+  function getValidatorThreshold(ValidatorType validatorType) external view returns (uint256 threshold) {
+    threshold = _validatorThreshold[validatorType];
+  }
+
+  /**
+   * @inheritdoc IRandomBeacon
+   */
+  function getUnavailabilitySlashThreshold() external view returns (uint256 threshold) {
+    threshold = _unavailabilitySlashThreshold;
+  }
+
+  /**
+   * @inheritdoc IRandomBeacon
+   */
+  function calcKeyHash(uint256[2] memory publicKeys) external pure returns (bytes32 keyHash) {
+    keyHash = LibSLA.calcKeyHash(publicKeys);
   }
 
   /**
@@ -266,7 +325,12 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
    * @param prevBeacon The previous beacon value.
    */
   function _requestRandomSeed(uint256 period, uint256 prevBeacon) internal {
-    RandomRequest memory req = RandomRequest({ period: period, prevBeacon: prevBeacon });
+    RandomRequest memory req = RandomRequest({
+      period: period,
+      prevBeacon: prevBeacon,
+      chainId: block.chainid,
+      verifyingContract: address(this)
+    });
     bytes32 reqHash = req.hash();
 
     _beaconPerPeriod[req.period].reqHash = reqHash;
@@ -303,12 +367,11 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
   function _recordAndSlashUnavailability(
     Beacon storage $beacon,
     uint256 lastUpdatedPeriod,
+    address slashIndicator,
     address[] memory cids,
     uint256[] memory trustedWeights
   ) internal onlyActivated(lastUpdatedPeriod) {
     unchecked {
-      ISlashRandomBeacon slashIndicator = ISlashRandomBeacon(getContract(ContractType.SLASH_INDICATOR));
-
       address cid;
       uint256 unavailableCount;
       uint256 length = cids.length;
@@ -331,7 +394,7 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
           // If missing proof, increment the consecutive unavailable count and check if it exceeds the threshold
           _unavailableCount[cid] = ++unavailableCount;
           if (unavailableCount >= slashThreshold) {
-            slashIndicator.slashRandomBeacon(cid, lastUpdatedPeriod);
+            ISlashRandomBeacon(slashIndicator).slashRandomBeacon(cid, lastUpdatedPeriod);
             // Delete the count if the validator has been slashed
             delete _unavailableCount[cid];
           }
@@ -372,13 +435,12 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
    * @dev Filters out the newly joined validators based on the provided threshold.
    */
   function _filterOutNewlyJoinedValidators(
-    address validatorContract,
-    uint256 currPeriod
+    uint256 currPeriod,
+    address[] calldata allCids
   ) internal view returns (address[] memory validCids) {
     unchecked {
       uint256 count;
-      uint256 threshold = _cooldownPeriodThreshold();
-      address[] memory allCids = ICandidateManager(validatorContract).getValidatorCandidateIds();
+      uint256 threshold = COOLDOWN_PERIOD_THRESHOLD();
       uint256[] memory registeredAts = IProfile(getContract(ContractType.PROFILE)).getManyId2RegisteredAt(allCids);
       uint256 length = allCids.length;
       validCids = new address[](length);
@@ -409,8 +471,8 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
     uint256 keyLastChange
   ) internal pure {
     // key hash should not be changed within the cooldown period
-    if (_computePeriod(keyLastChange) + _cooldownPeriodThreshold() > currPeriod) {
-      revert ErrKeyHashChangeCooldownNotEnded();
+    if (_computePeriod(keyLastChange) + COOLDOWN_PERIOD_THRESHOLD() > currPeriod) {
+      revert ErrNotEndedChangeKeyHashCooldown();
     }
 
     // proof should be valid
@@ -432,8 +494,8 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
     }
 
     // only allow to fulfill if the candidate is not newly registered
-    if (_computePeriod(profileRegisteredAt) + _cooldownPeriodThreshold() > currPeriod) {
-      revert ErrRegisterCoolDownNotEnded();
+    if (_computePeriod(profileRegisteredAt) + COOLDOWN_PERIOD_THRESHOLD() > currPeriod) {
+      revert ErrNotEndedRegisterCooldown();
     }
   }
 
@@ -451,12 +513,18 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
     uint256 currPeriod,
     bytes32 reqHash
   ) internal view {
+    // Verify the request with current chain context
+    if (req.chainId != block.chainid) revert ErrInvalidChainId({ expected: block.chainid, actual: req.chainId });
+    if (req.verifyingContract != address(this)) {
+      revert ErrInvalidVerifyingContract({ expected: address(this), actual: req.verifyingContract });
+    }
+
     // period should be valid
     if (req.period <= currPeriod) revert ErrInvalidPeriod();
     if (req.period < _activatedAtPeriod) revert ErrNotActivated(req.period);
 
     // beacon should not be finalized
-    if ($beacon.finalized) revert ErrBeaconAlreadyFinalized(req.period);
+    if ($beacon.finalized) revert ErrAlreadyFinalizedBeacon(req.period);
 
     bytes32 expectedReqHash = $beacon.reqHash;
     // request hash should be valid
@@ -464,10 +532,10 @@ contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalConfigCons
   }
 
   /**
-   * @dev Returns the cooldown period threshold.
+   * @dev Converts the consensus address to cid from `Profile` contract.
    */
-  function _cooldownPeriodThreshold() internal pure virtual returns (uint256) {
-    return COOLDOWN_PERIOD_THRESHOLD;
+  function _convertToCid(TConsensus consensus) internal view returns (address) {
+    return IProfile(getContract(ContractType.PROFILE)).getConsensus2Id({ consensus: consensus });
   }
 
   /**

@@ -7,9 +7,9 @@ import "../../extensions/RONTransferHelper.sol";
 import "../../interfaces/IProfile.sol";
 import "../../interfaces/IStakingVesting.sol";
 import "../../interfaces/IMaintenance.sol";
-import "../../interfaces/IRoninTrustedOrganization.sol";
 import "../../interfaces/IFastFinalityTracking.sol";
 import "../../interfaces/staking/IStaking.sol";
+import "../../interfaces/IRoninTrustedOrganization.sol";
 import "../../interfaces/slash-indicator/ISlashIndicator.sol";
 import "../../interfaces/random-beacon/IRandomBeacon.sol";
 import "../../interfaces/validator/ICoinbaseExecution.sol";
@@ -117,35 +117,49 @@ abstract contract CoinbaseExecution is
     uint256 lastPeriod = currentPeriod();
     uint256 epoch = epochOf(block.number);
     uint256 nextEpoch = epoch + 1;
-    address[] memory currValidatorIds = getValidatorIds();
 
     IRandomBeacon randomBeacon = IRandomBeacon(getContract(ContractType.RANDOM_BEACON));
     // This request is actually only invoked at the first epoch of the period.
     randomBeacon.execRequestRandomSeedForNextPeriod(lastPeriod, newPeriod);
 
-    _syncFastFinalityReward(epoch, currValidatorIds);
+    _syncFastFinalityReward({ epoch: epoch, validatorIds: getValidatorIds() });
 
     if (periodEnding) {
       // Get all candidate ids
       address[] memory allCids = _candidateIds;
-      randomBeacon.execWrapUpBeaconPeriod(lastPeriod, newPeriod);
+
+      ISlashIndicator slashIndicatorContract = ISlashIndicator(getContract(ContractType.SLASH_INDICATOR));
+      // Slash submit random beacon proof unavailability first, then update credit scores.
+      randomBeacon.execRecordAndSlashUnavailability(lastPeriod, newPeriod, address(slashIndicatorContract), allCids);
+      slashIndicatorContract.execUpdateCreditScores(allCids, lastPeriod);
+
       (uint256 totalDelegatingReward, uint256[] memory delegatingRewards) =
         _distributeRewardToTreasuriesAndCalculateTotalDelegatingReward(lastPeriod, allCids);
       _settleAndTransferDelegatingRewards(lastPeriod, allCids, totalDelegatingReward, delegatingRewards);
       _tryRecycleLockedFundsFromEmergencyExits();
       _recycleDeprecatedRewards();
 
-      ISlashIndicator slashIndicatorContract = ISlashIndicator(getContract(ContractType.SLASH_INDICATOR));
-      slashIndicatorContract.execUpdateCreditScores(allCids, lastPeriod);
       address[] memory revokedCandidateIds = _syncCandidateSet(newPeriod);
       if (revokedCandidateIds.length > 0) {
+        // Re-update `allCids` after unsatisfied candidates get removed.
+        allCids = _candidateIds;
         slashIndicatorContract.execResetCreditScores(revokedCandidateIds);
       }
+
+      // Wrap up the beacon period includes (1) finalizing the beacon proof, and (2) determining the validator list for the next period by new proof.
+      // Should wrap up the beacon after unsatisfied candidates get removed.
+      randomBeacon.execFinalizeBeaconAndPendingCids(lastPeriod, newPeriod, allCids);
+
       _currentPeriodStartAtBlock = block.number + 1;
     }
 
-    currValidatorIds = _syncValidatorSet(randomBeacon, newPeriod, nextEpoch);
-    _revampRoles(newPeriod, nextEpoch, currValidatorIds);
+    // Clear the previous validator set and block producer set before sync the new set from beacon.
+    _clearPreviousValidatorSetAndBlockProducerSet();
+    // Query the new validator set for upcoming epoch from the random beacon contract.
+    // Save new set into the contract storage.
+    address[] memory newValidatorIds = _syncValidatorSet(randomBeacon, newPeriod, nextEpoch);
+    // Activate applicable validators into the block producer set.
+    _updateApplicableValidatorToBlockProducerSet(newPeriod, nextEpoch, newValidatorIds);
 
     emit WrappedUpEpoch(lastPeriod, epoch, periodEnding);
 
@@ -166,7 +180,10 @@ abstract contract CoinbaseExecution is
       .getManyFinalityScoresById(epoch, validatorIds);
     uint256 divisor = scores.sum();
 
-    if (divisor == 0) return;
+    if (divisor == 0) {
+      emit ZeroSumFastFinalityScore(epoch, validatorIds);
+      return;
+    }
 
     uint256 iReward;
     uint256 totalReward = _totalFastFinalityReward;
@@ -324,8 +341,39 @@ abstract contract CoinbaseExecution is
     uint256 newPeriod,
     uint256 nextEpoch
   ) private returns (address[] memory newValidatorIds) {
-    newValidatorIds = randomBeacon.pickValidatorSet(nextEpoch);
-    _setNewValidatorSet(newValidatorIds, newValidatorIds.length, newPeriod);
+    newValidatorIds = randomBeacon.pickValidatorSetForCurrentPeriod(nextEpoch);
+
+    // Fallback to all governing validators if the retrieved validator set is empty.
+    if (newValidatorIds.length == 0) {
+      IProfile profile = IProfile(getContract(ContractType.PROFILE));
+      IRoninTrustedOrganization.TrustedOrganization[] memory allTrustedOrgs =
+        IRoninTrustedOrganization(getContract(ContractType.RONIN_TRUSTED_ORGANIZATION)).getAllTrustedOrganizations();
+
+      uint256 length = allTrustedOrgs.length;
+      newValidatorIds = new address[](length);
+      for (uint256 i; i < length; ++i) {
+        newValidatorIds[i] = profile.getConsensus2Id(allTrustedOrgs[i].consensusAddr);
+      }
+
+      emit EmptyValidatorSet(newPeriod, nextEpoch, newValidatorIds);
+    }
+
+    _updateNewValidatorSet(newValidatorIds, newPeriod, nextEpoch);
+  }
+
+  /**
+   * @dev Removes the previous validator set and block producer set.
+   * This method is called at the end of each epoch.
+   */
+  function _clearPreviousValidatorSetAndBlockProducerSet() private {
+    uint256 length = _validatorCount;
+
+    for (uint256 i; i < length; ++i) {
+      delete _validatorMap[_validatorIds[i]];
+      delete _validatorIds[i];
+    }
+
+    delete _validatorCount;
   }
 
   /**
@@ -333,46 +381,23 @@ abstract contract CoinbaseExecution is
    *
    * Emits the `ValidatorSetUpdated` event.
    *
-   * Note: This method should be called once in the end of each period.
+   * Note: This method should be called once in the end of each `epoch`.
    *
    */
-  function _setNewValidatorSet(address[] memory _newValidators, uint256 _newValidatorCount, uint256 _newPeriod) private {
-    // Remove exceeding validators in the current set
-    for (uint256 _i = _newValidatorCount; _i < _validatorCount;) {
-      delete _validatorMap[_validatorIds[_i]];
-      delete _validatorIds[_i];
+  function _updateNewValidatorSet(address[] memory newValidatorIds, uint256 newPeriod, uint256 nextEpoch) private {
+    uint256 newValidatorCount = newValidatorIds.length;
 
-      unchecked {
-        ++_i;
-      }
+    for (uint256 i; i < newValidatorCount; ++i) {
+      _validatorIds[i] = newValidatorIds[i];
     }
 
-    // Remove flag for all validator in the current set
-    for (uint _i; _i < _newValidatorCount;) {
-      delete _validatorMap[_validatorIds[_i]];
+    _validatorCount = newValidatorCount;
 
-      unchecked {
-        ++_i;
-      }
-    }
-
-    // Update new validator set and set flag correspondingly.
-    for (uint256 _i; _i < _newValidatorCount;) {
-      address _newValidator = _newValidators[_i];
-      _validatorMap[_newValidator] = EnumFlags.ValidatorFlag.Both;
-      _validatorIds[_i] = _newValidator;
-
-      unchecked {
-        ++_i;
-      }
-    }
-
-    _validatorCount = _newValidatorCount;
-    emit ValidatorSetUpdated(_newPeriod, _newValidators);
+    emit ValidatorSetUpdated(newPeriod, nextEpoch, newValidatorIds);
   }
 
   /**
-   * @dev Activate/Deactivate the validators from producing blocks, based on their in jail status and maintenance status.
+   * @dev Activate the validators from producing blocks, based on their in jail status and maintenance status.
    *
    * Requirements:
    * - This method is called at the end of each epoch
@@ -381,36 +406,26 @@ abstract contract CoinbaseExecution is
    * Emits the `BridgeOperatorSetUpdated` event.
    *
    */
-  function _revampRoles(uint256 _newPeriod, uint256 _nextEpoch, address[] memory currValidatorIds) private {
-    bool[] memory _maintainedList =
-      IMaintenance(getContract(ContractType.MAINTENANCE)).checkManyMaintainedById(currValidatorIds, block.number + 1);
+  function _updateApplicableValidatorToBlockProducerSet(
+    uint256 newPeriod,
+    uint256 nextEpoch,
+    address[] memory newValidatorIds
+  ) private {
+    uint256 nextBlock = block.number + 1;
+    bool[] memory maintainedList =
+      IMaintenance(getContract(ContractType.MAINTENANCE)).checkManyMaintainedById(newValidatorIds, nextBlock);
 
-    for (uint _i; _i < currValidatorIds.length;) {
-      address validatorId = currValidatorIds[_i];
+    // Add block producer flag for applicable validators
+    uint256 length = newValidatorIds.length;
+
+    for (uint256 i; i < length; ++i) {
+      address validatorId = newValidatorIds[i];
       bool emergencyExitRequested = block.timestamp <= _emergencyExitJailedTimestamp[validatorId];
-      bool isProducerBefore = _isBlockProducerById(validatorId);
-      bool isProducerAfter =
-        !(_isJailedAtBlockById(validatorId, block.number + 1) || _maintainedList[_i] || emergencyExitRequested);
+      bool isApplicable = !(_isJailedAtBlockById(validatorId, nextBlock) || maintainedList[i] || emergencyExitRequested);
 
-      if (!isProducerBefore && isProducerAfter) {
-        _validatorMap[validatorId] = _validatorMap[validatorId].addFlag(EnumFlags.ValidatorFlag.BlockProducer);
-      } else if (isProducerBefore && !isProducerAfter) {
-        _validatorMap[validatorId] = _validatorMap[validatorId].removeFlag(EnumFlags.ValidatorFlag.BlockProducer);
-      }
-
-      unchecked {
-        ++_i;
-      }
+      if (isApplicable) _validatorMap[validatorId] = true;
     }
-    emit BlockProducerSetUpdated(_newPeriod, _nextEpoch, getBlockProducerIds());
-  }
 
-  /**
-   * @dev Override `CandidateManager-_isTrustedOrg`.
-   */
-  function _isTrustedOrg(address validatorId) internal view override returns (bool) {
-    return IRoninTrustedOrganization(getContract(ContractType.RONIN_TRUSTED_ORGANIZATION)).getConsensusWeightById(
-      validatorId
-    ) > 0;
+    emit BlockProducerSetUpdated(newPeriod, nextEpoch, getBlockProducerIds());
   }
 }

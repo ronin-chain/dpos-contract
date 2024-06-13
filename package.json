@@ -22,7 +22,7 @@
     "plugin:sourcify": "hardhat sourcify --endpoint https://sourcify.roninchain.com/server"
   },
   "lint-staged": {
-    "contracts/**/*.sol": "prettier --write",
+    "contracts/**/*.sol": "forge fmt",
     "{test,src}/**/*.{js,ts}": "prettier --write",
     "hardhat.config.{js,ts}": "prettier --write"
   },

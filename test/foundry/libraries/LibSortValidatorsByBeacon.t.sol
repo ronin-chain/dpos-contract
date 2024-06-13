@@ -2,11 +2,15 @@
 pragma solidity ^0.8.0;
 
 import { console } from "forge-std/console.sol";
+import { StdStyle } from "forge-std/StdStyle.sol";
 import { Test } from "forge-std/Test.sol";
 import { LibSortValidatorsByBeacon } from "@ronin/contracts/libraries/LibSortValidatorsByBeacon.sol";
 import { LibSortValidatorsByBeaconOld } from "./mocks/LibSortValidatorsByBeaconOld.sol";
+import { LibArray } from "@ronin/contracts/libraries/LibArray.sol";
 
 contract LibSortValidatorsByBeaconTest is Test {
+  using StdStyle for *;
+
   uint256 constant threshold = 64;
   uint256 constant maxValidator = 22;
 
@@ -14,6 +18,104 @@ contract LibSortValidatorsByBeaconTest is Test {
   uint256 internal constant MIN_EPOCH = 1;
   /// @dev The maximum epoch value.
   uint256 internal constant MAX_EPOCH = 144;
+
+  uint96[] stakeAmounts = [
+    uint96(1450000 ether),
+    uint96(690000 ether),
+    uint96(830990 ether),
+    uint96(470000 ether),
+    uint96(550000 ether),
+    uint96(450000 ether),
+    uint96(599999 ether),
+    uint96(500000 ether),
+    uint96(500000 ether),
+    uint96(790000 ether),
+    uint96(500000 ether),
+    uint96(500000 ether),
+    uint96(1450000 ether),
+    uint96(1450000 ether),
+    uint96(790000 ether),
+    uint96(500000 ether),
+    uint96(500000 ether),
+    uint96(500000 ether)
+  ];
+  address[] idValues = [
+    address(vm.addr(uint256(keccak256(abi.encodePacked("0x0", vm.unixTime()))))),
+    address(vm.addr(uint256(keccak256(abi.encodePacked("0x1", vm.unixTime()))))),
+    address(vm.addr(uint256(keccak256(abi.encodePacked("0x2", vm.unixTime()))))),
+    address(vm.addr(uint256(keccak256(abi.encodePacked("0x3", vm.unixTime()))))),
+    address(vm.addr(uint256(keccak256(abi.encodePacked("0x4", vm.unixTime()))))),
+    address(vm.addr(uint256(keccak256(abi.encodePacked("0x5", vm.unixTime()))))),
+    address(vm.addr(uint256(keccak256(abi.encodePacked("0x6", vm.unixTime()))))),
+    address(vm.addr(uint256(keccak256(abi.encodePacked("0x7", vm.unixTime()))))),
+    address(vm.addr(uint256(keccak256(abi.encodePacked("0x8", vm.unixTime()))))),
+    address(vm.addr(uint256(keccak256(abi.encodePacked("0x9", vm.unixTime()))))),
+    address(vm.addr(uint256(keccak256(abi.encodePacked("0xa", vm.unixTime()))))),
+    address(vm.addr(uint256(keccak256(abi.encodePacked("0xb", vm.unixTime()))))),
+    address(vm.addr(uint256(keccak256(abi.encodePacked("0xc", vm.unixTime()))))),
+    address(vm.addr(uint256(keccak256(abi.encodePacked("0xd", vm.unixTime()))))),
+    address(vm.addr(uint256(keccak256(abi.encodePacked("0xe", vm.unixTime()))))),
+    address(vm.addr(uint256(keccak256(abi.encodePacked("0x10", vm.unixTime()))))),
+    address(vm.addr(uint256(keccak256(abi.encodePacked("0x11", vm.unixTime()))))),
+    address(vm.addr(uint256(keccak256(abi.encodePacked("0x12", vm.unixTime())))))
+  ];
+  uint256 numRv = 7;
+
+  mapping(address => uint256 count) pickCount;
+  mapping(address => uint256 index) indexOf;
+
+  function testConcrete_randomDistribution() external {
+    LibSortValidatorsByBeacon.RotatingValidatorStorage[] memory packedRVs =
+      new LibSortValidatorsByBeacon.RotatingValidatorStorage[](idValues.length);
+    require(idValues.length == stakeAmounts.length, "length mismatch");
+
+    for (uint256 i; i < idValues.length; i++) {
+      packedRVs[i]._cid = idValues[i];
+      packedRVs[i]._staked = stakeAmounts[i];
+    }
+
+    uint256 numSamples = 144;
+    uint256[] memory beaconValues = random(numSamples, uint256(keccak256("beaconValues")));
+    beaconValues[0] = 0;
+    uint256[] memory epochValues = random(numSamples, uint256(keccak256("epochValues")));
+
+
+    for (uint256 i; i < numSamples; ++i) {
+      address[] memory cids =
+        LibSortValidatorsByBeacon.pickTopKRotatingValidatorsByBeaconWeight(packedRVs, numRv, 0, epochValues[0] + i);
+
+      assertEq(cids.length, numRv, "Invalid number of picked weights");
+
+      for (uint256 j; j < cids.length; ++j) {
+        pickCount[cids[j]]++;
+      }
+    }
+
+    for (uint256 i; i < packedRVs.length; ++i) {
+      address cid = packedRVs[i]._cid;
+      uint256 staked = packedRVs[i]._staked;
+      string memory log = string.concat(
+        "CID: ".yellow(),
+        vm.toString(cid),
+        " Staked: ",
+        vm.toString(staked / 1 ether),
+        " RON".blue(),
+        " Pick Count: ",
+        vm.toString(pickCount[cid]),
+        " Pick Rate ".yellow(),
+        vm.toString(pickCount[cid] * 100 / numSamples),
+        "%"
+      );
+      console.log(log);
+    }
+  }
+
+  function random(uint256 numSample, uint256 v) private returns (uint256[] memory r) {
+    r = new uint256[](numSample);
+    for (uint256 i = 0; i < numSample; i++) {
+      r[i] = uint256(keccak256(abi.encode(i, v, vm.unixTime())));
+    }
+  }
 
   function testConcrete_sortValidatorsByBeaconOld() external {
     uint256 numGovernanceValidator = 2;
@@ -29,12 +131,12 @@ contract LibSortValidatorsByBeaconTest is Test {
     ids[5] = address(6);
 
     uint256[] memory stakedAmounts = new uint256[](6);
-    stakedAmounts[0] = 10 ether;
-    stakedAmounts[1] = 20 ether;
-    stakedAmounts[2] = 30 ether;
-    stakedAmounts[3] = 40 ether;
-    stakedAmounts[4] = 50 ether;
-    stakedAmounts[5] = 60 ether;
+    stakedAmounts[0] = uint96(10 ether);
+    stakedAmounts[1] = uint96(20 ether);
+    stakedAmounts[2] = uint96(30 ether);
+    stakedAmounts[3] = uint96(40 ether);
+    stakedAmounts[4] = uint96(50 ether);
+    stakedAmounts[5] = uint96(60 ether);
 
     uint256[] memory trustedWeights = new uint256[](6);
     trustedWeights[0] = 1;
@@ -79,12 +181,12 @@ contract LibSortValidatorsByBeaconTest is Test {
     ids[5] = address(6);
 
     uint256[] memory stakedAmounts = new uint256[](6);
-    stakedAmounts[0] = 10 ether;
-    stakedAmounts[1] = 20 ether;
-    stakedAmounts[2] = 30 ether;
-    stakedAmounts[3] = 40 ether;
-    stakedAmounts[4] = 50 ether;
-    stakedAmounts[5] = 60 ether;
+    stakedAmounts[0] = uint96(10 ether);
+    stakedAmounts[1] = uint96(20 ether);
+    stakedAmounts[2] = uint96(30 ether);
+    stakedAmounts[3] = uint96(40 ether);
+    stakedAmounts[4] = uint96(50 ether);
+    stakedAmounts[5] = uint96(60 ether);
 
     uint256[] memory trustedWeights = new uint256[](6);
     trustedWeights[0] = 1;
@@ -113,12 +215,12 @@ contract LibSortValidatorsByBeaconTest is Test {
     trustedWeights[4] = 0;
     trustedWeights[5] = 0;
 
-    stakedAmounts[0] = 100 ether;
-    stakedAmounts[1] = 200 ether;
-    stakedAmounts[2] = 300 ether;
-    stakedAmounts[3] = 400 ether;
-    stakedAmounts[4] = 500 ether;
-    stakedAmounts[5] = 600 ether;
+    stakedAmounts[0] = uint96(100 ether);
+    stakedAmounts[1] = uint96(200 ether);
+    stakedAmounts[2] = uint96(300 ether);
+    stakedAmounts[3] = uint96(400 ether);
+    stakedAmounts[4] = uint96(500 ether);
+    stakedAmounts[5] = uint96(600 ether);
 
     LibSortValidatorsByBeacon.filterAndSaveValidators(
       1, numGovernanceValidator, numStandardValidator, numRotatingValidator, newIds, stakedAmounts, trustedWeights
@@ -127,11 +229,12 @@ contract LibSortValidatorsByBeaconTest is Test {
     r = _bound(r, MIN_EPOCH, MAX_EPOCH);
 
     bool duplicated;
-    address[] memory pickeds = LibSortValidatorsByBeacon.pickValidatorSet(r, 1);
+    address[] memory pickeds = LibSortValidatorsByBeacon.pickValidatorSet(1, r, 1);
     for (uint256 i; i < pickeds.length; i++) {
       for (uint256 j; j < ids.length; j++) {
         if (pickeds[i] == ids[j]) {
           duplicated = true;
+          console.log("Duplicated address:", pickeds[i]);
           break;
         }
       }
@@ -155,12 +258,12 @@ contract LibSortValidatorsByBeaconTest is Test {
     ids[5] = address(6);
 
     uint256[] memory stakedAmounts = new uint256[](6);
-    stakedAmounts[0] = 10 ether;
-    stakedAmounts[1] = 20 ether;
-    stakedAmounts[2] = 30 ether;
-    stakedAmounts[3] = 40 ether;
-    stakedAmounts[4] = 50 ether;
-    stakedAmounts[5] = 60 ether;
+    stakedAmounts[0] = uint96(10 ether);
+    stakedAmounts[1] = uint96(20 ether);
+    stakedAmounts[2] = uint96(30 ether);
+    stakedAmounts[3] = uint96(40 ether);
+    stakedAmounts[4] = uint96(50 ether);
+    stakedAmounts[5] = uint96(60 ether);
 
     uint256[] memory trustedWeights = new uint256[](6);
     trustedWeights[0] = 1;
@@ -178,7 +281,7 @@ contract LibSortValidatorsByBeaconTest is Test {
     console.log("Reads:", reads.length, "Writes:", writes.length);
 
     for (uint256 i = MIN_EPOCH; i <= MAX_EPOCH; i++) {
-      address[] memory picked = LibSortValidatorsByBeacon.pickValidatorSet(i, beacon);
+      address[] memory picked = LibSortValidatorsByBeacon.pickValidatorSet(1, i, beacon);
       uint256 numNonRotatingValidator = picked.length - 1;
       assertEq(numNonRotatingValidator, 4, "Invalid number of non-rotating validators");
       // Non-rotating: address: 1, 2, 6, 5
@@ -444,7 +547,7 @@ contract LibSortValidatorsByBeaconTest is Test {
     );
 
     for (uint256 i = MIN_EPOCH; i <= MAX_EPOCH; i++) {
-      LibSortValidatorsByBeacon.pickValidatorSet(i, r);
+      LibSortValidatorsByBeacon.pickValidatorSet(1, i, r);
     }
   }
 
@@ -518,7 +621,7 @@ contract LibSortValidatorsByBeaconTest is Test {
 
     vm.record();
     vm.resumeGasMetering();
-    LibSortValidatorsByBeacon.pickValidatorSet(pickEpoch, r);
+    LibSortValidatorsByBeacon.pickValidatorSet(0, pickEpoch, r);
     vm.pauseGasMetering();
     (bytes32[] memory reads, bytes32[] memory writes) = vm.accesses(address(this));
     console.log("Reads:", reads.length, "Writes:", writes.length);

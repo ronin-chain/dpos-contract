@@ -80,8 +80,6 @@ contract RoninMigration is BaseMigration {
 
   function _setRoninRandomBeaconParam(ISharedArgument.RoninRandomBeaconParam memory param) internal view {
     param.slashThreshold = vm.envOr("RANDOM_BEACON_SLASH_THRESHOLD", uint256(3));
-    param.initialSeed =
-      vm.envOr("INITIAL_SEED", uint256(0xf163e32d61a89ecdf76fadff771e92444ed9233fc67ea6ea932bc5fbfbd35d4a));
     param.activatedAtPeriod = vm.envOr("RANDOM_BEACON_ACTIVATED_AT_PERIOD", vm.getBlockTimestamp() / 1 days + 1);
 
     param.validatorTypes = new IRandomBeacon.ValidatorType[](4);
@@ -294,7 +292,7 @@ contract RoninMigration is BaseMigration {
 
         Proposal.ProposalDetail memory proposal = LibProposal.buildProposal({
           governanceAdmin: roninGovernanceAdmin,
-          expiry: vm.getBlockTimestamp() + 15 minutes,
+          expiry: vm.getBlockTimestamp() + 1 hours,
           targets: targets,
           values: values,
           callDatas: callDatas
