@@ -40,6 +40,29 @@ interface IMainchainGatewayV3 is SignatureConsumer, MappedTokenConsumer {
   /// @dev Emitted when the withdrawal is unlocked
   event WithdrawalUnlocked(bytes32 receiptHash, Transfer.Receipt receipt);
 
+  function initialize(
+    address _roleSetter,
+    IWETH _wrappedToken,
+    uint256 _roninChainId,
+    uint256 _numerator,
+    uint256 _highTierVWNumerator,
+    uint256 _denominator,
+    // _addresses[0]: mainchainTokens
+    // _addresses[1]: roninTokens
+    // _addresses[2]: withdrawalUnlockers
+    address[][3] calldata _addresses,
+    // _thresholds[0]: highTierThreshold
+    // _thresholds[1]: lockedThreshold
+    // _thresholds[2]: unlockFeePercentages
+    // _thresholds[3]: dailyWithdrawalLimit
+    uint256[][4] calldata _thresholds,
+    Token.Standard[] calldata _standards
+  ) external payable;
+
+  function initializeV2(address bridgeManagerContract) external;
+
+  function wrappedNativeToken() external view returns (IWETH);
+
   /**
    * @dev Returns the domain seperator.
    */

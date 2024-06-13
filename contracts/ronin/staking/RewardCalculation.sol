@@ -52,11 +52,12 @@ abstract contract RewardCalculation is IRewardPool {
   /**
    * @dev Returns the reward amount that user claimable.
    */
-  function _getReward(address poolId, address user, uint256 latestPeriod, uint256 latestStakingAmount)
-    internal
-    view
-    returns (uint256)
-  {
+  function _getReward(
+    address poolId,
+    address user,
+    uint256 latestPeriod,
+    uint256 latestStakingAmount
+  ) internal view returns (uint256) {
     UserRewardFields storage _reward = _userReward[poolId][user];
 
     if (_reward.lastPeriod == latestPeriod) {

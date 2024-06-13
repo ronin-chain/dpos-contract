@@ -102,6 +102,21 @@ interface IRandomBeacon {
    */
   event RandomSeedRequested(uint256 indexed period, bytes32 indexed reqHash, RandomRequest req);
 
+  function initialize(
+    address profile,
+    address staking,
+    address trustedOrg,
+    address validatorSet,
+    uint256 slashThreshold,
+    uint256 activatedAtPeriod,
+    ValidatorType[] calldata validatorTypes,
+    uint256[] calldata thresholds
+  ) external;
+
+  function initializeV2() external;
+
+  function initializeV3() external;
+
   /**
    * @dev Threshold for the cooldown period of key hash change and newly registered candidates.
    */

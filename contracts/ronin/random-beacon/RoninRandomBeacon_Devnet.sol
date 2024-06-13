@@ -6,6 +6,16 @@ import { RoninRandomBeacon } from "./RoninRandomBeacon.sol";
 
 contract RoninRandomBeacon_Devnet is RoninRandomBeacon {
   /**
+   * @dev Left empty on purpose of matching the contract version with the one in the testnet.
+   */
+  function initializeV2() external reinitializer(2) { }
+
+  /**
+   * @dev Left empty on purpose of matching the contract version with the one in the testnet.
+   */
+  function initializeV3() external reinitializer(3) { }
+
+  /**
    * @dev Manual trigger request random seed for the given period.
    * This function is only used for testing purpose.
    */
