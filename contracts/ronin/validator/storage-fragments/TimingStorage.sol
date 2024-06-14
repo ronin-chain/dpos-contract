@@ -28,12 +28,6 @@ abstract contract TimingStorage is ITimingInfo, GlobalConfigConsumer {
    */
   uint256[47] private ______gap;
 
-  /**
-   * @inheritdoc ITimingInfo
-   */
-  function getPeriodOf(uint256 epoch) external view returns (uint256 period) {
-    period = _periodOf[epoch];
-  }
 
   /**
    * @inheritdoc ITimingInfo
@@ -41,7 +35,7 @@ abstract contract TimingStorage is ITimingInfo, GlobalConfigConsumer {
   function getPeriodEndBlock(uint256 period) external view returns (uint256 endedAtBlock) {
     if (period > _lastUpdatedPeriod) revert ErrPeriodNotEndedYet(period);
     uint256 firstTrackedPeriodEnd = _firstTrackedPeriodEnd;
-    if (period < firstTrackedPeriodEnd) revert ErrPeriodEndingBlockNotExist(period, firstTrackedPeriodEnd);
+    if (period < firstTrackedPeriodEnd) revert ErrPeriodEndingBlockNotTracked(period, firstTrackedPeriodEnd);
 
     endedAtBlock = _periodEndBlock[period];
   }
