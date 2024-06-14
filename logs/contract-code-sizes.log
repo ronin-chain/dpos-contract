@@ -72,8 +72,8 @@
 | MockProfile                             |   12,790 |     11,786 |
 | MockRONTransferHelperConsumer_Berlin    |      442 |     24,134 |
 | MockRONTransferHelperConsumer_Istanbul  |      442 |     24,134 |
-| MockRoninValidatorSetExtended           |   29,026 |     -4,450 |
-| MockRoninValidatorSetOverridePrecompile |   28,249 |     -3,673 |
+| MockRoninValidatorSetExtended           |   29,057 |     -4,481 |
+| MockRoninValidatorSetOverridePrecompile |   28,280 |     -3,704 |
 | MockSlashIndicatorExtended              |   19,067 |      5,509 |
 | MockSorting                             |    3,165 |     21,411 |
 | MockStaking                             |    4,859 |     19,717 |
@@ -92,7 +92,7 @@
 | RoninRandomBeacon_Mainnet               |   17,619 |      6,957 |
 | RoninRandomBeacon_Testnet               |   19,987 |      4,589 |
 | RoninTrustedOrganization                |   10,372 |     14,204 |
-| RoninValidatorSet                       |   24,176 |        400 |
+| RoninValidatorSet                       |   24,207 |        369 |
 | RoninValidatorSetREP10Migrator          |    2,957 |     21,619 |
 | RoninValidatorSetTimedMigrator          |    3,602 |     20,974 |
 | Safe                                    |   13,651 |     10,925 |
