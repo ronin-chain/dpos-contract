@@ -6,7 +6,7 @@ interface ITimingInfo {
   /// @dev Throws if the period has not ended yet or the period ending block does not exist.
   error ErrPeriodNotEndedYet(uint256 period);
   /// @dev Throws if the period ending block does not exist.
-  error ErrPeriodEndingBlockNotExist(uint256 period);
+  error ErrPeriodEndingBlockNotExist(uint256 period, uint256 firstTrackedPeriod);
 
   /**
    * @dev Returns the block that validator set was updated.

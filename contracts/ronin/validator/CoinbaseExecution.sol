@@ -53,6 +53,8 @@ abstract contract CoinbaseExecution is
   modifier oncePerEpoch() {
     if (epochOf(_lastUpdatedBlock) >= epochOf(block.number)) revert ErrAlreadyWrappedEpoch();
     _lastUpdatedBlock = block.number;
+    // TODO: remove this line in the next upgrade
+    if (_firstTrackedPeriodEnd == 0) _firstTrackedPeriodEnd = _lastUpdatedPeriod;
     _;
   }
 
