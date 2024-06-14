@@ -61,8 +61,6 @@ contract MockValidatorSet is
 
   function submitBlockReward() external payable override { }
 
-  function getPeriodOf(uint256 epoch) external view override returns (uint256) { }
-
   function getPeriodEndBlock(uint256 period) external view override returns (uint256) { }
 
   function wrapUpEpoch() external payable override {
