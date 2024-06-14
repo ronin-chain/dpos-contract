@@ -19,11 +19,19 @@ abstract contract TimingStorage is ITimingInfo, GlobalConfigConsumer {
   mapping(uint256 epoch => uint256 period) internal _periodOf;
   /// @dev Mapping from period index => ending block
   mapping(uint256 period => uint256 endedAtBlock) internal _periodEndBlock;
+
   /**
    * @dev This empty reserved space is put in place to allow future versions to add new
    * variables without shifting down storage in the inheritance chain.
    */
   uint256[48] private ______gap;
+
+  /**
+   * @inheritdoc ITimingInfo
+   */
+  function getPeriodOf(uint256 epoch) external view returns (uint256 period) {
+    period = _periodOf[epoch];
+  }
 
   /**
    * @inheritdoc ITimingInfo
