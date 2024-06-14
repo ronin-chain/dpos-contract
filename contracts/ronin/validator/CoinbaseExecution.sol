@@ -126,12 +126,12 @@ abstract contract CoinbaseExecution is
     // This request is actually only invoked at the first epoch of the period.
     randomBeacon.execRequestRandomSeedForNextPeriod(lastPeriod, newPeriod);
 
-    _syncFastFinalityReward({ epoch: epoch, validatorIds: getValidatorIds() });
+    // Get all candidate ids
+    address[] memory allCids = _candidateIds;
+
+    _syncFastFinalityReward({ epoch: epoch, validatorIds: allCids });
 
     if (periodEnding) {
-      // Get all candidate ids
-      address[] memory allCids = _candidateIds;
-
       ISlashIndicator slashIndicatorContract = ISlashIndicator(getContract(ContractType.SLASH_INDICATOR));
       // Slash submit random beacon proof unavailability first, then update credit scores.
       randomBeacon.execRecordAndSlashUnavailability(lastPeriod, newPeriod, address(slashIndicatorContract), allCids);
