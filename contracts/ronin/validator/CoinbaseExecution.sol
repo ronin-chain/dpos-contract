@@ -53,6 +53,10 @@ abstract contract CoinbaseExecution is
   modifier oncePerEpoch() {
     if (epochOf(_lastUpdatedBlock) >= epochOf(block.number)) revert ErrAlreadyWrappedEpoch();
     _lastUpdatedBlock = block.number;
+    // TODO: remove this line in the next upgrade
+    if (_firstTrackedPeriodEnd == 0) {
+      _firstTrackedPeriodEnd = _lastUpdatedPeriod;
+    }
     _;
   }
 
@@ -150,6 +154,7 @@ abstract contract CoinbaseExecution is
       // Should wrap up the beacon after unsatisfied candidates get removed.
       randomBeacon.execFinalizeBeaconAndPendingCids(lastPeriod, newPeriod, allCids);
 
+      _periodEndBlock[lastPeriod] = block.number;
       _currentPeriodStartAtBlock = block.number + 1;
     }
 
