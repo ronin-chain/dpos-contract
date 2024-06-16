@@ -68,7 +68,7 @@ library LibWrapUpEpoch {
 
   function fastForwardToNextEpoch() internal {
     vm.roll(vm.getBlockNumber() + 1);
-    vm.warp(vm.getBlockTimestamp() + 3);
+    vm.warp(vm.getBlockTimestamp() + 1);
 
     IRoninValidatorSet validatorSet =
       IRoninValidatorSet(config.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key()));
@@ -79,7 +79,7 @@ library LibWrapUpEpoch {
     if (startBlock > vm.getBlockNumber()) {
       diff = startBlock - vm.getBlockNumber();
       vm.roll(startBlock);
-      vm.warp(vm.getBlockTimestamp() + diff * 3);
+      vm.warp(vm.getBlockTimestamp() + 1);
     }
 
     uint256 startEpoch = validatorSet.epochOf(startBlock);
@@ -88,11 +88,11 @@ library LibWrapUpEpoch {
 
     uint256 startBlockOfCurrentEpoch = startBlock + (currEpoch - startEpoch) * numberOfBlocksInEpoch;
     diff = vm.getBlockNumber() - startBlockOfCurrentEpoch;
-    uint256 startTimestampOfCurrentEpoch = vm.getBlockTimestamp() - diff * 3;
+    uint256 startTimestampOfCurrentEpoch = vm.getBlockTimestamp() +1 ;
 
     uint256 nextEpochBlockNumber =
       startBlockOfCurrentEpoch + (numberOfBlocksInEpoch - 1) - (startBlockOfCurrentEpoch % numberOfBlocksInEpoch);
-    uint256 nextEpochTimestamp = startTimestampOfCurrentEpoch + numberOfBlocksInEpoch * 3;
+    uint256 nextEpochTimestamp = startTimestampOfCurrentEpoch + 1;
 
     vm.roll(nextEpochBlockNumber);
     vm.warp(nextEpochTimestamp);

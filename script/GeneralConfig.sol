@@ -48,6 +48,7 @@ contract GeneralConfig is BaseGeneralConfig {
     _contractNameMap[Contract.RoninGatewayPauseEnforcer.key()] = "PauseEnforcer";
     _contractNameMap[Contract.HardForkRoninGovernanceAdmin.key()] = Contract.RoninGovernanceAdmin.name();
     _contractNameMap[Contract.TemporalRoninTrustedOrganization.key()] = Contract.RoninTrustedOrganization.name();
+    _contractNameMap[Contract.RoninRandomBeacon.key()] = "RoninRandomBeacon_Devnet";
 
     if (block.chainid == 2021) {
       _contractNameMap[Contract.Profile.key()] = "Profile";

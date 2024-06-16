@@ -106,10 +106,10 @@ contract RoninMigration is BaseMigration {
   }
 
   function _setStakingVestingParam(ISharedArgument.StakingVestingParam memory param) internal view {
-    param.topupAmount = vm.envOr("TOPUP_AMOUNT", uint256(100_000_000_000));
-    param.fastFinalityRewardPercent = vm.envOr("FAST_FINALITY_REWARD_PERCENT", uint256(1_00)); // 1%
-    param.blockProducerBonusPerBlock = vm.envOr("BLOCK_PRODUCER_BONUS_PER_BLOCK", uint256(1_000));
-    param.bridgeOperatorBonusPerBlock = vm.envOr("BRIDGE_OPERATOR_BONUS_PER_BLOCK", uint256(1_100));
+    param.topupAmount = vm.envOr("TOPUP_AMOUNT", uint256(100_000_000_000_000_000));
+    param.fastFinalityRewardPercent = vm.envOr("FAST_FINALITY_REWARD_PERCENT", uint256(85_00)); // 1%
+    param.blockProducerBonusPerBlock = vm.envOr("BLOCK_PRODUCER_BONUS_PER_BLOCK", uint256(1_000_000));
+    param.bridgeOperatorBonusPerBlock = vm.envOr("BRIDGE_OPERATOR_BONUS_PER_BLOCK", uint256(0));
   }
 
   function _setSlashIndicatorParam(ISharedArgument.SlashIndicatorParam memory param) internal view {
@@ -153,7 +153,7 @@ contract RoninMigration is BaseMigration {
   }
 
   function _setTrustedOrganizationParam(ISharedArgument.RoninTrustedOrganizationParam memory param) internal {
-    param.trustedOrganizations = new IRoninTrustedOrganization.TrustedOrganization[](4);
+    param.trustedOrganizations = new IRoninTrustedOrganization.TrustedOrganization[](2);
     uint256 governorPk;
     uint256 consensusPk;
     address consensus;

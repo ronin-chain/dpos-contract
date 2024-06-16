@@ -38,7 +38,7 @@ contract DeployDPoS is RoninMigration {
   // @dev Array to store proxy targets to change admin
   address[] internal _changeProxyTargets;
 
-  uint256 internal constant MAX_CANDIDATE = 70;
+  uint256 internal _MAX_CANDIDATE = 7;
   address internal constant PAY_MASTER = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
 
   IProfile profile;
@@ -96,6 +96,10 @@ contract DeployDPoS is RoninMigration {
     _initRoninRandomBeacon(param.roninRandomBeacon);
   }
 
+  function setMaxCandidate(uint256 max) external {
+    _MAX_CANDIDATE = max;
+  }
+
   function _postCheck() internal virtual override {
     LibPrecompile.deployPrecompile();
 
@@ -121,11 +125,17 @@ contract DeployDPoS is RoninMigration {
     (uint256 min, uint256 max) = staking.getCommissionRateRange();
     uint256 commissionRate = min + (max - min) / 2;
 
+    uint[2] memory stakes = [
+      uint256(6904000 ether),
+      uint256(9014000 ether)];
+
     for (uint256 i; i < allTrustedOrgs.length; ++i) {
       (address candidateAdmin, uint256 privateKey) = makeAddrAndKey(string.concat("gv-candidate-", vm.toString(i)));
       bytes memory pubKey = bytes(string.concat("gv-pubKey-", vm.toString(allTrustedOrgs[i].governor)));
-      uint256 stakeAmount =
-        _bound(uint256(keccak256(abi.encode(vm.unixTime()))), minValidatorStakingAmount, type(uint96).max);
+      uint256 stakeAmount = stakes[i];
+      //   _bound(uint256(keccak256(abi.encode(vm.unixTime()))), minValidatorStakingAmount, type(uint96).max);
+
+
       // cheat to pass post check
       if (i == 0) stakeAmount = minValidatorStakingAmount + 1;
 
@@ -188,19 +198,27 @@ contract DeployDPoS is RoninMigration {
 
   function _cheatApplyValidatorCandidates() internal {
     IRoninTrustedOrganization.TrustedOrganization[] memory allTrustedOrgs = trustedOrg.getAllTrustedOrganizations();
-    uint256 maxValidatorCandidate = MAX_CANDIDATE - allTrustedOrgs.length;
+    uint256 maxValidatorCandidate = _MAX_CANDIDATE - allTrustedOrgs.length;
 
     uint256 minValidatorStakingAmount = staking.minValidatorStakingAmount();
     (uint256 min, uint256 max) = staking.getCommissionRateRange();
     uint256 commissionRate = min + (max - min) / 2;
+
+    uint256[5] memory stakes = [
+      uint256(7210_000 ether),
+      uint256(5611_000 ether),
+      uint256(7212_000 ether),
+      uint256(6277_000 ether),
+      uint256(6579_000 ether)
+    ];
 
     for (uint256 i; i < maxValidatorCandidate; ++i) {
       bytes memory pubKey = bytes(string.concat("sv-pubKey-", vm.toString(i)));
       address candidateAdmin = makeAddr(string.concat("sv-candidate-admin-", vm.toString(i)));
       TConsensus consensus = TConsensus.wrap(makeAddr(string.concat("sv-candidate-", vm.toString(i))));
 
-      uint256 stakeAmount =
-        _bound(uint256(keccak256(abi.encode(vm.unixTime()))), minValidatorStakingAmount, type(uint96).max);
+      uint256 stakeAmount = stakes[i];
+        // _bound(uint256(keccak256(abi.encode(vm.unixTime()))), minValidatorStakingAmount, type(uint96).max);
       vm.deal(PAY_MASTER, stakeAmount);
       prankOrBroadcast(PAY_MASTER);
       payable(candidateAdmin).transfer(stakeAmount);
