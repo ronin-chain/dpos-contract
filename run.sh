@@ -1,1 +1,1 @@
-source lib/foundry-deployment-kit/run.sh
+source dependencies/@fdk-v0.3.0-beta/run.sh

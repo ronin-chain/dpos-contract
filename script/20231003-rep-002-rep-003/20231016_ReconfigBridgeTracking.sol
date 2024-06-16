@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { LibErrorHandler } from "contract-libs/LibErrorHandler.sol";
+import { LibErrorHandler } from "@fdk/libraries/LibErrorHandler.sol";
 import "./20231003_REP002AndREP003_RON_NonConditional_Wrapup2Periods.s.sol";
 
 contract Simulation_20231016_ReconfigBridgeTracking is

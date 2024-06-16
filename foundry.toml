@@ -55,3 +55,8 @@ ronin-devnet = "https://hcm-rpc.skymavis.one/rpc"
 localhost = "http://localhost:8545"
 ronin-testnet-shadow = "http://34.27.172.168:8545"
 ronin-mainnet-shadow = "http://35.192.217.237:8545"
+
+[dependencies]
+"@fdk" = { version = "v0.3.0-beta", url = "https://github.com/axieinfinity/foundry-deployment-kit/archive/refs/tags/v0.3.0-beta.zip" }
+"@prb-test" = { version = "0.6.4" }
+"@openzeppelin-contracts" = { version = "4.7.3" }

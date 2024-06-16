@@ -10,7 +10,7 @@ import { ITransparentUpgradeableProxyV2 } from
   "@ronin/contracts/interfaces/extensions/ITransparentUpgradeableProxyV2.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
 import { console } from "forge-std/console.sol";
-import { LibErrorHandler } from "contract-libs/LibErrorHandler.sol";
+import { LibErrorHandler } from "@fdk/libraries/LibErrorHandler.sol";
 import { TContract } from "@fdk/types/Types.sol";
 import { LibProxy } from "@fdk/libraries/LibProxy.sol";
 import { BaseMigration } from "@fdk/BaseMigration.s.sol";
@@ -131,6 +131,10 @@ contract PostChecker is
       vm.prank(admin);
       profile.changeVRFKeyHash(cid, vrfKeys[i].keyHash);
     }
+
+    console.log(StdStyle.green("Cheat fast forward to 2 epochs ..."));
+    LibWrapUpEpoch.wrapUpEpoch();
+    LibWrapUpEpoch.wrapUpEpoch();
 
     console.log(StdStyle.green("Cheat fast forward to 2 days ..."));
     LibWrapUpEpoch.wrapUpPeriods({ times: 2, shouldSubmitBeacon: false });

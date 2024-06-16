@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { LibErrorHandler } from "contract-libs/LibErrorHandler.sol";
+import { LibErrorHandler } from "@fdk/libraries/LibErrorHandler.sol";
 import { Simulation__20231003_UpgradeREP002AndREP003_Base } from "./20231003_REP002AndREP003_Base.s.sol";
 
 contract Simulation_20231003_REP002AndREP003_RON_NonConditional_GatewayUpgrade_ActualProposal is

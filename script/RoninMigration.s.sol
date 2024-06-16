@@ -45,7 +45,7 @@ contract RoninMigration is BaseMigration {
     ISharedArgument.SharedParameter memory param;
 
     if (
-      network() == DefaultNetwork.Local.key() || network() == DefaultNetwork.RoninTestnet.key()
+      network() == DefaultNetwork.LocalHost.key() || network() == DefaultNetwork.RoninTestnet.key()
         || network() == Network.RoninDevnet.key() || network() == Network.ShadowForkMainnet.key()
     ) {
       param.initialOwner = makeAddr("initial-owner");
@@ -269,7 +269,7 @@ contract RoninMigration is BaseMigration {
       // in case proxyAdmin is GovernanceAdmin
       if (
         currentNetwork == DefaultNetwork.RoninTestnet.key() || currentNetwork == DefaultNetwork.RoninMainnet.key()
-          || currentNetwork == Network.RoninDevnet.key() || currentNetwork == DefaultNetwork.Local.key()
+          || currentNetwork == Network.RoninDevnet.key() || currentNetwork == DefaultNetwork.LocalHost.key()
           || currentNetwork == Network.ShadowForkMainnet.key()
       ) {
         // handle for ronin network
@@ -328,13 +328,13 @@ contract RoninMigration is BaseMigration {
   }
 
   function _getProxyAdminFromCurrentNetwork() internal view virtual returns (address proxyAdmin) {
-    if (network() == DefaultNetwork.Local.key()) {
+    if (network() == DefaultNetwork.LocalHost.key()) {
       address deployedProxyAdmin;
       try config.getAddressFromCurrentNetwork(Contract.RoninGovernanceAdmin.key()) returns (address payable res) {
         deployedProxyAdmin = res;
       } catch { }
 
-      return deployedProxyAdmin == address(0x0) ? config.sharedArguments().initialOwner : deployedProxyAdmin;
+      return deployedProxyAdmin == address(0x0) ? sender() : deployedProxyAdmin;
     }
 
     return loadContract(Contract.RoninGovernanceAdmin.key());

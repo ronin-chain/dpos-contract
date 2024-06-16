@@ -52,9 +52,9 @@ contract DeployDPoS is RoninMigration {
   IRoninGovernanceAdmin governanceAdmin;
   IFastFinalityTracking fastFinalityTracking;
 
-  function run() public onlyOn(DefaultNetwork.Local.key()) {
+  function run() public onlyOn(DefaultNetwork.LocalHost.key()) {
     ISharedArgument.SharedParameter memory param = config.sharedArguments();
-    address initialOwner = param.initialOwner;
+    address initialOwner = sender();
     vm.label(initialOwner, "initialOwner");
 
     validatorSet = new RoninValidatorSetDeploy().run();
@@ -183,6 +183,8 @@ contract DeployDPoS is RoninMigration {
       validatorTypes: param.validatorTypes,
       thresholds: param.thresholds
     });
+    randomBeacon.initializeV2();
+    randomBeacon.initializeV3();
     vm.stopBroadcast();
   }
 
