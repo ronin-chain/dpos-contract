@@ -13,56 +13,90 @@ library LibWrapUpEpoch {
   Vm internal constant vm = Vm(LibSharedAddress.VM);
   IGeneralConfig internal constant config = IGeneralConfig(LibSharedAddress.VME);
 
+  function wrapUpPeriod() internal {
+    wrapUpPeriods({ times: 1 });
+  }
+
+  function wrapUpPeriods(uint256 times) internal {
+    wrapUpPeriods({ times: times, shouldSubmitBeacon: false });
+  }
+
   function wrapUpPeriods(uint256 times, bool shouldSubmitBeacon) internal {
-    LibVRFProof.VRFKey[] memory keys = abi.decode(config.getUserDefinedConfig("vrf-keys"), (LibVRFProof.VRFKey[]));
+    LibVRFProof.VRFKey[] memory keys;
+    bytes memory raw = config.getUserDefinedConfig("vrf-keys");
+
+    if (raw.length != 0) {
+      keys = abi.decode(raw, (LibVRFProof.VRFKey[]));
+    } else {
+      require(!shouldSubmitBeacon, "LibWrapUpEpoch: no VRF keys");
+    }
 
     for (uint256 i; i < times; ++i) {
       fastForwardToNextDay();
-      wrapUpEpoch();
+      _wrapUpEpoch();
 
       if (!shouldSubmitBeacon) continue;
 
-      fastForwardToNextEpoch();
       wrapUpEpochAndSubmitBeacons(keys);
     }
   }
 
-  function wrapUpPeriods(uint256 times) internal {
-    wrapUpPeriods(times, true);
-  }
-
-  function wrapUpPeriod() internal {
-    wrapUpPeriods(1);
-  }
-
-  function wrapUpEpochs(uint256 times) internal {
-    LibVRFProof.VRFKey[] memory keys = abi.decode(config.getUserDefinedConfig("vrf-keys"), (LibVRFProof.VRFKey[]));
+  function wrapUpEpochs(uint256 times, bool shouldSubmitBeacon) internal {
+    LibVRFProof.VRFKey[] memory keys;
+    bytes memory raw = config.getUserDefinedConfig("vrf-keys");
+    
+    if (raw.length != 0) {
+      keys = abi.decode(raw, (LibVRFProof.VRFKey[]));
+    } else {
+      require(!shouldSubmitBeacon, "LibWrapUpEpoch: no VRF keys");
+    }
 
     for (uint256 i; i < times; ++i) {
-      fastForwardToNextEpoch();
-      wrapUpEpochAndSubmitBeacons(keys);
+      if (shouldSubmitBeacon) {
+        wrapUpEpochAndSubmitBeacons(keys);
+      } else {
+        wrapUpEpoch();
+      }
     }
   }
 
   function wrapUpEpoch() internal {
     fastForwardToNextEpoch();
-    wrapUpEpoch(block.coinbase);
+    _wrapUpEpoch();
   }
 
   function wrapUpEpochAndSubmitBeacons(LibVRFProof.VRFKey[] memory keys) internal {
     fastForwardToNextEpoch();
-    wrapUpEpochAndSubmitBeacons(keys, block.coinbase);
+    _wrapUpEpochAndSubmitBeacons(keys);
   }
 
-  function wrapUpEpoch(address caller) private {
-    vm.startPrank(caller);
-    IRoninValidatorSet(config.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key())).wrapUpEpoch();
+  function _wrapUpEpoch() private {
+    IRoninValidatorSet validatorSet =
+      IRoninValidatorSet(config.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key()));
+    vm.startPrank(block.coinbase);
+    validatorSet.wrapUpEpoch();
     vm.stopPrank();
+
+    uint256 blockProducerCount = validatorSet.getBlockProducers().length;
+    uint256 validatorCount = validatorSet.getValidators().length;
+    uint256 validatorCandidateCount = validatorSet.getValidatorCandidates().length;
+
+    require(blockProducerCount > 0, "LibWrapUpEpoch: no block producer");
+    require(validatorCount > 0, "LibWrapUpEpoch: no validator");
+    require(validatorCandidateCount > 0, "LibWrapUpEpoch: no validator candidate");
+    require(
+      blockProducerCount == validatorSet.getBlockProducerIds().length, "LibWrapUpEpoch: invalid block producer set"
+    );
+    require(validatorCount == validatorSet.getValidatorIds().length, "LibWrapUpEpoch: invalid validator set");
+    require(
+      validatorCandidateCount == validatorSet.getValidatorCandidateIds().length,
+      "LibWrapUpEpoch: invalid validator candidate set"
+    );
   }
 
-  function wrapUpEpochAndSubmitBeacons(LibVRFProof.VRFKey[] memory keys, address caller) private {
+  function _wrapUpEpochAndSubmitBeacons(LibVRFProof.VRFKey[] memory keys) private {
     vm.recordLogs();
-    wrapUpEpoch(caller);
+    _wrapUpEpoch();
     LibVRFProof.listenEventAndSubmitProof(keys);
   }
 

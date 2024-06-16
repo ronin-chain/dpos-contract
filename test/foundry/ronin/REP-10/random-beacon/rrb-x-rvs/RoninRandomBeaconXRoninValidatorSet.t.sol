@@ -10,7 +10,6 @@ contract RoninRandomBeaconXRoninValidatorSetTest is REP10_BaseTest {
     vm.assume(wrapUpEpochCount > 0 && wrapUpEpochCount < 400);
 
     for (uint16 i; i < wrapUpEpochCount; i++) {
-      LibWrapUpEpoch.fastForwardToNextEpoch();
       LibWrapUpEpoch.wrapUpEpoch();
 
       assertEq(
@@ -25,7 +24,6 @@ contract RoninRandomBeaconXRoninValidatorSetTest is REP10_BaseTest {
     vm.deal(address(roninValidatorSet), 10_000_000 ether);
     vm.deal(address(stakingVesting), 100_000_000 ether);
 
-    LibWrapUpEpoch.fastForwardToNextEpoch();
     LibWrapUpEpoch.wrapUpEpoch();
 
     TConsensus[] memory allConsensuses = roninValidatorSet.getValidatorCandidates();
@@ -61,9 +59,8 @@ contract RoninRandomBeaconXRoninValidatorSetTest is REP10_BaseTest {
       );
     }
 
-    LibWrapUpEpoch.fastForwardToNextDay();
     vm.recordLogs();
-    LibWrapUpEpoch.wrapUpEpoch();
+    LibWrapUpEpoch.wrapUpPeriod();
     VmSafe.Log[] memory logs = vm.getRecordedLogs();
 
     for (uint256 i; i < logs.length; ++i) {
@@ -81,9 +78,8 @@ contract RoninRandomBeaconXRoninValidatorSetTest is REP10_BaseTest {
       }
     }
 
-    LibWrapUpEpoch.fastForwardToNextDay();
     vm.recordLogs();
-    LibWrapUpEpoch.wrapUpEpoch();
+    LibWrapUpEpoch.wrapUpPeriod();
 
     logs = vm.getRecordedLogs();
     address[] memory nonRotatingValidators;
@@ -114,7 +110,6 @@ contract RoninRandomBeaconXRoninValidatorSetTest is REP10_BaseTest {
     vm.deal(address(roninValidatorSet), 10_000_000 ether);
     vm.deal(address(stakingVesting), 100_000_000 ether);
 
-    LibWrapUpEpoch.fastForwardToNextEpoch();
     LibWrapUpEpoch.wrapUpEpoch();
 
     TConsensus[] memory allConsensuses = roninValidatorSet.getValidatorCandidates();
@@ -151,9 +146,8 @@ contract RoninRandomBeaconXRoninValidatorSetTest is REP10_BaseTest {
       );
     }
 
-    LibWrapUpEpoch.fastForwardToNextDay();
     vm.recordLogs();
-    LibWrapUpEpoch.wrapUpEpoch();
+    LibWrapUpEpoch.wrapUpPeriod();
     VmSafe.Log[] memory logs = vm.getRecordedLogs();
 
     for (uint256 i; i < logs.length; ++i) {
@@ -171,9 +165,8 @@ contract RoninRandomBeaconXRoninValidatorSetTest is REP10_BaseTest {
       }
     }
 
-    LibWrapUpEpoch.fastForwardToNextDay();
     vm.recordLogs();
-    LibWrapUpEpoch.wrapUpEpoch();
+    LibWrapUpEpoch.wrapUpPeriod();
 
     logs = vm.getRecordedLogs();
     address[] memory nonRotatingValidators;
@@ -204,8 +197,7 @@ contract RoninRandomBeaconXRoninValidatorSetTest is REP10_BaseTest {
     vm.deal(address(roninValidatorSet), 10_000_000 ether);
     vm.deal(address(stakingVesting), 100_000_000 ether);
 
-    LibWrapUpEpoch.fastForwardToNextDay();
-    LibWrapUpEpoch.wrapUpEpoch();
+    LibWrapUpEpoch.wrapUpPeriod();
 
     address[] memory allCids = roninValidatorSet.getValidatorCandidateIds();
     address[] memory admins = profile.getManyId2Admin(allCids);
@@ -231,7 +223,6 @@ contract RoninRandomBeaconXRoninValidatorSetTest is REP10_BaseTest {
         roninValidatorSet.submitBlockReward{ value: reward }();
       }
 
-      LibWrapUpEpoch.fastForwardToNextEpoch();
       LibWrapUpEpoch.wrapUpEpoch();
 
       if (currPeriod != roninValidatorSet.currentPeriod()) {
