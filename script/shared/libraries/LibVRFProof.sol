@@ -38,6 +38,8 @@ library LibVRFProof {
   }
 
   function listenEventAndSubmitProof(VRFKey[] memory keys) internal {
+    // return;
+
     if (keys.length == 0) return;
 
     VmSafe.Log[] memory logs = vm.getRecordedLogs();

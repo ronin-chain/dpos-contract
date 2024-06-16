@@ -14,6 +14,7 @@ import { LibArray } from "../../libraries/LibArray.sol";
 import { TConsensus } from "../../udvts/Types.sol";
 import { ContractType } from "../../utils/ContractType.sol";
 import { ErrOncePerBlock, ErrCallerMustBeCoinbase } from "../../utils/CommonErrors.sol";
+import { console2 as console } from "forge-std/console2.sol";
 
 contract FastFinalityTracking is IFastFinalityTracking, Initializable, HasContracts {
   using LibArray for uint256[];
@@ -98,11 +99,14 @@ contract FastFinalityTracking is IFastFinalityTracking, Initializable, HasContra
       uint256 length = voters.length;
       uint256 epoch = validator.epochOf(block.number);
 
+      console.log("!@$!@$!^!* Tracked QC Score", epoch);
       for (uint256 i; i < length; ++i) {
         $record = _tracker[epoch][votedCids[i]];
 
         ++$record.qcVoteCount;
         $record.score += normalizedVoterStakeAmounts[i] * (g * g) / (h * h);
+
+        console.log(block.number, votedCids[i], $record.qcVoteCount, $record.score);
       }
     }
   }
@@ -128,6 +132,7 @@ contract FastFinalityTracking is IFastFinalityTracking, Initializable, HasContra
       uint256[] memory normalizedStakeAmounts = LibArray.inplaceClip({ values: stakeAmounts, lower: 0, upper: pivot });
       for (uint256 i; i < allCids.length; ++i) {
         $normalizedData.normalizedStake[allCids[i]] = normalizedStakeAmounts[i];
+        console.log("NormStake", allCids[i], normalizedStakeAmounts[i]);
       }
 
       $normalizedData.normalizedSum = normalizedSum_;

@@ -123,7 +123,8 @@ contract DeployDPoS is RoninMigration {
     IRoninTrustedOrganization.TrustedOrganization[] memory allTrustedOrgs = trustedOrg.getAllTrustedOrganizations();
     uint256 minValidatorStakingAmount = staking.minValidatorStakingAmount();
     (uint256 min, uint256 max) = staking.getCommissionRateRange();
-    uint256 commissionRate = min + (max - min) / 2;
+    // uint256 commissionRate = min + (max - min) / 2;
+    uint256 commissionRate = 100_00;
 
     uint[2] memory stakes = [
       uint256(6904000 ether),
@@ -202,14 +203,15 @@ contract DeployDPoS is RoninMigration {
 
     uint256 minValidatorStakingAmount = staking.minValidatorStakingAmount();
     (uint256 min, uint256 max) = staking.getCommissionRateRange();
-    uint256 commissionRate = min + (max - min) / 2;
+    // uint256 commissionRate = min + (max - min) / 2;
+    uint256 commissionRate = 100_00;
 
     uint256[5] memory stakes = [
       uint256(7210_000 ether),
       uint256(5611_000 ether),
       uint256(7212_000 ether),
       uint256(6277_000 ether),
-      uint256(6579_000 ether)
+      uint256(6579_00_000 ether)
     ];
 
     for (uint256 i; i < maxValidatorCandidate; ++i) {

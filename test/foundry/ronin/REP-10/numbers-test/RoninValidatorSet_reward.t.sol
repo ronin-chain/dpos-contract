@@ -71,6 +71,10 @@ contract RoninValidatorSetTest_RewardTest is REP10_Light_BaseTest {
         revert();
         break;
       }
+
+      if (i == 1) {
+        revert("Intended break");
+      }
     }
 
     // uint256 currBlockNumber = vm.getBlockNumber();
