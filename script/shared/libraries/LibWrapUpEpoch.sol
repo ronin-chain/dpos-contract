@@ -89,10 +89,19 @@ library LibWrapUpEpoch {
 
     logs = vm.getRecordedLogs();
     for (uint256 i; i < logs.length; ++i) {
-      if (
-        logs[i].emitter == address(validatorSet) && logs[i].topics[0] == ICoinbaseExecution.EmptyValidatorSet.selector
-      ) {
-        console.log("LibWrapUpEpoch: WARNING: EMPTY VALIDATOR SET".yellow());
+      if (logs[i].emitter == address(validatorSet)) {
+        if (logs[i].topics[0] == ICoinbaseExecution.EmptyValidatorSet.selector) {
+          console.log("LibWrapUpEpoch: WARNING: EMPTY VALIDATOR SET".yellow());
+        }
+        if (logs[i].topics[0] == ICoinbaseExecution.FastFinalityRewardDistributionFailed.selector) {
+          revert("PANIC: Fast finality reward distribution failed");
+        }
+        if (logs[i].topics[0] == ICoinbaseExecution.MiningRewardDistributionFailed.selector) {
+          revert("PANIC: Mining reward distribution failed");
+        }
+        if (logs[i].topics[0] == ICoinbaseExecution.StakingRewardDistributionFailed.selector) {
+          revert("PANIC: Validator set update failed");
+        }
       }
     }
 

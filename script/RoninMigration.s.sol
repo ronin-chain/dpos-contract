@@ -58,6 +58,8 @@ contract RoninMigration is BaseMigration {
       _setTrustedOrganizationParam(param.roninTrustedOrganization);
       _setRoninRandomBeaconParam(param.roninRandomBeacon);
       _setRoninValidatorSetREP10Migrator(param.roninValidatorSetREP10Migrator);
+    } else if (network() == DefaultNetwork.RoninMainnet.key()) {
+      console.log("RoninMigration: RoninMainnet Migration");
     } else {
       revert("RoninMigration: Other network unsupported");
     }

@@ -44,6 +44,7 @@ contract PostChecker is
 {
   using LibProxy for *;
   using LibErrorHandler for bool;
+  using StdStyle for *;
 
   TConsensus internal _gvToCheatVRF;
   TConsensus[] internal _gvsToRemove;
@@ -153,6 +154,9 @@ contract PostChecker is
         StdStyle.green("Cheat fast forward to activated period for number of periods:"), activatedAtPeriod - currPeriod
       );
       LibWrapUpEpoch.wrapUpPeriods({ times: activatedAtPeriod - currPeriod, shouldSubmitBeacon: false });
+      console.log("Expected Switch Logic to REP10 Logic");
+
+      console.log("Logic now:".yellow(), address(validatorSet).getProxyImplementation());
     }
 
     console.log(StdStyle.green("Cheat fast forward to 1 epoch ..."));
