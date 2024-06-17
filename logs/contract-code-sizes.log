@@ -3,7 +3,7 @@
 | Address                                 | 0.086     | 24.49       |
 | ArrayReplaceLib                         | 0.086     | 24.49       |
 | Ballot                                  | 0.086     | 24.49       |
-| BaseGeneralConfig                       | 28.291    | -3.715      |
+| BaseGeneralConfig                       | 31.341    | -6.765      |
 | BridgeOperatorsBallot                   | 0.166     | 24.41       |
 | BridgeTrackingRecoveryLogic             | 0.913     | 23.663      |
 | ECDSA                                   | 0.086     | 24.49       |
@@ -16,7 +16,7 @@
 | ErrorHandler                            | 0.086     | 24.49       |
 | FastFinalityTracking                    | 6.312     | 18.264      |
 | Forwarder                               | 3.816     | 20.76       |
-| GeneralConfig                           | 28.291    | -3.715      |
+| GeneralConfig                           | 34.714    | -10.138     |
 | GlobalProposal                          | 0.166     | 24.41       |
 | HasBridgeDeprecated                     | 0.063     | 24.513      |
 | HasBridgeTrackingDeprecated             | 0.063     | 24.513      |
