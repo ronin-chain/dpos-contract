@@ -101,6 +101,7 @@ contract FastFinalityTracking is IFastFinalityTracking, Initializable, HasContra
         $record = _tracker[epoch][votedCids[i]];
 
         ++$record.qcVoteCount;
+        // Simplification of: `$record.score += (normalizedVoterStakeAmounts[i] / g) * (g * g) / (h * h)`
         $record.score += normalizedVoterStakeAmounts[i] * g / (h * h);
       }
     }
