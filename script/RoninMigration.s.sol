@@ -69,13 +69,13 @@ contract RoninMigration is BaseMigration {
     internal
   {
     param.activatedAtPeriod =
-      vm.envOr("RONIN_VALIDATOR_SET_REP10_MIGRATOR_ACTIVATED_AT_PERIOD", (vm.unixTime() / 1_000) / 1 days + 2);
+      vm.envOr("RONIN_VALIDATOR_SET_REP10_MIGRATOR_ACTIVATED_AT_PERIOD", (vm.unixTime() / 1_000) / 1 days);
     console.log("RONIN_VALIDATOR_SET_REP10_MIGRATOR_ACTIVATED_AT_PERIOD: ", param.activatedAtPeriod);
   }
 
   function _setRoninRandomBeaconParam(ISharedArgument.RoninRandomBeaconParam memory param) internal {
     param.slashThreshold = vm.envOr("RANDOM_BEACON_SLASH_THRESHOLD", uint256(3));
-    param.activatedAtPeriod = vm.envOr("RANDOM_BEACON_ACTIVATED_AT_PERIOD", (vm.unixTime() / 1_000) / 1 days + 2);
+    param.activatedAtPeriod = vm.envOr("RANDOM_BEACON_ACTIVATED_AT_PERIOD", (vm.unixTime() / 1_000) / 1 days);
     console.log("RANDOM_BEACON_ACTIVATED_AT_PERIOD: ", param.activatedAtPeriod);
 
     param.validatorTypes = new IRandomBeacon.ValidatorType[](4);
@@ -144,7 +144,7 @@ contract RoninMigration is BaseMigration {
     // Slash random beacon
     param.slashRandomBeacon.randomBeaconSlashAmount = vm.envOr("SLASH_RANDOM_BEACON_AMOUNT", uint256(10 ether));
     param.slashRandomBeacon.activatedAtPeriod =
-      vm.envOr("SLASH_RANDOM_BEACON_ACTIVATED_AT_PERIOD", uint256((vm.unixTime() / 1_000) / 1 days + 2));
+      vm.envOr("SLASH_RANDOM_BEACON_ACTIVATED_AT_PERIOD", uint256((vm.unixTime() / 1_000) / 1 days));
     console.log("SLASH_RANDOM_BEACON_ACTIVATED_AT_PERIOD: ", param.slashRandomBeacon.activatedAtPeriod);
 
     // Credit score

@@ -202,9 +202,7 @@ contract RoninRandomBeaconXRoninValidatorSetTest is REP10_BaseTest {
       );
     }
 
-    vm.recordLogs();
-    LibWrapUpEpoch.wrapUpPeriod();
-    VmSafe.Log[] memory logs = vm.getRecordedLogs();
+    VmSafe.Log[] memory logs = LibWrapUpEpoch.wrapUpPeriod();
 
     for (uint256 i; i < logs.length; ++i) {
       if (
@@ -221,10 +219,8 @@ contract RoninRandomBeaconXRoninValidatorSetTest is REP10_BaseTest {
       }
     }
 
-    vm.recordLogs();
-    LibWrapUpEpoch.wrapUpPeriod();
+    logs = LibWrapUpEpoch.wrapUpPeriod();
 
-    logs = vm.getRecordedLogs();
     address[] memory nonRotatingValidators;
     address[] memory rotatingValidators;
     for (uint256 i; i < logs.length; ++i) {
@@ -289,9 +285,7 @@ contract RoninRandomBeaconXRoninValidatorSetTest is REP10_BaseTest {
       );
     }
 
-    vm.recordLogs();
-    LibWrapUpEpoch.wrapUpPeriod();
-    VmSafe.Log[] memory logs = vm.getRecordedLogs();
+    VmSafe.Log[] memory logs = LibWrapUpEpoch.wrapUpPeriod();
 
     for (uint256 i; i < logs.length; ++i) {
       if (
@@ -308,10 +302,8 @@ contract RoninRandomBeaconXRoninValidatorSetTest is REP10_BaseTest {
       }
     }
 
-    vm.recordLogs();
-    LibWrapUpEpoch.wrapUpPeriod();
+    logs = LibWrapUpEpoch.wrapUpPeriod();
 
-    logs = vm.getRecordedLogs();
     address[] memory nonRotatingValidators;
     address[] memory rotatingValidators;
     for (uint256 i; i < logs.length; ++i) {

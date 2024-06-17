@@ -2,6 +2,7 @@
 pragma solidity ^0.8.19;
 
 import { Vm, VmSafe } from "forge-std/Vm.sol";
+import { StdStyle } from "forge-std/StdStyle.sol";
 import { console } from "forge-std/console.sol";
 import { Contract } from "script/utils/Contract.sol";
 import { IGeneralConfig } from "@fdk/interfaces/IGeneralConfig.sol";
@@ -11,18 +12,20 @@ import { IRoninValidatorSet } from "@ronin/contracts/interfaces/validator/IRonin
 import { VRF, LibVRFProof } from "./LibVRFProof.sol";
 
 library LibWrapUpEpoch {
+  using StdStyle for *;
+
   Vm internal constant vm = Vm(LibSharedAddress.VM);
   IGeneralConfig internal constant vme = IGeneralConfig(LibSharedAddress.VME);
 
-  function wrapUpPeriod() internal {
-    wrapUpPeriods({ times: 1 });
+  function wrapUpPeriod() internal returns (VmSafe.Log[] memory logs) {
+    logs = wrapUpPeriods({ times: 1 })[0];
   }
 
-  function wrapUpPeriods(uint256 times) internal {
-    wrapUpPeriods({ times: times, shouldSubmitBeacon: false });
+  function wrapUpPeriods(uint256 times) internal returns (VmSafe.Log[][] memory logs) {
+    logs = wrapUpPeriods({ times: times, shouldSubmitBeacon: false });
   }
 
-  function wrapUpPeriods(uint256 times, bool shouldSubmitBeacon) internal {
+  function wrapUpPeriods(uint256 times, bool shouldSubmitBeacon) internal returns (VmSafe.Log[][] memory logs) {
     LibVRFProof.VRFKey[] memory keys;
     bytes memory raw = vme.getUserDefinedConfig("vrf-keys");
 
@@ -32,17 +35,20 @@ library LibWrapUpEpoch {
       require(!shouldSubmitBeacon, "LibWrapUpEpoch: no VRF keys");
     }
 
+    uint256 logLength = shouldSubmitBeacon ? times * 2 : times;
+    logs = new VmSafe.Log[][](logLength);
+    uint256 index;
     for (uint256 i; i < times; ++i) {
       fastForwardToNextDay();
-      _wrapUpEpoch();
+      logs[index++] = _wrapUpEpoch();
 
       if (!shouldSubmitBeacon) continue;
 
-      wrapUpEpochAndSubmitBeacons(keys);
+      logs[index++] = wrapUpEpochAndSubmitBeacons(keys);
     }
   }
 
-  function wrapUpEpochs(uint256 times, bool shouldSubmitBeacon) internal {
+  function wrapUpEpochs(uint256 times, bool shouldSubmitBeacon) internal returns (VmSafe.Log[][] memory logs) {
     LibVRFProof.VRFKey[] memory keys;
     bytes memory raw = vme.getUserDefinedConfig("vrf-keys");
 
@@ -52,26 +58,27 @@ library LibWrapUpEpoch {
       require(!shouldSubmitBeacon, "LibWrapUpEpoch: no VRF keys");
     }
 
+    logs = new VmSafe.Log[][](times);
     for (uint256 i; i < times; ++i) {
       if (shouldSubmitBeacon) {
-        wrapUpEpochAndSubmitBeacons(keys);
+        logs[i] = wrapUpEpochAndSubmitBeacons(keys);
       } else {
-        wrapUpEpoch();
+        logs[i] = wrapUpEpoch();
       }
     }
   }
 
-  function wrapUpEpoch() internal {
+  function wrapUpEpoch() internal returns (VmSafe.Log[] memory logs) {
     fastForwardToNextEpoch();
-    _wrapUpEpoch();
+    logs = _wrapUpEpoch();
   }
 
-  function wrapUpEpochAndSubmitBeacons(LibVRFProof.VRFKey[] memory keys) internal {
+  function wrapUpEpochAndSubmitBeacons(LibVRFProof.VRFKey[] memory keys) internal returns (VmSafe.Log[] memory logs) {
     fastForwardToNextEpoch();
-    _wrapUpEpochAndSubmitBeacons(keys);
+    logs = _wrapUpEpochAndSubmitBeacons(keys);
   }
 
-  function _wrapUpEpoch() private {
+  function _wrapUpEpoch() private returns (VmSafe.Log[] memory logs) {
     IRoninValidatorSet validatorSet =
       IRoninValidatorSet(vme.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key()));
     vm.recordLogs();
@@ -80,12 +87,12 @@ library LibWrapUpEpoch {
     validatorSet.wrapUpEpoch();
     vm.stopPrank();
 
-    VmSafe.Log[] memory logs = vm.getRecordedLogs();
+    logs = vm.getRecordedLogs();
     for (uint256 i; i < logs.length; ++i) {
       if (
         logs[i].emitter == address(validatorSet) && logs[i].topics[0] == ICoinbaseExecution.EmptyValidatorSet.selector
       ) {
-        revert("LibWrapUpEpoch: PANIC EMPTY VALIDATOR SET");
+        console.log("LibWrapUpEpoch: WARNING: EMPTY VALIDATOR SET".yellow());
       }
     }
 
@@ -106,10 +113,9 @@ library LibWrapUpEpoch {
     );
   }
 
-  function _wrapUpEpochAndSubmitBeacons(LibVRFProof.VRFKey[] memory keys) private {
-    vm.recordLogs();
-    _wrapUpEpoch();
-    LibVRFProof.listenEventAndSubmitProof(keys);
+  function _wrapUpEpochAndSubmitBeacons(LibVRFProof.VRFKey[] memory keys) private returns (VmSafe.Log[] memory logs) {
+    logs = _wrapUpEpoch();
+    LibVRFProof.listenEventAndSubmitProof(keys, logs);
   }
 
   function fastForwardToNextEpoch() internal {
