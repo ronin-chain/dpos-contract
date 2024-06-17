@@ -39,7 +39,7 @@ function chainId(Network network) pure returns (uint256) {
 }
 
 function key(Network network) pure returns (TNetwork) {
-  return TNetwork.wrap(bytes20(LibString.packOne(chainAlias(network))));
+  return TNetwork.wrap(LibString.packOne(chainAlias(network)));
 }
 
 function explorer(Network network) pure returns (string memory link) {
