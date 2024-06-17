@@ -67,15 +67,16 @@ contract RoninMigration is BaseMigration {
 
   function _setRoninValidatorSetREP10Migrator(ISharedArgument.RoninValidatorSetREP10MigratorParam memory param)
     internal
-    view
   {
     param.activatedAtPeriod =
-      vm.envOr("RONIN_VALIDATOR_SET_REP10_MIGRATOR_ACTIVATED_AT_PERIOD", vm.getBlockTimestamp() / 1 days + 1);
+      vm.envOr("RONIN_VALIDATOR_SET_REP10_MIGRATOR_ACTIVATED_AT_PERIOD", (vm.unixTime() / 1_000) / 1 days + 2);
+    console.log("RONIN_VALIDATOR_SET_REP10_MIGRATOR_ACTIVATED_AT_PERIOD: ", param.activatedAtPeriod);
   }
 
-  function _setRoninRandomBeaconParam(ISharedArgument.RoninRandomBeaconParam memory param) internal view {
+  function _setRoninRandomBeaconParam(ISharedArgument.RoninRandomBeaconParam memory param) internal {
     param.slashThreshold = vm.envOr("RANDOM_BEACON_SLASH_THRESHOLD", uint256(3));
-    param.activatedAtPeriod = vm.envOr("RANDOM_BEACON_ACTIVATED_AT_PERIOD", vm.getBlockTimestamp() / 1 days + 1);
+    param.activatedAtPeriod = vm.envOr("RANDOM_BEACON_ACTIVATED_AT_PERIOD", (vm.unixTime() / 1_000) / 1 days + 2);
+    console.log("RANDOM_BEACON_ACTIVATED_AT_PERIOD: ", param.activatedAtPeriod);
 
     param.validatorTypes = new IRandomBeacon.ValidatorType[](4);
     param.validatorTypes[0] = IRandomBeacon.ValidatorType.Governing;
@@ -112,7 +113,7 @@ contract RoninMigration is BaseMigration {
     param.bridgeOperatorBonusPerBlock = vm.envOr("BRIDGE_OPERATOR_BONUS_PER_BLOCK", uint256(1_100));
   }
 
-  function _setSlashIndicatorParam(ISharedArgument.SlashIndicatorParam memory param) internal view {
+  function _setSlashIndicatorParam(ISharedArgument.SlashIndicatorParam memory param) internal {
     // Deprecated slash bridge operator
     param.__deprecatedSlashBridgeOperator.missingVotesRatioTier1 = vm.envOr("MISSING_VOTES_RATIO_TIER1", uint256(10_00)); // 10%
     param.__deprecatedSlashBridgeOperator.missingVotesRatioTier2 = vm.envOr("MISSING_VOTES_RATIO_TIER2", uint256(20_00)); // 20%
@@ -143,7 +144,8 @@ contract RoninMigration is BaseMigration {
     // Slash random beacon
     param.slashRandomBeacon.randomBeaconSlashAmount = vm.envOr("SLASH_RANDOM_BEACON_AMOUNT", uint256(10 ether));
     param.slashRandomBeacon.activatedAtPeriod =
-      vm.envOr("SLASH_RANDOM_BEACON_ACTIVATED_AT_PERIOD", uint256(vm.getBlockTimestamp() / 1 days + 1));
+      vm.envOr("SLASH_RANDOM_BEACON_ACTIVATED_AT_PERIOD", uint256((vm.unixTime() / 1_000) / 1 days + 2));
+    console.log("SLASH_RANDOM_BEACON_ACTIVATED_AT_PERIOD: ", param.slashRandomBeacon.activatedAtPeriod);
 
     // Credit score
     param.creditScore.gainCreditScore = vm.envOr("GAIN_CREDIT_SCORE", uint256(100));

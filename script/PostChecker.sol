@@ -3,6 +3,8 @@ pragma solidity ^0.8.19;
 
 import { ICandidateStaking } from "@ronin/contracts/interfaces/staking/ICandidateStaking.sol";
 import { IProfile } from "@ronin/contracts/interfaces/IProfile.sol";
+import { IRoninValidatorSet } from "@ronin/contracts/interfaces/validator/IRoninValidatorSet.sol";
+import { IRandomBeacon } from "@ronin/contracts/interfaces/random-beacon/IRandomBeacon.sol";
 import { IRoninTrustedOrganization } from "@ronin/contracts/interfaces/IRoninTrustedOrganization.sol";
 import { TConsensus } from "@ronin/contracts/udvts/Types.sol";
 import { ContractType } from "contracts/utils/ContractType.sol";
@@ -43,7 +45,8 @@ contract PostChecker is
   using LibProxy for *;
   using LibErrorHandler for bool;
 
-  uint256 internal constant MAX_GOV_PERCENTAGE = 10;
+  TConsensus internal _gvToCheatVRF;
+  TConsensus[] internal _gvsToRemove;
 
   function _postCheck() internal virtual override(ScriptExtended, RoninMigration) {
     RoninMigration._postCheck();
@@ -102,21 +105,28 @@ contract PostChecker is
     IProfile profile = IProfile(loadContract(Contract.Profile.key()));
     IRoninTrustedOrganization trustedOrg =
       IRoninTrustedOrganization(loadContract(Contract.RoninTrustedOrganization.key()));
+    IRandomBeacon randomBeacon = IRandomBeacon(loadContract(Contract.RoninRandomBeacon.key()));
+    IRoninValidatorSet validatorSet = IRoninValidatorSet(loadContract(Contract.RoninValidatorSet.key()));
 
     address governanceAdmin = loadContract(Contract.RoninGovernanceAdmin.key());
     IRoninTrustedOrganization.TrustedOrganization[] memory allTrustedOrgs = trustedOrg.getAllTrustedOrganizations();
     uint256 gvToRemove = allTrustedOrgs.length - 1;
     if (gvToRemove != 0) {
-      TConsensus[] memory consensusesToRemove = new TConsensus[](gvToRemove);
-      for (uint256 i = allTrustedOrgs.length - 1; i >= 1; --i) {
-        uint256 j = allTrustedOrgs.length - 1 - i;
-        consensusesToRemove[j] = allTrustedOrgs[i].consensusAddr;
-        if (i == 1) break;
+      for (uint256 i; i < allTrustedOrgs.length; ++i) {
+        if (validatorSet.isValidatorCandidate(allTrustedOrgs[i].consensusAddr)) {
+          _gvToCheatVRF = allTrustedOrgs[i].consensusAddr;
+          break;
+        }
+      }
+
+      for (uint256 i; i < allTrustedOrgs.length; ++i) {
+        if (allTrustedOrgs[i].consensusAddr == _gvToCheatVRF) continue;
+        _gvsToRemove.push(allTrustedOrgs[i].consensusAddr);
       }
 
       vm.prank(governanceAdmin);
       ITransparentUpgradeableProxyV2(address(trustedOrg)).functionDelegateCall(
-        abi.encodeCall(trustedOrg.removeTrustedOrganizations, (consensusesToRemove))
+        abi.encodeCall(trustedOrg.removeTrustedOrganizations, (_gvsToRemove))
       );
     }
 
@@ -136,9 +146,16 @@ contract PostChecker is
     LibWrapUpEpoch.wrapUpEpoch();
     LibWrapUpEpoch.wrapUpEpoch();
 
-    console.log(StdStyle.green("Cheat fast forward to 2 days ..."));
-    LibWrapUpEpoch.wrapUpPeriods({ times: 2, shouldSubmitBeacon: false });
+    uint256 activatedAtPeriod = randomBeacon.getActivatedAtPeriod();
+    uint256 currPeriod = validatorSet.currentPeriod();
+    if (currPeriod < activatedAtPeriod) {
+      console.log(
+        StdStyle.green("Cheat fast forward to activated period for number of periods:"), activatedAtPeriod - currPeriod
+      );
+      LibWrapUpEpoch.wrapUpPeriods({ times: activatedAtPeriod - currPeriod, shouldSubmitBeacon: false });
+    }
 
-    LibWrapUpEpoch.wrapUpPeriods(3);
+    console.log(StdStyle.green("Cheat fast forward to 1 epoch ..."));
+    LibWrapUpEpoch.wrapUpEpoch();
   }
 }

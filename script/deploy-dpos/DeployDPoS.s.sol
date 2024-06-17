@@ -98,6 +98,10 @@ contract DeployDPoS is RoninMigration {
 
   function _postCheck() internal virtual override {
     LibPrecompile.deployPrecompile();
+    // Localhost will init block timestamp to 0, so we need to fast forward to current unix time
+    vm.warp(vm.unixTime() / 1_000);
+    // Finalize the period
+    LibWrapUpEpoch.wrapUpPeriods({ times: 1, shouldSubmitBeacon: false });
 
     _cheatApplyGoverningValidatorCandidates();
     _cheatAddVRFKeysForGoverningValidators();

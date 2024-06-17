@@ -6,12 +6,13 @@ import { console } from "forge-std/console.sol";
 import { Contract } from "script/utils/Contract.sol";
 import { IGeneralConfig } from "@fdk/interfaces/IGeneralConfig.sol";
 import { LibSharedAddress } from "@fdk/libraries/LibSharedAddress.sol";
+import { ICoinbaseExecution } from "@ronin/contracts/interfaces/validator/ICoinbaseExecution.sol";
 import { IRoninValidatorSet } from "@ronin/contracts/interfaces/validator/IRoninValidatorSet.sol";
 import { VRF, LibVRFProof } from "./LibVRFProof.sol";
 
 library LibWrapUpEpoch {
   Vm internal constant vm = Vm(LibSharedAddress.VM);
-  IGeneralConfig internal constant config = IGeneralConfig(LibSharedAddress.VME);
+  IGeneralConfig internal constant vme = IGeneralConfig(LibSharedAddress.VME);
 
   function wrapUpPeriod() internal {
     wrapUpPeriods({ times: 1 });
@@ -23,7 +24,7 @@ library LibWrapUpEpoch {
 
   function wrapUpPeriods(uint256 times, bool shouldSubmitBeacon) internal {
     LibVRFProof.VRFKey[] memory keys;
-    bytes memory raw = config.getUserDefinedConfig("vrf-keys");
+    bytes memory raw = vme.getUserDefinedConfig("vrf-keys");
 
     if (raw.length != 0) {
       keys = abi.decode(raw, (LibVRFProof.VRFKey[]));
@@ -43,8 +44,8 @@ library LibWrapUpEpoch {
 
   function wrapUpEpochs(uint256 times, bool shouldSubmitBeacon) internal {
     LibVRFProof.VRFKey[] memory keys;
-    bytes memory raw = config.getUserDefinedConfig("vrf-keys");
-    
+    bytes memory raw = vme.getUserDefinedConfig("vrf-keys");
+
     if (raw.length != 0) {
       keys = abi.decode(raw, (LibVRFProof.VRFKey[]));
     } else {
@@ -72,10 +73,21 @@ library LibWrapUpEpoch {
 
   function _wrapUpEpoch() private {
     IRoninValidatorSet validatorSet =
-      IRoninValidatorSet(config.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key()));
+      IRoninValidatorSet(vme.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key()));
+    vm.recordLogs();
+
     vm.startPrank(block.coinbase);
     validatorSet.wrapUpEpoch();
     vm.stopPrank();
+
+    VmSafe.Log[] memory logs = vm.getRecordedLogs();
+    for (uint256 i; i < logs.length; ++i) {
+      if (
+        logs[i].emitter == address(validatorSet) && logs[i].topics[0] == ICoinbaseExecution.EmptyValidatorSet.selector
+      ) {
+        revert("LibWrapUpEpoch: PANIC EMPTY VALIDATOR SET");
+      }
+    }
 
     uint256 blockProducerCount = validatorSet.getBlockProducers().length;
     uint256 validatorCount = validatorSet.getValidators().length;
@@ -101,11 +113,12 @@ library LibWrapUpEpoch {
   }
 
   function fastForwardToNextEpoch() internal {
+    uint256 blockTime = vme.getNetworkData(vme.getCurrentNetwork()).blockTime;
     vm.roll(vm.getBlockNumber() + 1);
-    vm.warp(vm.getBlockTimestamp() + 3);
+    vm.warp(vm.getBlockTimestamp() + blockTime);
 
     IRoninValidatorSet validatorSet =
-      IRoninValidatorSet(config.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key()));
+      IRoninValidatorSet(vme.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key()));
 
     uint256 diff;
     uint256 startBlock = validatorSet.currentPeriodStartAtBlock();
@@ -113,7 +126,7 @@ library LibWrapUpEpoch {
     if (startBlock > vm.getBlockNumber()) {
       diff = startBlock - vm.getBlockNumber();
       vm.roll(startBlock);
-      vm.warp(vm.getBlockTimestamp() + diff * 3);
+      vm.warp(vm.getBlockTimestamp() + diff * blockTime);
     }
 
     uint256 startEpoch = validatorSet.epochOf(startBlock);
@@ -122,22 +135,23 @@ library LibWrapUpEpoch {
 
     uint256 startBlockOfCurrentEpoch = startBlock + (currEpoch - startEpoch) * numberOfBlocksInEpoch;
     diff = vm.getBlockNumber() - startBlockOfCurrentEpoch;
-    uint256 startTimestampOfCurrentEpoch = vm.getBlockTimestamp() - diff * 3;
+    uint256 startTimestampOfCurrentEpoch = vm.getBlockTimestamp() - diff * blockTime;
 
     uint256 nextEpochBlockNumber =
       startBlockOfCurrentEpoch + (numberOfBlocksInEpoch - 1) - (startBlockOfCurrentEpoch % numberOfBlocksInEpoch);
-    uint256 nextEpochTimestamp = startTimestampOfCurrentEpoch + numberOfBlocksInEpoch * 3;
+    uint256 nextEpochTimestamp = startTimestampOfCurrentEpoch + numberOfBlocksInEpoch * blockTime;
 
     vm.roll(nextEpochBlockNumber);
     vm.warp(nextEpochTimestamp);
   }
 
   function fastForwardToNextDay() internal {
+    uint256 blockTime = vme.getNetworkData(vme.getCurrentNetwork()).blockTime;
     vm.roll(vm.getBlockNumber() + 1);
-    vm.warp(vm.getBlockTimestamp() + 3);
+    vm.warp(vm.getBlockTimestamp() + blockTime);
 
     IRoninValidatorSet validatorSet =
-      IRoninValidatorSet(config.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key()));
+      IRoninValidatorSet(vme.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key()));
 
     uint256 diff;
     uint256 startBlock = validatorSet.currentPeriodStartAtBlock();
@@ -145,16 +159,16 @@ library LibWrapUpEpoch {
     if (startBlock > vm.getBlockNumber()) {
       diff = startBlock - vm.getBlockNumber();
       vm.roll(startBlock);
-      vm.warp(vm.getBlockTimestamp() + diff * 3);
+      vm.warp(vm.getBlockTimestamp() + diff * blockTime);
     }
 
     uint256 numberOfBlocksInEpoch = validatorSet.numberOfBlocksInEpoch();
 
     diff = vm.getBlockNumber() - startBlock;
-    uint256 startTimestampOfCurrentPeriod = vm.getBlockTimestamp() - diff * 3;
+    uint256 startTimestampOfCurrentPeriod = vm.getBlockTimestamp() - diff * blockTime;
 
     uint256 nextDayTimestamp = startTimestampOfCurrentPeriod + 1 days;
-    uint256 multiplier = (nextDayTimestamp - startTimestampOfCurrentPeriod) / (3 * numberOfBlocksInEpoch) - 1;
+    uint256 multiplier = (nextDayTimestamp - startTimestampOfCurrentPeriod) / (blockTime * numberOfBlocksInEpoch) - 1;
 
     uint256 nextDayEpochBlockNumber = startBlock + (multiplier * numberOfBlocksInEpoch);
 
