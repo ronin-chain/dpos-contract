@@ -108,12 +108,11 @@ contract RoninRandomBeacon_FulfillRandomSeed_Test is REP10_BaseTest {
     vm.prank(adminToChangeVRF);
     profile.changeVRFKeyHash(standardValidatorId, invalidKey.keyHash);
 
-    LibWrapUpEpoch.wrapUpPeriod();
+    LibWrapUpEpoch.wrapUpPeriods({ times: 1, shouldSubmitBeacon: true });
   }
 
   function testFailConcrete_RevertIf_NewlyJoinedGoverningValidator_SubmitBeacon() external {
     LibWrapUpEpoch.wrapUpPeriods({ times: 1, shouldSubmitBeacon: false });
-    LibWrapUpEpoch.wrapUpEpoch();
 
     address newCandidate = makeAddr("new-candidate");
     address newConsensus = makeAddr("new-consensus");
@@ -153,7 +152,6 @@ contract RoninRandomBeacon_FulfillRandomSeed_Test is REP10_BaseTest {
     vm.prank(profile.getId2Admin(cid));
     profile.changeVRFKeyHash(cid, newKey.keyHash);
 
-    LibWrapUpEpoch.wrapUpEpoch();
-    LibVRFProof.listenEventAndSubmitProof(newKeys);
+    LibWrapUpEpoch.wrapUpEpochAndSubmitBeacons(newKeys);
   }
 }

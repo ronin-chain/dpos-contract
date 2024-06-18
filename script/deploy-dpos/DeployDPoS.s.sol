@@ -52,9 +52,9 @@ contract DeployDPoS is RoninMigration {
   IRoninGovernanceAdmin governanceAdmin;
   IFastFinalityTracking fastFinalityTracking;
 
-  function run() public onlyOn(DefaultNetwork.Local.key()) {
+  function run() public onlyOn(DefaultNetwork.LocalHost.key()) {
     ISharedArgument.SharedParameter memory param = config.sharedArguments();
-    address initialOwner = param.initialOwner;
+    address initialOwner = sender();
     vm.label(initialOwner, "initialOwner");
 
     validatorSet = new RoninValidatorSetDeploy().run();
@@ -98,10 +98,14 @@ contract DeployDPoS is RoninMigration {
 
   function _postCheck() internal virtual override {
     LibPrecompile.deployPrecompile();
+    // Localhost will init block timestamp to 0, so we need to fast forward to current unix time
+    vm.warp(vm.unixTime() / 1_000);
 
     _cheatApplyGoverningValidatorCandidates();
     _cheatAddVRFKeysForGoverningValidators();
     _cheatApplyValidatorCandidates();
+
+    LibWrapUpEpoch.wrapUpPeriods({ times: 1, shouldSubmitBeacon: false });
 
     super._postCheck();
   }
@@ -183,6 +187,8 @@ contract DeployDPoS is RoninMigration {
       validatorTypes: param.validatorTypes,
       thresholds: param.thresholds
     });
+    randomBeacon.initializeV2();
+    randomBeacon.initializeV3();
     vm.stopBroadcast();
   }
 

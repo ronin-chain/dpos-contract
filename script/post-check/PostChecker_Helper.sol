@@ -5,7 +5,7 @@ import { StdStyle } from "forge-std/StdStyle.sol";
 import { console } from "forge-std/console.sol";
 
 import { BaseMigration } from "@fdk/BaseMigration.s.sol";
-import { LibErrorHandler } from "contract-libs/LibErrorHandler.sol";
+import { LibErrorHandler } from "@fdk/libraries/LibErrorHandler.sol";
 import { LibVRFProof } from "script/shared/libraries/LibVRFProof.sol";
 
 abstract contract PostChecker_Helper is BaseMigration {

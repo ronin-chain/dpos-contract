@@ -32,15 +32,8 @@ library LibVRFProof {
   string internal constant CONFIG_PATH = "config/";
   IGeneralConfig internal constant config = IGeneralConfig(LibSharedAddress.VME);
 
-  function listenEventAndSubmitProof() internal {
-    LibVRFProof.VRFKey[] memory keys = abi.decode(config.getUserDefinedConfig("vrf-keys"), (LibVRFProof.VRFKey[]));
-    listenEventAndSubmitProof(keys);
-  }
-
-  function listenEventAndSubmitProof(VRFKey[] memory keys) internal {
+  function listenEventAndSubmitProof(VRFKey[] memory keys, VmSafe.Log[] memory logs) internal {
     if (keys.length == 0) return;
-
-    VmSafe.Log[] memory logs = vm.getRecordedLogs();
 
     address randomBeacon;
     try config.getAddressFromCurrentNetwork(Contract.RoninRandomBeacon.key()) returns (address payable addr) {

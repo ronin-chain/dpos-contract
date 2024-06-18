@@ -24,6 +24,6 @@ contract RoninRandomBeacon_Devnet is RoninRandomBeacon {
   }
 
   function COOLDOWN_PERIOD_THRESHOLD() public pure override returns (uint256) {
-    return 0;
+    return 1;
   }
 }

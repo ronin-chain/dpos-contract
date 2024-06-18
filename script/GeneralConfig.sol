@@ -5,6 +5,8 @@ import { console } from "forge-std/console.sol";
 import { BaseGeneralConfig } from "@fdk/BaseGeneralConfig.sol";
 import { Network } from "./utils/Network.sol";
 import { Contract } from "./utils/Contract.sol";
+import { DefaultNetwork } from "@fdk/utils/DefaultNetwork.sol";
+import { TNetwork } from "@fdk/types/TNetwork.sol";
 
 contract GeneralConfig is BaseGeneralConfig {
   constructor() BaseGeneralConfig("", "deployments/") { }
@@ -45,14 +47,18 @@ contract GeneralConfig is BaseGeneralConfig {
 
     // override artifact name with contract name
     _contractNameMap[Contract.Profile.key()] = "Profile";
+    _contractNameMap[Contract.RoninRandomBeacon.key()] = "RoninRandomBeacon_Devnet";
     _contractNameMap[Contract.RoninGatewayPauseEnforcer.key()] = "PauseEnforcer";
     _contractNameMap[Contract.HardForkRoninGovernanceAdmin.key()] = Contract.RoninGovernanceAdmin.name();
     _contractNameMap[Contract.TemporalRoninTrustedOrganization.key()] = Contract.RoninTrustedOrganization.name();
 
-    if (block.chainid == 2021) {
+    TNetwork currNetwork = getCurrentNetwork();
+    if (currNetwork == DefaultNetwork.RoninTestnet.key()) {
       _contractNameMap[Contract.Profile.key()] = "Profile";
-    } else if (block.chainid == 2020) {
+      _contractNameMap[Contract.RoninRandomBeacon.key()] = "RoninRandomBeacon_Testnet";
+    } else if (currNetwork == DefaultNetwork.RoninMainnet.key()) {
       _contractNameMap[Contract.Profile.key()] = "Profile_Mainnet";
+      _contractNameMap[Contract.RoninRandomBeacon.key()] = "RoninRandomBeacon_Mainnet";
     }
   }
 
