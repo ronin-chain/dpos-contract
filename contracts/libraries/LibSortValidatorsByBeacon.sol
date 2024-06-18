@@ -11,7 +11,7 @@ library LibSortValidatorsByBeacon {
   using LibArray for address[];
 
   /// @dev value is equal to keccak256(abi.encode(uint256(keccak256("@ronin.RandomBeacon.storage.sortedValidatorsByBeacon")) - 1)) & ~bytes32(uint256(0xff))
-  bytes32 private constant $$_SortedValidatorByBeaconStorageLocation =
+  bytes32 internal constant $$_SortedValidatorByBeaconStorageLocation =
     0x8593e13447c7ce85611f094407732145bce33e516174eca63d12235f14022600;
 
   struct SortedValidatorStorage {
@@ -24,7 +24,9 @@ library LibSortValidatorsByBeacon {
   }
 
   struct RotatingValidatorStorage {
+    // The candidate id of the validator.
     address _cid;
+    // The staked amount of the validator.
     uint96 _staked;
   }
 
@@ -81,7 +83,7 @@ library LibSortValidatorsByBeacon {
       if (!(length == stakedAmounts.length && length == trustedWeights.length)) revert LibArray.ErrLengthMismatch();
       // save all cids if the number of cids is less than the max pick config
       if (nGV + nSV + nRV >= length) {
-        _cleanAndUseAllCids(period, cids);
+        _saveAllCids(period, cids);
         return;
       }
 
@@ -109,7 +111,7 @@ library LibSortValidatorsByBeacon {
       // filter and pick non-standard validators
       uint256[] memory rvIndices = indices.filterByIndexMap(picked, notInIndexMapFilter);
 
-      _cleanAndUpdateNewCids({
+      _updateNewCids({
         nRV: nRV,
         period: period,
         nonRotatingValidators: cids.take(gvIndices.concat(svIndices)),
@@ -122,11 +124,10 @@ library LibSortValidatorsByBeacon {
   /**
    * @dev Saves the all cids for a given period.
    *
-   * - Clean up the previous sorted data
    * - Save all cids as unsorted validators.
    */
-  function _cleanAndUseAllCids(uint256 period, address[] memory cids) private {
-    ValidatorStorage storage $ = _getValidatorPerPeriodLocation();
+  function _saveAllCids(uint256 period, address[] memory cids) private {
+    ValidatorStorage storage $ = getValidatorPerPeriodLocation(period);
     SortedValidatorStorage storage $sortedValidatorStorage = $._sorted;
 
     $._pickAll = true;
@@ -150,9 +151,7 @@ library LibSortValidatorsByBeacon {
   /**
    * @dev Saves the sorted validators for a given period, beacon, and number of non-rotating validators.
    *
-   * - Clean up the previous unsorted data
-   * - Replace the non-rotating validators set with the new one
-   * - Delete the previous packed rotating validators set
+   * - Save non-rotating validators set
    * - Save the new packed rotating validators set
    *
    * @param period The period for which the validators are being saved.
@@ -161,14 +160,14 @@ library LibSortValidatorsByBeacon {
    * @param rotatingValidators An array of addresses representing the rotating validators.
    * @param rotatingStakeAmounts An array of stake values corresponding to the rotating validators.
    */
-  function _cleanAndUpdateNewCids(
+  function _updateNewCids(
     uint256 period,
     uint256 nRV,
     address[] memory nonRotatingValidators,
     address[] memory rotatingValidators,
     uint256[] memory rotatingStakeAmounts
   ) private {
-    ValidatorStorage storage $validatorStorage = _getValidatorPerPeriodLocation();
+    ValidatorStorage storage $validatorStorage = getValidatorPerPeriodLocation(period);
     SortedValidatorStorage storage $sortedValidatorStorage = $validatorStorage._sorted;
 
     // delete previous unsorted data
@@ -188,7 +187,7 @@ library LibSortValidatorsByBeacon {
     $sortedValidatorStorage._nRV = uint16(nRV);
 
     // pack `rotatingValidators` and `rotatingStakeAmounts` into `RotatingValidatorStorage` struct (which cost 1 slot) each to save gas
-    // max cap of RON is 1 billion, so using 96 bits (can present up to ~80 billion) for storing stake amount are enough
+    // max cap of RON is 1 billion, so using 96 bits (can present up to ~80 billion) for storing stake amounts are enough
     uint96[] memory narrowingCastingStakeAmounts = rotatingStakeAmounts.unsafeToUint96s();
     uint256 length = rotatingValidators.length;
     RotatingValidatorStorage memory rv;
@@ -201,10 +200,21 @@ library LibSortValidatorsByBeacon {
   }
 
   /**
+   * @dev Returns the saved validator set for a given period.
+   */
+  function getSavedValidatorSet(uint256 period) internal pure returns (ValidatorStorage memory savedValidatorSet) {
+    savedValidatorSet = getValidatorPerPeriodLocation(period);
+  }
+
+  /**
    * @dev Returns the set of validators for a given period and epoch.
    */
-  function pickValidatorSet(uint256 epoch, uint256 beacon) internal view returns (address[] memory pickedValidatorIds) {
-    ValidatorStorage storage $ = _getValidatorPerPeriodLocation();
+  function pickValidatorSet(
+    uint256 period,
+    uint256 epoch,
+    uint256 beacon
+  ) internal view returns (address[] memory pickedValidatorIds) {
+    ValidatorStorage storage $ = getValidatorPerPeriodLocation(period);
     UnsortedValidatorStorage storage $unsortedValidatorStorage = $._unsorted;
 
     if ($._pickAll) return $unsortedValidatorStorage._cids;
@@ -218,20 +228,43 @@ library LibSortValidatorsByBeacon {
     if (nRV == 0) return nonRotatingValidators;
 
     RotatingValidatorStorage[] memory packedRVs = $sortedValidatorStorage._rotatingValidators;
-    address[] memory pickedRotatingValidators = _pickTopKRotatingValidatorsByBeaconWeight(packedRVs, nRV, beacon, epoch);
+    address[] memory pickedRotatingValidators = pickTopKRotatingValidatorsByBeaconWeight(packedRVs, nRV, beacon, epoch);
 
     pickedValidatorIds = nonRotatingValidators.concat(pickedRotatingValidators);
   }
 
   /**
-   * @dev Picks the top `k` rotating validators based on their corresponding beacon weight.
+   * @dev Picks the top `k` rotating validators based on their corresponding beacon weight, epoch number and staked amount.
    */
-  function _pickTopKRotatingValidatorsByBeaconWeight(
+  function pickTopKRotatingValidatorsByBeaconWeights(
+    address[] memory cids,
+    uint256[] memory stakedAmounts,
+    uint256 k,
+    uint256 beacon,
+    uint256 epoch
+  ) internal pure returns (address[] memory pickedCids) {
+    uint256 length = cids.length;
+    if (length != stakedAmounts.length) revert LibArray.ErrLengthMismatch();
+
+    RotatingValidatorStorage[] memory packedRVs = new RotatingValidatorStorage[](length);
+
+    for (uint256 i; i < length; ++i) {
+      packedRVs[i]._cid = cids[i];
+      packedRVs[i]._staked = uint96(stakedAmounts[i]);
+    }
+
+    pickedCids = pickTopKRotatingValidatorsByBeaconWeight(packedRVs, k, beacon, epoch);
+  }
+
+  /**
+   * @dev Picks the top `k` rotating validators based on their corresponding beacon weight, epoch number and staked amount.
+   */
+  function pickTopKRotatingValidatorsByBeaconWeight(
     RotatingValidatorStorage[] memory packedRVs,
     uint256 k,
     uint256 beacon,
     uint256 epoch
-  ) private pure returns (address[] memory rotatingValidators) {
+  ) internal pure returns (address[] memory rotatingValidators) {
     uint256 length = packedRVs.length;
     rotatingValidators = new address[](length);
     uint256[] memory weights = new uint256[](length);
@@ -284,12 +317,24 @@ library LibSortValidatorsByBeacon {
   }
 
   /**
-   * @dev Private function to get the storage location of the sorted validator mapping.
+   * @dev Internal function to get the storage location of the validator set for a given slot.
+   * @return $ The storage mapping for the validator set.
+   */
+  function getStorageAt(bytes32 slot) internal pure returns (ValidatorStorage storage $) {
+    assembly ("memory-safe") {
+      $.slot := slot
+    }
+  }
+
+  /**
+   * @dev Internal function to get the storage location of the sorted validator mapping.
    * @return $ The storage mapping for the sorted validator.
    */
-  function _getValidatorPerPeriodLocation() private pure returns (ValidatorStorage storage $) {
+  function getValidatorPerPeriodLocation(uint256 period) internal pure returns (ValidatorStorage storage $) {
     assembly ("memory-safe") {
-      $.slot := $$_SortedValidatorByBeaconStorageLocation
+      mstore(0x00, period)
+      mstore(0x20, $$_SortedValidatorByBeaconStorageLocation)
+      $.slot := keccak256(0x00, 0x40)
     }
   }
 }

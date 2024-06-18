@@ -16,6 +16,32 @@ interface IStaking is IRewardPool, IBaseStaking, ICandidateStaking, IDelegatorSt
   /// @dev Error indicating that the REP-4 migration is already done.
   error ErrMigrateWasAdminAlreadyDone();
 
+  function MIGRATOR_ROLE() external view returns (bytes32);
+
+  function initialize(
+    address __validatorContract,
+    uint256 __minValidatorStakingAmount,
+    uint256 __maxCommissionRate,
+    uint256 __cooldownSecsToUndelegate,
+    uint256 __waitingSecsToRevoke
+  ) external;
+
+  /**
+   * @dev Initializes the contract storage V2.
+   */
+  function initializeV2() external;
+
+  /**
+   * @dev Initializes the contract storage V3.
+   */
+  function initializeV3(address __profileContract) external;
+
+  function initializeV4(address admin, address migrator) external;
+
+  function migrateWasAdmin(address[] calldata poolIds, address[] calldata admins, bool[] calldata flags) external;
+
+  function disableMigrateWasAdmin() external;
+
   /**
    * @dev Records the amount of rewards `_rewards` for the pools `_consensusAddrs`.
    *

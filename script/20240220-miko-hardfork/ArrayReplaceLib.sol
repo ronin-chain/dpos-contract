@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import "forge-std/console2.sol";
+import { console } from "forge-std/console.sol";
 
 library ArrayReplaceLib {
   function replace(uint[] memory src, uint[] memory dst, uint where) internal pure returns (uint256[] memory out) {

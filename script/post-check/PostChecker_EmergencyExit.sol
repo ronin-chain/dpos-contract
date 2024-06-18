@@ -1,11 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { StdStyle } from "forge-std/StdStyle.sol";
-import { console } from "forge-std/console.sol";
-
-import { LibErrorHandler } from "contract-libs/LibErrorHandler.sol";
-import { TContract } from "@fdk/types/Types.sol";
+import { LibErrorHandler } from "@fdk/libraries/LibErrorHandler.sol";
 import { LibProxy } from "@fdk/libraries/LibProxy.sol";
 import { BaseMigration } from "@fdk/BaseMigration.s.sol";
 import { Contract } from "../utils/Contract.sol";
@@ -13,7 +9,6 @@ import { Contract } from "../utils/Contract.sol";
 import { ICandidateManager } from "@ronin/contracts/interfaces/validator/ICandidateManager.sol";
 import { ICandidateStaking } from "@ronin/contracts/interfaces/staking/ICandidateStaking.sol";
 import { IStaking } from "@ronin/contracts/interfaces/staking/IStaking.sol";
-import { RoninValidatorSet } from "@ronin/contracts/ronin/validator/RoninValidatorSet.sol";
 import { LibWrapUpEpoch } from "script/shared/libraries/LibWrapUpEpoch.sol";
 import { LibApplyCandidate } from "script/shared/libraries/LibApplyCandidate.sol";
 import "./PostChecker_Helper.sol";
@@ -58,7 +53,6 @@ abstract contract PostChecker_EmergencyExit is BaseMigration, PostChecker_Helper
 
     bytes memory returnData;
     if (IStaking(_staking).waitingSecsToRevoke() > 1 days) {
-      LibWrapUpEpoch.fastForwardToNextDay();
       LibWrapUpEpoch.wrapUpPeriod();
 
       // The exited candidate still in candidate list until the time of being revoked.

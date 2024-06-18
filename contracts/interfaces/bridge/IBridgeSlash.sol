@@ -8,6 +8,17 @@ import { IBridgeSlashEvents } from "./events/IBridgeSlashEvents.sol";
  * @dev Interface for the BridgeSlash contract to manage slashing functionality for bridge operators.
  */
 interface IBridgeSlash is IBridgeSlashEvents {
+  function initialize(
+    address validatorContract,
+    address bridgeManagerContract,
+    address bridgeTrackingContract,
+    address dposGA
+  ) external;
+
+  /**
+   * @dev Helper for running upgrade script, required to only revoked once by the DPoS's governance admin.
+   */
+  function initializeREP2() external;
   /**
    * @dev Slashes the unavailability of bridge operators during a specific period.
    * @param period The period to slash the bridge operators for.

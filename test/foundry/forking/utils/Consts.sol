@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import { RoninGovernanceAdmin } from "@ronin/contracts/ronin/RoninGovernanceAdmin.sol";
+import { IRoninGovernanceAdmin } from "@ronin/contracts/interfaces/IRoninGovernanceAdmin.sol";
 import { TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
 
 bytes constant EMPTY_PARAM = "";
@@ -18,8 +18,8 @@ TransparentUpgradeableProxyV2 constant RONIN_VALIDATOR_SET_CONTRACT =
   TransparentUpgradeableProxyV2(payable(0x54B3AC74a90E64E8dDE60671b6fE8F8DDf18eC9d));
 TransparentUpgradeableProxyV2 constant RONIN_BRIDGE_TRACKING_CONTRACT =
   TransparentUpgradeableProxyV2(payable(0x874ad3ACb2801733c3fbE31a555d430Ce3A138Ed));
-RoninGovernanceAdmin constant RONIN_GOVERNANCE_ADMIN_CONTRACT =
-  RoninGovernanceAdmin(payable(0x53Ea388CB72081A3a397114a43741e7987815896));
+IRoninGovernanceAdmin constant RONIN_GOVERNANCE_ADMIN_CONTRACT =
+  IRoninGovernanceAdmin(payable(0x53Ea388CB72081A3a397114a43741e7987815896));
 TransparentUpgradeableProxyV2 constant RONIN_GATEWAY_CONTRACT =
   TransparentUpgradeableProxyV2(payable(0xCee681C9108c42C710c6A8A949307D5F13C9F3ca));
 

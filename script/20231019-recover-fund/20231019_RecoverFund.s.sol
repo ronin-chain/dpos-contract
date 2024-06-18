@@ -2,16 +2,16 @@
 pragma solidity ^0.8.19;
 
 import { console } from "forge-std/console.sol";
-import { Proposal, RoninMigration } from "script/RoninMigration.s.sol";
+import { RoninMigration } from "script/RoninMigration.s.sol";
 import { Contract } from "script/utils/Contract.sol";
 import { DefaultNetwork } from "@fdk/utils/DefaultNetwork.sol";
-import { DefaultContract } from "@fdk/utils/DefaultContract.sol";
-import { BridgeTracking } from "@ronin/contracts/ronin/gateway/BridgeTracking.sol";
-import { GovernanceAdmin, RoninGovernanceAdmin } from "@ronin/contracts/ronin/RoninGovernanceAdmin.sol";
+import { IRoninGovernanceAdmin } from "@ronin/contracts/interfaces/IRoninGovernanceAdmin.sol";
+import { IGovernanceAdmin } from "@ronin/contracts/interfaces/extensions/IGovernanceAdmin.sol";
 import { BridgeTrackingRecoveryLogic } from "./contracts/BridgeTrackingRecoveryLogic.sol";
-import { RoninTrustedOrganization } from "@ronin/contracts/multi-chains/RoninTrustedOrganization.sol";
-import { BridgeReward } from "@ronin/contracts/ronin/gateway/BridgeReward.sol";
+import { IRoninTrustedOrganization } from "@ronin/contracts/interfaces/IRoninTrustedOrganization.sol";
+import { IBridgeReward } from "@ronin/contracts/interfaces/bridge/IBridgeReward.sol";
 import { TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
+import { Proposal } from "@ronin/contracts/libraries/Proposal.sol";
 
 import {
   IRoninTrustedOrganization,
@@ -20,7 +20,7 @@ import {
 import { LibProposal } from "script/shared/libraries/LibProposal.sol";
 
 contract Simulation__20231019_RecoverFund is RoninMigration {
-  BridgeReward public constant DEPRECATED_BRIDGE_REWARD = BridgeReward(0x1C952D6717eBFd2E92E5f43Ef7C1c3f7677F007D);
+  IBridgeReward public constant DEPRECATED_BRIDGE_REWARD = IBridgeReward(0x1C952D6717eBFd2E92E5f43Ef7C1c3f7677F007D);
 
   /**
    * Steps:
@@ -35,7 +35,8 @@ contract Simulation__20231019_RecoverFund is RoninMigration {
 
     address deployer = 0xFE490b68E64B190B415Bb92F8D2F7566243E6ea0; // Mainnet Shadow deployer address
 
-    RoninGovernanceAdmin roninGovernanceAdmin = RoninGovernanceAdmin(loadContract(Contract.RoninGovernanceAdmin.key()));
+    IRoninGovernanceAdmin roninGovernanceAdmin =
+      IRoninGovernanceAdmin(loadContract(Contract.RoninGovernanceAdmin.key()));
     RoninTrustedOrganization trustedOrgContract =
       RoninTrustedOrganization(loadContract(Contract.RoninTrustedOrganization.key()));
     address bridgeTracking = loadContract(Contract.BridgeTracking.key());
@@ -53,8 +54,8 @@ contract Simulation__20231019_RecoverFund is RoninMigration {
 
     tos[0] = address(roninGovernanceAdmin);
     tos[1] = address(DEPRECATED_BRIDGE_REWARD);
-    callDatas[0] = abi.encodeCall(GovernanceAdmin.changeProxyAdmin, (bridgeTracking, admin));
-    callDatas[1] = abi.encodeCall(BridgeReward.initializeREP2, ());
+    callDatas[0] = abi.encodeCall(IGovernanceAdmin.changeProxyAdmin, (bridgeTracking, admin));
+    callDatas[1] = abi.encodeCall(IBridgeReward.initializeREP2, ());
 
     Proposal.ProposalDetail memory proposal =
       LibProposal.buildProposal(roninGovernanceAdmin, vm.getBlockTimestamp() + 20 minutes, tos, values, callDatas);

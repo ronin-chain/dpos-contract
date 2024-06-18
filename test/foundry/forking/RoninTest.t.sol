@@ -11,12 +11,8 @@ import {
 } from "./extensions/TransparentUpgradeableProxyV3.sol";
 import { TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
 
-import { BridgeTracking } from "@ronin/contracts/ronin/gateway/BridgeTracking.sol";
-import { RoninGatewayV3 } from "@ronin/contracts/ronin/gateway/RoninGatewayV3.sol";
-import { RoninGovernanceAdmin } from "@ronin/contracts/ronin/RoninGovernanceAdmin.sol";
-import { RoninValidatorSet } from "@ronin/contracts/ronin/validator/RoninValidatorSet.sol";
-
-import "@ronin/contracts/mainchain/MainchainGatewayV3.sol";
+import { IRoninGovernanceAdmin } from "@ronin/contracts/interfaces/IRoninGovernanceAdmin.sol";
+import { IRoninValidatorSet } from "@ronin/contracts/interfaces/validator/IRoninValidatorSet.sol";
 
 import "./utils/Consts.sol";
 
@@ -71,11 +67,11 @@ abstract contract RoninTest is Base_Test, ITransparentUpgradeableProxyDeployer {
   }
 
   function setUp() external {
-    vm.label(address(RONIN_GOVERNANCE_ADMIN_CONTRACT), type(RoninGovernanceAdmin).name);
-    vm.label(address(RONIN_GATEWAY_CONTRACT), _getProxyLabel(type(RoninGatewayV3).name));
-    vm.label(address(ETH_GATEWAY_CONTRACT), _getProxyLabel(type(MainchainGatewayV3).name));
-    vm.label(address(RONIN_BRIDGE_TRACKING_CONTRACT), _getProxyLabel(type(BridgeTracking).name));
-    vm.label(address(RONIN_VALIDATOR_SET_CONTRACT), _getProxyLabel(type(RoninValidatorSet).name));
+    vm.label(address(RONIN_GOVERNANCE_ADMIN_CONTRACT), "RoninGovernanceAdmin");
+    vm.label(address(RONIN_GATEWAY_CONTRACT), _getProxyLabel("RoninGatewayV3"));
+    vm.label(address(ETH_GATEWAY_CONTRACT), _getProxyLabel("MainchainGatewayV3"));
+    vm.label(address(RONIN_BRIDGE_TRACKING_CONTRACT), _getProxyLabel("BridgeTracking"));
+    vm.label(address(RONIN_VALIDATOR_SET_CONTRACT), _getProxyLabel("RoninValidatorSet"));
 
     _defaultAdmin = _createPersistentAccount(ADMIN_PK, DEFAULT_BALANCE);
     vm.label(_defaultAdmin, "DEFAULT_ADMIN");

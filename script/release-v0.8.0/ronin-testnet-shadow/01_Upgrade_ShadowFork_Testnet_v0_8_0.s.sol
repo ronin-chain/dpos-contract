@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { IBaseStaking } from "@ronin/contracts/interfaces/staking/IBaseStaking.sol";
 import {
   TransparentUpgradeableProxy,
   TransparentUpgradeableProxyV2
@@ -11,21 +10,16 @@ import { console } from "forge-std/console.sol";
 import { TContract } from "@fdk/types/Types.sol";
 import { LibProxy } from "@fdk/libraries/LibProxy.sol";
 import { DefaultNetwork } from "@fdk/utils/DefaultNetwork.sol";
-import {
-  ISharedArgument,
-  RoninTrustedOrganization,
-  Proposal,
-  RoninMigration,
-  RoninGovernanceAdmin
-} from "script/RoninMigration.s.sol";
+import { ISharedArgument, IRoninTrustedOrganization, Proposal, RoninMigration } from "script/RoninMigration.s.sol";
+import { IRoninGovernanceAdmin } from "@ronin/contracts/interfaces/IRoninGovernanceAdmin.sol";
 import { ISharedArgument } from "script/interfaces/ISharedArgument.sol";
 import { Network } from "script/utils/Network.sol";
 import { Contract } from "script/utils/Contract.sol";
-import { Maintenance } from "@ronin/contracts/ronin/Maintenance.sol";
 import { LibProposal } from "script/shared/libraries/LibProposal.sol";
-import { SlashIndicator } from "@ronin/contracts/ronin/slash-indicator/SlashIndicator.sol";
-import { FastFinalityTracking } from "@ronin/contracts/ronin/fast-finality/FastFinalityTracking.sol";
-import { RoninRandomBeacon, RoninRandomBeaconDeploy } from "script/contracts/RoninRandomBeaconDeploy.s.sol";
+import { ISlashIndicator } from "@ronin/contracts/interfaces/slash-indicator/ISlashIndicator.sol";
+
+import { IFastFinalityTracking } from "@ronin/contracts/interfaces/IFastFinalityTracking.sol";
+import { IRandomBeacon, RoninRandomBeaconDeploy } from "script/contracts/RoninRandomBeaconDeploy.s.sol";
 import {
   RoninValidatorSetREP10Migrator,
   RoninValidatorSetREP10MigratorLogicDeploy
@@ -38,15 +32,15 @@ contract Migration_01_Upgrade_ShadowForkTestnet_Release_V0_8_0 is RoninMigration
   address[] private contractsToUpgrade;
   TContract[] private contractTypesToUpgrade;
 
-  RoninRandomBeacon private randomBeacon;
+  IRandomBeacon private randomBeacon;
   address private roninValidatorSetREP10LogicMigrator;
 
   function run() public {
     // config.forceSetRawSharedArguments(_sharedArguments());
 
-    RoninGovernanceAdmin governanceAdmin = RoninGovernanceAdmin(loadContract(Contract.RoninGovernanceAdmin.key()));
-    RoninTrustedOrganization trustedOrg =
-      RoninTrustedOrganization(loadContract(Contract.RoninTrustedOrganization.key()));
+    IRoninGovernanceAdmin governanceAdmin = IRoninGovernanceAdmin(loadContract(Contract.RoninGovernanceAdmin.key()));
+    IRoninTrustedOrganization trustedOrg =
+      IRoninTrustedOrganization(loadContract(Contract.RoninTrustedOrganization.key()));
 
     ISharedArgument.SharedParameter memory param = config.sharedArguments();
 
@@ -61,9 +55,7 @@ contract Migration_01_Upgrade_ShadowForkTestnet_Release_V0_8_0 is RoninMigration
       staking: loadContract(Contract.Staking.key()),
       trustedOrg: address(trustedOrg),
       validatorSet: loadContract(Contract.RoninValidatorSet.key()),
-      slashIndicator: loadContract(Contract.SlashIndicator.key()),
       slashThreshold: param.roninRandomBeacon.slashThreshold,
-      initialSeed: param.roninRandomBeacon.initialSeed,
       activatedAtPeriod: param.roninRandomBeacon.activatedAtPeriod,
       validatorTypes: param.roninRandomBeacon.validatorTypes,
       thresholds: param.roninRandomBeacon.thresholds
@@ -122,7 +114,7 @@ contract Migration_01_Upgrade_ShadowForkTestnet_Release_V0_8_0 is RoninMigration
       if (contractTypesToUpgrade[i] == Contract.FastFinalityTracking.key()) {
         callDatas[i] = abi.encodeCall(
           TransparentUpgradeableProxy.upgradeToAndCall,
-          (logics[i], abi.encodeCall(FastFinalityTracking.initializeV3, (loadContract(Contract.Staking.key()))))
+          (logics[i], abi.encodeCall(IFastFinalityTracking.initializeV3, (loadContract(Contract.Staking.key()))))
         );
       }
 
@@ -132,7 +124,7 @@ contract Migration_01_Upgrade_ShadowForkTestnet_Release_V0_8_0 is RoninMigration
           (
             logics[i],
             abi.encodeCall(
-              SlashIndicator.initializeV4,
+              ISlashIndicator.initializeV4,
               (
                 address(randomBeacon),
                 param.slashIndicator.slashRandomBeacon.randomBeaconSlashAmount,

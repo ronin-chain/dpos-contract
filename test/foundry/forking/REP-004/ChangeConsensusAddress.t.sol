@@ -386,7 +386,7 @@ contract ChangeConsensusAddressForkTest is Test {
     __assertWeight(TConsensus.wrap(consensus), consensus, 0);
   }
 
-  function __assertWeight(TConsensus consensus, address id, uint256 weight) private {
+  function __assertWeight(TConsensus consensus, address id, uint256 weight) private view {
     TConsensus[] memory consensuses = new TConsensus[](1);
     address[] memory ids = new address[](1);
 

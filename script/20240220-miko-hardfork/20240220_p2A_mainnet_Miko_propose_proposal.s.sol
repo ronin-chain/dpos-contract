@@ -2,11 +2,12 @@
 pragma solidity ^0.8.19;
 
 import "./20240220_p2_Miko_build_proposal.s.sol";
+import { DefaultNetwork } from "@fdk/utils/DefaultNetwork.sol";
+import { Contract } from "script/utils/Contract.sol";
 
 contract Proposal__20240220_MikoHardfork_ProposeProposal is Proposal__20240220_MikoHardfork_BuildProposal {
   using LibProxy for *;
   using StdStyle for *;
-  using ArrayReplaceLib for *;
 
   /**
    * See `README.md`

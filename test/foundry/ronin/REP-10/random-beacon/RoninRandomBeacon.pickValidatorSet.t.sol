@@ -4,6 +4,51 @@ pragma solidity ^0.8.13;
 import "../REP-10_Base.t.sol";
 
 contract RoninRandomBacon_PickValidatorSet_Test is REP10_BaseTest {
+  using StdStyle for *;
+
+  mapping(address cid => uint256 pickCount) internal _pickCountValidatorSet;
+  mapping(address cid => uint256 pickCount) internal _pickCountRandomBeacon;
+
+  function testConcrete_LogPickCount_pickValidatorSet() external {
+    LibWrapUpEpoch.wrapUpPeriods({ times: 1, shouldSubmitBeacon: true });
+    LibVRFProof.VRFKey[] memory keys = abi.decode(vme.getUserDefinedConfig("vrf-keys"), (LibVRFProof.VRFKey[]));
+    uint256 wrapUpCount = 1000;
+
+    for (uint256 i; i < wrapUpCount; ++i) {
+      LibWrapUpEpoch.wrapUpEpochAndSubmitBeacons(keys);
+
+      address[] memory validatorIds =
+        roninRandomBeacon.pickValidatorSetForCurrentPeriod(roninValidatorSet.epochOf(block.number) + 1);
+      address[] memory blockProducerIds = roninValidatorSet.getBlockProducerIds();
+      for (uint256 j; j < validatorIds.length; ++j) {
+        _pickCountValidatorSet[validatorIds[j]]++;
+        _pickCountRandomBeacon[blockProducerIds[j]]++;
+      }
+    }
+
+    // Log pick count
+    address[] memory allCids = roninValidatorSet.getValidatorCandidateIds();
+    console.log("Number of Candidates:", allCids.length);
+    console.log("Number of Wrap Up Epochs:", wrapUpCount);
+    for (uint256 i; i < allCids.length; ++i) {
+      assertEq(_pickCountValidatorSet[allCids[i]], _pickCountRandomBeacon[allCids[i]], "Pick count should be the same");
+      (, uint256 staked,) = staking.getPoolDetail(profile.getId2Consensus(allCids[i]));
+      string memory log = string.concat(
+        "CID: ".yellow(),
+        vm.toString(allCids[i]),
+        " Staked: ",
+        vm.toString(staked / 1 ether),
+        " RON".blue(),
+        " Pick Count: ",
+        vm.toString(_pickCountValidatorSet[allCids[i]]),
+        " Pick Rate: ".yellow(),
+        vm.toString(_pickCountValidatorSet[allCids[i]] * 100 / wrapUpCount),
+        "%"
+      );
+      console.log(log);
+    }
+  }
+
   function testFuzz_AlwaysContainsGV_getValidatorIds(uint256 wrapUpEpochCount, uint256 wrapUpPeriodCount) external {
     wrapUpEpochCount = bound(wrapUpEpochCount, 1, 10);
     wrapUpPeriodCount = bound(wrapUpPeriodCount, 1, 5);

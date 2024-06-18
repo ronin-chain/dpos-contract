@@ -15,6 +15,22 @@ interface IBridgeTracking {
 
   event ExternalCallFailed(address indexed to, bytes4 indexed msgSig, bytes reason);
 
+  function initialize(address bridgeContract, address validatorContract, uint256 startedAtBlock_) external;
+
+  function initializeV2() external;
+
+  function initializeV3(address bridgeManager, address bridgeSlash, address bridgeReward, address dposGA) external;
+
+  /**
+   * @dev Helper for running upgrade script, required to only revoked once by the DPoS's governance admin.
+   * The following must be assured after initializing REP2:
+   * `_lastSyncPeriod`
+   *    == `{BridgeReward}.latestRewardedPeriod + 1`
+   *    == `{BridgeSlash}._startedAtPeriod - 1`
+   *    == `currentPeriod()`
+   */
+  function initializeREP2() external;
+
   /**
    * @dev Returns the block that allow incomming mutable call.
    */

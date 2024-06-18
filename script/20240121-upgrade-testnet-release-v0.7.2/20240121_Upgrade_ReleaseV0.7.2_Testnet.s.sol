@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { Staking } from "@ronin/contracts/ronin/staking/Staking.sol";
-import { TransparentUpgradeableProxy } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
+import { IStaking } from "@ronin/contracts/interfaces/staking/IStaking.sol";
+import { TransparentUpgradeableProxy } from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
 import { console } from "forge-std/console.sol";
 import { TContract } from "@fdk/types/Types.sol";
 import { LibProxy } from "@fdk/libraries/LibProxy.sol";
 import { DefaultNetwork } from "@fdk/utils/DefaultNetwork.sol";
-import { RoninTrustedOrganization, Proposal, RoninMigration, RoninGovernanceAdmin } from "script/RoninMigration.s.sol";
+import { IRoninTrustedOrganization, Proposal, RoninMigration, IRoninGovernanceAdmin } from "script/RoninMigration.s.sol";
 import { Contract } from "script/utils/Contract.sol";
 import { LibProposal } from "script/shared/libraries/LibProposal.sol";
 
@@ -23,9 +23,9 @@ contract Migration__20240121_UpgradeReleaseV0_7_2_Testnet is RoninMigration {
   TContract[] private contractTypesToUpgrade;
 
   function run() public onlyOn(DefaultNetwork.RoninTestnet.key()) {
-    RoninGovernanceAdmin governanceAdmin = RoninGovernanceAdmin(loadContract(Contract.RoninGovernanceAdmin.key()));
-    RoninTrustedOrganization trustedOrg =
-      RoninTrustedOrganization(loadContract(Contract.RoninTrustedOrganization.key()));
+    IRoninGovernanceAdmin governanceAdmin = IRoninGovernanceAdmin(loadContract(Contract.RoninGovernanceAdmin.key()));
+    IRoninTrustedOrganization trustedOrg =
+      IRoninTrustedOrganization(loadContract(Contract.RoninTrustedOrganization.key()));
     address payable[] memory allContracts = config.getAllAddresses(network());
 
     for (uint256 i; i < allContracts.length; ++i) {
@@ -72,7 +72,7 @@ contract Migration__20240121_UpgradeReleaseV0_7_2_Testnet is RoninMigration {
       callDatas[i] = contractTypesToUpgrade[i] == Contract.Staking.key()
         ? abi.encodeCall(
           TransparentUpgradeableProxy.upgradeToAndCall,
-          (logics[i], abi.encodeCall(Staking.initializeV4, (STAKING_DEFAULT_ADMIN, STAKING_MIGRATOR)))
+          (logics[i], abi.encodeCall(IStaking.initializeV4, (STAKING_DEFAULT_ADMIN, STAKING_MIGRATOR)))
         )
         : abi.encodeCall(TransparentUpgradeableProxy.upgradeTo, (logics[i]));
 

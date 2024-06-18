@@ -57,6 +57,13 @@ interface IRoninTrustedOrganization is IQuorum {
   event ConsensusAddressOfTrustedOrgChanged(TrustedOrganization orgAfterChanged, TConsensus oldConsensus);
 
   /**
+   * @dev Initializes the contract storage.
+   */
+  function initialize(TrustedOrganization[] calldata trustedOrgs, uint256 num, uint256 denom) external;
+
+  function initializeV2(address profileContract) external;
+
+  /**
    * @dev Adds a list of addresses into the trusted organization.
    *
    * Requirements:
