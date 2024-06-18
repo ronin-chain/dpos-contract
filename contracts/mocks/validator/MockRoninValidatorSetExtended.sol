@@ -50,7 +50,7 @@ contract MockRoninValidatorSetExtended is MockRoninValidatorSetOverridePrecompil
     for (uint _i = 0; _i < _addrs.length; _i++) {
       address _cAddr = _addrs[_i];
       _validatorIds[_i] = _cAddr;
-      _validatorMap[_cAddr] = EnumFlags.ValidatorFlag.Both;
+      _validatorMap[_cAddr] = true;
     }
   }
 }

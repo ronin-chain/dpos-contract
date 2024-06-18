@@ -55,9 +55,8 @@ contract RoninRandomBeaconXProfileTest is REP10_BaseTest {
 
     vm.prank(adminToChangeVRF);
     profile.changeVRFKeyHash(cidToChangeVRF, newKey.keyHash);
-
-    LibWrapUpEpoch.wrapUpEpoch();
-    LibVRFProof.listenEventAndSubmitProof(keys);
+    
+    LibWrapUpEpoch.wrapUpEpochAndSubmitBeacons(keys);
   }
 
   function testConcrete_WhenPassedRegisteredCoolDown_NewlyJoinedGoverningValidator_canSubmitBeacon() external {

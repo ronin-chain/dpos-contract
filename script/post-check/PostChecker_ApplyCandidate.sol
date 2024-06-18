@@ -1,12 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { ICandidateStaking } from "@ronin/contracts/interfaces/staking/ICandidateStaking.sol";
 import { ICandidateManager } from "@ronin/contracts/interfaces/validator/ICandidateManager.sol";
-import { RoninValidatorSet } from "@ronin/contracts/ronin/validator/RoninValidatorSet.sol";
-import { StdStyle } from "forge-std/StdStyle.sol";
-import { console } from "forge-std/console.sol";
-import { TContract } from "@fdk/types/Types.sol";
 import { LibProxy } from "@fdk/libraries/LibProxy.sol";
 import { BaseMigration } from "@fdk/BaseMigration.s.sol";
 import { Contract } from "../utils/Contract.sol";

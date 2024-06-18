@@ -5,6 +5,21 @@ pragma solidity ^0.8.9;
 import { IBridgeRewardEvents } from "./events/IBridgeRewardEvents.sol";
 
 interface IBridgeReward is IBridgeRewardEvents {
+  function initialize(
+    address bridgeManagerContract,
+    address bridgeTrackingContract,
+    address bridgeSlashContract,
+    address validatorSetContract,
+    address dposGA,
+    uint256 rewardPerPeriod
+  ) external payable;
+
+  /**
+   * @dev Helper for running upgrade script, required to only revoked once by the DPoS's governance admin.
+   * The following must be assured after initializing REP2: `_lastSyncPeriod` == `{BridgeReward}.latestRewardedPeriod` == `currentPeriod()`
+   */
+  function initializeREP2() external;
+
   /**
    * @dev This function allows bridge operators to manually synchronize the reward for a given period length.
    * @param periodLength The length of the reward period for which synchronization is requested.

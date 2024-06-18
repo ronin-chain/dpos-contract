@@ -1,18 +1,18 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { HasContracts } from "@ronin/contracts/extensions/collections/HasContracts.sol";
 import { ICandidateStaking } from "@ronin/contracts/interfaces/staking/ICandidateStaking.sol";
 import { IProfile } from "@ronin/contracts/interfaces/IProfile.sol";
+import { IRoninValidatorSet } from "@ronin/contracts/interfaces/validator/IRoninValidatorSet.sol";
+import { IRandomBeacon } from "@ronin/contracts/interfaces/random-beacon/IRandomBeacon.sol";
 import { IRoninTrustedOrganization } from "@ronin/contracts/interfaces/IRoninTrustedOrganization.sol";
-import { RoninValidatorSet } from "@ronin/contracts/ronin/validator/RoninValidatorSet.sol";
-import { RoninRandomBeacon } from "@ronin/contracts/ronin/random-beacon/RoninRandomBeacon.sol";
 import { TConsensus } from "@ronin/contracts/udvts/Types.sol";
 import { ContractType } from "contracts/utils/ContractType.sol";
-import { TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
+import { ITransparentUpgradeableProxyV2 } from
+  "@ronin/contracts/interfaces/extensions/ITransparentUpgradeableProxyV2.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
 import { console } from "forge-std/console.sol";
-import { LibErrorHandler } from "contract-libs/LibErrorHandler.sol";
+import { LibErrorHandler } from "@fdk/libraries/LibErrorHandler.sol";
 import { TContract } from "@fdk/types/Types.sol";
 import { LibProxy } from "@fdk/libraries/LibProxy.sol";
 import { BaseMigration } from "@fdk/BaseMigration.s.sol";
@@ -44,8 +44,10 @@ contract PostChecker is
 {
   using LibProxy for *;
   using LibErrorHandler for bool;
+  using StdStyle for *;
 
-  uint256 internal constant MAX_GOV_PERCENTAGE = 10;
+  TConsensus internal _gvToCheatVRF;
+  TConsensus[] internal _gvsToRemove;
 
   function _postCheck() internal virtual override(ScriptExtended, RoninMigration) {
     RoninMigration._postCheck();
@@ -104,21 +106,28 @@ contract PostChecker is
     IProfile profile = IProfile(loadContract(Contract.Profile.key()));
     IRoninTrustedOrganization trustedOrg =
       IRoninTrustedOrganization(loadContract(Contract.RoninTrustedOrganization.key()));
+    IRandomBeacon randomBeacon = IRandomBeacon(loadContract(Contract.RoninRandomBeacon.key()));
+    IRoninValidatorSet validatorSet = IRoninValidatorSet(loadContract(Contract.RoninValidatorSet.key()));
 
     address governanceAdmin = loadContract(Contract.RoninGovernanceAdmin.key());
     IRoninTrustedOrganization.TrustedOrganization[] memory allTrustedOrgs = trustedOrg.getAllTrustedOrganizations();
     uint256 gvToRemove = allTrustedOrgs.length - 1;
     if (gvToRemove != 0) {
-      TConsensus[] memory consensusesToRemove = new TConsensus[](gvToRemove);
-      for (uint256 i = allTrustedOrgs.length - 1; i >= 1; --i) {
-        uint256 j = allTrustedOrgs.length - 1 - i;
-        consensusesToRemove[j] = allTrustedOrgs[i].consensusAddr;
-        if (i == 1) break;
+      for (uint256 i; i < allTrustedOrgs.length; ++i) {
+        if (validatorSet.isValidatorCandidate(allTrustedOrgs[i].consensusAddr)) {
+          _gvToCheatVRF = allTrustedOrgs[i].consensusAddr;
+          break;
+        }
+      }
+
+      for (uint256 i; i < allTrustedOrgs.length; ++i) {
+        if (allTrustedOrgs[i].consensusAddr == _gvToCheatVRF) continue;
+        _gvsToRemove.push(allTrustedOrgs[i].consensusAddr);
       }
 
       vm.prank(governanceAdmin);
-      TransparentUpgradeableProxyV2(payable(address(trustedOrg))).functionDelegateCall(
-        abi.encodeCall(trustedOrg.removeTrustedOrganizations, (consensusesToRemove))
+      ITransparentUpgradeableProxyV2(address(trustedOrg)).functionDelegateCall(
+        abi.encodeCall(trustedOrg.removeTrustedOrganizations, (_gvsToRemove))
       );
     }
 
@@ -134,9 +143,23 @@ contract PostChecker is
       profile.changeVRFKeyHash(cid, vrfKeys[i].keyHash);
     }
 
-    console.log(StdStyle.green("Cheat fast forward to 2 days ..."));
-    LibWrapUpEpoch.wrapUpPeriods({ times: 2, shouldSubmitBeacon: false });
+    console.log(StdStyle.green("Cheat fast forward to 2 epochs ..."));
+    LibWrapUpEpoch.wrapUpEpoch();
+    LibWrapUpEpoch.wrapUpEpoch();
 
-    LibWrapUpEpoch.wrapUpPeriods(3);
+    uint256 activatedAtPeriod = randomBeacon.getActivatedAtPeriod();
+    uint256 currPeriod = validatorSet.currentPeriod();
+    if (currPeriod < activatedAtPeriod) {
+      console.log(
+        StdStyle.green("Cheat fast forward to activated period for number of periods:"), activatedAtPeriod - currPeriod
+      );
+      LibWrapUpEpoch.wrapUpPeriods({ times: activatedAtPeriod - currPeriod, shouldSubmitBeacon: false });
+      console.log("Expected Switch Logic to REP10 Logic");
+
+      console.log("Logic now:".yellow(), address(validatorSet).getProxyImplementation());
+    }
+
+    console.log(StdStyle.green("Cheat fast forward to 1 epoch ..."));
+    LibWrapUpEpoch.wrapUpEpoch();
   }
 }

@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 import "../extensions/sequential-governance/CoreGovernance.sol";
 import "../extensions/collections/HasContracts.sol";
 import "../interfaces/IRoninTrustedOrganization.sol";
+import { IGovernanceAdmin } from "../interfaces/extensions/IGovernanceAdmin.sol";
 import { ErrorHandler } from "../libraries/ErrorHandler.sol";
 import { IdentityGuard } from "../utils/IdentityGuard.sol";
 import { HasGovernanceAdminDeprecated, HasBridgeDeprecated } from "../utils/DeprecatedSlots.sol";
@@ -13,7 +14,8 @@ abstract contract GovernanceAdmin is
   IdentityGuard,
   HasContracts,
   HasGovernanceAdminDeprecated,
-  HasBridgeDeprecated
+  HasBridgeDeprecated,
+  IGovernanceAdmin
 {
   using ErrorHandler for bool;
 
@@ -56,28 +58,23 @@ abstract contract GovernanceAdmin is
   /**
    * @inheritdoc IHasContracts
    */
-  function setContract(ContractType contractType, address addr) external virtual override onlySelfCall {
+  function setContract(
+    ContractType contractType,
+    address addr
+  ) external virtual override(HasContracts, IHasContracts) onlySelfCall {
     _requireHasCode(addr);
     _setContract(contractType, addr);
   }
 
   /**
-   * @dev Sets the expiry duration for a new proposal.
-   *
-   * Requirements:
-   * - Only allowing self-call to this method, since this contract does not have admin.
-   *
+   * @inheritdoc IGovernanceAdmin
    */
   function setProposalExpiryDuration(uint256 _expiryDuration) external onlySelfCall {
     _setProposalExpiryDuration(_expiryDuration);
   }
 
   /**
-   * @dev Returns the current implementation of `_proxy`.
-   *
-   * Requirements:
-   * - This contract must be the admin of `_proxy`.
-   *
+   * @inheritdoc IGovernanceAdmin
    */
   function getProxyImplementation(address _proxy) external view returns (address) {
     // We need to manually run the static call since the getter cannot be flagged as view
@@ -89,18 +86,14 @@ abstract contract GovernanceAdmin is
   }
 
   /**
-   * @dev Returns the proposal expiry duration.
+   * @inheritdoc IGovernanceAdmin
    */
   function getProposalExpiryDuration() external view returns (uint256) {
     return super._getProposalExpiryDuration();
   }
 
   /**
-   * @dev Returns the current admin of `_proxy`.
-   *
-   * Requirements:
-   * - This contract must be the admin of `_proxy`.
-   *
+   * @inheritdoc IGovernanceAdmin
    */
   function getProxyAdmin(address _proxy) external view returns (address) {
     // We need to manually run the static call since the getter cannot be flagged as view
@@ -112,11 +105,7 @@ abstract contract GovernanceAdmin is
   }
 
   /**
-   * @dev Changes the admin of `_proxy` to `newAdmin`.
-   *
-   * Requirements:
-   * - This contract must be the current admin of `_proxy`.
-   *
+   * @inheritdoc IGovernanceAdmin
    */
   function changeProxyAdmin(address _proxy, address _newAdmin) external onlySelfCall {
     // bytes4(keccak256("changeAdmin(address)"))

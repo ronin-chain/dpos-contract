@@ -1,18 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { LibErrorHandler } from "contract-libs/LibErrorHandler.sol";
+import { LibErrorHandler } from "@fdk/libraries/LibErrorHandler.sol";
 import "./20231003_REP002AndREP003_RON_NonConditional_Wrapup2Periods.s.sol";
-import { BridgeRewardDeploy } from "script/contracts/BridgeRewardDeploy.s.sol";
-import { BridgeSlashDeploy } from "script/contracts/BridgeSlashDeploy.s.sol";
-import { RoninBridgeManagerDeploy } from "script/contracts/RoninBridgeManagerDeploy.s.sol";
-
-import { RoninGatewayV3 } from "@ronin/contracts/ronin/gateway/RoninGatewayV3.sol";
-import { BridgeReward } from "@ronin/contracts/ronin/gateway/BridgeReward.sol";
-import { BridgeSlash } from "@ronin/contracts/ronin/gateway/BridgeSlash.sol";
-import { RoninBridgeManager } from "@ronin/contracts/ronin/gateway/RoninBridgeManager.sol";
-import { BridgeTracking } from "@ronin/contracts/ronin/gateway/BridgeTracking.sol";
-import { TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
 
 contract Simulation_20231003_REP002AndREP003_RON_NonConditional_GatewayUpgrade_Approve is
   Simulation__20231003_UpgradeREP002AndREP003_RON_NonConditional_Wrapup2Periods

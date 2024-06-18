@@ -1,11 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { StdStyle } from "forge-std/StdStyle.sol";
-import { console } from "forge-std/console.sol";
-
-import { LibErrorHandler } from "contract-libs/LibErrorHandler.sol";
-import { TContract } from "@fdk/types/Types.sol";
+import { LibErrorHandler } from "@fdk/libraries/LibErrorHandler.sol";
 import { LibProxy } from "@fdk/libraries/LibProxy.sol";
 import { BaseMigration } from "@fdk/BaseMigration.s.sol";
 import { Contract } from "../utils/Contract.sol";
@@ -14,7 +10,6 @@ import { IStaking } from "@ronin/contracts/interfaces/staking/IStaking.sol";
 import { ICandidateStaking } from "@ronin/contracts/interfaces/staking/ICandidateStaking.sol";
 import { IDelegatorStaking } from "@ronin/contracts/interfaces/staking/IDelegatorStaking.sol";
 import { IValidatorInfoV2 } from "@ronin/contracts/interfaces/validator/info-fragments/IValidatorInfoV2.sol";
-import { RoninValidatorSet } from "@ronin/contracts/ronin/validator/RoninValidatorSet.sol";
 import { LibWrapUpEpoch } from "script/shared/libraries/LibWrapUpEpoch.sol";
 import "./PostChecker_Helper.sol";
 

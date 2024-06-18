@@ -3,16 +3,10 @@ pragma solidity ^0.8.19;
 
 import { StdStyle } from "forge-std/StdStyle.sol";
 import { console } from "forge-std/console.sol";
-import { VmSafe } from "forge-std/Vm.sol";
 
 import { BaseMigration } from "@fdk/BaseMigration.s.sol";
-import { LibErrorHandler } from "contract-libs/LibErrorHandler.sol";
-import { Contract } from "../utils/Contract.sol";
-import { VRF, LibVRFProof } from "script/shared/libraries/LibVRFProof.sol";
-import { ICandidateStaking } from "@ronin/contracts/interfaces/staking/ICandidateStaking.sol";
-import { RoninValidatorSet } from "@ronin/contracts/ronin/validator/RoninValidatorSet.sol";
-import { RoninRandomBeacon } from "@ronin/contracts/ronin/random-beacon/RoninRandomBeacon.sol";
-import { RandomRequest } from "@ronin/contracts/libraries/LibSLA.sol";
+import { LibErrorHandler } from "@fdk/libraries/LibErrorHandler.sol";
+import { LibVRFProof } from "script/shared/libraries/LibVRFProof.sol";
 
 abstract contract PostChecker_Helper is BaseMigration {
   uint256 NORMAL_SMALL_NUMBER = 1_000_000;

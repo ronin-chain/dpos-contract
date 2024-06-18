@@ -92,7 +92,6 @@ interface ISharedArgument is IGeneralConfig {
 
   struct RoninRandomBeaconParam {
     uint256 slashThreshold;
-    uint256 initialSeed;
     uint256 activatedAtPeriod;
     IRandomBeacon.ValidatorType[] validatorTypes;
     uint256[] thresholds;

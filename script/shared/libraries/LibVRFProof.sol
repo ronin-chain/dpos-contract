@@ -2,7 +2,6 @@
 pragma solidity ^0.8.19;
 
 import { console } from "forge-std/console.sol";
-import { StdStyle } from "forge-std/StdStyle.sol";
 import { VRF } from "@chainlink/contracts/src/v0.8/VRF.sol";
 import { Vm, VmSafe } from "forge-std/Vm.sol";
 import { LibSharedAddress } from "@fdk/libraries/LibSharedAddress.sol";
@@ -26,19 +25,15 @@ library LibVRFProof {
 
   event RoninRandomBeaconNotYetDeployed();
 
+  uint256 private constant SECP256K1_ORDER =
+    115792089237316195423570985008687907852837564279074904382605163141518161494337;
+  uint256 private constant UINT256_MAX = 115792089237316195423570985008687907853269984665640564039457584007913129639935;
   Vm internal constant vm = Vm(LibSharedAddress.VM);
   string internal constant CONFIG_PATH = "config/";
   IGeneralConfig internal constant config = IGeneralConfig(LibSharedAddress.VME);
 
-  function listenEventAndSubmitProof() internal {
-    LibVRFProof.VRFKey[] memory keys = abi.decode(config.getUserDefinedConfig("vrf-keys"), (LibVRFProof.VRFKey[]));
-    listenEventAndSubmitProof(keys);
-  }
-
-  function listenEventAndSubmitProof(VRFKey[] memory keys) internal {
+  function listenEventAndSubmitProof(VRFKey[] memory keys, VmSafe.Log[] memory logs) internal {
     if (keys.length == 0) return;
-
-    VmSafe.Log[] memory logs = vm.getRecordedLogs();
 
     address randomBeacon;
     try config.getAddressFromCurrentNetwork(Contract.RoninRandomBeacon.key()) returns (address payable addr) {
@@ -48,9 +43,10 @@ library LibVRFProof {
       return;
     }
 
-    (bytes32 keyHash, RandomRequest memory req) = LibVRFProof.parseRequest(logs, randomBeacon);
-    if (keyHash == 0x0) return;
+    (bytes32 reqHash, RandomRequest memory req) = LibVRFProof.parseRequest(logs, randomBeacon);
+    if (reqHash == 0x0) return;
 
+    console.log("Submit proof for request", vm.toString(reqHash), req.period, req.prevBeacon);
     for (uint256 i; i < keys.length; ++i) {
       LibVRFProof.VRFKey memory key = keys[i];
       VRF.Proof memory proof = LibVRFProof.genProof(key, randomBeacon, req);
@@ -71,11 +67,6 @@ library LibVRFProof {
       keys[i].keyHash = vm.parseBytes32(s[1]);
       keys[i].secretKey = vm.parseBytes32(s[2]);
       (keys[i].oracle, keys[i].privateKey) = makeAddrAndKey(string.concat("oracle-", vm.toString(i)));
-
-      console.log("keyHash", i, vm.toString(keys[i].keyHash));
-      console.log("secretKey", i, vm.toString(keys[i].secretKey));
-      console.log("oracle", i, keys[i].oracle);
-      console.log("privateKey", i, vm.toString(keys[i].privateKey));
     }
   }
 
@@ -102,7 +93,7 @@ library LibVRFProof {
     string memory outDir = string.concat("script/data/cache", "/", vm.toString(msg.sig));
     if (!vm.exists(outDir)) vm.createDir(outDir, false);
 
-    cmdInput = new string[](7);
+    cmdInput = new string[](9);
 
     cmdInput[0] = "./bin/ronin-random-beacon";
     cmdInput[1] = "random";
@@ -110,7 +101,9 @@ library LibVRFProof {
     cmdInput[3] = CONFIG_PATH;
     cmdInput[4] = string.concat("--period=", vm.toString(req.period));
     cmdInput[5] = string.concat("--prev-beacon=", vm.toString(req.prevBeacon));
-    cmdInput[6] = string.concat("--output-path=", outDir);
+    cmdInput[6] = string.concat("--chain-id=", vm.toString(block.chainid));
+    cmdInput[7] = string.concat("--verifying-contract=", vm.toString(randomBeacon));
+    cmdInput[8] = string.concat("--output-path=", outDir);
 
     string memory command;
     for (uint256 i; i < cmdInput.length; ++i) {
@@ -183,8 +176,39 @@ library LibVRFProof {
   }
 
   function makeAddrAndKey(string memory name) private returns (address addr, uint256 privateKey) {
-    privateKey = uint256(keccak256(abi.encodePacked(name)));
+    privateKey = boundPrivateKey(uint256(keccak256(abi.encodePacked(name))));
     addr = vm.addr(privateKey);
     vm.label(addr, name);
+  }
+
+  function boundPrivateKey(uint256 privateKey) internal pure returns (uint256 result) {
+    result = _bound(privateKey, 1, SECP256K1_ORDER - 1);
+  }
+
+  function _bound(uint256 x, uint256 min, uint256 max) internal pure returns (uint256 result) {
+    require(min <= max, "StdUtils bound(uint256,uint256,uint256): Max is less than min.");
+    // If x is between min and max, return x directly. This is to ensure that dictionary values
+    // do not get shifted if the min is nonzero. More info: https://github.com/foundry-rs/forge-std/issues/188
+    if (x >= min && x <= max) return x;
+
+    uint256 size = max - min + 1;
+
+    // If the value is 0, 1, 2, 3, wrap that to min, min+1, min+2, min+3. Similarly for the UINT256_MAX side.
+    // This helps ensure coverage of the min/max values.
+    if (x <= 3 && size > x) return min + x;
+    if (x >= UINT256_MAX - 3 && size > UINT256_MAX - x) return max - (UINT256_MAX - x);
+
+    // Otherwise, wrap x into the range [min, max], i.e. the range is inclusive.
+    if (x > max) {
+      uint256 diff = x - max;
+      uint256 rem = diff % size;
+      if (rem == 0) return max;
+      result = min + rem - 1;
+    } else if (x < min) {
+      uint256 diff = min - x;
+      uint256 rem = diff % size;
+      if (rem == 0) return min;
+      result = max - rem + 1;
+    }
   }
 }
