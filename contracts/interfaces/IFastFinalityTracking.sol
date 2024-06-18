@@ -18,6 +18,12 @@ interface IFastFinalityTracking {
     mapping(address cid => uint256 normalizedStake) normalizedStake;
   }
 
+  function initialize(address validatorContract) external;
+
+  function initializeV2(address profileContract) external;
+
+  function initializeV3(address stakingContract) external;
+
   /**
    * @dev Submit list of `voters` who vote for fast finality in the current block.
    *

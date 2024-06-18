@@ -66,10 +66,10 @@ interface IDelegatorStaking is IRewardPool {
   /**
    * @dev Returns the claimable reward of the user `_user`.
    */
-  function getRewards(address user, TConsensus[] calldata consensusAddrList)
-    external
-    view
-    returns (uint256[] memory rewards);
+  function getRewards(
+    address user,
+    TConsensus[] calldata consensusAddrList
+  ) external view returns (uint256[] memory rewards);
 
   /**
    * @dev Returns the claimable reward of the user `_user`.
@@ -94,7 +94,8 @@ interface IDelegatorStaking is IRewardPool {
    * Emits the `RewardClaimed` event and the `Delegated` event.
    *
    */
-  function delegateRewards(TConsensus[] calldata consensusAddrList, TConsensus consensusAddrDst)
-    external
-    returns (uint256 amount);
+  function delegateRewards(
+    TConsensus[] calldata consensusAddrList,
+    TConsensus consensusAddrDst
+  ) external returns (uint256 amount);
 }

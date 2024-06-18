@@ -2,13 +2,9 @@
 pragma solidity ^0.8.19;
 
 import { ProxyAdmin } from "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
-import { RoninGovernanceAdmin } from "@ronin/contracts/ronin/RoninGovernanceAdmin.sol";
-import { TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
+import { IRoninGovernanceAdmin } from "@ronin/contracts/interfaces/IRoninGovernanceAdmin.sol";
 import { TransparentUpgradeableProxy } from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
-import {
-  IRoninTrustedOrganization,
-  RoninTrustedOrganization
-} from "@ronin/contracts/multi-chains/RoninTrustedOrganization.sol";
+import { IRoninTrustedOrganization } from "@ronin/contracts/interfaces/IRoninTrustedOrganization.sol";
 import { IRandomBeacon } from "@ronin/contracts/interfaces/random-beacon/IRandomBeacon.sol";
 import { TConsensus } from "@ronin/contracts/udvts/Types.sol";
 import { Proposal } from "@ronin/contracts/libraries/Proposal.sol";
@@ -24,7 +20,6 @@ import { IPostCheck } from "./interfaces/IPostCheck.sol";
 import { BaseMigration } from "@fdk/BaseMigration.s.sol";
 import { vme } from "@fdk/utils/Constants.sol";
 import { LibString } from "@solady/utils/LibString.sol";
-import { GeneralConfig } from "script/GeneralConfig.sol";
 import { LibDeploy, DeployInfo, ProxyInterface, UpgradeInfo } from "@fdk/libraries/LibDeploy.sol";
 import { LibProposal } from "script/shared/libraries/LibProposal.sol";
 import { LibWrapUpEpoch } from "script/shared/libraries/LibWrapUpEpoch.sol";
@@ -37,7 +32,7 @@ contract RoninMigration is BaseMigration {
   ISharedArgument internal constant config = ISharedArgument(address(vme));
 
   function _configByteCode() internal virtual override returns (bytes memory) {
-    return type(GeneralConfig).creationCode;
+    return vm.getCode("out/GeneralConfig.sol/GeneralConfig.json");
   }
 
   function _postCheck() internal virtual override {
@@ -50,7 +45,7 @@ contract RoninMigration is BaseMigration {
     ISharedArgument.SharedParameter memory param;
 
     if (
-      network() == DefaultNetwork.Local.key() || network() == DefaultNetwork.RoninTestnet.key()
+      network() == DefaultNetwork.LocalHost.key() || network() == DefaultNetwork.RoninTestnet.key()
         || network() == Network.RoninDevnet.key() || network() == Network.ShadowForkMainnet.key()
     ) {
       param.initialOwner = makeAddr("initial-owner");
@@ -63,6 +58,8 @@ contract RoninMigration is BaseMigration {
       _setTrustedOrganizationParam(param.roninTrustedOrganization);
       _setRoninRandomBeaconParam(param.roninRandomBeacon);
       _setRoninValidatorSetREP10Migrator(param.roninValidatorSetREP10Migrator);
+    } else if (network() == DefaultNetwork.RoninMainnet.key()) {
+      console.log("RoninMigration: RoninMainnet Migration");
     } else {
       revert("RoninMigration: Other network unsupported");
     }
@@ -72,17 +69,16 @@ contract RoninMigration is BaseMigration {
 
   function _setRoninValidatorSetREP10Migrator(ISharedArgument.RoninValidatorSetREP10MigratorParam memory param)
     internal
-    view
   {
     param.activatedAtPeriod =
-      vm.envOr("RONIN_VALIDATOR_SET_REP10_MIGRATOR_ACTIVATED_AT_PERIOD", vm.getBlockTimestamp() / 1 days + 1);
+      vm.envOr("RONIN_VALIDATOR_SET_REP10_MIGRATOR_ACTIVATED_AT_PERIOD", (vm.unixTime() / 1_000) / 1 days);
+    console.log("RONIN_VALIDATOR_SET_REP10_MIGRATOR_ACTIVATED_AT_PERIOD: ", param.activatedAtPeriod);
   }
 
-  function _setRoninRandomBeaconParam(ISharedArgument.RoninRandomBeaconParam memory param) internal view {
+  function _setRoninRandomBeaconParam(ISharedArgument.RoninRandomBeaconParam memory param) internal {
     param.slashThreshold = vm.envOr("RANDOM_BEACON_SLASH_THRESHOLD", uint256(3));
-    param.initialSeed =
-      vm.envOr("INITIAL_SEED", uint256(0xf163e32d61a89ecdf76fadff771e92444ed9233fc67ea6ea932bc5fbfbd35d4a));
-    param.activatedAtPeriod = vm.envOr("RANDOM_BEACON_ACTIVATED_AT_PERIOD", vm.getBlockTimestamp() / 1 days + 1);
+    param.activatedAtPeriod = vm.envOr("RANDOM_BEACON_ACTIVATED_AT_PERIOD", (vm.unixTime() / 1_000) / 1 days);
+    console.log("RANDOM_BEACON_ACTIVATED_AT_PERIOD: ", param.activatedAtPeriod);
 
     param.validatorTypes = new IRandomBeacon.ValidatorType[](4);
     param.validatorTypes[0] = IRandomBeacon.ValidatorType.Governing;
@@ -119,7 +115,7 @@ contract RoninMigration is BaseMigration {
     param.bridgeOperatorBonusPerBlock = vm.envOr("BRIDGE_OPERATOR_BONUS_PER_BLOCK", uint256(1_100));
   }
 
-  function _setSlashIndicatorParam(ISharedArgument.SlashIndicatorParam memory param) internal view {
+  function _setSlashIndicatorParam(ISharedArgument.SlashIndicatorParam memory param) internal {
     // Deprecated slash bridge operator
     param.__deprecatedSlashBridgeOperator.missingVotesRatioTier1 = vm.envOr("MISSING_VOTES_RATIO_TIER1", uint256(10_00)); // 10%
     param.__deprecatedSlashBridgeOperator.missingVotesRatioTier2 = vm.envOr("MISSING_VOTES_RATIO_TIER2", uint256(20_00)); // 20%
@@ -150,7 +146,8 @@ contract RoninMigration is BaseMigration {
     // Slash random beacon
     param.slashRandomBeacon.randomBeaconSlashAmount = vm.envOr("SLASH_RANDOM_BEACON_AMOUNT", uint256(10 ether));
     param.slashRandomBeacon.activatedAtPeriod =
-      vm.envOr("SLASH_RANDOM_BEACON_ACTIVATED_AT_PERIOD", uint256(vm.getBlockTimestamp() / 1 days + 1));
+      vm.envOr("SLASH_RANDOM_BEACON_ACTIVATED_AT_PERIOD", uint256((vm.unixTime() / 1_000) / 1 days));
+    console.log("SLASH_RANDOM_BEACON_ACTIVATED_AT_PERIOD: ", param.slashRandomBeacon.activatedAtPeriod);
 
     // Credit score
     param.creditScore.gainCreditScore = vm.envOr("GAIN_CREDIT_SCORE", uint256(100));
@@ -276,13 +273,13 @@ contract RoninMigration is BaseMigration {
       // in case proxyAdmin is GovernanceAdmin
       if (
         currentNetwork == DefaultNetwork.RoninTestnet.key() || currentNetwork == DefaultNetwork.RoninMainnet.key()
-          || currentNetwork == Network.RoninDevnet.key() || currentNetwork == DefaultNetwork.Local.key()
+          || currentNetwork == Network.RoninDevnet.key() || currentNetwork == DefaultNetwork.LocalHost.key()
           || currentNetwork == Network.ShadowForkMainnet.key()
       ) {
         // handle for ronin network
         console.log(StdStyle.yellow("Voting on RoninGovernanceAdmin for upgrading..."));
 
-        RoninGovernanceAdmin roninGovernanceAdmin = RoninGovernanceAdmin(governanceAdmin);
+        IRoninGovernanceAdmin roninGovernanceAdmin = IRoninGovernanceAdmin(governanceAdmin);
         bytes[] memory callDatas = new bytes[](1);
         uint256[] memory values = new uint256[](1);
         address[] memory targets = new address[](1);
@@ -294,7 +291,7 @@ contract RoninMigration is BaseMigration {
 
         Proposal.ProposalDetail memory proposal = LibProposal.buildProposal({
           governanceAdmin: roninGovernanceAdmin,
-          expiry: vm.getBlockTimestamp() + 15 minutes,
+          expiry: vm.getBlockTimestamp() + 1 hours,
           targets: targets,
           values: values,
           callDatas: callDatas
@@ -302,7 +299,7 @@ contract RoninMigration is BaseMigration {
 
         LibProposal.executeProposal(
           roninGovernanceAdmin,
-          RoninTrustedOrganization(loadContract(Contract.RoninTrustedOrganization.key())),
+          IRoninTrustedOrganization(loadContract(Contract.RoninTrustedOrganization.key())),
           proposal
         );
 
@@ -317,8 +314,8 @@ contract RoninMigration is BaseMigration {
       // in case proxyAdmin is an eoa
       console.log(StdStyle.yellow("Upgrading with EOA wallet..."));
       vm.broadcast(address(proxyAdmin));
-      if (callData.length == 0) TransparentUpgradeableProxyV2(payable(proxy)).upgradeTo(logic);
-      else TransparentUpgradeableProxyV2(payable(proxy)).upgradeToAndCall(logic, callData);
+      if (callData.length == 0) TransparentUpgradeableProxy(payable(proxy)).upgradeTo(logic);
+      else TransparentUpgradeableProxy(payable(proxy)).upgradeToAndCall(logic, callData);
     } else {
       console.log(StdStyle.yellow("Upgrading with owner of ProxyAdmin contract..."));
       // in case proxyAdmin is a ProxyAdmin contract
@@ -335,13 +332,13 @@ contract RoninMigration is BaseMigration {
   }
 
   function _getProxyAdminFromCurrentNetwork() internal view virtual returns (address proxyAdmin) {
-    if (network() == DefaultNetwork.Local.key()) {
+    if (network() == DefaultNetwork.LocalHost.key()) {
       address deployedProxyAdmin;
       try config.getAddressFromCurrentNetwork(Contract.RoninGovernanceAdmin.key()) returns (address payable res) {
         deployedProxyAdmin = res;
       } catch { }
 
-      return deployedProxyAdmin == address(0x0) ? config.sharedArguments().initialOwner : deployedProxyAdmin;
+      return deployedProxyAdmin == address(0x0) ? sender() : deployedProxyAdmin;
     }
 
     return loadContract(Contract.RoninGovernanceAdmin.key());

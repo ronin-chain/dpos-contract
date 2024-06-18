@@ -27,7 +27,7 @@ contract RoninGovernanceAdmin is
   mapping(bytes32 => IsolatedGovernance.Vote) internal _emergencyExitPoll;
 
   modifier onlyGovernor() {
-    _requireGorvernor();
+    _requireGovernor();
     _;
   }
 
@@ -40,7 +40,7 @@ contract RoninGovernanceAdmin is
     _setContract(ContractType.VALIDATOR, _validatorContract);
   }
 
-  function _requireGorvernor() private view {
+  function _requireGovernor() private view {
     if (_getWeight(msg.sender) == 0) revert ErrUnauthorized(msg.sig, RoleAccess.GOVERNOR);
   }
 
@@ -50,7 +50,7 @@ contract RoninGovernanceAdmin is
   function setContract(
     ContractType contractType,
     address addr
-  ) external override(HasContracts, GovernanceAdmin) onlySelfCall {
+  ) external override(HasContracts, IHasContracts, GovernanceAdmin) onlySelfCall {
     _requireHasCode(addr);
     _setContract(contractType, addr);
   }

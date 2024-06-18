@@ -3,7 +3,7 @@ pragma solidity ^0.8.19;
 
 import { Vm } from "forge-std/Vm.sol";
 import { LibSharedAddress } from "@fdk/libraries/LibSharedAddress.sol";
-import { LibErrorHandler } from "contract-libs/LibErrorHandler.sol";
+import { LibErrorHandler } from "@fdk/libraries/LibErrorHandler.sol";
 import { ICandidateStaking } from "@ronin/contracts/interfaces/staking/ICandidateStaking.sol";
 
 library LibApplyCandidate {

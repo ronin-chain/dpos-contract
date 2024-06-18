@@ -1,21 +1,27 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
+import { TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
+import { IProfile } from "@ronin/contracts/interfaces/IProfile.sol";
+import { IMaintenance } from "@ronin/contracts/interfaces/IMaintenance.sol";
+import { IStaking } from "@ronin/contracts/interfaces/staking/IStaking.sol";
+import { ISlashIndicator } from "@ronin/contracts/interfaces/slash-indicator/ISlashIndicator.sol";
+import { IStakingVesting } from "@ronin/contracts/interfaces/IStakingVesting.sol";
+import { IRoninValidatorSet } from "@ronin/contracts/interfaces/validator/IRoninValidatorSet.sol";
+import { IFastFinalityTracking } from "@ronin/contracts/interfaces/IFastFinalityTracking.sol";
 import { console } from "forge-std/console.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
-import { TContract } from "@fdk/types/Types.sol";
 import { LibProxy } from "@fdk/libraries/LibProxy.sol";
-import "script/contracts/ProfileDeploy.s.sol";
-import "script/contracts/StakingDeploy.s.sol";
-import "script/contracts/MaintenanceDeploy.s.sol";
-import "script/contracts/SlashIndicatorDeploy.s.sol";
-import "script/contracts/StakingVestingDeploy.s.sol";
-import "script/contracts/RoninValidatorSetDeploy.s.sol";
-import "script/contracts/FastFinalityTrackingDeploy.s.sol";
-import "script/contracts/RoninGovernanceAdminDeploy.s.sol";
-import "script/contracts/RoninTrustedOrganizationDeploy.s.sol";
-import "script/contracts/RoninRandomBeaconDeploy.s.sol";
+import { ProfileDeploy } from "script/contracts/ProfileDeploy.s.sol";
+import { StakingDeploy } from "script/contracts/StakingDeploy.s.sol";
+import { MaintenanceDeploy } from "script/contracts/MaintenanceDeploy.s.sol";
+import { SlashIndicatorDeploy } from "script/contracts/SlashIndicatorDeploy.s.sol";
+import { StakingVestingDeploy } from "script/contracts/StakingVestingDeploy.s.sol";
+import { RoninValidatorSetDeploy } from "script/contracts/RoninValidatorSetDeploy.s.sol";
+import { FastFinalityTrackingDeploy } from "script/contracts/FastFinalityTrackingDeploy.s.sol";
+import { RoninGovernanceAdminDeploy } from "script/contracts/RoninGovernanceAdminDeploy.s.sol";
+import { RoninTrustedOrganizationDeploy } from "script/contracts/RoninTrustedOrganizationDeploy.s.sol";
+import { RoninRandomBeaconDeploy } from "script/contracts/RoninRandomBeaconDeploy.s.sol";
 import {
   RoninValidatorSetREP10Migrator,
   RoninValidatorSetREP10MigratorLogicDeploy
@@ -35,20 +41,20 @@ contract DeployDPoS is RoninMigration {
   uint256 internal constant MAX_CANDIDATE = 70;
   address internal constant PAY_MASTER = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
 
-  Profile profile;
-  Staking staking;
-  Maintenance maintenance;
-  SlashIndicator slashIndicator;
-  StakingVesting stakingVesting;
-  RoninValidatorSet validatorSet;
-  RoninRandomBeacon randomBeacon;
-  RoninTrustedOrganization trustedOrg;
-  RoninGovernanceAdmin governanceAdmin;
-  FastFinalityTracking fastFinalityTracking;
+  IProfile profile;
+  IStaking staking;
+  IMaintenance maintenance;
+  ISlashIndicator slashIndicator;
+  IStakingVesting stakingVesting;
+  IRoninValidatorSet validatorSet;
+  IRandomBeacon randomBeacon;
+  IRoninTrustedOrganization trustedOrg;
+  IRoninGovernanceAdmin governanceAdmin;
+  IFastFinalityTracking fastFinalityTracking;
 
-  function run() public onlyOn(DefaultNetwork.Local.key()) {
+  function run() public onlyOn(DefaultNetwork.LocalHost.key()) {
     ISharedArgument.SharedParameter memory param = config.sharedArguments();
-    address initialOwner = param.initialOwner;
+    address initialOwner = sender();
     vm.label(initialOwner, "initialOwner");
 
     validatorSet = new RoninValidatorSetDeploy().run();
@@ -92,10 +98,14 @@ contract DeployDPoS is RoninMigration {
 
   function _postCheck() internal virtual override {
     LibPrecompile.deployPrecompile();
+    // Localhost will init block timestamp to 0, so we need to fast forward to current unix time
+    vm.warp(vm.unixTime() / 1_000);
 
     _cheatApplyGoverningValidatorCandidates();
     _cheatAddVRFKeysForGoverningValidators();
     _cheatApplyValidatorCandidates();
+
+    LibWrapUpEpoch.wrapUpPeriods({ times: 1, shouldSubmitBeacon: false });
 
     super._postCheck();
   }
@@ -172,13 +182,13 @@ contract DeployDPoS is RoninMigration {
       staking: address(staking),
       trustedOrg: address(trustedOrg),
       validatorSet: address(validatorSet),
-      slashIndicator: address(slashIndicator),
       slashThreshold: param.slashThreshold,
-      initialSeed: param.initialSeed,
       activatedAtPeriod: param.activatedAtPeriod,
       validatorTypes: param.validatorTypes,
       thresholds: param.thresholds
     });
+    randomBeacon.initializeV2();
+    randomBeacon.initializeV3();
     vm.stopBroadcast();
   }
 

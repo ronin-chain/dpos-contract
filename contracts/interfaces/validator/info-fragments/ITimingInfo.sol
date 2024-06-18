@@ -3,6 +3,11 @@
 pragma solidity ^0.8.9;
 
 interface ITimingInfo {
+  /// @dev Throws if the period has not ended yet or the period ending block does not exist.
+  error ErrPeriodNotEndedYet(uint256 period);
+  /// @dev Throws if the period ending block does not exist.
+  error ErrPeriodEndingBlockNotTracked(uint256 period, uint256 firstTrackedPeriod);
+
   /**
    * @dev Returns the block that validator set was updated.
    */
@@ -22,6 +27,16 @@ interface ITimingInfo {
    * @dev Returns whether the epoch ending is at the block number `_block`.
    */
   function epochEndingAt(uint256 _block) external view returns (bool);
+
+  /**
+   * @dev Returns the block number that `period` ending at.
+   *
+   * Throws error if the period has not ended yet.
+   * Throws error if the period ending block does not exist.
+   *
+   * @param period The period index.
+   */
+  function getPeriodEndBlock(uint256 period) external view returns (uint256 blockNumber);
 
   /**
    * @dev Tries to get the period index from the epoch number.

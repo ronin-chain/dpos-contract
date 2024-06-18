@@ -1,11 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import "./20240220_p1_Miko_before.s.sol";
-import "./20240220_p2B_shadow_Miko_propose_proposal.s.sol";
-import "./20240220_p4_Miko_after.s.sol";
-import "./20240220_p5_Miko_stable.s.sol";
-import "./20240220_p6_postcheck.s.sol";
+import { Proposal__Base_20240220_MikoHardfork } from "./20240220_Base_Miko_Hardfork.s.sol";
+import { Proposal__20240220_MikoHardfork_Before } from "./20240220_p1_Miko_before.s.sol";
+import { Proposal__20240220_MikoHardfork_ProposeProposal } from "./20240220_p2A_mainnet_Miko_propose_proposal.s.sol";
+import { Proposal__20240220_MikoHardfork_After } from "./20240220_p4_Miko_after.s.sol";
+import { Proposal__20240220_MikoHardfork_Stable } from "./20240220_p5_Miko_stable.s.sol";
+import { Proposal__20240220_PostCheck } from "./20240220_p6_postcheck.s.sol";
+import { DefaultNetwork } from "@fdk/utils/DefaultNetwork.sol";
+import { LibProxy } from "@fdk/libraries/LibProxy.sol";
+import { StdStyle } from "forge-std/StdStyle.sol";
 
 contract Proposal__Full_20240220_MikoHardfork_ProposeProposal is
   Proposal__20240220_MikoHardfork_Before,
@@ -16,7 +20,6 @@ contract Proposal__Full_20240220_MikoHardfork_ProposeProposal is
 {
   using LibProxy for *;
   using StdStyle for *;
-  using ArrayReplaceLib for *;
 
   modifier resetBroadcastStatus() {
     _;

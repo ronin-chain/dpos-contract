@@ -76,6 +76,12 @@ interface IProfile {
   error ErrLookUpIdFromVRFKeyFailed(bytes32 vrfKeyHash);
   error ErrValidatorOnRenunciation(address cid);
 
+  function initialize(address validatorContract) external;
+
+  function initializeV2(address stakingContract, address trustedOrgContract) external;
+
+  function initializeV3(uint256 cooldown) external;
+
   /// @dev Getter to query full `profile` from `id` address.
   function getId2Profile(address id) external view returns (CandidateProfile memory profile);
 

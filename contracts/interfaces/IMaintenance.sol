@@ -82,6 +82,22 @@ interface IMaintenance {
     uint256 cooldownSecsToMaintain
   );
 
+  function initialize(
+    address validatorContract,
+    uint256 minMaintenanceDurationInBlock_,
+    uint256 maxMaintenanceDurationInBlock_,
+    uint256 minOffsetToStartSchedule_,
+    uint256 maxOffsetToStartSchedule_,
+    uint256 maxSchedule_,
+    uint256 cooldownSecsToMaintain_
+  ) external;
+
+  function initializeV2() external;
+
+  function initializeV3(address profileContract_) external;
+
+  function initializeV4() external;
+
   /**
    * @dev Exits the maintenance status.
    * @param consensusAddr The address of the consensus to exit maintenance status for.

@@ -8,19 +8,18 @@ import { console } from "forge-std/console.sol";
 
 import { RoninValidatorSetREP10Migrator } from
   "@ronin/contracts/ronin/validator/migrations/RoninValidatorSetREP10Migrator.sol";
-import { RoninGovernanceAdmin } from "@ronin/contracts/ronin/RoninGovernanceAdmin.sol";
-import { RoninValidatorSet } from "@ronin/contracts/ronin/validator/RoninValidatorSet.sol";
-import { SlashIndicator } from "@ronin/contracts/ronin/slash-indicator/SlashIndicator.sol";
-import { RoninRandomBeacon } from "@ronin/contracts/ronin/random-beacon/RoninRandomBeacon.sol";
-import { FastFinalityTracking } from "@ronin/contracts/ronin/fast-finality/FastFinalityTracking.sol";
-import { RoninTrustedOrganization } from "@ronin/contracts/multi-chains/RoninTrustedOrganization.sol";
-import { IBaseStaking } from "@ronin/contracts/interfaces/staking/IBaseStaking.sol";
+import { IRoninGovernanceAdmin } from "@ronin/contracts/interfaces/IRoninGovernanceAdmin.sol";
+import { IRoninValidatorSet } from "@ronin/contracts/interfaces/validator/IRoninValidatorSet.sol";
+import { ISlashIndicator } from "@ronin/contracts/interfaces/slash-indicator/ISlashIndicator.sol";
+
+import { IRandomBeacon } from "@ronin/contracts/interfaces/random-beacon/IRandomBeacon.sol";
+import { IFastFinalityTracking } from "@ronin/contracts/interfaces/IFastFinalityTracking.sol";
+import { IRoninTrustedOrganization } from "@ronin/contracts/interfaces/IRoninTrustedOrganization.sol";
 import { IRandomBeacon } from "@ronin/contracts/interfaces/random-beacon/IRandomBeacon.sol";
 import { ICandidateManager } from "@ronin/contracts/interfaces/validator/ICandidateManager.sol";
 import { ISlashUnavailability } from "@ronin/contracts/interfaces/slash-indicator/ISlashUnavailability.sol";
 import { TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
 import { Proposal } from "@ronin/contracts/libraries/Proposal.sol";
-import { ContractType } from "@ronin/contracts/utils/ContractType.sol";
 
 import { RoninMigration } from "script/RoninMigration.s.sol";
 import { RoninRandomBeaconDeploy } from "script/contracts/RoninRandomBeaconDeploy.s.sol";
@@ -29,11 +28,8 @@ import { RoninValidatorSetREP10MigratorLogicDeploy } from
 import { ISharedArgument } from "script/interfaces/ISharedArgument.sol";
 import { LibProxy } from "@fdk/libraries/LibProxy.sol";
 import { TContract } from "@fdk/types/Types.sol";
-import { DefaultNetwork } from "@fdk/utils/DefaultNetwork.sol";
-import { Network } from "script/utils/Network.sol";
 import { Contract } from "script/utils/Contract.sol";
 import { LibProposal } from "script/shared/libraries/LibProposal.sol";
-import { LibVRFProof } from "script/shared/libraries/LibVRFProof.sol";
 import { LibWrapUpEpoch } from "script/shared/libraries/LibWrapUpEpoch.sol";
 
 contract Migration__01_Upgrade_Testnet_Release_V0_8_0 is RoninMigration {
@@ -59,17 +55,17 @@ contract Migration__01_Upgrade_Testnet_Release_V0_8_0 is RoninMigration {
 
   address private roninValidatorSetREP10LogicMigrator;
 
-  SlashIndicator private slashIndicator;
-  RoninValidatorSet private roninValidatorSet;
-  RoninRandomBeacon private roninRandomBeacon;
-  RoninGovernanceAdmin private roninGovernanceAdmin;
-  RoninTrustedOrganization private roninTrustedOrganization;
+  ISlashIndicator private slashIndicator;
+  IRoninValidatorSet private roninValidatorSet;
+  IRandomBeacon private roninRandomBeacon;
+  IRoninGovernanceAdmin private roninGovernanceAdmin;
+  IRoninTrustedOrganization private roninTrustedOrganization;
 
   function run() public {
-    slashIndicator = SlashIndicator(loadContract(Contract.SlashIndicator.key()));
-    roninValidatorSet = RoninValidatorSet(loadContract(Contract.RoninValidatorSet.key()));
-    roninGovernanceAdmin = RoninGovernanceAdmin(loadContract(Contract.RoninGovernanceAdmin.key()));
-    roninTrustedOrganization = RoninTrustedOrganization(loadContract(Contract.RoninTrustedOrganization.key()));
+    slashIndicator = ISlashIndicator(loadContract(Contract.SlashIndicator.key()));
+    roninValidatorSet = IRoninValidatorSet(loadContract(Contract.RoninValidatorSet.key()));
+    roninGovernanceAdmin = IRoninGovernanceAdmin(loadContract(Contract.RoninGovernanceAdmin.key()));
+    roninTrustedOrganization = IRoninTrustedOrganization(loadContract(Contract.RoninTrustedOrganization.key()));
 
     ISharedArgument.SharedParameter memory param = config.sharedArguments();
     _updateConfig(param);
@@ -229,9 +225,7 @@ contract Migration__01_Upgrade_Testnet_Release_V0_8_0 is RoninMigration {
       staking: loadContract(Contract.Staking.key()),
       trustedOrg: address(roninTrustedOrganization),
       validatorSet: loadContract(Contract.RoninValidatorSet.key()),
-      slashIndicator: address(slashIndicator),
       slashThreshold: RANDOM_BEACON_SLASH_THRESHOLD,
-      initialSeed: uint256(keccak256(abi.encode(vm.unixTime()))),
       activatedAtPeriod: REP10_ACTIVATION_PERIOD,
       validatorTypes: validatorTypes,
       thresholds: thresholds
@@ -271,7 +265,7 @@ contract Migration__01_Upgrade_Testnet_Release_V0_8_0 is RoninMigration {
       if (contractTypesToUpgrade[i] == Contract.FastFinalityTracking.key()) {
         callDatas[i] = abi.encodeCall(
           TransparentUpgradeableProxy.upgradeToAndCall,
-          (logics[i], abi.encodeCall(FastFinalityTracking.initializeV3, (loadContract(Contract.Staking.key()))))
+          (logics[i], abi.encodeCall(IFastFinalityTracking.initializeV3, (loadContract(Contract.Staking.key()))))
         );
       }
 
@@ -281,7 +275,7 @@ contract Migration__01_Upgrade_Testnet_Release_V0_8_0 is RoninMigration {
           (
             logics[i],
             abi.encodeCall(
-              SlashIndicator.initializeV4,
+              ISlashIndicator.initializeV4,
               (
                 address(roninRandomBeacon),
                 param.slashIndicator.slashRandomBeacon.randomBeaconSlashAmount,

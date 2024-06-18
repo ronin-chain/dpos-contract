@@ -7,9 +7,8 @@ import { Math } from "@openzeppelin/contracts/utils/math/Math.sol";
 import { HasContracts } from "../../extensions/collections/HasContracts.sol";
 import { IProfile } from "../../interfaces/IProfile.sol";
 import { IStaking } from "../../interfaces/staking/IStaking.sol";
-import { ICandidateManager } from "../../interfaces/validator/ICandidateManager.sol";
 import { IFastFinalityTracking } from "../../interfaces/IFastFinalityTracking.sol";
-import { RoninValidatorSet } from "../../ronin/validator/RoninValidatorSet.sol";
+import { IRoninValidatorSet } from "../../interfaces/validator/IRoninValidatorSet.sol";
 import { LibArray } from "../../libraries/LibArray.sol";
 import { TConsensus } from "../../udvts/Types.sol";
 import { ContractType } from "../../utils/ContractType.sol";
@@ -84,7 +83,7 @@ contract FastFinalityTracking is IFastFinalityTracking, Initializable, HasContra
       address[] memory votedCids = __css2cidBatch(voters);
 
       IStaking staking = IStaking(getContract(ContractType.STAKING));
-      RoninValidatorSet validator = RoninValidatorSet(getContract(ContractType.VALIDATOR));
+      IRoninValidatorSet validator = IRoninValidatorSet(getContract(ContractType.VALIDATOR));
 
       (uint256 h, uint256[] memory normalizedVoterStakeAmounts) =
         _loadOrRecordNormalizedSumAndPivot(staking, validator, votedCids);
@@ -102,14 +101,15 @@ contract FastFinalityTracking is IFastFinalityTracking, Initializable, HasContra
         $record = _tracker[epoch][votedCids[i]];
 
         ++$record.qcVoteCount;
-        $record.score += normalizedVoterStakeAmounts[i] * (g * g) / (h * h);
+        // Simplification of: `$record.score += (normalizedVoterStakeAmounts[i] / g) * (g * g) / (h * h)`
+        $record.score += normalizedVoterStakeAmounts[i] * g / (h * h);
       }
     }
   }
 
   function _loadOrRecordNormalizedSumAndPivot(
     IStaking staking,
-    RoninValidatorSet validator,
+    IRoninValidatorSet validator,
     address[] memory voterCids
   ) private returns (uint256 normalizedSum_, uint256[] memory normalizedVoterStakes_) {
     uint256 currentPeriod = validator.currentPeriod();

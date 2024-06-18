@@ -1,10 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "../CoreGovernance.sol";
-import "./CommonGovernanceProposal.sol";
+import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import { CoreGovernance } from "../CoreGovernance.sol";
+import { CommonGovernanceProposal } from "./CommonGovernanceProposal.sol";
+import { IGovernanceProposal } from "../../../interfaces/extensions/sequential-governance/IGovernanceProposal.sol";
+import { Ballot } from "../../../libraries/Ballot.sol";
+import { Proposal } from "../../../libraries/Proposal.sol";
+import { ErrInvalidChainId } from "../../../utils/CommonErrors.sol";
 
-abstract contract GovernanceProposal is CoreGovernance, CommonGovernanceProposal {
+abstract contract GovernanceProposal is CoreGovernance, CommonGovernanceProposal, IGovernanceProposal {
   using Proposal for Proposal.ProposalDetail;
 
   /**
