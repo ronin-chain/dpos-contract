@@ -8,10 +8,11 @@ import { Maintenance } from "@ronin/contracts/ronin/Maintenance.sol";
 import { TConsensus, Profile, IProfile } from "@ronin/contracts/ronin/profile/Profile.sol";
 import { RoninValidatorSet } from "@ronin/contracts/ronin/validator/RoninValidatorSet.sol";
 import { TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
-import { LibSharedAddress } from "foundry-deployment-kit/libraries/LibSharedAddress.sol";
-import { ISharedArgument } from "script/deploy-dpos/interfaces/ISharedArgument.sol";
+import { LibSharedAddress } from "@fdk/libraries/LibSharedAddress.sol";
+import { ISharedArgument } from "script/interfaces/ISharedArgument.sol";
 import { DeployDPoS } from "script/deploy-dpos/DeployDPoS.s.sol";
 import { Contract } from "script/utils/Contract.sol";
+import { LibPrecompile } from "script/shared/libraries/LibPrecompile.sol";
 
 contract MaintenanceTest is Test {
   address coinbase;
@@ -19,7 +20,7 @@ contract MaintenanceTest is Test {
   Staking staking;
   Maintenance maintenance;
   RoninValidatorSet validatorSet;
-  ISharedArgument config = ISharedArgument(LibSharedAddress.CONFIG);
+  ISharedArgument config = ISharedArgument(LibSharedAddress.VME);
 
   function setUp() public {
     coinbase = makeAddr("coinbase");
@@ -29,6 +30,8 @@ contract MaintenanceTest is Test {
     vm.warp(block.timestamp + 3000);
 
     new DeployDPoS().run();
+
+    LibPrecompile.deployPrecompile();
 
     profile = Profile(config.getAddressFromCurrentNetwork(Contract.Profile.key()));
     staking = Staking(config.getAddressFromCurrentNetwork(Contract.Staking.key()));
@@ -55,15 +58,15 @@ contract MaintenanceTest is Test {
 
     uint256 minOffset = maintenance.minOffsetToStartSchedule();
     uint256 latestEpochBlock = validatorSet.getLastUpdatedBlock();
-    uint256 numberOfBlockInEpoch = validatorSet.numberOfBlocksInEpoch();
+    uint256 numberOfBlocksInEpoch = validatorSet.numberOfBlocksInEpoch();
     uint256 minDuration = maintenance.minMaintenanceDurationInBlock();
     uint256 maxDuration = maintenance.maxMaintenanceDurationInBlock();
 
     uint256 durationInBlock = _bound(100, minDuration, maxDuration);
 
-    uint256 startBlock = latestEpochBlock + numberOfBlockInEpoch + minOffset + 1;
-    uint256 endBlock = latestEpochBlock + numberOfBlockInEpoch + minOffset
-      + numberOfBlockInEpoch * (durationInBlock / numberOfBlockInEpoch + 1);
+    uint startBlock = latestEpochBlock + numberOfBlocksInEpoch + 1
+      + ((minOffset + numberOfBlocksInEpoch) / numberOfBlocksInEpoch) * numberOfBlocksInEpoch;
+    uint endBlock = startBlock - 1 + (durationInBlock / numberOfBlocksInEpoch + 1) * numberOfBlocksInEpoch;
 
     vm.prank(admin);
     maintenance.schedule(consensus, startBlock, endBlock);
@@ -154,7 +157,7 @@ contract MaintenanceTest is Test {
 
     uint256 minOffset = maintenance.minOffsetToStartSchedule();
     uint256 latestEpochBlock = validatorSet.getLastUpdatedBlock();
-    uint256 numberOfBlockInEpoch = validatorSet.numberOfBlocksInEpoch();
+    uint256 numberOfBlocksInEpoch = validatorSet.numberOfBlocksInEpoch();
     uint256 minDuration = maintenance.minMaintenanceDurationInBlock();
     uint256 maxDuration = maintenance.maxMaintenanceDurationInBlock();
 
@@ -163,9 +166,12 @@ contract MaintenanceTest is Test {
 
     durationInBlock = _bound(durationInBlock, minDuration, maxDuration);
 
-    startBlock = latestEpochBlock + numberOfBlockInEpoch + minOffset + 1;
-    endBlock = latestEpochBlock + numberOfBlockInEpoch + minOffset
-      + numberOfBlockInEpoch * (durationInBlock / numberOfBlockInEpoch + 1);
+    startBlock = latestEpochBlock + numberOfBlocksInEpoch + 1
+      + ((minOffset + numberOfBlocksInEpoch) / numberOfBlocksInEpoch) * numberOfBlocksInEpoch;
+    endBlock = startBlock - 1 + ((durationInBlock / numberOfBlocksInEpoch + 1) * numberOfBlocksInEpoch);
+
+    console.log("startBlock", startBlock);
+    console.log("endBlock", endBlock);
 
     vm.prank(admin);
     maintenance.schedule(consensus, startBlock, endBlock);
@@ -185,12 +191,12 @@ contract MaintenanceTest is Test {
 
     uint256 minOffset = maintenance.minOffsetToStartSchedule();
     uint256 latestEpochBlock = validatorSet.getLastUpdatedBlock();
-    uint256 numberOfBlockInEpoch = validatorSet.numberOfBlocksInEpoch();
+    uint256 numberOfBlocksInEpoch = validatorSet.numberOfBlocksInEpoch();
     uint256 minDuration = maintenance.minMaintenanceDurationInBlock();
 
-    uint256 startBlock = latestEpochBlock + numberOfBlockInEpoch + minOffset + 1;
-    uint256 endBlock = latestEpochBlock + numberOfBlockInEpoch + minOffset
-      + numberOfBlockInEpoch * (minDuration / numberOfBlockInEpoch + 1);
+    uint startBlock = latestEpochBlock + numberOfBlocksInEpoch + 1
+      + ((minOffset + numberOfBlocksInEpoch) / numberOfBlocksInEpoch) * numberOfBlocksInEpoch;
+    uint endBlock = startBlock - 1 + (minDuration / numberOfBlocksInEpoch + 1) * numberOfBlocksInEpoch;
 
     vm.prank(admin);
     maintenance.schedule(consensus, startBlock, endBlock);

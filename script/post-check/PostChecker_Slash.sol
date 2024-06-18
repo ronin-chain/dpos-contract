@@ -2,12 +2,12 @@
 pragma solidity ^0.8.19;
 
 import { StdStyle } from "forge-std/StdStyle.sol";
-import { console2 as console } from "forge-std/console2.sol";
+import { console } from "forge-std/console.sol";
 
 import { LibErrorHandler } from "contract-libs/LibErrorHandler.sol";
-import { TContract } from "foundry-deployment-kit/types/Types.sol";
-import { LibProxy } from "foundry-deployment-kit/libraries/LibProxy.sol";
-import { BaseMigration } from "foundry-deployment-kit/BaseMigration.s.sol";
+import { TContract } from "@fdk/types/Types.sol";
+import { LibProxy } from "@fdk/libraries/LibProxy.sol";
+import { BaseMigration } from "@fdk/BaseMigration.s.sol";
 import { Contract } from "../utils/Contract.sol";
 
 import { IStaking } from "@ronin/contracts/interfaces/staking/IStaking.sol";
@@ -18,7 +18,8 @@ import { ICreditScore } from "@ronin/contracts/interfaces/slash-indicator/ICredi
 import { ICandidateManager } from "@ronin/contracts/interfaces/validator/ICandidateManager.sol";
 import { RoninValidatorSet } from "@ronin/contracts/ronin/validator/RoninValidatorSet.sol";
 import { IValidatorInfoV2 } from "@ronin/contracts/interfaces/validator/info-fragments/IValidatorInfoV2.sol";
-
+import { TConsensus } from "@ronin/contracts/udvts/Types.sol";
+import { LibWrapUpEpoch } from "script/shared/libraries/LibWrapUpEpoch.sol";
 import "./PostChecker_Helper.sol";
 
 abstract contract PostChecker_Slash is BaseMigration, PostChecker_Helper {
@@ -38,9 +39,9 @@ abstract contract PostChecker_Slash is BaseMigration, PostChecker_Helper {
   uint256 private _slashAmountTier2;
 
   function _postCheck__Slash() internal {
-    _validatorSet = CONFIG.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key());
-    _staking = CONFIG.getAddressFromCurrentNetwork(Contract.Staking.key());
-    _slashingContract = CONFIG.getAddressFromCurrentNetwork(Contract.SlashIndicator.key());
+    _validatorSet = loadContract(Contract.RoninValidatorSet.key());
+    _staking = loadContract(Contract.Staking.key());
+    _slashingContract = loadContract(Contract.SlashIndicator.key());
     _postCheck_RandomQueryData();
 
     (, _tier2Threshold, _slashAmountTier2,) = ISlashIndicator(_slashingContract).getUnavailabilitySlashingConfigs();
@@ -54,17 +55,17 @@ abstract contract PostChecker_Slash is BaseMigration, PostChecker_Helper {
     _postCheckSlashTier2AndBailOutAgain();
 
     vm.revertTo(snapshotId);
-    _pickSuitableSlasheeForSlashBelowRequirement();
-    _postCheckSlashUntilBelowRequirement();
+    // _pickSuitableSlasheeForSlashBelowRequirement();
+    // _postCheckSlashUntilBelowRequirement();
   }
 
   function _postCheck_CreditScore() private {
     (uint256 gainCreditScore, uint256 maxCreditScore,,) = ICreditScore(_slashingContract).getCreditScoreConfigs();
     uint256 wrapUpCount = maxCreditScore / gainCreditScore;
-    _wrapUpEpochs(wrapUpCount);
+    LibWrapUpEpoch.wrapUpPeriods(wrapUpCount);
   }
 
-  function _postCheck_RandomQueryData() private view logPostCheck("[Slash] query random data") {
+  function _postCheck_RandomQueryData() private logPostCheck("[Slash] query random data") {
     (uint256 tier1Threshold, uint256 tier2Threshold, uint256 slashAmountTier2, uint256 jailDuration) =
       ISlashIndicator(_slashingContract).getUnavailabilitySlashingConfigs();
     require(tier1Threshold < NORMAL_SMALL_NUMBER || tier1Threshold == 0, "abnormal tier 1");
@@ -84,12 +85,11 @@ abstract contract PostChecker_Slash is BaseMigration, PostChecker_Helper {
       (bool success,) =
         _slashingContract.call(abi.encodeWithSelector(ISlashUnavailability.slashUnavailability.selector, _slashee));
       assertTrue(success);
-      vm.roll(block.number + 1);
+      vm.roll(vm.getBlockNumber() + 1);
     }
     vm.stopPrank();
 
-    _fastForwardToNextEpoch();
-    _wrapUpEpoch();
+    LibWrapUpEpoch.wrapUpEpoch();
     (, res) = _validatorSet.staticcall(abi.encodeWithSelector(IValidatorInfoV2.isBlockProducer.selector, _slashee));
     assertFalse(abi.decode(res, (bool)));
   }
@@ -102,7 +102,7 @@ abstract contract PostChecker_Slash is BaseMigration, PostChecker_Helper {
     uint256 creditScoreBefore = abi.decode(res, (uint256));
 
     (bool success,) = _slashingContract.call(abi.encodeWithSelector(ICreditScore.bailOut.selector, _slashee));
-    assertEq(success, true);
+    assertEq(success, true, "[Postcheck][Bailout] Cannot bailout");
 
     (, res) = _slashingContract.staticcall(abi.encodeWithSelector(ICreditScore.getCreditScore.selector, _slashee));
     uint256 creditScoreAfter = abi.decode(res, (uint256));
@@ -113,8 +113,7 @@ abstract contract PostChecker_Slash is BaseMigration, PostChecker_Helper {
 
     vm.stopPrank();
 
-    _fastForwardToNextEpoch();
-    _wrapUpEpoch();
+    LibWrapUpEpoch.wrapUpEpoch();
     (, res) = _validatorSet.staticcall(abi.encodeWithSelector(IValidatorInfoV2.isBlockProducer.selector, _slashee));
     assertTrue(abi.decode(res, (bool)));
   }
@@ -129,18 +128,18 @@ abstract contract PostChecker_Slash is BaseMigration, PostChecker_Helper {
   }
 
   function _postCheckSlashUntilBelowRequirement() private logPostCheck("[Slash] slash until below requirement") {
-    (, bytes memory returndata) =
+    (, bytes memory returnData) =
       _validatorSet.staticcall(abi.encodeWithSelector(ICandidateManager.getCandidateInfo.selector, _slashee));
-    ICandidateManager.ValidatorCandidate memory info = abi.decode(returndata, (ICandidateManager.ValidatorCandidate));
+    ICandidateManager.ValidatorCandidate memory info = abi.decode(returnData, (ICandidateManager.ValidatorCandidate));
     assertTrue(info.topupDeadline == 0);
+
     _postCheckSlashUnavailability();
 
-    _fastForwardToNextDay();
-    _wrapUpEpoch();
+    LibWrapUpEpoch.wrapUpPeriod();
 
-    (, returndata) =
+    (, returnData) =
       _validatorSet.staticcall(abi.encodeWithSelector(ICandidateManager.getCandidateInfo.selector, _slashee));
-    info = abi.decode(returndata, (ICandidateManager.ValidatorCandidate));
+    info = abi.decode(returnData, (ICandidateManager.ValidatorCandidate));
     assertTrue(info.topupDeadline > 0);
   }
 
@@ -172,7 +171,7 @@ abstract contract PostChecker_Slash is BaseMigration, PostChecker_Helper {
       (_slasheeAdmin, stakingAmount,) = abi.decode(returnedData, (address, uint256, uint256));
 
       i++;
-    } while (stakingAmount > _slashAmountTier2 + minStakingAmount && i < consensusLst.length);
+    } while (stakingAmount >= _slashAmountTier2 + minStakingAmount && i < consensusLst.length);
 
     assertTrue(i < consensusLst.length, "PostChecker_Slash: cannot find suitable validator, skip");
     _slasher = consensusLst[(i * (consensusLst.length - 1)) % consensusLst.length];

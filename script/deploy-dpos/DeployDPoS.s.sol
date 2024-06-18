@@ -2,27 +2,38 @@
 pragma solidity ^0.8.19;
 
 import "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
-import { console2 as console } from "forge-std/console2.sol";
+import { console } from "forge-std/console.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
-import { TContract } from "foundry-deployment-kit/types/Types.sol";
-import { LibProxy } from "foundry-deployment-kit/libraries/LibProxy.sol";
-import "./contracts/ProfileDeploy.s.sol";
-import "./contracts/StakingDeploy.s.sol";
-import "./contracts/MaintenanceDeploy.s.sol";
-import "./contracts/SlashIndicatorDeploy.s.sol";
-import "./contracts/StakingVestingDeploy.s.sol";
-import "./contracts/RoninValidatorSetDeploy.s.sol";
-import "./contracts/FastFinalityTrackingDeploy.s.sol";
-import "./contracts/RoninGovernanceAdminDeploy.s.sol";
-import "./contracts/RoninTrustedOrganizationDeploy.s.sol";
-import "./DPoSMigration.s.sol";
+import { TContract } from "@fdk/types/Types.sol";
+import { LibProxy } from "@fdk/libraries/LibProxy.sol";
+import "script/contracts/ProfileDeploy.s.sol";
+import "script/contracts/StakingDeploy.s.sol";
+import "script/contracts/MaintenanceDeploy.s.sol";
+import "script/contracts/SlashIndicatorDeploy.s.sol";
+import "script/contracts/StakingVestingDeploy.s.sol";
+import "script/contracts/RoninValidatorSetDeploy.s.sol";
+import "script/contracts/FastFinalityTrackingDeploy.s.sol";
+import "script/contracts/RoninGovernanceAdminDeploy.s.sol";
+import "script/contracts/RoninTrustedOrganizationDeploy.s.sol";
+import "script/contracts/RoninRandomBeaconDeploy.s.sol";
+import {
+  RoninValidatorSetREP10Migrator,
+  RoninValidatorSetREP10MigratorLogicDeploy
+} from "script/contracts/RoninValidatorSetRep10MigratorLogicDeploy.s.sol";
+import "script/RoninMigration.s.sol";
+import { LibVRFProof } from "script/shared/libraries/LibVRFProof.sol";
+import { LibPrecompile } from "script/shared/libraries/LibPrecompile.sol";
+import { LibWrapUpEpoch } from "script/shared/libraries/LibWrapUpEpoch.sol";
 
-contract DeployDPoS is DPoSMigration {
+contract DeployDPoS is RoninMigration {
   using LibProxy for *;
   using StdStyle for *;
 
   // @dev Array to store proxy targets to change admin
   address[] internal _changeProxyTargets;
+
+  uint256 internal constant MAX_CANDIDATE = 70;
+  address internal constant PAY_MASTER = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
 
   Profile profile;
   Staking staking;
@@ -30,22 +41,13 @@ contract DeployDPoS is DPoSMigration {
   SlashIndicator slashIndicator;
   StakingVesting stakingVesting;
   RoninValidatorSet validatorSet;
+  RoninRandomBeacon randomBeacon;
   RoninTrustedOrganization trustedOrg;
   RoninGovernanceAdmin governanceAdmin;
   FastFinalityTracking fastFinalityTracking;
 
   function run() public onlyOn(DefaultNetwork.Local.key()) {
-    {
-      address mockPrecompile = _deployLogic(Contract.MockPrecompile.key());
-      vm.etch(address(0x68), mockPrecompile.code);
-      vm.makePersistent(address(0x68));
-      vm.etch(address(0x6a), mockPrecompile.code);
-      vm.makePersistent(address(0x6a));
-    }
-
-    console.log("current block number:", block.number);
-
-    ISharedArgument.SharedParameter memory param = cfg.sharedArguments();
+    ISharedArgument.SharedParameter memory param = config.sharedArguments();
     address initialOwner = param.initialOwner;
     vm.label(initialOwner, "initialOwner");
 
@@ -59,6 +61,7 @@ contract DeployDPoS is DPoSMigration {
     slashIndicator = new SlashIndicatorDeploy().run();
     stakingVesting = new StakingVestingDeploy().run();
     fastFinalityTracking = new FastFinalityTrackingDeploy().run();
+    randomBeacon = new RoninRandomBeaconDeploy().run();
 
     // change ProxyAdmin to RoninGovernanceAdmin
     vm.startBroadcast(initialOwner);
@@ -77,50 +80,132 @@ contract DeployDPoS is DPoSMigration {
 
     // initialize neccessary config
     _initStaking(param.staking);
-    _initTrustedOrg(param.trustedOrganization);
+    _initTrustedOrg(param.roninTrustedOrganization);
     _initValidatorSet(param.roninValidatorSet);
     _initProfile();
     _initMaintenance(param.maintenance);
     _initSlashIndicator(param.slashIndicator);
     _initStakingVesting(param.stakingVesting);
     _initFastFinalityTracking();
+    _initRoninRandomBeacon(param.roninRandomBeacon);
   }
 
-  function _postCheck() internal override {
-    // post check
-    _validateValidatorSet();
-    _validateGovernanceAdmin();
+  function _postCheck() internal virtual override {
+    LibPrecompile.deployPrecompile();
+
+    _cheatApplyGoverningValidatorCandidates();
+    _cheatAddVRFKeysForGoverningValidators();
+    _cheatApplyValidatorCandidates();
+
     super._postCheck();
   }
 
-  function _validateValidatorSet() internal logFn("Validate Validator Set") {
-    _fastForwardToNextDay();
-    _wrapUpEpoch();
-    _fastForwardToNextDay();
-    _wrapUpEpoch();
-
-    console.log(">", StdStyle.green("Validate Validator {wrapUpEpoch} successful"));
+  function cheatSetUpValidators() external {
+    _cheatApplyGoverningValidatorCandidates();
+    _cheatAddVRFKeysForGoverningValidators();
+    _cheatApplyValidatorCandidates();
   }
 
-  function _validateGovernanceAdmin() internal logFn("Validate Governance Admin") {
-    // Get all contracts deployed from the current network
-    address payable[] memory addrs = config.getAllAddresses(network());
+  function _cheatApplyGoverningValidatorCandidates() internal {
+    // apply validator candidates
+    console.log(">", "Cheat Applying Governing Validator Candidates".yellow());
 
-    // Identify proxy targets to change admin
-    for (uint256 i; i < addrs.length; ++i) {
-      if (addrs[i].getProxyAdmin(false) == address(governanceAdmin)) {
-        console.log("Target Proxy to migrate admin", vm.getLabel(addrs[i]));
-        _changeProxyTargets.push(addrs[i]);
-      }
-    }
-    address[] memory targets = _changeProxyTargets;
-    for (uint256 i; i < targets.length; ++i) {
-      TContract contractType = config.getContractTypeFromCurrentNetwok(targets[i]);
-      console.log("Upgrading contract:", vm.getLabel(targets[i]));
-      _upgradeProxy(contractType, EMPTY_ARGS);
-    }
+    IRoninTrustedOrganization.TrustedOrganization[] memory allTrustedOrgs = trustedOrg.getAllTrustedOrganizations();
+    uint256 minValidatorStakingAmount = staking.minValidatorStakingAmount();
+    (uint256 min, uint256 max) = staking.getCommissionRateRange();
+    uint256 commissionRate = min + (max - min) / 2;
 
-    console.log(">", StdStyle.green("Validate Governance Admin Upgrade Proposal successful"));
+    for (uint256 i; i < allTrustedOrgs.length; ++i) {
+      (address candidateAdmin, uint256 privateKey) = makeAddrAndKey(string.concat("gv-candidate-", vm.toString(i)));
+      bytes memory pubKey = bytes(string.concat("gv-pubKey-", vm.toString(allTrustedOrgs[i].governor)));
+      uint256 stakeAmount =
+        _bound(uint256(keccak256(abi.encode(vm.unixTime()))), minValidatorStakingAmount, type(uint96).max);
+      // cheat to pass post check
+      if (i == 0) stakeAmount = minValidatorStakingAmount + 1;
+
+      vm.deal(PAY_MASTER, stakeAmount);
+      prankOrBroadcast(PAY_MASTER);
+      payable(candidateAdmin).transfer(stakeAmount);
+
+      prankOrBroadcast(candidateAdmin);
+      staking.applyValidatorCandidate{ value: stakeAmount }(
+        candidateAdmin, allTrustedOrgs[i].consensusAddr, payable(candidateAdmin), commissionRate, pubKey, ""
+      );
+
+      console.log(
+        string.concat(
+          "Governing Candidate Admin:",
+          " ",
+          vm.toString(i),
+          " ",
+          vm.toString(candidateAdmin),
+          " ",
+          "Private key:",
+          " ",
+          vm.toString(privateKey)
+        )
+      );
+    }
+  }
+
+  function _cheatAddVRFKeysForGoverningValidators() internal {
+    IRoninTrustedOrganization.TrustedOrganization[] memory allTrustedOrgs = trustedOrg.getAllTrustedOrganizations();
+    LibVRFProof.VRFKey[] memory vrfKeys = LibVRFProof.genVRFKeys(allTrustedOrgs.length);
+    config.setUserDefinedConfig("vrf-keys", abi.encode(vrfKeys));
+
+    for (uint256 i; i < vrfKeys.length; ++i) {
+      address cid = profile.getConsensus2Id(allTrustedOrgs[i].consensusAddr);
+      address admin = profile.getId2Admin(cid);
+      vm.broadcast(admin);
+      profile.changeVRFKeyHash(cid, vrfKeys[i].keyHash);
+    }
+  }
+
+  function _initRoninRandomBeacon(ISharedArgument.RoninRandomBeaconParam memory param)
+    internal
+    logFn("_initRoninRandomBeacon")
+  {
+    vm.startBroadcast(sender());
+    vm.recordLogs();
+    randomBeacon.initialize({
+      profile: address(profile),
+      staking: address(staking),
+      trustedOrg: address(trustedOrg),
+      validatorSet: address(validatorSet),
+      slashIndicator: address(slashIndicator),
+      slashThreshold: param.slashThreshold,
+      initialSeed: param.initialSeed,
+      activatedAtPeriod: param.activatedAtPeriod,
+      validatorTypes: param.validatorTypes,
+      thresholds: param.thresholds
+    });
+    vm.stopBroadcast();
+  }
+
+  function _cheatApplyValidatorCandidates() internal {
+    IRoninTrustedOrganization.TrustedOrganization[] memory allTrustedOrgs = trustedOrg.getAllTrustedOrganizations();
+    uint256 maxValidatorCandidate = MAX_CANDIDATE - allTrustedOrgs.length;
+
+    uint256 minValidatorStakingAmount = staking.minValidatorStakingAmount();
+    (uint256 min, uint256 max) = staking.getCommissionRateRange();
+    uint256 commissionRate = min + (max - min) / 2;
+
+    for (uint256 i; i < maxValidatorCandidate; ++i) {
+      bytes memory pubKey = bytes(string.concat("sv-pubKey-", vm.toString(i)));
+      address candidateAdmin = makeAddr(string.concat("sv-candidate-admin-", vm.toString(i)));
+      TConsensus consensus = TConsensus.wrap(makeAddr(string.concat("sv-candidate-", vm.toString(i))));
+
+      uint256 stakeAmount =
+        _bound(uint256(keccak256(abi.encode(vm.unixTime()))), minValidatorStakingAmount, type(uint96).max);
+      vm.deal(PAY_MASTER, stakeAmount);
+      prankOrBroadcast(PAY_MASTER);
+      payable(candidateAdmin).transfer(stakeAmount);
+
+      prankOrBroadcast(candidateAdmin);
+      staking.applyValidatorCandidate{ value: stakeAmount }(
+        candidateAdmin, consensus, payable(candidateAdmin), commissionRate, pubKey, ""
+      );
+    }
   }
 
   function _initProfile() internal logFn("_initProfile") {
@@ -165,6 +250,10 @@ contract DeployDPoS is DPoSMigration {
     );
     // slashIndicator.initializeV2(address(validatorSet));
     slashIndicator.initializeV3(address(profile));
+    slashIndicator.initializeV4(
+      address(randomBeacon), param.slashRandomBeacon.randomBeaconSlashAmount, param.slashRandomBeacon.activatedAtPeriod
+    );
+
     vm.stopBroadcast();
   }
 
@@ -179,6 +268,8 @@ contract DeployDPoS is DPoSMigration {
   }
 
   function _initValidatorSet(ISharedArgument.RoninValidatorSetParam memory param) internal logFn("_initValidatorSet") {
+    address migrator = new RoninValidatorSetREP10MigratorLogicDeploy().run();
+
     uint256[2] memory emergencyConfig;
     emergencyConfig[0] = param.emergencyExitLockedAmount;
     emergencyConfig[1] = param.emergencyExpiryDuration;
@@ -202,6 +293,17 @@ contract DeployDPoS is DPoSMigration {
     validatorSet.initializeV3(address(fastFinalityTracking));
     validatorSet.initializeV4(address(profile));
     vm.stopBroadcast();
+
+    UpgradeInfo({
+      proxy: address(validatorSet),
+      logic: migrator,
+      callValue: 0,
+      shouldPrompt: true,
+      callData: abi.encodeCall(RoninValidatorSetREP10Migrator.initialize, (address(randomBeacon))),
+      proxyInterface: ProxyInterface.Transparent,
+      upgradeCallback: this.upgradeCallback,
+      shouldUseCallback: true
+    }).upgrade();
   }
 
   function _initStaking(ISharedArgument.StakingParam memory param) internal logFn("_initStaking") {
@@ -247,6 +349,8 @@ contract DeployDPoS is DPoSMigration {
   function _initFastFinalityTracking() internal logFn("_initFastFinalityTracking") {
     vm.startBroadcast(sender());
     fastFinalityTracking.initialize(address(validatorSet));
+    fastFinalityTracking.initializeV2(address(profile));
+    fastFinalityTracking.initializeV3(address(staking));
     vm.stopBroadcast();
   }
 }

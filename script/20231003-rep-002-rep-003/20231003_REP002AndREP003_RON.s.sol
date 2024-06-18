@@ -2,6 +2,7 @@
 pragma solidity ^0.8.19;
 
 import "./20231003_REP002AndREP003_Base.s.sol";
+import { LibWrapUpEpoch } from "script/shared/libraries/LibWrapUpEpoch.sol";
 
 contract Simulation__20231003_UpgradeREP002AndREP003_RON is Simulation__20231003_UpgradeREP002AndREP003_Base {
   function run() public virtual override {
@@ -13,12 +14,11 @@ contract Simulation__20231003_UpgradeREP002AndREP003_RON is Simulation__20231003
     _depositForOnBothChain("before-upgrade-user");
 
     // trigger conditional migration
-    _fastForwardToNextDay();
-    _wrapUpEpoch();
+    LibWrapUpEpoch.wrapUpPeriod();
 
     // // test `RoninValidatorSet` functionality
-    // _fastForwardToNextDay();
-    // _wrapUpEpoch();
+    // LibWrapUpEpoch.fastForwardToNextDay();
+    // LibWrapUpEpoch.wrapUpPeriod();
 
     // // test `RoninGatewayV3` functionality
     // _depositForOnBothChain("after-upgrade-user");
@@ -43,9 +43,8 @@ contract Simulation__20231003_UpgradeREP002AndREP003_RON is Simulation__20231003
       // upgrade `SlashIndicator` to `NotifiedMigrator`
       // bump `SlashIndicator` to V2, V3
       bytes[] memory slashIndicatorDatas = new bytes[](2);
-      slashIndicatorDatas[0] = abi.encodeCall(
-        SlashIndicator.initializeV2, (config.getAddressFromCurrentNetwork(Contract.RoninGovernanceAdmin.key()))
-      );
+      slashIndicatorDatas[0] =
+        abi.encodeCall(SlashIndicator.initializeV2, (loadContract(Contract.RoninGovernanceAdmin.key())));
       slashIndicatorDatas[1] =
         abi.encodeCall(SlashIndicator.initializeV3, (loadContractOrDeploy(Contract.Profile.key())));
       new NotifiedMigratorUpgrade().run(Contract.SlashIndicator, slashIndicatorDatas);

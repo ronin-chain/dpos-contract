@@ -2,10 +2,10 @@
 pragma solidity ^0.8.19;
 
 import "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
-import { console2 as console } from "forge-std/console2.sol";
+import { console } from "forge-std/console.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
-import { TContract } from "foundry-deployment-kit/types/Types.sol";
-import { LibProxy } from "foundry-deployment-kit/libraries/LibProxy.sol";
+import { TContract } from "@fdk/types/Types.sol";
+import { LibProxy } from "@fdk/libraries/LibProxy.sol";
 import "./contracts/ProfileDeploy.s.sol";
 import "./contracts/StakingDeploy.s.sol";
 import "./contracts/MaintenanceDeploy.s.sol";
@@ -16,7 +16,7 @@ import "./contracts/FastFinalityTrackingDeploy.s.sol";
 import "./contracts/RoninGovernanceAdminDeploy.s.sol";
 import "./contracts/RoninTrustedOrganizationDeploy.s.sol";
 import "./TestnetMigration.s.sol";
-import { DefaultContract } from "foundry-deployment-kit/utils/DefaultContract.sol";
+import { DefaultContract } from "@fdk/utils/DefaultContract.sol";
 
 contract Migration__20231212_DeployTestnet is TestnetMigration {
   using LibProxy for *;
@@ -33,7 +33,7 @@ contract Migration__20231212_DeployTestnet is TestnetMigration {
   FastFinalityTracking fastFinalityTracking;
 
   function run() public onlyOn(DefaultNetwork.RoninTestnet.key()) {
-    console.log("current block number:", block.number);
+    console.log("current block number:", vm.getBlockNumber());
 
     ISharedArgument.SharedParameter memory param = testnetConfig.sharedArguments();
     address initialOwner = param.initialOwner;

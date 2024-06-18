@@ -6,38 +6,44 @@ import "../../udvts/Types.sol";
 import "../../extensions/collections/HasContracts.sol";
 import "../../utils/RoleAccess.sol";
 import { IProfile } from "../../interfaces/IProfile.sol";
+import { ITimingInfo } from "../../interfaces/validator/info-fragments/ITimingInfo.sol";
 
 abstract contract ProfileStorage is IProfile, HasContracts {
   /// @dev Mapping from id address => candidate profile.
-  mapping(address => CandidateProfile) internal _id2Profile;
+  mapping(address id => CandidateProfile) internal _id2Profile;
 
   /**
    * @dev Mapping from any address or keccak256(pubkey) => whether it is already registered.
    * This registry can only be toggled to `true` and NOT vice versa. All registered values
    * cannot be reused.
    */
-  mapping(uint256 => bool) internal _registry;
+  mapping(uint256 => bool registered) internal _registry;
 
   /// @dev Mapping from consensus address => id address.
-  mapping(TConsensus => address) internal _consensus2Id;
+  mapping(TConsensus => address id) internal _consensus2Id;
 
   /// @dev The cooldown time to change any info in the profile.
   uint256 internal _profileChangeCooldown;
 
+  /// @dev Mapping from vrf key hash => id address.
+  mapping(bytes32 vrfKeyHash => address cid) internal _vrfKeyHash2Id;
+
   /// @dev Upgradeable gap.
-  bytes32[47] __gap;
+  bytes32[46] __gap;
 
   /**
    * @dev Add a profile from memory to storage.
    */
   function _addNewProfile(CandidateProfile storage _profile, CandidateProfile memory newProfile) internal {
     _profile.id = newProfile.id;
+    _profile.registeredAt = newProfile.registeredAt;
 
     _setConsensus(_profile, newProfile.consensus);
     _setAdmin(_profile, newProfile.admin);
     _setTreasury(_profile, newProfile.treasury);
     _setGovernor(_profile, newProfile.__reservedGovernor);
     _setPubkey(_profile, newProfile.pubkey);
+    _setVRFKeyHash(_profile, newProfile.vrfKeyHash);
 
     emit ProfileAdded(newProfile.id);
   }
@@ -90,6 +96,27 @@ abstract contract ProfileStorage is IProfile, HasContracts {
     _registry[_hashPubkey(pubkey)] = true;
 
     emit PubkeyChanged(_profile.id, pubkey);
+  }
+
+  /**
+   * @dev Set VRF Key Hash for the profile.
+   */
+  function _setVRFKeyHash(CandidateProfile storage _profile, bytes32 vrfKeyHash) internal {
+    //  Prevent reverting or registering null vrf key hash in `registry`,
+    //  in case normal candidate register for their profile,
+    //  since only Governing Validator can utilize VRF Key Hash
+    if (vrfKeyHash == bytes32(0x0)) return;
+
+    // Delete old VRF key hash in mapping
+    delete _vrfKeyHash2Id[_profile.vrfKeyHash];
+    _vrfKeyHash2Id[vrfKeyHash] = _profile.id;
+
+    // Set new vrf key hash
+    _profile.vrfKeyHash = vrfKeyHash;
+    _registry[uint256(vrfKeyHash)] = true;
+    _profile.vrfKeyHashLastChange = block.timestamp;
+
+    emit VRFKeyHashChanged(_profile.id, vrfKeyHash);
   }
 
   function _startCooldown(CandidateProfile storage _profile) internal {

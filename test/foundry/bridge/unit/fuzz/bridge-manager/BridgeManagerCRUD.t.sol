@@ -7,7 +7,7 @@ import { RoninGatewayV3 } from "@ronin/contracts/ronin/gateway/RoninGatewayV3.so
 import {
   RoleAccess,
   ContractType,
-  AddressArrayUtils,
+  LibArray,
   MockBridgeManager
 } from "@ronin/contracts/mocks/ronin/MockBridgeManager.sol";
 import {
@@ -20,7 +20,7 @@ import {
 } from "@ronin/contracts/utils/CommonErrors.sol";
 
 contract BridgeManagerCRUDTest is BridgeManagerUtils {
-  using AddressArrayUtils for address[];
+  using LibArray for address[];
 
   enum InputIndex {
     VoteWeights,
@@ -123,7 +123,7 @@ contract BridgeManagerCRUDTest is BridgeManagerUtils {
         vm.expectRevert(abi.encodeWithSelector(ErrZeroAddress.selector, IBridgeManager.addBridgeOperators.selector));
       } else {
         vm.expectRevert(
-          abi.encodeWithSelector(AddressArrayUtils.ErrDuplicated.selector, IBridgeManager.addBridgeOperators.selector)
+          abi.encodeWithSelector(LibArray.ErrDuplicated.selector, IBridgeManager.addBridgeOperators.selector)
         );
       }
     }

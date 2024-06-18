@@ -14,7 +14,7 @@ libs = ['lib', 'node_modules/@openzeppelin', 'node_modules/hardhat']
 solc = '0.8.25'
 use_literal_content = true
 extra_output = ["devdoc", "userdoc", "storagelayout"]
-evm_version = 'istanbul'
+evm_version = 'berlin'
 cache_path = 'cache_foundry'
 fs_permissions = [{ access = "read-write", path = "./" }]
 
@@ -48,10 +48,10 @@ runs = 1_000
 
 [rpc_endpoints]
 ethereum = "https://eth.llamarpc.com"
-goerli = "https://ethereum-goerli.publicnode.com"
+goerli = "https://goerli.infura.io/v3/${INFURA_API_KEY}"
 ronin-mainnet = "https://api-archived.roninchain.com/rpc"
 ronin-testnet = "https://saigon-archive.roninchain.com/rpc"
 ronin-devnet = "https://hcm-rpc.skymavis.one/rpc"
 localhost = "http://localhost:8545"
 ronin-testnet-shadow = "http://34.27.172.168:8545"
-ronin-mainnet-shadow = "http://35.225.161.81:8545"
+ronin-mainnet-shadow = "http://35.192.217.237:8545"

@@ -1,0 +1,4 @@
+FastFinalityTracking
+    recordVoters
+        scores must not be zero
+        counts must not be zero

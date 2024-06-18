@@ -6,6 +6,11 @@ interface IConditionalImplementControl {
   error ErrDelegateFromUnknownOrigin(address addr);
 
   /**
+   * @dev Emitted when migrator logic is deployed.
+   */
+  event Constructed(address indexed proxy, address indexed prevImpl, address indexed newImpl);
+
+  /**
    * @dev Emitted when the implementation is upgraded.
    */
   event Upgraded(address indexed implementation);
@@ -14,9 +19,4 @@ interface IConditionalImplementControl {
    * @dev Executes the selfUpgrade function, upgrading to the new contract implementation.
    */
   function selfUpgrade() external;
-
-  /**
-   * @dev Set additional calldata to call when upgrading via `selfUpgrade`.
-   */
-  function setCallDatas(bytes[] calldata args) external;
 }

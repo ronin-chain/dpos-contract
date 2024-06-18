@@ -7,13 +7,13 @@ import { Contract } from "../utils/Contract.sol";
 
 contract HardForkRoninGovernanceAdminDeploy is RoninMigration {
   function _defaultArguments() internal view override returns (bytes memory args) {
-    ISharedArgument.SharedParameter memory param = config.sharedArguments();
+    ISharedArgument.RoninGovernanceAdminParam memory param = config.sharedArguments().roninGovernanceAdmin;
 
     args = abi.encode(
       block.chainid,
-      config.getAddressFromCurrentNetwork(Contract.RoninTrustedOrganization.key()),
-      config.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key()),
-      param.expiryDuration
+      loadContract(Contract.RoninTrustedOrganization.key()),
+      loadContract(Contract.RoninValidatorSet.key()),
+      param.proposalExpiryDuration
     );
   }
 

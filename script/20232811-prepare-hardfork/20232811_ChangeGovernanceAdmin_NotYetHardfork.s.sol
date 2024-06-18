@@ -2,11 +2,11 @@
 pragma solidity ^0.8.19;
 
 import { TransparentUpgradeableProxy } from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
-import { console2 as console } from "forge-std/console2.sol";
+import { console } from "forge-std/console.sol";
 import { stdStorage, StdStorage } from "forge-std/StdStorage.sol";
 import { LibErrorHandler } from "contract-libs/LibErrorHandler.sol";
-import { TContract } from "foundry-deployment-kit/types/Types.sol";
-import { LibProxy } from "foundry-deployment-kit/libraries/LibProxy.sol";
+import { TContract } from "@fdk/types/Types.sol";
+import { LibProxy } from "@fdk/libraries/LibProxy.sol";
 import { Proposal, RoninMigration } from "script/RoninMigration.s.sol";
 import { LibString, Contract } from "script/utils/Contract.sol";
 import {
@@ -29,10 +29,10 @@ contract Migration__20232811_ChangeGovernanceAdmin_NotYetHardfork is Migration__
 
   function __node_hardfork_hook() internal override {
     // Get current broken Ronin Governance Admin
-    __roninGovernanceAdmin = config.getAddressFromCurrentNetwork(Contract.RoninGovernanceAdmin.key());
+    __roninGovernanceAdmin = loadContract(Contract.RoninGovernanceAdmin.key());
 
     // Deploy new Ronin Governance Admin
-    __trustedOrg = config.getAddressFromCurrentNetwork(Contract.RoninTrustedOrganization.key());
+    __trustedOrg = loadContract(Contract.RoninTrustedOrganization.key());
 
     // Deploy temporary Ronin Trusted Organization
     address tempTrustedOrgLogic = _deployLogic(Contract.TemporalRoninTrustedOrganization.key());

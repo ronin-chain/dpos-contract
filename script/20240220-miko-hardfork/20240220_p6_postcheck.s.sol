@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { TContract } from "foundry-deployment-kit/types/Types.sol";
-import { LibProxy } from "foundry-deployment-kit/libraries/LibProxy.sol";
+import { TContract } from "@fdk/types/Types.sol";
+import { LibProxy } from "@fdk/libraries/LibProxy.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
 
 import {
@@ -44,7 +44,7 @@ abstract contract Proposal__20240220_PostCheck is Proposal__Base_20240220_MikoHa
     console2.log("\n== Proposal post check finished ==".magenta().bold());
   }
 
-  function _sys_postCheck_profile_all_migrated() internal {
+  function _sys_postCheck_profile_all_migrated() internal view {
     (address[] memory poolIds,,) = _sys__parseMigrateData(MIGRATE_DATA_PATH);
     for (uint i; i < poolIds.length; i++) {
       address cid = poolIds[i];
@@ -59,7 +59,7 @@ abstract contract Proposal__20240220_PostCheck is Proposal__Base_20240220_MikoHa
     profileContract.changeConsensusAddr(address(0), TConsensus.wrap(address(0)));
   }
 
-  function _sys_postCheck_checkAdminOfBridgeTracking() internal {
+  function _sys_postCheck_checkAdminOfBridgeTracking() internal view {
     address actualAdmin = LibProxy.getProxyAdmin(payable(bridgeTracking));
     assertTrue(actualAdmin == 0x5FA49E6CA54a9daa8eCa4F403ADBDE5ee075D84a);
   }
