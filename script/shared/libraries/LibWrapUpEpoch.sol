@@ -22,7 +22,7 @@ library LibWrapUpEpoch {
   }
 
   function wrapUpPeriods(uint256 times) internal returns (VmSafe.Log[][] memory logs) {
-    logs = wrapUpPeriods({ times: times, shouldSubmitBeacon: false });
+    logs = wrapUpPeriods({ times: times, shouldSubmitBeacon: true });
   }
 
   function wrapUpPeriods(uint256 times, bool shouldSubmitBeacon) internal returns (VmSafe.Log[][] memory logs) {
