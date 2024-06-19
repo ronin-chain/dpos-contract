@@ -104,11 +104,10 @@ abstract contract CoinbaseExecution is
     }
 
     rewardProducingBlock -= cutOffReward;
-    (uint256 minRate, uint256 maxRate) = IStaking(getContract(ContractType.STAKING)).getCommissionRateRange();
-    uint256 rate = Math.max(Math.min(_candidateInfo[id].commissionRate, maxRate), minRate);
-    uint256 miningAmount = (rate * rewardProducingBlock) / _MAX_PERCENTAGE;
-    _miningReward[id] += miningAmount;
-    _delegatingReward[id] += (rewardProducingBlock - miningAmount);
+    (uint256 validatorMiningReward, uint256 delegatingMiningReward) =
+      _splitRewardBetweenValidatorAndDelegators({ vId: id, totalReward: rewardProducingBlock });
+    _miningReward[id] += validatorMiningReward;
+    _delegatingReward[id] += delegatingMiningReward;
   }
 
   /**
@@ -137,9 +136,11 @@ abstract contract CoinbaseExecution is
       randomBeacon.execRecordAndSlashUnavailability(lastPeriod, newPeriod, address(slashIndicatorContract), allCids);
       slashIndicatorContract.execUpdateCreditScores(allCids, lastPeriod);
 
-      (uint256 totalDelegatingReward, uint256[] memory delegatingRewards) =
+      (uint256 totalDelegatingReward, uint256[] memory delegatingRewards, uint256[] memory delegatingFFRewards) =
         _distributeRewardToTreasuriesAndCalculateTotalDelegatingReward(lastPeriod, allCids);
-      _settleAndTransferDelegatingRewards(lastPeriod, allCids, totalDelegatingReward, delegatingRewards);
+      _settleAndTransferDelegatingRewards(
+        lastPeriod, allCids, totalDelegatingReward, delegatingRewards, delegatingFFRewards
+      );
       _tryRecycleLockedFundsFromEmergencyExits();
       _recycleDeprecatedRewards();
 
@@ -217,20 +218,33 @@ abstract contract CoinbaseExecution is
   function _distributeRewardToTreasuriesAndCalculateTotalDelegatingReward(
     uint256 lastPeriod,
     address[] memory currValidatorIds
-  ) private returns (uint256 totalDelegatingReward, uint256[] memory delegatingRewards) {
+  )
+    private
+    returns (uint256 totalDelegatingReward, uint256[] memory delegatingRewards, uint256[] memory delegatingFFRewards)
+  {
     address vId; // validator id
     address payable treasury;
-    delegatingRewards = new uint256[](currValidatorIds.length);
 
-    for (uint _i; _i < currValidatorIds.length;) {
-      vId = currValidatorIds[_i];
+    uint256 length = currValidatorIds.length;
+    delegatingRewards = new uint256[](length);
+    delegatingFFRewards = new uint256[](length);
+
+    for (uint i; i < length; ++i) {
+      vId = currValidatorIds[i];
       treasury = _candidateInfo[vId].__shadowedTreasury;
 
       if (!_isJailedById(vId) && !_miningRewardDeprecatedById(vId, lastPeriod)) {
-        totalDelegatingReward += _delegatingReward[vId];
-        delegatingRewards[_i] = _delegatingReward[vId];
+        (uint256 validatorFFReward, uint256 delegatingFFReward) =
+          _splitRewardBetweenValidatorAndDelegators({ vId: vId, totalReward: _fastFinalityReward[vId] });
+
+        delegatingFFRewards[i] = delegatingFFReward;
+        // Add the fast finality reward to the total delegating reward array
+        delegatingRewards[i] = _delegatingReward[vId] + delegatingFFReward;
+
+        totalDelegatingReward += delegatingRewards[i];
+
         _distributeMiningReward(vId, treasury);
-        _distributeFastFinalityReward(vId, treasury);
+        _distributeFastFinalityReward(vId, treasury, validatorFFReward);
       } else {
         _totalDeprecatedReward += _miningReward[vId] + _delegatingReward[vId] + _fastFinalityReward[vId];
       }
@@ -238,10 +252,6 @@ abstract contract CoinbaseExecution is
       delete _delegatingReward[vId];
       delete _miningReward[vId];
       delete _fastFinalityReward[vId];
-
-      unchecked {
-        ++_i;
-      }
     }
   }
 
@@ -266,8 +276,12 @@ abstract contract CoinbaseExecution is
     }
   }
 
-  function _distributeFastFinalityReward(address cid, address payable treasury) private {
-    uint256 amount = _fastFinalityReward[cid];
+  /**
+   * @dev Distributes the fast finality reward to the validator.
+   *
+   * Note: This amount must exclude the fast finality reward for delegators.
+   */
+  function _distributeFastFinalityReward(address cid, address payable treasury, uint256 amount) private {
     if (amount > 0) {
       if (_unsafeSendRONLimitGas(treasury, amount, DEFAULT_ADDITION_GAS)) {
         emit FastFinalityRewardDistributed(cid, treasury, amount);
@@ -286,18 +300,21 @@ abstract contract CoinbaseExecution is
    * Emits the `StakingRewardDistributionFailed` once the contract fails to distribute reward.
    *
    * Note: This method should be called once in the end of each period.
-   *
+   * - `delegatingFFRewards` is the fast finality rewards for delegators.
+   * - `delegatingRewards` already includes the fast finality rewards for delegators.
    */
   function _settleAndTransferDelegatingRewards(
     uint256 period,
     address[] memory currValidatorIds,
     uint256 totalDelegatingReward,
-    uint256[] memory delegatingRewards
+    uint256[] memory delegatingRewards,
+    uint256[] memory delegatingFFRewards
   ) private {
     IStaking _staking = IStaking(getContract(ContractType.STAKING));
     if (totalDelegatingReward > 0) {
       if (_unsafeSendRON(payable(address(_staking)), totalDelegatingReward)) {
         _staking.execRecordRewards(currValidatorIds, delegatingRewards, period);
+        emit FastFinalityRewardDistributed(currValidatorIds, delegatingFFRewards);
         emit StakingRewardDistributed(totalDelegatingReward, currValidatorIds, delegatingRewards);
         return;
       }
@@ -432,5 +449,24 @@ abstract contract CoinbaseExecution is
     }
 
     emit BlockProducerSetUpdated(newPeriod, nextEpoch, getBlockProducerIds());
+  }
+
+  /**
+   * @dev Helper function to split the reward between the validator and the delegator base on the commission rate.
+   *
+   * @param vId The validator id.
+   * @param totalReward The total reward to be split.
+   * @return validatorReward The reward for the validator.
+   * @return delegatorReward The reward for the delegators.
+   */
+  function _splitRewardBetweenValidatorAndDelegators(
+    address vId,
+    uint256 totalReward
+  ) private view returns (uint256 validatorReward, uint256 delegatorReward) {
+    (uint256 minRate, uint256 maxRate) = IStaking(getContract(ContractType.STAKING)).getCommissionRateRange();
+    uint256 rate = Math.max(Math.min(_candidateInfo[vId].commissionRate, maxRate), minRate);
+
+    validatorReward = (rate * totalReward) / _MAX_PERCENTAGE;
+    delegatorReward = totalReward - validatorReward;
   }
 }
