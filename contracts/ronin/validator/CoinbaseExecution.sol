@@ -319,9 +319,9 @@ abstract contract CoinbaseExecution is
         return;
       }
 
-      emit StakingRewardDistributionFailed(
-        totalDelegatingReward, currValidatorIds, delegatingRewards, address(this).balance
-      );
+      uint256 selfBalance = address(this).balance;
+      emit StakingRewardDistributionFailed(totalDelegatingReward, currValidatorIds, delegatingRewards, selfBalance);
+      emit FastFinalityRewardDistributionFailed(currValidatorIds, delegatingFFRewards, selfBalance);
     }
   }
 
