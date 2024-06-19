@@ -105,7 +105,7 @@ abstract contract CoinbaseExecution is
 
     rewardProducingBlock -= cutOffReward;
     (uint256 validatorMiningReward, uint256 delegatingMiningReward) =
-      _splitRewardBetweenValidatorAndDelegators({ vId: id, totalReward: rewardProducingBlock });
+      _calcCommissionReward({ vId: id, totalReward: rewardProducingBlock });
     _miningReward[id] += validatorMiningReward;
     _delegatingReward[id] += delegatingMiningReward;
   }
@@ -235,7 +235,7 @@ abstract contract CoinbaseExecution is
 
       if (!_isJailedById(vId) && !_miningRewardDeprecatedById(vId, lastPeriod)) {
         (uint256 validatorFFReward, uint256 delegatingFFReward) =
-          _splitRewardBetweenValidatorAndDelegators({ vId: vId, totalReward: _fastFinalityReward[vId] });
+          _calcCommissionReward({ vId: vId, totalReward: _fastFinalityReward[vId] });
 
         delegatingFFRewards[i] = delegatingFFReward;
         // Add the fast finality reward to the total delegating reward array
@@ -459,7 +459,7 @@ abstract contract CoinbaseExecution is
    * @return validatorReward The reward for the validator.
    * @return delegatorReward The reward for the delegators.
    */
-  function _splitRewardBetweenValidatorAndDelegators(
+  function _calcCommissionReward(
     address vId,
     uint256 totalReward
   ) private view returns (uint256 validatorReward, uint256 delegatorReward) {
