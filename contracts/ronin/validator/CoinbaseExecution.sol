@@ -2,27 +2,25 @@
 
 pragma solidity ^0.8.9;
 
-import { EnumFlags } from "../../libraries/EnumFlags.sol";
-import { LibArray } from "../../libraries/LibArray.sol";
 import { Math } from "../../libraries/Math.sol";
-import { ContractType } from "../../utils/ContractType.sol";
-import "../../interfaces/validator/ICoinbaseExecution.sol";
-import "../../interfaces/random-beacon/IRandomBeacon.sol";
-import "../../interfaces/staking/IStaking.sol";
-import "../../interfaces/IProfile.sol";
-import "../../interfaces/IStakingVesting.sol";
-import "../../interfaces/IMaintenance.sol";
-import "../../interfaces/IFastFinalityTracking.sol";
-import "../../interfaces/slash-indicator/ISlashIndicator.sol";
-import "../../interfaces/IRoninTrustedOrganization.sol";
-import "../../interfaces/validator/ICoinbaseExecution.sol";
 import { EmergencyExit } from "./EmergencyExit.sol";
+import { IProfile } from "../../interfaces/IProfile.sol";
+import { IStaking } from "../../interfaces/staking/IStaking.sol";
+import { IMaintenance } from "../../interfaces/IMaintenance.sol";
+import { IStakingVesting } from "../../interfaces/IStakingVesting.sol";
+import { IRandomBeacon } from "../../interfaces/random-beacon/IRandomBeacon.sol";
+import { IFastFinalityTracking } from "../../interfaces/IFastFinalityTracking.sol";
+import { ICoinbaseExecution } from "../../interfaces/validator/ICoinbaseExecution.sol";
+import { ISlashIndicator } from "../../interfaces/slash-indicator/ISlashIndicator.sol";
+import { IRoninTrustedOrganization } from "../../interfaces/IRoninTrustedOrganization.sol";
+import { LibArray } from "../../libraries/LibArray.sol";
+import { ContractType } from "../../utils/ContractType.sol";
+import { TConsensus } from "../../udvts/Types.sol";
 import { ErrCallerMustBeCoinbase } from "../../utils/CommonErrors.sol";
 import { CoinbaseExecutionDependant } from "./CoinbaseExecutionDependant.sol";
 
 abstract contract CoinbaseExecution is ICoinbaseExecution, CoinbaseExecutionDependant {
   using LibArray for uint256[];
-  using EnumFlags for EnumFlags.ValidatorFlag;
 
   modifier onlyCoinbase() {
     _requireCoinbase();
@@ -88,10 +86,11 @@ abstract contract CoinbaseExecution is ICoinbaseExecution, CoinbaseExecutionDepe
     }
 
     rewardProducingBlock -= cutOffReward;
-    (uint256 validatorMiningReward, uint256 delegatingMiningReward) =
+    (uint256 validatorMiningReward, uint256 delegatorMiningReward) =
       _calcCommissionReward({ vId: id, totalReward: rewardProducingBlock });
-    _miningReward[id] += validatorMiningReward;
-    _delegatingReward[id] += delegatingMiningReward;
+
+    _validatorMiningReward[id] += validatorMiningReward;
+    _delegatorMiningReward[id] += delegatorMiningReward;
   }
 
   /**
@@ -121,10 +120,10 @@ abstract contract CoinbaseExecution is ICoinbaseExecution, CoinbaseExecutionDepe
         randomBeacon.execRecordAndSlashUnavailability(lastPeriod, newPeriod, address(slashIndicatorContract), allCids);
         slashIndicatorContract.execUpdateCreditScores(allCids, lastPeriod);
 
-        (uint256[] memory delegatingBlockMiningRewards, uint256[] memory delegatingFastFinalityRewards) =
-          _distributeRewardToTreasuriesAndCalculateTotalDelegatingReward(lastPeriod, allCids);
+        (uint256[] memory delegatorBlockMiningRewards, uint256[] memory delegatorFastFinalityRewards) =
+          _distributeRewardToTreasuriesAndCalculateTotalDelegatorsReward(lastPeriod, allCids);
         _settleAndTransferDelegatingRewards(
-          lastPeriod, allCids, delegatingBlockMiningRewards, delegatingFastFinalityRewards
+          lastPeriod, allCids, delegatorBlockMiningRewards, delegatorFastFinalityRewards
         );
         _tryRecycleLockedFundsFromEmergencyExits();
         _recycleDeprecatedRewards();
@@ -194,23 +193,23 @@ abstract contract CoinbaseExecution is ICoinbaseExecution, CoinbaseExecutionDepe
 
   /**
    * @dev This loops over all validator candidates to:
-   * - Update delegating reward for and calculate total delegating rewards to be sent to the staking contract,
+   * - Update delegator reward for and calculate total delegator rewards to be sent to the staking contract,
    * - Distribute the reward of block producers and bridge operators to their treasury addresses,
    * - Update the total deprecated reward if the two previous conditions do not satisfy.
    *
    * Note: This method should be called once in the end of each period.
    *
    */
-  function _distributeRewardToTreasuriesAndCalculateTotalDelegatingReward(
+  function _distributeRewardToTreasuriesAndCalculateTotalDelegatorsReward(
     uint256 lastPeriod,
     address[] memory cids
-  ) private returns (uint256[] memory delegatingBlockMiningRewards, uint256[] memory delegatingFastFinalityRewards) {
+  ) private returns (uint256[] memory delegatorBlockMiningRewards, uint256[] memory delegatorFastFinalityRewards) {
     address vId; // validator id
     address payable treasury;
 
     uint256 length = cids.length;
-    delegatingBlockMiningRewards = new uint256[](length);
-    delegatingFastFinalityRewards = new uint256[](length);
+    delegatorBlockMiningRewards = new uint256[](length);
+    delegatorFastFinalityRewards = new uint256[](length);
 
     (uint256 minRate, uint256 maxRate) = IStaking(getContract(ContractType.STAKING)).getCommissionRateRange();
 
@@ -219,24 +218,24 @@ abstract contract CoinbaseExecution is ICoinbaseExecution, CoinbaseExecutionDepe
       treasury = _candidateInfo[vId].__shadowedTreasury;
 
       if (!_isJailedById(vId) && !_miningRewardDeprecatedById(vId, lastPeriod)) {
-        (uint256 validatorFFReward, uint256 delegatingFastFinalityReward) = _calcCommissionReward({
+        (uint256 validatorFFReward, uint256 delegatorFFReward) = _calcCommissionReward({
           vId: vId,
           totalReward: _fastFinalityReward[vId],
           maxCommissionRate: maxRate,
           minCommissionRate: minRate
         });
 
-        delegatingBlockMiningRewards[i] = _delegatingReward[vId];
-        delegatingFastFinalityRewards[i] = delegatingFastFinalityReward;
+        delegatorBlockMiningRewards[i] = _delegatorMiningReward[vId];
+        delegatorFastFinalityRewards[i] = delegatorFFReward;
 
         _distributeMiningReward(vId, treasury);
         _distributeFastFinalityReward(vId, treasury, validatorFFReward);
       } else {
-        _totalDeprecatedReward += _miningReward[vId] + _delegatingReward[vId] + _fastFinalityReward[vId];
+        _totalDeprecatedReward += _validatorMiningReward[vId] + _delegatorMiningReward[vId] + _fastFinalityReward[vId];
       }
 
-      delete _delegatingReward[vId];
-      delete _miningReward[vId];
+      delete _delegatorMiningReward[vId];
+      delete _validatorMiningReward[vId];
       delete _fastFinalityReward[vId];
     }
   }
@@ -251,7 +250,7 @@ abstract contract CoinbaseExecution is ICoinbaseExecution, CoinbaseExecutionDepe
    *
    */
   function _distributeMiningReward(address cid, address payable treasury) private {
-    uint256 amount = _miningReward[cid];
+    uint256 amount = _validatorMiningReward[cid];
     if (amount > 0) {
       if (_unsafeSendRONLimitGas(treasury, amount, DEFAULT_ADDITION_GAS)) {
         emit MiningRewardDistributed(cid, treasury, amount);
@@ -289,32 +288,32 @@ abstract contract CoinbaseExecution is ICoinbaseExecution, CoinbaseExecutionDepe
    * Emits the `DelegatingFastFinalityRewardDistributionFailed` once the contract fails to distribute fast finality reward.
    *
    * Note: This method should be called once in the end of each period.
-   * - `delegatingFastFinalityRewards` is the fast finality rewards for delegators.
-   * - `delegatingBlockMiningRewards` is the block mining rewards for delegators.
+   * - `delegatorFFRewards` is the fast finality rewards for delegators.
+   * - `delegatorMiningRewards` is the block mining rewards for delegators.
    */
   function _settleAndTransferDelegatingRewards(
     uint256 period,
     address[] memory cids,
-    uint256[] memory delegatingBlockMiningRewards,
-    uint256[] memory delegatingFastFinalityRewards
+    uint256[] memory delegatorMiningRewards,
+    uint256[] memory delegatorFFRewards
   ) private {
     IStaking staking = IStaking(getContract(ContractType.STAKING));
-    uint256[] memory totalRewards = LibArray.add(delegatingBlockMiningRewards, delegatingFastFinalityRewards);
+    uint256[] memory totalRewards = LibArray.add(delegatorMiningRewards, delegatorFFRewards);
     uint256 totalDelegatingReward = totalRewards.sum();
 
     if (totalDelegatingReward != 0) {
       if (_unsafeSendRON(payable(address(staking)), totalDelegatingReward)) {
         staking.execRecordRewards({ poolIds: cids, rewards: totalRewards, period: period });
 
-        emit DelegatingFastFinalityRewardDistributed(cids, delegatingFastFinalityRewards);
-        emit DelegatingBlockMiningRewardDistributed(cids, delegatingBlockMiningRewards);
+        emit FastFinalityRewardDelegatorsDistributed(cids, delegatorFFRewards);
+        emit BlockMiningRewardDelegatorsDistributed(cids, delegatorMiningRewards);
 
         return;
       }
 
       uint256 selfBalance = address(this).balance;
-      emit DelegatingBlockMiningRewardDistributionFailed(cids, delegatingBlockMiningRewards, selfBalance);
-      emit DelegatingFastFinalityRewardDistributionFailed(cids, delegatingFastFinalityRewards, selfBalance);
+      emit FastFinalityRewardDelegatorsDistributionFailed(cids, delegatorFFRewards, selfBalance);
+      emit BlockMiningRewardDelegatorsDistributionFailed(cids, delegatorMiningRewards, selfBalance);
     }
   }
 

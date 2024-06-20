@@ -15,11 +15,9 @@ import { HasContracts } from "@ronin/contracts/extensions/collections/HasContrac
 import { CandidateManager } from "@ronin/contracts/ronin/validator/CandidateManager.sol";
 import { EmergencyExitBallot } from "@ronin/contracts/libraries/EmergencyExitBallot.sol";
 import { SlashIndicator } from "@ronin/contracts/ronin/slash-indicator/SlashIndicator.sol";
-import {
-  ICandidateManagerCallback,
-  ICandidateManager,
-  RoninValidatorSet
-} from "@ronin/contracts/ronin/validator/RoninValidatorSet.sol";
+import { RoninValidatorSet, IRoninValidatorSet } from "@ronin/contracts/ronin/validator/RoninValidatorSet.sol";
+import { ICandidateManager } from "@ronin/contracts/interfaces/validator/ICandidateManager.sol";
+import { ICandidateManagerCallback } from "@ronin/contracts/interfaces/validator/ICandidateManagerCallback.sol";
 import {
   TransparentUpgradeableProxy,
   TransparentUpgradeableProxyV2
@@ -1025,7 +1023,7 @@ contract ChangeConsensusAddressForkTest is Test {
     RoninValidatorSet logic = new RoninValidatorSet();
     vm.prank(_getProxyAdmin(address(_validator)));
     TransparentUpgradeableProxyV2(payable(_validator)).upgradeToAndCall(
-      address(logic), abi.encodeCall(RoninValidatorSet.initializeV4, (address(_profile)))
+      address(logic), abi.encodeCall(IRoninValidatorSet.initializeV4, (address(_profile)))
     );
   }
 
