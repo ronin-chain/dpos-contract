@@ -229,13 +229,19 @@ abstract contract CoinbaseExecution is
     delegatingRewards = new uint256[](length);
     delegatingFFRewards = new uint256[](length);
 
+    (uint256 minRate, uint256 maxRate) = IStaking(getContract(ContractType.STAKING)).getCommissionRateRange();
+
     for (uint i; i < length; ++i) {
       vId = currValidatorIds[i];
       treasury = _candidateInfo[vId].__shadowedTreasury;
 
       if (!_isJailedById(vId) && !_miningRewardDeprecatedById(vId, lastPeriod)) {
-        (uint256 validatorFFReward, uint256 delegatingFFReward) =
-          _calcCommissionReward({ vId: vId, totalReward: _fastFinalityReward[vId] });
+        (uint256 validatorFFReward, uint256 delegatingFFReward) = _calcCommissionReward({
+          vId: vId,
+          totalReward: _fastFinalityReward[vId],
+          maxCommissionRate: maxRate,
+          minCommissionRate: minRate
+        });
 
         delegatingFFRewards[i] = delegatingFFReward;
         // Add the fast finality reward to the total delegating reward array
@@ -464,7 +470,16 @@ abstract contract CoinbaseExecution is
     uint256 totalReward
   ) private view returns (uint256 validatorReward, uint256 delegatorReward) {
     (uint256 minRate, uint256 maxRate) = IStaking(getContract(ContractType.STAKING)).getCommissionRateRange();
-    uint256 rate = Math.max(Math.min(_candidateInfo[vId].commissionRate, maxRate), minRate);
+    return _calcCommissionReward(vId, totalReward, minRate, maxRate);
+  }
+
+  function _calcCommissionReward(
+    address vId,
+    uint256 totalReward,
+    uint minCommissionRate,
+    uint maxCommissionRate
+  ) private view returns (uint256 validatorReward, uint256 delegatorReward) {
+    uint256 rate = Math.max(Math.min(_candidateInfo[vId].commissionRate, maxCommissionRate), minCommissionRate);
 
     validatorReward = (rate * totalReward) / _MAX_PERCENTAGE;
     delegatorReward = totalReward - validatorReward;
