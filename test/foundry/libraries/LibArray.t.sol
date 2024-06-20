@@ -5,6 +5,32 @@ import { Test } from "forge-std/Test.sol";
 import { LibArray } from "@ronin/contracts/libraries/LibArray.sol";
 
 contract LibArrayTest is Test {
+  function testFuzz_Add(uint256[1000] memory arr1_, uint256[1000] memory arr2_) public pure {
+    uint256[] memory arr1 = new uint256[](arr1_.length);
+    uint256[] memory arr2 = new uint256[](arr2_.length);
+    for (uint256 i; i < arr1.length; ++i) {
+      arr1[i] = bound(arr1_[i], 0, type(uint128).max);
+      arr2[i] = bound(arr2_[i], 0, type(uint128).max);
+    }
+
+    uint256[] memory expected = new uint256[](arr1.length);
+    for (uint256 i; i < arr1.length; ++i) {
+      expected[i] = arr1[i] + arr2[i];
+    }
+
+    uint256[] memory actual = LibArray.add(arr1, arr2);
+
+    for (uint256 i; i < arr1.length; ++i) {
+      assertEq(actual[i], expected[i], "actual[i] == expected[i]");
+    }
+
+    assertEq(
+      keccak256(abi.encodePacked(actual)),
+      keccak256(abi.encodePacked(expected)),
+      "keccak256(abi.encodePacked(actual)) == keccak256(abi.encodePacked(expected))"
+    );
+  }
+
   function testFuzz_ShouldSortCorrectly_QuickSortDescending(uint256[] memory values) public pure {
     vm.assume(values.length > 0);
 
