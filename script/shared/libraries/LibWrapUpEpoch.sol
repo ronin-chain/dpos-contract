@@ -94,8 +94,8 @@ library LibWrapUpEpoch {
           console.log("LibWrapUpEpoch: WARNING: EMPTY VALIDATOR SET".yellow());
         }
 
-        // Event signature of `FastFinalityRewardDistributed(address,address,uint256)`
-        if (logs[i].topics[0] == bytes32(0x0c4d6a43fc8470dee97db74874b5685e412cc517d9bdecfde1623c5e835b18e4)) {
+        // Event signature of `FastFinalityRewardDistributedFailed(address,address,uint256)`
+        if (logs[i].topics[0] == bytes32(0x98697ee35f04a599a814432016fff3968c483d2d88dacb484926b9358f8e7cf9)) {
           revert("PANIC: Fast finality reward distribution failed");
         }
         if (logs[i].topics[0] == ICoinbaseExecution.MiningRewardDistributionFailed.selector) {
