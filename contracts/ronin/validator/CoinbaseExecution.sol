@@ -298,11 +298,10 @@ abstract contract CoinbaseExecution is ICoinbaseExecution, CoinbaseExecutionDepe
     uint256[] memory delegatorFFRewards
   ) private {
     IStaking staking = IStaking(getContract(ContractType.STAKING));
-    uint256[] memory totalRewards = LibArray.add(delegatorMiningRewards, delegatorFFRewards);
-    uint256 totalDelegatingReward = totalRewards.sum();
+    (uint256[] memory totalRewards, uint256 sumReward) = LibArray.addAndSum(delegatorMiningRewards, delegatorFFRewards);
 
-    if (totalDelegatingReward != 0) {
-      if (_unsafeSendRON(payable(address(staking)), totalDelegatingReward)) {
+    if (sumReward != 0) {
+      if (_unsafeSendRON(payable(address(staking)), sumReward)) {
         staking.execRecordRewards({ poolIds: cids, rewards: totalRewards, period: period });
 
         emit FastFinalityRewardDelegatorsDistributed(cids, delegatorFFRewards);
@@ -380,6 +379,7 @@ abstract contract CoinbaseExecution is ICoinbaseExecution, CoinbaseExecutionDepe
     uint256 newPeriod,
     uint256 nextEpoch
   ) private returns (address[] memory allGVs) {
+    // TODO(TuDo1403): should add a method to query all cids of governor in Trusted Org contract
     IProfile profile = IProfile(getContract(ContractType.PROFILE));
     IRoninTrustedOrganization trustedOrg =
       IRoninTrustedOrganization(getContract(ContractType.RONIN_TRUSTED_ORGANIZATION));

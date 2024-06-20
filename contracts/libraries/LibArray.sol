@@ -21,6 +21,27 @@ library LibArray {
   error ErrDuplicated(bytes4 msgSig);
 
   /**
+   * @dev Add two arrays of uint256 values element-wise and return the sum.
+   * @param arr1 The first array of uint256 values.
+   * @param arr2 The second array of uint256 values.
+   * @return res The result of summing each element of two arrays.
+   * @return total The sum value of two arrays.
+   */
+  function addAndSum(
+    uint256[] memory arr1,
+    uint256[] memory arr2
+  ) internal pure returns (uint256[] memory res, uint256 total) {
+    uint256 length = arr1.length;
+    if (length != arr2.length) revert ErrLengthMismatch();
+
+    res = new uint256[](length);
+    for (uint256 i; i < length; ++i) {
+      res[i] = arr1[i] + arr2[i];
+      total += res[i];
+    }
+  }
+
+  /**
    * @dev Add two arrays of uint256 values element-wise.
    * @param arr1 The first array of uint256 values.
    * @param arr2 The second array of uint256 values.
