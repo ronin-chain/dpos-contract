@@ -2,40 +2,25 @@
 
 pragma solidity ^0.8.9;
 
-import "../../extensions/collections/HasContracts.sol";
-import "../../extensions/RONTransferHelper.sol";
+import { EnumFlags } from "../../libraries/EnumFlags.sol";
+import { LibArray } from "../../libraries/LibArray.sol";
+import { Math } from "../../libraries/Math.sol";
+import { ContractType } from "../../utils/ContractType.sol";
+import "../../interfaces/validator/ICoinbaseExecution.sol";
+import "../../interfaces/random-beacon/IRandomBeacon.sol";
+import "../../interfaces/staking/IStaking.sol";
 import "../../interfaces/IProfile.sol";
 import "../../interfaces/IStakingVesting.sol";
 import "../../interfaces/IMaintenance.sol";
 import "../../interfaces/IFastFinalityTracking.sol";
-import "../../interfaces/staking/IStaking.sol";
-import "../../interfaces/IRoninTrustedOrganization.sol";
 import "../../interfaces/slash-indicator/ISlashIndicator.sol";
-import "../../interfaces/random-beacon/IRandomBeacon.sol";
+import "../../interfaces/IRoninTrustedOrganization.sol";
 import "../../interfaces/validator/ICoinbaseExecution.sol";
-import "../../libraries/EnumFlags.sol";
-import "../../libraries/Math.sol";
-import { LibArray } from "../../libraries/LibArray.sol";
-import {
-  HasStakingVestingDeprecated,
-  HasBridgeTrackingDeprecated,
-  HasMaintenanceDeprecated,
-  HasSlashIndicatorDeprecated
-} from "../../utils/DeprecatedSlots.sol";
-import "./storage-fragments/CommonStorage.sol";
 import { EmergencyExit } from "./EmergencyExit.sol";
-import { TPoolId } from "../../udvts/Types.sol";
 import { ErrCallerMustBeCoinbase } from "../../utils/CommonErrors.sol";
+import { CoinbaseExecutionDependant } from "./CoinbaseExecutionDependant.sol";
 
-abstract contract CoinbaseExecution is
-  ICoinbaseExecution,
-  RONTransferHelper,
-  HasContracts,
-  HasStakingVestingDeprecated,
-  HasBridgeTrackingDeprecated,
-  HasMaintenanceDeprecated,
-  HasSlashIndicatorDeprecated,
-  EmergencyExit
+abstract contract CoinbaseExecution is ICoinbaseExecution, CoinbaseExecutionDependant
 {
   using LibArray for uint256[];
   using EnumFlags for EnumFlags.ValidatorFlag;
