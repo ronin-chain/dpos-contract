@@ -28,7 +28,6 @@ abstract contract TimingStorage is ITimingInfo, GlobalConfigConsumer {
    */
   uint256[47] private ______gap;
 
-
   /**
    * @inheritdoc ITimingInfo
    */
