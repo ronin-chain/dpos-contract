@@ -31,6 +31,46 @@ contract LibArrayTest is Test {
     );
   }
 
+  function test_AddAndSum() public pure {
+    uint[] memory arr1 = new uint[](3);
+    arr1[0] = 1;
+    arr1[1] = 2;
+    arr1[2] = 3;
+    uint[] memory arr2 = new uint[](3);
+    arr2[0] = 0;
+    arr2[1] = 2;
+    arr2[2] = 5;
+    uint[] memory expected = new uint[](3);
+    expected[0] = 1;
+    expected[1] = 4;
+    expected[2] = 8;
+    (uint256[] memory actualArr, uint actualSum) = LibArray.addAndSum(arr1, arr2);
+    uint expectedSum = 13;
+
+    for (uint256 i; i < arr1.length; ++i) {
+      assertEq(actualArr[i], expected[i], "actual[i] == expected[i]");
+    }
+
+    assertEq(
+      keccak256(abi.encodePacked(actualArr)),
+      keccak256(abi.encodePacked(expected)),
+      "keccak256(abi.encodePacked(actual)) == keccak256(abi.encodePacked(expected))"
+    );
+    assertEq(actualSum, expectedSum, "actualSum == expectedSum");
+  }
+
+  function test_Add_revertWhenMismatchLength() public {
+    uint[] memory arr1 = new uint[](3);
+    arr1[0] = 1;
+    arr1[1] = 2;
+    arr1[2] = 3;
+    uint[] memory arr2 = new uint[](1);
+    arr2[0] = 0;
+
+    vm.expectRevert(LibArray.ErrLengthMismatch.selector);
+    LibArray.add(arr1, arr2);
+  }
+
   function testFuzz_Add(uint256[1000] memory arr1_, uint256[1000] memory arr2_) public pure {
     uint256[] memory arr1 = new uint256[](arr1_.length);
     uint256[] memory arr2 = new uint256[](arr2_.length);
@@ -55,6 +95,35 @@ contract LibArrayTest is Test {
       keccak256(abi.encodePacked(expected)),
       "keccak256(abi.encodePacked(actual)) == keccak256(abi.encodePacked(expected))"
     );
+  }
+
+  function testFuzz_AddAndSum(uint256[1000] memory arr1_, uint256[1000] memory arr2_) public pure {
+    uint256[] memory arr1 = new uint256[](arr1_.length);
+    uint256[] memory arr2 = new uint256[](arr2_.length);
+    for (uint256 i; i < arr1.length; ++i) {
+      arr1[i] = bound(arr1_[i], 0, type(uint128).max);
+      arr2[i] = bound(arr2_[i], 0, type(uint128).max);
+    }
+
+    uint256[] memory expected = new uint256[](arr1.length);
+    uint256 expectedSum;
+    for (uint256 i; i < arr1.length; ++i) {
+      expected[i] = arr1[i] + arr2[i];
+      expectedSum += expected[i];
+    }
+
+    (uint256[] memory actualArr, uint256 actualSum) = LibArray.addAndSum(arr1, arr2);
+
+    for (uint256 i; i < arr1.length; ++i) {
+      assertEq(actualArr[i], expected[i], "actual[i] == expected[i]");
+    }
+
+    assertEq(
+      keccak256(abi.encodePacked(actualArr)),
+      keccak256(abi.encodePacked(expected)),
+      "keccak256(abi.encodePacked(actual)) == keccak256(abi.encodePacked(expected))"
+    );
+    assertEq(actualSum, expectedSum, "actualSum == expectedSum");
   }
 
   function testFuzz_ShouldSortCorrectly_QuickSortDescending(uint256[] memory values) public pure {
