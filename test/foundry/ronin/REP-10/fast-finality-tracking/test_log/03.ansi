@@ -1,11 +1,11 @@
 Compiling 1 files with 0.8.25
-Solc 0.8.25 finished in 46.66s
+Solc 0.8.25 finished in 45.10s
 Compiler run [32msuccessful![0m
 
 Ran 1 test for test/foundry/ronin/REP-10/fast-finality-tracking/REP-10_FastFinalityTracking_Light.t.sol:REP_10_FastFinalityTrackingTest_Light
-[32m[PASS][0m testREP10Concrete_FastFinalityRewardSharing_FullVote_MustBeCorrect_Light() (gas: 27617653285)
+[32m[PASS][0m testREP10Concrete_FastFinalityRewardSharing_FullVote_MustBeCorrect_Light() (gas: 50918827453)
 Logs:
-  [94mContractConfig:[0m Deployment data loaded in 13 milliseconds
+  [94mContractConfig:[0m Deployment data loaded in 11 milliseconds
   SLASH_RANDOM_BEACON_ACTIVATED_AT_PERIOD:  19895
   RANDOM_BEACON_ACTIVATED_AT_PERIOD:  19895
   RONIN_VALIDATOR_SET_REP10_MIGRATOR_ACTIVATED_AT_PERIOD:  19895
@@ -146,14 +146,14 @@ Calldata:
   2,	0x658702C841F2530518B63cC02D7C3A1529Be9976,	7812000000000000000000,	true,	100,	500
   3,	0xE281F6E5aD3d73dB4a8539c05a91867Aa91C5407,	9180000000000000000000,	true,	100,	500
   4,	0x46B74B234b9EDFE72a7e07851aEb6Ae1E982171A,	7362000000000000000000,	true,	100,	500
-  5,	0x6fFea97cf8272373A3E0E39dD43ec64C4dfd0fbe,	7210000000000000000000,	true,	100,	500
-  6,	0xFd1986e6A40Ea50b9871D6582cA7a2500dAE0A4F,	5611000000000000000000,	true,	100,	500
-  7,	0x88015835A3e1402Fa5228Bcc63Fb2A3B39468fdF,	7212000000000000000000,	true,	100,	500
-  8,	0xd0e5b58E25bAd4A6472E8e4F8008631082533613,	6277000000000000000000,	true,	100,	500
-  9,	0xD97D9d0D4F1847b234614e4A2F448c1a56755E39,	6579000000000000000000,	true,	100,	500
-  10,	0x58534aC1A60910A17e412bf26B6c4CBb833B0959,	7380000000000000000000,	true,	100,	500
-  11,	0x86C1D92FEB8003A9202aBFe44231556BB98865b6,	6066000000000000000000,	true,	100,	1000
-  12,	0xc8C80d63c0539D9023Da7786a63C505150875c5a,	5218000000000000000000,	true,	100,	500
+  5,	0x6fFea97cf8272373A3E0E39dD43ec64C4dfd0fbe,	7210000000000000000000,	false,	100,	500
+  6,	0xFd1986e6A40Ea50b9871D6582cA7a2500dAE0A4F,	5611000000000000000000,	false,	100,	500
+  7,	0x88015835A3e1402Fa5228Bcc63Fb2A3B39468fdF,	7212000000000000000000,	false,	100,	500
+  8,	0xd0e5b58E25bAd4A6472E8e4F8008631082533613,	6277000000000000000000,	false,	100,	500
+  9,	0xD97D9d0D4F1847b234614e4A2F448c1a56755E39,	6579000000000000000000,	false,	100,	500
+  10,	0x58534aC1A60910A17e412bf26B6c4CBb833B0959,	7380000000000000000000,	false,	100,	500
+  11,	0x86C1D92FEB8003A9202aBFe44231556BB98865b6,	6066000000000000000000,	false,	100,	1000
+  12,	0xc8C80d63c0539D9023Da7786a63C505150875c5a,	5218000000000000000000,	false,	100,	500
   -------------------------------------------
 
 
@@ -178,7 +178,7 @@ Calldata:
   [93mValidator: [0m adm-10 [93mBalance: [0m 0
   [93mValidator: [0m adm-11 [93mBalance: [0m 0
   [93mValidator: [0m adm-12 [93mBalance: [0m 0
-  Block Producers in epoch: [3, 1, 2, 10, 7, 4, 8, 0, 11, 6, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 7, 10, 8, 11, 6, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -380,7 +380,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 151
-  Block Producers in epoch: [3, 1, 2, 10, 7, 4, 9, 8, 5, 6, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 9, 8, 7, 5, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -582,7 +582,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 152
-  Block Producers in epoch: [3, 1, 2, 10, 7, 4, 8, 0, 9, 6, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 8, 9, 6, 10, 11, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -784,7 +784,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 153
-  Block Producers in epoch: [3, 1, 2, 10, 7, 9, 6, 4, 0, 12, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 7, 9, 6, 12, 10, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -986,7 +986,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 154
-  Block Producers in epoch: [3, 1, 2, 10, 7, 11, 4, 5, 9, 6, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 11, 5, 9, 6, 8, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -1188,7 +1188,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 155
-  Block Producers in epoch: [3, 1, 2, 10, 7, 11, 8, 5, 0, 9, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 11, 7, 8, 10, 5, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -1390,7 +1390,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 156
-  Block Producers in epoch: [3, 1, 2, 10, 7, 4, 5, 11, 8, 6, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 5, 11, 8, 6, 12, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -1592,7 +1592,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 157
-  Block Producers in epoch: [3, 1, 2, 10, 7, 5, 0, 4, 9, 8, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 5, 10, 9, 8, 11, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -1794,7 +1794,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 158
-  Block Producers in epoch: [3, 1, 2, 10, 7, 5, 4, 11, 9, 12, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 5, 10, 11, 9, 12, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -1996,7 +1996,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 159
-  Block Producers in epoch: [3, 1, 2, 10, 7, 11, 9, 4, 12, 0, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 11, 7, 9, 12, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -2198,7 +2198,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 160
-  Block Producers in epoch: [3, 1, 2, 10, 7, 0, 9, 11, 12, 6, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 7, 9, 11, 12, 6, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -2400,7 +2400,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 161
-  Block Producers in epoch: [3, 1, 2, 10, 7, 9, 5, 6, 11, 0, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 7, 10, 9, 5, 6, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -2602,7 +2602,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 162
-  Block Producers in epoch: [3, 1, 2, 10, 7, 4, 11, 5, 9, 0, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 11, 7, 5, 9, 6, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -2804,7 +2804,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 163
-  Block Producers in epoch: [3, 1, 2, 10, 7, 11, 4, 6, 9, 12, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 11, 6, 9, 12, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -3006,7 +3006,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 164
-  Block Producers in epoch: [3, 1, 2, 10, 7, 4, 11, 5, 0, 8, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 11, 7, 5, 8, 12, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -3208,7 +3208,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 165
-  Block Producers in epoch: [3, 1, 2, 10, 7, 11, 12, 8, 5, 0, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 11, 12, 8, 7, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -3410,7 +3410,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 166
-  Block Producers in epoch: [3, 1, 2, 10, 7, 4, 9, 11, 12, 8, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 7, 9, 11, 10, 12, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -3612,7 +3612,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 167
-  Block Producers in epoch: [3, 1, 2, 10, 7, 4, 8, 6, 0, 9, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 8, 6, 7, 9, 10, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -3814,7 +3814,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 168
-  Block Producers in epoch: [3, 1, 2, 10, 7, 11, 9, 0, 6, 4, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 7, 11, 9, 10, 6, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -4016,7 +4016,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 169
-  Block Producers in epoch: [3, 1, 2, 10, 7, 11, 6, 9, 0, 12, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 11, 10, 6, 9, 7, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -4218,7 +4218,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 170
-  Block Producers in epoch: [3, 1, 2, 10, 7, 11, 8, 4, 9, 0, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 11, 7, 8, 9, 5, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -4420,7 +4420,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 171
-  Block Producers in epoch: [3, 1, 2, 10, 7, 11, 4, 8, 5, 12, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 11, 8, 5, 12, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -4622,7 +4622,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 172
-  Block Producers in epoch: [3, 1, 2, 10, 7, 5, 4, 11, 9, 8, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 5, 11, 9, 7, 8, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -4824,7 +4824,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 173
-  Block Producers in epoch: [3, 1, 2, 10, 7, 4, 9, 0, 8, 11, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 7, 9, 10, 8, 11, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -5026,7 +5026,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 174
-  Block Producers in epoch: [3, 1, 2, 10, 7, 5, 4, 8, 0, 11, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 7, 5, 8, 11, 12, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -5228,7 +5228,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 175
-  Block Producers in epoch: [3, 1, 2, 10, 7, 5, 11, 8, 0, 6, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 5, 11, 8, 6, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -5430,7 +5430,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 176
-  Block Producers in epoch: [3, 1, 2, 10, 7, 9, 4, 11, 12, 8, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 9, 10, 7, 11, 12, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -5632,7 +5632,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 177
-  Block Producers in epoch: [3, 1, 2, 10, 7, 5, 11, 0, 9, 12, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 5, 11, 10, 9, 12, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -5834,7 +5834,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 178
-  Block Producers in epoch: [3, 1, 2, 10, 7, 8, 5, 11, 6, 12, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 8, 5, 11, 6, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -6036,7 +6036,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 179
-  Block Producers in epoch: [3, 1, 2, 10, 7, 11, 9, 4, 6, 5, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 11, 9, 7, 6, 10, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -6238,7 +6238,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 180
-  Block Producers in epoch: [3, 1, 2, 10, 7, 4, 5, 8, 6, 11, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 5, 8, 6, 11, 9, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -6440,7 +6440,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 181
-  Block Producers in epoch: [3, 1, 2, 10, 7, 0, 4, 9, 6, 11, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 7, 9, 6, 10, 11, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -6642,7 +6642,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 182
-  Block Producers in epoch: [3, 1, 2, 10, 7, 8, 0, 5, 9, 6, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 8, 7, 5, 9, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -6844,7 +6844,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 183
-  Block Producers in epoch: [3, 1, 2, 10, 7, 4, 0, 6, 8, 11, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 6, 7, 8, 11, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -7046,7 +7046,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 184
-  Block Producers in epoch: [3, 1, 2, 10, 7, 9, 4, 8, 12, 11, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 9, 8, 12, 11, 10, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -7248,7 +7248,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 185
-  Block Producers in epoch: [3, 1, 2, 10, 7, 0, 8, 4, 12, 11, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 8, 10, 7, 12, 11, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -7450,7 +7450,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 186
-  Block Producers in epoch: [3, 1, 2, 10, 7, 6, 5, 11, 8, 12, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 7, 10, 6, 5, 11, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -7652,7 +7652,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 187
-  Block Producers in epoch: [3, 1, 2, 10, 7, 11, 5, 6, 4, 12, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 7, 11, 5, 6, 12, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -7854,7 +7854,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 188
-  Block Producers in epoch: [3, 1, 2, 10, 7, 9, 5, 0, 4, 11, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 9, 5, 11, 7, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -8056,7 +8056,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 189
-  Block Producers in epoch: [3, 1, 2, 10, 7, 0, 8, 9, 4, 5, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 7, 10, 8, 9, 5, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -8258,7 +8258,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 190
-  Block Producers in epoch: [3, 1, 2, 10, 7, 11, 9, 6, 12, 0, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 11, 9, 7, 6, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -8460,7 +8460,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 191
-  Block Producers in epoch: [3, 1, 2, 10, 7, 11, 4, 8, 6, 9, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 11, 7, 8, 6, 9, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -8662,7 +8662,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 192
-  Block Producers in epoch: [3, 1, 2, 10, 7, 5, 11, 6, 12, 9, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 7, 5, 11, 10, 6, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -8864,7 +8864,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 193
-  Block Producers in epoch: [3, 1, 2, 10, 7, 8, 0, 9, 4, 12, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 8, 9, 12, 10, 7, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -9066,7 +9066,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 194
-  Block Producers in epoch: [3, 1, 2, 10, 7, 4, 12, 6, 9, 5, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 7, 12, 10, 6, 9, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -9268,7 +9268,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 195
-  Block Producers in epoch: [3, 1, 2, 10, 7, 5, 8, 11, 12, 4, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 7, 5, 8, 11, 10, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -9470,7 +9470,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 196
-  Block Producers in epoch: [3, 1, 2, 10, 7, 12, 6, 0, 5, 4, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 7, 10, 12, 6, 5, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -9672,7 +9672,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 197
-  Block Producers in epoch: [3, 1, 2, 10, 7, 9, 11, 0, 4, 8, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 9, 11, 7, 8, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -9874,7 +9874,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 198
-  Block Producers in epoch: [3, 1, 2, 10, 7, 4, 11, 8, 6, 12, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 7, 11, 8, 6, 12, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -10076,7 +10076,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 199
-  Block Producers in epoch: [3, 1, 2, 10, 7, 11, 8, 5, 6, 4, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 11, 8, 7, 5, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -10278,7 +10278,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 200
-  Block Producers in epoch: [3, 1, 2, 10, 7, 0, 5, 4, 9, 8, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 5, 9, 8, 11, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -10480,7 +10480,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 201
-  Block Producers in epoch: [3, 1, 2, 10, 7, 8, 4, 11, 5, 9, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 8, 10, 11, 5, 9, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -10682,7 +10682,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 202
-  Block Producers in epoch: [3, 1, 2, 10, 7, 11, 4, 5, 8, 9, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 11, 5, 8, 7, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -10884,7 +10884,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 203
-  Block Producers in epoch: [3, 1, 2, 10, 7, 11, 4, 5, 9, 0, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 11, 5, 9, 10, 12, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -11086,7 +11086,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 204
-  Block Producers in epoch: [3, 1, 2, 10, 7, 5, 12, 8, 4, 0, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 7, 5, 12, 8, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -11288,7 +11288,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 205
-  Block Producers in epoch: [3, 1, 2, 10, 7, 11, 4, 0, 6, 9, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 11, 10, 6, 9, 5, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -11490,7 +11490,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 206
-  Block Producers in epoch: [3, 1, 2, 10, 7, 5, 4, 11, 8, 0, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 7, 10, 5, 11, 8, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -11692,7 +11692,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 207
-  Block Producers in epoch: [3, 1, 2, 10, 7, 11, 9, 12, 8, 0, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 11, 9, 12, 8, 6, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -11894,7 +11894,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 208
-  Block Producers in epoch: [3, 1, 2, 10, 7, 11, 0, 9, 8, 6, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 11, 9, 7, 8, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -12096,7 +12096,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 209
-  Block Producers in epoch: [3, 1, 2, 10, 7, 8, 11, 9, 5, 6, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 8, 11, 9, 10, 5, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -12298,7 +12298,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 210
-  Block Producers in epoch: [3, 1, 2, 10, 7, 0, 4, 9, 11, 5, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 9, 10, 11, 5, 8, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -12500,7 +12500,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 211
-  Block Producers in epoch: [3, 1, 2, 10, 7, 0, 4, 6, 8, 5, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 6, 8, 5, 12, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -12702,7 +12702,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 212
-  Block Producers in epoch: [3, 1, 2, 10, 7, 11, 0, 9, 5, 6, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 11, 9, 5, 6, 12, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -12904,7 +12904,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 213
-  Block Producers in epoch: [3, 1, 2, 10, 7, 5, 0, 4, 9, 12, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 7, 5, 9, 10, 12, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -13106,7 +13106,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 214
-  Block Producers in epoch: [3, 1, 2, 10, 7, 4, 9, 6, 12, 0, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 9, 6, 10, 7, 12, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -13308,7 +13308,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 215
-  Block Producers in epoch: [3, 1, 2, 10, 7, 4, 0, 9, 5, 11, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 9, 5, 11, 7, 6, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -13510,7 +13510,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 216
-  Block Producers in epoch: [3, 1, 2, 10, 7, 5, 8, 9, 11, 4, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 5, 8, 9, 11, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -13712,7 +13712,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 217
-  Block Producers in epoch: [3, 1, 2, 10, 7, 5, 11, 4, 9, 0, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 5, 11, 9, 10, 8, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -13914,7 +13914,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 218
-  Block Producers in epoch: [3, 1, 2, 10, 7, 5, 9, 8, 0, 6, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 5, 9, 8, 7, 6, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -14116,7 +14116,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 219
-  Block Producers in epoch: [3, 1, 2, 10, 7, 5, 9, 4, 0, 6, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 5, 9, 7, 6, 11, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -14318,7 +14318,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 220
-  Block Producers in epoch: [3, 1, 2, 10, 7, 5, 8, 6, 9, 11, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 5, 8, 7, 6, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -14520,7 +14520,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 221
-  Block Producers in epoch: [3, 1, 2, 10, 7, 11, 5, 8, 9, 4, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 11, 10, 5, 8, 9, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -14722,7 +14722,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 222
-  Block Producers in epoch: [3, 1, 2, 10, 7, 4, 9, 6, 0, 11, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 9, 7, 6, 11, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -14924,7 +14924,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 223
-  Block Producers in epoch: [3, 1, 2, 10, 7, 11, 4, 9, 12, 0, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 11, 10, 9, 12, 6, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -15126,7 +15126,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 224
-  Block Producers in epoch: [3, 1, 2, 10, 7, 11, 8, 6, 4, 12, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 11, 7, 8, 6, 12, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -15328,7 +15328,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 225
-  Block Producers in epoch: [3, 1, 2, 10, 7, 0, 4, 5, 11, 9, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 5, 7, 11, 9, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -15530,7 +15530,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 226
-  Block Producers in epoch: [3, 1, 2, 10, 7, 9, 0, 8, 5, 4, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 9, 8, 10, 5, 6, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -15732,7 +15732,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 227
-  Block Producers in epoch: [3, 1, 2, 10, 7, 11, 8, 9, 5, 6, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 7, 11, 8, 9, 5, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -15934,7 +15934,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 228
-  Block Producers in epoch: [3, 1, 2, 10, 7, 8, 11, 6, 9, 12, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 8, 11, 6, 9, 12, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -16136,7 +16136,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 229
-  Block Producers in epoch: [3, 1, 2, 10, 7, 11, 5, 9, 0, 6, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 11, 7, 5, 9, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -16338,7 +16338,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 230
-  Block Producers in epoch: [3, 1, 2, 10, 7, 5, 4, 6, 12, 8, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 5, 10, 6, 12, 7, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -16540,7 +16540,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 231
-  Block Producers in epoch: [3, 1, 2, 10, 7, 5, 4, 0, 9, 6, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 5, 9, 6, 7, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -16742,7 +16742,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 232
-  Block Producers in epoch: [3, 1, 2, 10, 7, 4, 0, 8, 11, 9, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 8, 11, 7, 9, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -16944,7 +16944,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 233
-  Block Producers in epoch: [3, 1, 2, 10, 7, 4, 12, 9, 0, 11, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 7, 12, 9, 11, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -17146,7 +17146,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 234
-  Block Producers in epoch: [3, 1, 2, 10, 7, 5, 8, 6, 0, 9, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 5, 10, 8, 6, 7, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -17348,7 +17348,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 235
-  Block Producers in epoch: [3, 1, 2, 10, 7, 11, 0, 6, 5, 4, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 11, 7, 10, 6, 5, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -17550,7 +17550,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 236
-  Block Producers in epoch: [3, 1, 2, 10, 7, 4, 9, 8, 11, 6, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 7, 9, 8, 11, 6, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -17752,7 +17752,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 237
-  Block Producers in epoch: [3, 1, 2, 10, 7, 4, 5, 0, 9, 8, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 7, 5, 9, 8, 10, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -17954,7 +17954,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 238
-  Block Producers in epoch: [3, 1, 2, 10, 7, 5, 11, 8, 0, 4, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 5, 11, 8, 9, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -18156,7 +18156,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 239
-  Block Producers in epoch: [3, 1, 2, 10, 7, 5, 0, 11, 6, 8, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 5, 10, 11, 6, 7, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -18358,7 +18358,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 240
-  Block Producers in epoch: [3, 1, 2, 10, 7, 0, 6, 12, 4, 5, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 7, 6, 12, 5, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -18560,7 +18560,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 241
-  Block Producers in epoch: [3, 1, 2, 10, 7, 11, 4, 12, 8, 9, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 11, 10, 12, 8, 9, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -18762,7 +18762,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 242
-  Block Producers in epoch: [3, 1, 2, 10, 7, 0, 8, 5, 11, 12, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 8, 5, 11, 7, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -18964,7 +18964,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 243
-  Block Producers in epoch: [3, 1, 2, 10, 7, 4, 9, 11, 0, 5, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 9, 11, 10, 5, 8, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -19166,7 +19166,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 244
-  Block Producers in epoch: [3, 1, 2, 10, 7, 0, 4, 9, 12, 5, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 9, 12, 5, 8, 7, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -19368,7 +19368,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 245
-  Block Producers in epoch: [3, 1, 2, 10, 7, 11, 4, 5, 0, 8, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 11, 7, 5, 8, 10, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -19570,7 +19570,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 246
-  Block Producers in epoch: [3, 1, 2, 10, 7, 5, 6, 8, 9, 11, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 5, 6, 8, 7, 9, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -19772,7 +19772,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 247
-  Block Producers in epoch: [3, 1, 2, 10, 7, 4, 0, 5, 6, 8, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 5, 6, 7, 8, 12, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -19974,7 +19974,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 248
-  Block Producers in epoch: [3, 1, 2, 10, 7, 11, 0, 4, 8, 12, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 11, 7, 8, 12, 9, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -20176,7 +20176,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 249
-  Block Producers in epoch: [3, 1, 2, 10, 7, 4, 11, 0, 12, 6, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 7, 11, 12, 10, 6, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -20378,7 +20378,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 250
-  Block Producers in epoch: [3, 1, 2, 10, 7, 0, 6, 5, 12, 8, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 6, 5, 7, 12, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -20580,7 +20580,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 251
-  Block Producers in epoch: [3, 1, 2, 10, 7, 11, 4, 8, 5, 9, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 7, 11, 8, 5, 9, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -20782,7 +20782,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 252
-  Block Producers in epoch: [3, 1, 2, 10, 7, 8, 5, 4, 0, 11, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 8, 7, 5, 11, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -20984,7 +20984,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 253
-  Block Producers in epoch: [3, 1, 2, 10, 7, 5, 4, 11, 0, 8, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 5, 11, 10, 7, 8, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -21186,7 +21186,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 254
-  Block Producers in epoch: [3, 1, 2, 10, 7, 11, 4, 9, 8, 6, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 7, 11, 9, 8, 6, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -21388,7 +21388,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 255
-  Block Producers in epoch: [3, 1, 2, 10, 7, 11, 8, 5, 9, 4, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 11, 7, 8, 5, 9, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -21590,7 +21590,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 256
-  Block Producers in epoch: [3, 1, 2, 10, 7, 4, 0, 8, 5, 9, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 8, 5, 9, 12, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -21792,7 +21792,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 257
-  Block Producers in epoch: [3, 1, 2, 10, 7, 11, 4, 0, 5, 8, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 11, 7, 5, 8, 12, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -21994,7 +21994,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 258
-  Block Producers in epoch: [3, 1, 2, 10, 7, 0, 4, 11, 9, 5, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 11, 7, 9, 5, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -22196,7 +22196,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 259
-  Block Producers in epoch: [3, 1, 2, 10, 7, 4, 6, 8, 0, 12, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 7, 6, 10, 8, 12, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -22398,7 +22398,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 260
-  Block Producers in epoch: [3, 1, 2, 10, 7, 9, 5, 4, 12, 0, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 9, 5, 12, 7, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -22600,7 +22600,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 261
-  Block Producers in epoch: [3, 1, 2, 10, 7, 5, 4, 9, 8, 11, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 7, 5, 9, 8, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -22802,7 +22802,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 262
-  Block Producers in epoch: [3, 1, 2, 10, 7, 9, 8, 4, 5, 0, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 9, 10, 8, 5, 11, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -23004,7 +23004,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 263
-  Block Producers in epoch: [3, 1, 2, 10, 7, 8, 9, 0, 11, 4, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 8, 10, 9, 11, 7, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -23206,7 +23206,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 264
-  Block Producers in epoch: [3, 1, 2, 10, 7, 0, 11, 8, 6, 9, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 11, 8, 6, 9, 5, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -23408,7 +23408,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 265
-  Block Producers in epoch: [3, 1, 2, 10, 7, 9, 4, 0, 6, 12, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 9, 7, 6, 12, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -23610,7 +23610,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 266
-  Block Producers in epoch: [3, 1, 2, 10, 7, 0, 8, 11, 12, 6, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 8, 11, 10, 12, 6, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -23812,7 +23812,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 267
-  Block Producers in epoch: [3, 1, 2, 10, 7, 11, 4, 5, 8, 0, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 11, 7, 5, 10, 8, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -24014,7 +24014,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 268
-  Block Producers in epoch: [3, 1, 2, 10, 7, 11, 5, 12, 8, 9, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 7, 10, 11, 5, 12, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -24216,7 +24216,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 269
-  Block Producers in epoch: [3, 1, 2, 10, 7, 0, 5, 11, 12, 9, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 5, 11, 12, 9, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -24418,7 +24418,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 270
-  Block Producers in epoch: [3, 1, 2, 10, 7, 5, 8, 9, 0, 4, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 7, 5, 8, 9, 6, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -24620,7 +24620,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 271
-  Block Producers in epoch: [3, 1, 2, 10, 7, 11, 4, 5, 9, 8, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 11, 10, 7, 5, 9, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -24822,7 +24822,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 272
-  Block Producers in epoch: [3, 1, 2, 10, 7, 8, 4, 5, 12, 9, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 7, 10, 8, 5, 12, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -25024,7 +25024,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 273
-  Block Producers in epoch: [3, 1, 2, 10, 7, 5, 11, 0, 6, 8, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 5, 11, 6, 8, 10, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -25226,7 +25226,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 274
-  Block Producers in epoch: [3, 1, 2, 10, 7, 5, 11, 0, 4, 8, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 5, 11, 8, 12, 9, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -25428,7 +25428,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 275
-  Block Producers in epoch: [3, 1, 2, 10, 7, 4, 0, 11, 12, 6, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 11, 12, 6, 5, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -25630,7 +25630,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 276
-  Block Producers in epoch: [3, 1, 2, 10, 7, 11, 4, 8, 12, 9, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 11, 10, 8, 7, 12, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -25832,7 +25832,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 277
-  Block Producers in epoch: [3, 1, 2, 10, 7, 5, 9, 8, 11, 6, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 5, 9, 8, 11, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -26034,7 +26034,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 278
-  Block Producers in epoch: [3, 1, 2, 10, 7, 9, 0, 8, 5, 6, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 7, 9, 8, 10, 5, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -26236,7 +26236,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 279
-  Block Producers in epoch: [3, 1, 2, 10, 7, 11, 6, 0, 4, 8, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 11, 6, 7, 8, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -26438,7 +26438,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 280
-  Block Producers in epoch: [3, 1, 2, 10, 7, 0, 4, 9, 5, 11, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 9, 5, 7, 10, 11, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -26640,7 +26640,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 281
-  Block Producers in epoch: [3, 1, 2, 10, 7, 5, 11, 6, 0, 9, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 5, 10, 11, 6, 9, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -26842,7 +26842,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 282
-  Block Producers in epoch: [3, 1, 2, 10, 7, 5, 11, 8, 4, 12, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 5, 11, 8, 7, 12, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -27044,7 +27044,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 283
-  Block Producers in epoch: [3, 1, 2, 10, 7, 0, 8, 4, 5, 12, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 7, 8, 5, 12, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -27246,7 +27246,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 284
-  Block Producers in epoch: [3, 1, 2, 10, 7, 5, 8, 9, 11, 6, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 5, 8, 7, 9, 11, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -27448,7 +27448,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 285
-  Block Producers in epoch: [3, 1, 2, 10, 7, 4, 5, 11, 6, 9, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 5, 7, 11, 6, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -27650,7 +27650,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 286
-  Block Producers in epoch: [3, 1, 2, 10, 7, 4, 5, 0, 6, 11, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 7, 5, 6, 11, 12, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -27852,7 +27852,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 287
-  Block Producers in epoch: [3, 1, 2, 10, 7, 0, 5, 12, 4, 6, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 7, 5, 12, 6, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -28054,7 +28054,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 288
-  Block Producers in epoch: [3, 1, 2, 10, 7, 4, 11, 9, 6, 5, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 11, 9, 6, 5, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -28256,7 +28256,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 289
-  Block Producers in epoch: [3, 1, 2, 10, 7, 4, 9, 0, 8, 5, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 9, 8, 5, 6, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -28458,7 +28458,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 290
-  Block Producers in epoch: [3, 1, 2, 10, 7, 4, 9, 6, 12, 5, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 7, 9, 6, 12, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -28660,7 +28660,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 291
-  Block Producers in epoch: [3, 1, 2, 10, 7, 4, 8, 9, 6, 0, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 7, 8, 9, 6, 11, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -28862,7 +28862,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 292
-  Block Producers in epoch: [3, 1, 2, 10, 7, 0, 9, 11, 5, 6, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 10, 9, 11, 5, 6, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -29064,7 +29064,7 @@ Calldata:
       Block:  198,	Producer: p-8,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  199,	Producer: p-9,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
   Period: 19905 Epoch: 293
-  Block Producers in epoch: [3, 1, 2, 10, 7, 11, 6, 4, 8, 9, ]
+  Block Producers in epoch: [0, 1, 2, 3, 4, 11, 7, 6, 8, 9, ]
       Block:  0,	Producer: p-0,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  1,	Producer: p-1,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
       Block:  2,	Producer: p-2,	Voters: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, ]
@@ -29280,37 +29280,37 @@ Calldata:
   FF Delegator Reward: css-10 Amount: [92m24022628[0m
   FF Delegator Reward: css-11 Amount: [92m19579320[0m
   FF Delegator Reward: css-12 Amount: [92m19219580[0m
-  Total BM Delegator Reward: [92m61011660[0m
-  BM Delegator Reward: css-00 Amount: [92m4062200[0m
+  Total BM Delegator Reward: [92m61007140[0m
+  BM Delegator Reward: css-00 Amount: [92m6157440[0m
   BM Delegator Reward: css-01 Amount: [92m5832000[0m
   BM Delegator Reward: css-02 Amount: [92m6157440[0m
   BM Delegator Reward: css-03 Amount: [92m6157440[0m
-  BM Delegator Reward: css-04 Amount: [92m4618080[0m
+  BM Delegator Reward: css-04 Amount: [92m6157440[0m
   BM Delegator Reward: css-05 Amount: [92m4147720[0m
-  BM Delegator Reward: css-06 Amount: [92m3121480[0m
-  BM Delegator Reward: css-07 Amount: [92m6157440[0m
-  BM Delegator Reward: css-08 Amount: [92m3933920[0m
-  BM Delegator Reward: css-09 Amount: [92m4190480[0m
-  BM Delegator Reward: css-10 Amount: [92m6157440[0m
-  BM Delegator Reward: css-11 Amount: [92m4252500[0m
-  BM Delegator Reward: css-12 Amount: [92m2223520[0m
-   Validator: adm-00 CRate: 500 Commission Reward: [92m2048800[0m Delegator Reward: [92m38946200[0m Total Reward: [92m40995000[0m
+  BM Delegator Reward: css-06 Amount: [92m2993200[0m
+  BM Delegator Reward: css-07 Amount: [92m4318760[0m
+  BM Delegator Reward: css-08 Amount: [92m3805640[0m
+  BM Delegator Reward: css-09 Amount: [92m3976680[0m
+  BM Delegator Reward: css-10 Amount: [92m4575320[0m
+  BM Delegator Reward: css-11 Amount: [92m4333500[0m
+  BM Delegator Reward: css-12 Amount: [92m2394560[0m
+   Validator: adm-00 CRate: 500 Commission Reward: [92m2158560[0m Delegator Reward: [92m41041440[0m Total Reward: [92m43200000[0m
    Validator: adm-01 CRate: 1000 Commission Reward: [92m4142894[0m Delegator Reward: [92m37286050[0m Total Reward: [92m41428944[0m
    Validator: adm-02 CRate: 500 Commission Reward: [92m1887969[0m Delegator Reward: [92m35900223[0m Total Reward: [92m37788192[0m
    Validator: adm-03 CRate: 500 Commission Reward: [92m1859860[0m Delegator Reward: [92m35366156[0m Total Reward: [92m37226016[0m
-   Validator: adm-04 CRate: 500 Commission Reward: [92m1670076[0m Delegator Reward: [92m31753044[0m Total Reward: [92m33423120[0m
+   Validator: adm-04 CRate: 500 Commission Reward: [92m1750716[0m Delegator Reward: [92m33292404[0m Total Reward: [92m35043120[0m
    Validator: adm-05 CRate: 500 Commission Reward: [92m1644471[0m Delegator Reward: [92m31264353[0m Total Reward: [92m32908824[0m
-   Validator: adm-06 CRate: 500 Commission Reward: [92m1578111[0m Delegator Reward: [92m29998713[0m Total Reward: [92m31576824[0m
-   Validator: adm-07 CRate: 500 Commission Reward: [92m1720281[0m Delegator Reward: [92m32714151[0m Total Reward: [92m34434432[0m
-   Validator: adm-08 CRate: 500 Commission Reward: [92m1573172[0m Delegator Reward: [92m29908684[0m Total Reward: [92m31481856[0m
-   Validator: adm-09 CRate: 500 Commission Reward: [92m1494920[0m Delegator Reward: [92m28423096[0m Total Reward: [92m29918016[0m
-   Validator: adm-10 CRate: 500 Commission Reward: [92m1586908[0m Delegator Reward: [92m30180068[0m Total Reward: [92m31766976[0m
-   Validator: adm-11 CRate: 1000 Commission Reward: [92m2647980[0m Delegator Reward: [92m23831820[0m Total Reward: [92m26479800[0m
-   Validator: adm-12 CRate: 500 Commission Reward: [92m1128036[0m Delegator Reward: [92m21443100[0m Total Reward: [92m22571136[0m
-  Sum Validator Reward: [92m24983478[0m
-  Sum Delegator Reward: [92m407015658[0m
+   Validator: adm-06 CRate: 500 Commission Reward: [92m1571391[0m Delegator Reward: [92m29870433[0m Total Reward: [92m31441824[0m
+   Validator: adm-07 CRate: 500 Commission Reward: [92m1623961[0m Delegator Reward: [92m30875471[0m Total Reward: [92m32499432[0m
+   Validator: adm-08 CRate: 500 Commission Reward: [92m1566452[0m Delegator Reward: [92m29780404[0m Total Reward: [92m31346856[0m
+   Validator: adm-09 CRate: 500 Commission Reward: [92m1483720[0m Delegator Reward: [92m28209296[0m Total Reward: [92m29693016[0m
+   Validator: adm-10 CRate: 500 Commission Reward: [92m1504028[0m Delegator Reward: [92m28597948[0m Total Reward: [92m30101976[0m
+   Validator: adm-11 CRate: 1000 Commission Reward: [92m2656980[0m Delegator Reward: [92m23912820[0m Total Reward: [92m26569800[0m
+   Validator: adm-12 CRate: 500 Commission Reward: [92m1136996[0m Delegator Reward: [92m21614140[0m Total Reward: [92m22751136[0m
+  Sum Validator Reward: [92m24987998[0m
+  Sum Delegator Reward: [92m407011138[0m
   Total Reward: [92m431999136[0m
 
-Suite result: [32mok[0m. [32m1[0m passed; [31m0[0m failed; [33m0[0m skipped; finished in 15.20s (10.05s CPU time)
+Suite result: [32mok[0m. [32m1[0m passed; [31m0[0m failed; [33m0[0m skipped; finished in 12.84s (9.97s CPU time)
 
-Ran 1 test suite in 15.38s (15.20s CPU time): [32m1[0m tests passed, [31m0[0m failed, [33m0[0m skipped (1 total tests)
+Ran 1 test suite in 12.97s (12.84s CPU time): [32m1[0m tests passed, [31m0[0m failed, [33m0[0m skipped (1 total tests)
