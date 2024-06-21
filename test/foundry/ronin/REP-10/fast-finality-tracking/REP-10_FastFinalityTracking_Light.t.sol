@@ -22,7 +22,10 @@ contract REP_10_FastFinalityTrackingTest_Light is REP10_BaseTest {
     uint256 cRate; // commission rate
   }
 
-  uint256 private blockBonus = 0;
+  uint256 private BLOCK_BONUS_BY_VESTING = 5_000;
+  uint256 private BLOCK_REWARD_SUBMIT_BY_VALIDATOR = 10_000;
+
+
   uint256 private fastFinalityRewardPercentage = 8500;
   Delegator[] private delegators;
   Validator[] private validators;
@@ -67,7 +70,7 @@ contract REP_10_FastFinalityTrackingTest_Light is REP10_BaseTest {
   function _overrideRewardConfig() private {
     vm.startPrank(address(governanceAdmin));
     TransparentUpgradeableProxyV2(payable(address(stakingVesting))).functionDelegateCall(
-      abi.encodeCall(IStakingVesting.setBlockProducerBonusPerBlock, (blockBonus))
+      abi.encodeCall(IStakingVesting.setBlockProducerBonusPerBlock, (BLOCK_BONUS_BY_VESTING))
     );
     TransparentUpgradeableProxyV2(payable(address(stakingVesting))).functionDelegateCall(
       abi.encodeCall(IStakingVesting.setFastFinalityRewardPercentage, (fastFinalityRewardPercentage))
@@ -93,20 +96,26 @@ contract REP_10_FastFinalityTrackingTest_Light is REP10_BaseTest {
     }
 
     Validator[13] memory mValidators = [
-      Validator({ adm: makeAddr("adm-00"), css: makeAddr("css-00"), amt: 6904 ether, gv: true, vRate: 100, cRate: 500 }),
-      Validator({ adm: makeAddr("adm-01"), css: makeAddr("css-01"), amt: 9014 ether, gv: true, vRate: 100, cRate: 1000 }),
-      Validator({ adm: makeAddr("adm-02"), css: makeAddr("css-02"), amt: 7812 ether, gv: true, vRate: 100, cRate: 500 }),
-      Validator({ adm: makeAddr("adm-03"), css: makeAddr("css-03"), amt: 9180 ether, gv: true, vRate: 100, cRate: 500 }),
-      Validator({ adm: makeAddr("adm-04"), css: makeAddr("css-04"), amt: 7362 ether, gv: true, vRate: 100, cRate: 2000 }),
-      Validator({ adm: makeAddr("adm-05"), css: makeAddr("css-05"), amt: 7210 ether, gv: false, vRate: 100, cRate: 2000 }),
-      Validator({ adm: makeAddr("adm-06"), css: makeAddr("css-06"), amt: 5611 ether, gv: false, vRate: 80, cRate: 500 }),
-      Validator({ adm: makeAddr("adm-07"), css: makeAddr("css-07"), amt: 7212 ether, gv: false, vRate: 100, cRate: 500 }),
-      Validator({ adm: makeAddr("adm-08"), css: makeAddr("css-08"), amt: 6277 ether, gv: false, vRate: 100, cRate: 500 }),
-      Validator({ adm: makeAddr("adm-09"), css: makeAddr("css-09"), amt: 6579 ether, gv: false, vRate: 90, cRate: 500 }),
-      Validator({ adm: makeAddr("adm-10"), css: makeAddr("css-10"), amt: 7380 ether, gv: false, vRate: 100, cRate: 500 }),
-      Validator({ adm: makeAddr("adm-11"), css: makeAddr("css-11"), amt: 6066 ether, gv: false, vRate: 100, cRate: 500 }),
-      Validator({ adm: makeAddr("adm-12"), css: makeAddr("css-12"), amt: 5218 ether, gv: false, vRate: 100, cRate: 500 })
+  Validator({ adm: makeAddr("adm-00"), css: makeAddr("css-00"), amt: 8112 ether, gv: true, vRate: 0, cRate: 500 }),
+  Validator({ adm: makeAddr("adm-01"), css: makeAddr("css-01"), amt: 5678 ether, gv: true, vRate: 0, cRate: 1000 }),
+  Validator({ adm: makeAddr("adm-02"), css: makeAddr("css-02"), amt: 8337 ether, gv: true, vRate: 0, cRate: 500 }),
+  Validator({ adm: makeAddr("adm-03"), css: makeAddr("css-03"), amt: 5917 ether, gv: true, vRate: 0, cRate: 500 }),
+  Validator({ adm: makeAddr("adm-04"), css: makeAddr("css-04"), amt: 5308 ether, gv: true, vRate: 0, cRate: 2000 }),
+  Validator({ adm: makeAddr("adm-05"), css: makeAddr("css-05"), amt: 8660 ether, gv: true, vRate: 0, cRate: 2000 }),
+  Validator({ adm: makeAddr("adm-06"), css: makeAddr("css-06"), amt: 8343 ether, gv: true, vRate: 0, cRate: 500 }),
+  Validator({ adm: makeAddr("adm-07"), css: makeAddr("css-07"), amt: 7142 ether, gv: true, vRate: 0, cRate: 500 }),
+  Validator({ adm: makeAddr("adm-08"), css: makeAddr("css-08"), amt: 7481 ether, gv: true, vRate: 0, cRate: 500 }),
+  Validator({ adm: makeAddr("adm-09"), css: makeAddr("css-09"), amt: 8521 ether, gv: true, vRate: 0, cRate: 500 }),
+  Validator({ adm: makeAddr("adm-10"), css: makeAddr("css-10"), amt: 7245 ether, gv: true, vRate: 0, cRate: 500 }),
+  Validator({ adm: makeAddr("adm-11"), css: makeAddr("css-11"), amt: 8315 ether, gv: true, vRate: 0, cRate: 500 }),
+  Validator({ adm: makeAddr("adm-12"), css: makeAddr("css-12"), amt: 8141 ether, gv: true, vRate: 0, cRate: 500 })
     ];
+
+    console.log("--------------------- TEST INPUT ----------------------\n\n");
+
+    console.log("    Block Bonus By Vesting:    ", vm.toString(BLOCK_BONUS_BY_VESTING));
+    console.log("    Block Reward By Validator: ", vm.toString(BLOCK_REWARD_SUBMIT_BY_VALIDATOR));
+    console.log("    Fast Finality Reward %:    ", vm.toString(fastFinalityRewardPercentage));
 
     console.log("id,\tcss,\tamt,\tgv,\tvRate,\tcRate");
     for (uint256 i; i < mValidators.length; i++) {
@@ -127,6 +136,8 @@ contract REP_10_FastFinalityTrackingTest_Light is REP10_BaseTest {
         )
       );
     }
+
+    console.log("-------------------------------------------\n\n");
   }
 
   function _addGoverningValidators() private {
@@ -269,17 +280,17 @@ contract REP_10_FastFinalityTrackingTest_Light is REP10_BaseTest {
         // Record finality by rate of each validators
         TConsensus[] memory votingConsensus = allConsensuses;
         for (uint k; k < allConsensuses.length; ++k) {
-          if (uint256(blockhash(block.number - 1)) % 100 > css2VoteRate[TConsensus.unwrap(allConsensuses[k])]) {
+          if (uint256(keccak256(abi.encode(k,j,block.number))) % 100 >= css2VoteRate[TConsensus.unwrap(allConsensuses[k])]) {
             votingConsensus = __excludeMember(votingConsensus, allConsensuses[k]);
           }
         }
 
 
-        console.log(string.concat("    Block: ", vm.toString(j),   ",\tProducer: p-", vm.toString(producerIdx), ",\tVoters: ", __toStringConsensusList(votingConsensus)));
+        console.log(string.concat("    Block:  ", vm.toString(j),   ",\tProducer: p-", vm.toString(producerIdx), ",\tVoters: ", __toStringConsensusList(votingConsensus)));
         fastFinalityTracking.recordFinality(votingConsensus);
 
         // Submit block reward
-        roninValidatorSet.submitBlockReward{ value: 10_000 }();
+        roninValidatorSet.submitBlockReward{ value: BLOCK_REWARD_SUBMIT_BY_VALIDATOR }();
 
         vm.stopPrank();
 

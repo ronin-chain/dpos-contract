@@ -385,4 +385,22 @@ contract REP_10_FastFinalityTrackingTest is REP10_BaseTest {
       assertTrue(counts[i] > 0, "Count should never be zero");
     }
   }
+
+  function __excludeMember(TConsensus[] memory lst, TConsensus who) internal pure returns (TConsensus[] memory res) {
+    uint len = lst.length;
+    uint count;
+    res = new TConsensus[](len);
+
+    for (uint i; i < len; ++i) {
+      if (lst[i] == who) {
+        continue;
+      }
+
+      res[count++] = lst[i];
+    }
+
+    assembly {
+      mstore(res, count)
+    }
+  }
 }

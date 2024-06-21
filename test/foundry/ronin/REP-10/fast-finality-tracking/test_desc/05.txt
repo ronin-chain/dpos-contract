@@ -1,0 +1,17 @@
+// Change staked as in 01
+
+Validator[13] memory mValidators = [
+  Validator({ adm: makeAddr("adm-00"), css: makeAddr("css-00"), amt: 5531 ether, gv: true, vRate: 100, cRate: 500 }),
+  Validator({ adm: makeAddr("adm-01"), css: makeAddr("css-01"), amt: 6432 ether, gv: true, vRate: 100, cRate: 1000 }),
+  Validator({ adm: makeAddr("adm-02"), css: makeAddr("css-02"), amt: 6511 ether, gv: true, vRate: 100, cRate: 500 }),
+  Validator({ adm: makeAddr("adm-03"), css: makeAddr("css-03"), amt: 7788 ether, gv: true, vRate: 100, cRate: 500 }),
+  Validator({ adm: makeAddr("adm-04"), css: makeAddr("css-04"), amt: 6022 ether, gv: true, vRate: 100, cRate: 2000 }),
+  Validator({ adm: makeAddr("adm-05"), css: makeAddr("css-05"), amt: 5612 ether, gv: true, vRate: 100, cRate: 2000 }),
+  Validator({ adm: makeAddr("adm-06"), css: makeAddr("css-06"), amt: 5450 ether, gv: true, vRate: 80, cRate: 500 }),
+  Validator({ adm: makeAddr("adm-07"), css: makeAddr("css-07"), amt: 8984 ether, gv: true, vRate: 100, cRate: 500 }),
+  Validator({ adm: makeAddr("adm-08"), css: makeAddr("css-08"), amt: 5713 ether, gv: true, vRate: 100, cRate: 500 }),
+  Validator({ adm: makeAddr("adm-09"), css: makeAddr("css-09"), amt: 5020 ether, gv: true, vRate: 90, cRate: 500 }),
+  Validator({ adm: makeAddr("adm-10"), css: makeAddr("css-10"), amt: 5879 ether, gv: true, vRate: 100, cRate: 500 }),
+  Validator({ adm: makeAddr("adm-11"), css: makeAddr("css-11"), amt: 6126 ether, gv: true, vRate: 100, cRate: 500 }),
+  Validator({ adm: makeAddr("adm-12"), css: makeAddr("css-12"), amt: 6706 ether, gv: true, vRate: 100, cRate: 500 })
+];
