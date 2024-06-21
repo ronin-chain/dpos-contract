@@ -26,6 +26,8 @@ interface IStakingVesting {
   event BridgeOperatorBonusPerBlockUpdated(uint256);
   /// @dev Emitted when the percent of fast finality reward is updated
   event FastFinalityRewardPercentageUpdated(uint256);
+  /// @dev Emitted when the percent of fast finality reward for REP10 is updated
+  event FastFinalityRewardPercentageUpdatedForREP10(uint256);
 
   function initialize(
     address validatorContract,

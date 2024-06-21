@@ -30,7 +30,7 @@ contract StakingVesting is
   /// @dev The fast finality reward percentage after REP-10 upgrade.
   uint256 internal _fastFinalityRewardPercentageREP10;
   /// @dev The period that REP-10 is activated.
-  uint256 internal _activatedAtPeriod;
+  uint256 internal _rep10ActivationPeriod;
 
   constructor() {
     _disableInitializers();
@@ -59,9 +59,9 @@ contract StakingVesting is
   }
 
   function initializeV4(uint256 activatedAtPeriod, uint256 fastFinalityRewardPercentREP10) external reinitializer(4) {
-    _activatedAtPeriod = activatedAtPeriod;
+    _rep10ActivationPeriod = activatedAtPeriod;
     _fastFinalityRewardPercentageREP10 = fastFinalityRewardPercentREP10;
-    emit FastFinalityRewardPercentageUpdated(fastFinalityRewardPercentREP10);
+    emit FastFinalityRewardPercentageUpdatedForREP10(fastFinalityRewardPercentREP10);
   }
 
   /**
@@ -93,13 +93,7 @@ contract StakingVesting is
   /**
    * @inheritdoc IStakingVesting
    */
-  function fastFinalityRewardPercentage() public view override returns (uint256) {
-    uint256 currPeriod = IRoninValidatorSet(getContract(ContractType.VALIDATOR)).currentPeriod();
-
-    if (currPeriod >= _activatedAtPeriod) {
-      return _fastFinalityRewardPercentageREP10;
-    }
-
+  function fastFinalityRewardPercentage() external view override returns (uint256) {
     return _fastFinalityRewardPercentage;
   }
 
@@ -121,7 +115,13 @@ contract StakingVesting is
 
     blockProducerBonus = forBlockProducer ? blockProducerBlockBonus(block.number) : 0;
     bridgeOperatorBonus = forBridgeOperator ? bridgeOperatorBlockBonus(block.number) : 0;
-    fastFinalityRewardPercent = fastFinalityRewardPercentage();
+
+    uint256 currPeriod = IRoninValidatorSet(getContract(ContractType.VALIDATOR)).currentPeriod();
+    if (currPeriod >= _rep10ActivationPeriod) {
+      _fastFinalityRewardPercentage = _fastFinalityRewardPercentageREP10;
+    }
+
+    fastFinalityRewardPercent = _fastFinalityRewardPercentage;
 
     uint256 totalAmount = blockProducerBonus + bridgeOperatorBonus;
 
