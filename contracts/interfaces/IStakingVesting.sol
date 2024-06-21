@@ -37,6 +37,8 @@ interface IStakingVesting {
 
   function initializeV3(uint256 fastFinalityRewardPercent) external;
 
+  function initializeV4(uint256 activatedAtPeriod, uint256 fastFinalityRewardPercentREP10) external;
+
   /**
    * @dev Returns the bonus amount for the block producer at `blockNum`.
    */
