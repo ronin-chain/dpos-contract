@@ -348,6 +348,7 @@ contract DeployDPoS is RoninMigration {
     );
     // stakingVesting.initializeV2();
     stakingVesting.initializeV3(param.fastFinalityRewardPercent);
+    stakingVesting.initializeV4(param.activatedAtPeriod, param.fastFinalityRewardPercentREP10);
     vm.stopBroadcast();
   }
 

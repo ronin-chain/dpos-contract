@@ -108,9 +108,12 @@ contract RoninMigration is BaseMigration {
     param.cooldownSecsToUndelegate = vm.envOr("COOLDOWN_SECS_TO_UNDELEGATE", uint256(3 days));
   }
 
-  function _setStakingVestingParam(ISharedArgument.StakingVestingParam memory param) internal view {
+  function _setStakingVestingParam(ISharedArgument.StakingVestingParam memory param) internal {
     param.topupAmount = vm.envOr("TOPUP_AMOUNT", uint256(100_000_000_000));
     param.fastFinalityRewardPercent = vm.envOr("FAST_FINALITY_REWARD_PERCENT", uint256(1_00)); // 1%
+    param.fastFinalityRewardPercentREP10 = vm.envOr("FAST_FINALITY_REWARD_PERCENT_REP10", uint256(8_500)); // 85%
+    param.activatedAtPeriod =
+      vm.envOr("FAST_FINALITY_REWARD_ACTIVATED_AT_PERIOD", uint256((vm.unixTime() / 1_000) / 1 days));
     param.blockProducerBonusPerBlock = vm.envOr("BLOCK_PRODUCER_BONUS_PER_BLOCK", uint256(1_000));
     param.bridgeOperatorBonusPerBlock = vm.envOr("BRIDGE_OPERATOR_BONUS_PER_BLOCK", uint256(1_100));
   }
