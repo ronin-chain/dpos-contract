@@ -1,0 +1,300 @@
+No files changed, compilation skipped
+[2m2024-06-21T11:17:11.739708Z[0m [31mERROR[0m [2mcheatcodes[0m[2m:[0m non-empty stderr [3minput[0m[2m=[0m["./script/misc/genkey.sh"] [3mstderr[0m[2m=[0m"./script/misc/genkey.sh: line 4: go: command not found\n"
+[2m2024-06-21T11:17:11.740864Z[0m [31mERROR[0m [2mforge::runner[0m[2m:[0m setUp failed [3mreason[0m[2m=[0mpanic: array out-of-bounds access (0x32) [3mcontract[0m[2m=[0m0x7FA9385bE102ac3EAc297483Dd6233D62b3e1496
+
+Ran 1 test for test/foundry/ronin/REP-10/fast-finality-tracking/REP-10_FastFinalityTracking.t.sol:REP_10_FastFinalityTrackingTest
+[31m[FAIL. Reason: setup failed: panic: array out-of-bounds access (0x32)][0m setUp() (gas: 0)
+Logs:
+  [94mContractConfig:[0m Deployment data loaded in 12 milliseconds
+  SLASH_RANDOM_BEACON_ACTIVATED_AT_PERIOD:  19895
+  RANDOM_BEACON_ACTIVATED_AT_PERIOD:  19895
+  RONIN_VALIDATOR_SET_REP10_MIGRATOR_ACTIVATED_AT_PERIOD:  19895
+  >  [94m_deployProxy RoninValidatorSet[0m ...
+  [92m([94mlocalhost[0m)[93mRoninValidatorSetLogic[0m[0x90193C961A926261B756D1E5bb255e67ff9498A1] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0x90193c961a926261b756d1e5bb255e67ff9498a1[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mRoninValidatorSetLogic[0m[0x90193C961A926261B756D1E5bb255e67ff9498A1]
+
+  [92m([94mlocalhost[0m)[93mRoninValidatorSetProxy[0m[0xA8452Ec99ce0C64f20701dB7dD3abDb607c00496] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0xa8452ec99ce0c64f20701db7dd3abdb607c00496[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mRoninValidatorSetProxy[0m[0xA8452Ec99ce0C64f20701dB7dD3abDb607c00496]
+
+  >  [94m_deployProxy RoninTrustedOrganization[0m ...
+  [92m([94mlocalhost[0m)[93mRoninTrustedOrganizationLogic[0m[0xBb2180ebd78ce97360503434eD37fcf4a1Df61c3] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0xbb2180ebd78ce97360503434ed37fcf4a1df61c3[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mRoninTrustedOrganizationLogic[0m[0xBb2180ebd78ce97360503434eD37fcf4a1Df61c3]
+
+  [92m([94mlocalhost[0m)[93mRoninTrustedOrganizationProxy[0m[0xDB8cFf278adCCF9E9b5da745B44E754fC4EE3C76] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0xdb8cff278adccf9e9b5da745b44e754fc4ee3c76[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mRoninTrustedOrganizationProxy[0m[0xDB8cFf278adCCF9E9b5da745B44E754fC4EE3C76]
+
+  >  [94m_deployImmutable RoninGovernanceAdmin[0m ...
+  [92m([94mlocalhost[0m)[93mRoninGovernanceAdmin[0m[0x50EEf481cae4250d252Ae577A09bF514f224C6C4] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0x50eef481cae4250d252ae577a09bf514f224c6c4[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mRoninGovernanceAdmin[0m[0x50EEf481cae4250d252Ae577A09bF514f224C6C4]
+
+  >  [94m_deployProxy Profile[0m ...
+  [92m([94mlocalhost[0m)[93mProfileLogic[0m[0x62c20Aa1e0272312BC100b4e23B4DC1Ed96dD7D1] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0x62c20aa1e0272312bc100b4e23b4dc1ed96dd7d1[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mProfileLogic[0m[0x62c20Aa1e0272312BC100b4e23B4DC1Ed96dD7D1]
+
+  [92m([94mlocalhost[0m)[93mProfileProxy[0m[0xDEb1E9a6Be7Baf84208BB6E10aC9F9bbE1D70809] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0xdeb1e9a6be7baf84208bb6e10ac9f9bbe1d70809[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mProfileProxy[0m[0xDEb1E9a6Be7Baf84208BB6E10aC9F9bbE1D70809]
+
+  >  [94m_deployProxy Staking[0m ...
+  [92m([94mlocalhost[0m)[93mStakingLogic[0m[0xD718d5A27a29FF1cD22403426084bA0d479869a0] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0xd718d5a27a29ff1cd22403426084ba0d479869a0[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mStakingLogic[0m[0xD718d5A27a29FF1cD22403426084bA0d479869a0]
+
+  [92m([94mlocalhost[0m)[93mStakingProxy[0m[0x4f559F30f5eB88D635FDe1548C4267DB8FaB0351] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0x4f559f30f5eb88d635fde1548c4267db8fab0351[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mStakingProxy[0m[0x4f559F30f5eB88D635FDe1548C4267DB8FaB0351]
+
+  >  [94m_deployProxy Maintenance[0m ...
+  [92m([94mlocalhost[0m)[93mMaintenanceLogic[0m[0x416C42991d05b31E9A6dC209e91AD22b79D87Ae6] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0x416c42991d05b31e9a6dc209e91ad22b79d87ae6[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mMaintenanceLogic[0m[0x416C42991d05b31E9A6dC209e91AD22b79D87Ae6]
+
+  [92m([94mlocalhost[0m)[93mMaintenanceProxy[0m[0xd21060559c9beb54fC07aFd6151aDf6cFCDDCAeB] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0xd21060559c9beb54fc07afd6151adf6cfcddcaeb[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mMaintenanceProxy[0m[0xd21060559c9beb54fC07aFd6151aDf6cFCDDCAeB]
+
+  >  [94m_deployProxy SlashIndicator[0m ...
+  [92m([94mlocalhost[0m)[93mSlashIndicatorLogic[0m[0x4C52a6277b1B84121b3072C0c92b6Be0b7CC10F1] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0x4c52a6277b1b84121b3072c0c92b6be0b7cc10f1[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mSlashIndicatorLogic[0m[0x4C52a6277b1B84121b3072C0c92b6Be0b7CC10F1]
+
+  [92m([94mlocalhost[0m)[93mSlashIndicatorProxy[0m[0x978e3286EB805934215a88694d80b09aDed68D90] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0x978e3286eb805934215a88694d80b09aded68d90[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mSlashIndicatorProxy[0m[0x978e3286EB805934215a88694d80b09aDed68D90]
+
+  >  [94m_deployProxy StakingVesting[0m ...
+  [92m([94mlocalhost[0m)[93mStakingVestingLogic[0m[0x8B71b41D4dBEb2b6821d44692d3fACAAf77480Bb] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0x8b71b41d4dbeb2b6821d44692d3facaaf77480bb[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mStakingVestingLogic[0m[0x8B71b41D4dBEb2b6821d44692d3fACAAf77480Bb]
+
+  [92m([94mlocalhost[0m)[93mStakingVestingProxy[0m[0x1c23A6d89F95ef3148BCDA8E242cAb145bf9c0E4] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0x1c23a6d89f95ef3148bcda8e242cab145bf9c0e4[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mStakingVestingProxy[0m[0x1c23A6d89F95ef3148BCDA8E242cAb145bf9c0E4]
+
+  >  [94m_deployProxy FastFinalityTracking[0m ...
+  [92m([94mlocalhost[0m)[93mFastFinalityTrackingLogic[0m[0x0c8b5822b6e02CDa722174F19A1439A7495a3fA6] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0x0c8b5822b6e02cda722174f19a1439a7495a3fa6[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mFastFinalityTrackingLogic[0m[0x0c8b5822b6e02CDa722174F19A1439A7495a3fA6]
+
+  [92m([94mlocalhost[0m)[93mFastFinalityTrackingProxy[0m[0x20A42a5a785622c6Ba2576B2D6e924aA82BFA11D] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0x20a42a5a785622c6ba2576b2d6e924aa82bfa11d[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mFastFinalityTrackingProxy[0m[0x20A42a5a785622c6Ba2576B2D6e924aA82BFA11D]
+
+  >  [94m_deployProxy RoninRandomBeacon[0m ...
+  [92m([94mlocalhost[0m)[93mRoninRandomBeaconLogic[0m[0xDeF3bca8c80064589E6787477FFa7Dd616B5574F] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0xdef3bca8c80064589e6787477ffa7dd616b5574f[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mRoninRandomBeaconLogic[0m[0xDeF3bca8c80064589E6787477FFa7Dd616B5574F]
+
+  [92m([94mlocalhost[0m)[93mRoninRandomBeaconProxy[0m[0xc7B87b2b892EA5C3CfF47168881FE168C00377FB] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0xc7b87b2b892ea5c3cff47168881fe168c00377fb[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mRoninRandomBeaconProxy[0m[0xc7B87b2b892EA5C3CfF47168881FE168C00377FB]
+
+  >  [94m_initStaking[0m ...
+  >  [94m_initTrustedOrg[0m ...
+  >  [94m_initValidatorSet[0m ...
+  >  [94m_deployLogic RoninValidatorSet[0m ...
+  [92m([94mlocalhost[0m)[93mRoninValidatorSetLogic[0m[0x29C66C9208f106f34754814f488FA80b6d566790] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0x29c66c9208f106f34754814f488fa80b6d566790[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mRoninValidatorSetLogic[0m[0x29C66C9208f106f34754814f488FA80b6d566790]
+
+  >  [94m_deployLogic RoninValidatorSetREP10Migrator[0m ...
+  [92m([94mlocalhost[0m)[93mRoninValidatorSetREP10MigratorLogic[0m[0xcae746B46013Bf4D43B8E2B9e98F9DBE2461532A] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0xcae746b46013bf4d43b8e2b9e98f9dbe2461532a[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mRoninValidatorSetREP10MigratorLogic[0m[0xcae746B46013Bf4D43B8E2B9e98F9DBE2461532A]
+
+  [93mVoting on RoninGovernanceAdmin for upgrading...[0m
+  [95m
+================================= Proposal Detail =================================
+[0m
+  	Governance Admin:          	([94mlocalhost[0m)[93mRoninGovernanceAdmin[0m[0x50EEf481cae4250d252Ae577A09bF514f224C6C4]
+	Nonce:                   	1
+	Expiry:                  	3601
+	Number of internal calls:	1
+
+  [94m
+========================== Index: 0 ==========================
+[0mTarget:      	([94mlocalhost[0m)[93mRoninValidatorSet[0m[0xA8452Ec99ce0C64f20701dB7dD3abDb607c00496]
+Value:     	0
+Gas amount:	1000000
+Calldata:
+[93m1) "upgradeTo(address)"
+0x794aC86b74c89e4c4f5722e8cdB15e982ecD1C92[0m
+  [95m
+==============================================================================
+[0m
+  [93mVoting on RoninGovernanceAdmin for upgrading...[0m
+  [95m
+================================= Proposal Detail =================================
+[0m
+  	Governance Admin:          	([94mlocalhost[0m)[93mRoninGovernanceAdmin[0m[0x50EEf481cae4250d252Ae577A09bF514f224C6C4]
+	Nonce:                   	2
+	Expiry:                  	3601
+	Number of internal calls:	1
+
+  [94m
+========================== Index: 0 ==========================
+[0mTarget:      	([94mlocalhost[0m)[93mRoninValidatorSet[0m[0xA8452Ec99ce0C64f20701dB7dD3abDb607c00496]
+Value:     	0
+Gas amount:	1000000
+Calldata:
+[93m1) "upgradeToAndCall(address,bytes)"
+0xcae746B46013Bf4D43B8E2B9e98F9DBE2461532A
+0xc4d66de8000000000000000000000000c7b87b2b892ea5c3cff47168881fe168c00377fb[0m
+  [95m
+==============================================================================
+[0m
+  >  [94m_initProfile[0m ...
+  >  [94m_initMaintenance[0m ...
+  >  [94m_initSlashIndicator[0m ...
+  >  [94m_initStakingVesting[0m ...
+  >  [94m_initFastFinalityTracking[0m ...
+  >  [94m_initRoninRandomBeacon[0m ...
+
+Suite result: [31mFAILED[0m. [32m0[0m passed; [31m1[0m failed; [33m0[0m skipped; finished in 2.63s (0.00ns CPU time)
+[2m2024-06-21T11:17:11.744511Z[0m [31mERROR[0m [2mcheatcodes[0m[2m:[0m non-empty stderr [3minput[0m[2m=[0m["./script/misc/genkey.sh"] [3mstderr[0m[2m=[0m"./script/misc/genkey.sh: line 4: go: command not found\n"
+[2m2024-06-21T11:17:11.744959Z[0m [31mERROR[0m [2mforge::runner[0m[2m:[0m setUp failed [3mreason[0m[2m=[0mpanic: array out-of-bounds access (0x32) [3mcontract[0m[2m=[0m0x7FA9385bE102ac3EAc297483Dd6233D62b3e1496
+
+Ran 1 test for test/foundry/ronin/REP-10/fast-finality-tracking/REP-10_FastFinalityTracking_Light.t.sol:REP_10_FastFinalityTrackingTest_Light
+[31m[FAIL. Reason: setup failed: panic: array out-of-bounds access (0x32)][0m setUp() (gas: 0)
+Logs:
+  [94mContractConfig:[0m Deployment data loaded in 11 milliseconds
+  SLASH_RANDOM_BEACON_ACTIVATED_AT_PERIOD:  19895
+  RANDOM_BEACON_ACTIVATED_AT_PERIOD:  19895
+  RONIN_VALIDATOR_SET_REP10_MIGRATOR_ACTIVATED_AT_PERIOD:  19895
+  >  [94m_deployProxy RoninValidatorSet[0m ...
+  [92m([94mlocalhost[0m)[93mRoninValidatorSetLogic[0m[0x90193C961A926261B756D1E5bb255e67ff9498A1] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0x90193c961a926261b756d1e5bb255e67ff9498a1[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mRoninValidatorSetLogic[0m[0x90193C961A926261B756D1E5bb255e67ff9498A1]
+
+  [92m([94mlocalhost[0m)[93mRoninValidatorSetProxy[0m[0xA8452Ec99ce0C64f20701dB7dD3abDb607c00496] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0xa8452ec99ce0c64f20701db7dd3abdb607c00496[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mRoninValidatorSetProxy[0m[0xA8452Ec99ce0C64f20701dB7dD3abDb607c00496]
+
+  >  [94m_deployProxy RoninTrustedOrganization[0m ...
+  [92m([94mlocalhost[0m)[93mRoninTrustedOrganizationLogic[0m[0xBb2180ebd78ce97360503434eD37fcf4a1Df61c3] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0xbb2180ebd78ce97360503434ed37fcf4a1df61c3[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mRoninTrustedOrganizationLogic[0m[0xBb2180ebd78ce97360503434eD37fcf4a1Df61c3]
+
+  [92m([94mlocalhost[0m)[93mRoninTrustedOrganizationProxy[0m[0xDB8cFf278adCCF9E9b5da745B44E754fC4EE3C76] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0xdb8cff278adccf9e9b5da745b44e754fc4ee3c76[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mRoninTrustedOrganizationProxy[0m[0xDB8cFf278adCCF9E9b5da745B44E754fC4EE3C76]
+
+  >  [94m_deployImmutable RoninGovernanceAdmin[0m ...
+  [92m([94mlocalhost[0m)[93mRoninGovernanceAdmin[0m[0x50EEf481cae4250d252Ae577A09bF514f224C6C4] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0x50eef481cae4250d252ae577a09bf514f224c6c4[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mRoninGovernanceAdmin[0m[0x50EEf481cae4250d252Ae577A09bF514f224C6C4]
+
+  >  [94m_deployProxy Profile[0m ...
+  [92m([94mlocalhost[0m)[93mProfileLogic[0m[0x62c20Aa1e0272312BC100b4e23B4DC1Ed96dD7D1] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0x62c20aa1e0272312bc100b4e23b4dc1ed96dd7d1[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mProfileLogic[0m[0x62c20Aa1e0272312BC100b4e23B4DC1Ed96dD7D1]
+
+  [92m([94mlocalhost[0m)[93mProfileProxy[0m[0xDEb1E9a6Be7Baf84208BB6E10aC9F9bbE1D70809] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0xdeb1e9a6be7baf84208bb6e10ac9f9bbe1d70809[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mProfileProxy[0m[0xDEb1E9a6Be7Baf84208BB6E10aC9F9bbE1D70809]
+
+  >  [94m_deployProxy Staking[0m ...
+  [92m([94mlocalhost[0m)[93mStakingLogic[0m[0xD718d5A27a29FF1cD22403426084bA0d479869a0] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0xd718d5a27a29ff1cd22403426084ba0d479869a0[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mStakingLogic[0m[0xD718d5A27a29FF1cD22403426084bA0d479869a0]
+
+  [92m([94mlocalhost[0m)[93mStakingProxy[0m[0x4f559F30f5eB88D635FDe1548C4267DB8FaB0351] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0x4f559f30f5eb88d635fde1548c4267db8fab0351[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mStakingProxy[0m[0x4f559F30f5eB88D635FDe1548C4267DB8FaB0351]
+
+  >  [94m_deployProxy Maintenance[0m ...
+  [92m([94mlocalhost[0m)[93mMaintenanceLogic[0m[0x416C42991d05b31E9A6dC209e91AD22b79D87Ae6] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0x416c42991d05b31e9a6dc209e91ad22b79d87ae6[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mMaintenanceLogic[0m[0x416C42991d05b31E9A6dC209e91AD22b79D87Ae6]
+
+  [92m([94mlocalhost[0m)[93mMaintenanceProxy[0m[0xd21060559c9beb54fC07aFd6151aDf6cFCDDCAeB] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0xd21060559c9beb54fc07afd6151adf6cfcddcaeb[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mMaintenanceProxy[0m[0xd21060559c9beb54fC07aFd6151aDf6cFCDDCAeB]
+
+  >  [94m_deployProxy SlashIndicator[0m ...
+  [92m([94mlocalhost[0m)[93mSlashIndicatorLogic[0m[0x4C52a6277b1B84121b3072C0c92b6Be0b7CC10F1] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0x4c52a6277b1b84121b3072c0c92b6be0b7cc10f1[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mSlashIndicatorLogic[0m[0x4C52a6277b1B84121b3072C0c92b6Be0b7CC10F1]
+
+  [92m([94mlocalhost[0m)[93mSlashIndicatorProxy[0m[0x978e3286EB805934215a88694d80b09aDed68D90] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0x978e3286eb805934215a88694d80b09aded68d90[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mSlashIndicatorProxy[0m[0x978e3286EB805934215a88694d80b09aDed68D90]
+
+  >  [94m_deployProxy StakingVesting[0m ...
+  [92m([94mlocalhost[0m)[93mStakingVestingLogic[0m[0x8B71b41D4dBEb2b6821d44692d3fACAAf77480Bb] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0x8b71b41d4dbeb2b6821d44692d3facaaf77480bb[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mStakingVestingLogic[0m[0x8B71b41D4dBEb2b6821d44692d3fACAAf77480Bb]
+
+  [92m([94mlocalhost[0m)[93mStakingVestingProxy[0m[0x1c23A6d89F95ef3148BCDA8E242cAb145bf9c0E4] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0x1c23a6d89f95ef3148bcda8e242cab145bf9c0e4[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mStakingVestingProxy[0m[0x1c23A6d89F95ef3148BCDA8E242cAb145bf9c0E4]
+
+  >  [94m_deployProxy FastFinalityTracking[0m ...
+  [92m([94mlocalhost[0m)[93mFastFinalityTrackingLogic[0m[0x0c8b5822b6e02CDa722174F19A1439A7495a3fA6] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0x0c8b5822b6e02cda722174f19a1439a7495a3fa6[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mFastFinalityTrackingLogic[0m[0x0c8b5822b6e02CDa722174F19A1439A7495a3fA6]
+
+  [92m([94mlocalhost[0m)[93mFastFinalityTrackingProxy[0m[0x20A42a5a785622c6Ba2576B2D6e924aA82BFA11D] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0x20a42a5a785622c6ba2576b2d6e924aa82bfa11d[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mFastFinalityTrackingProxy[0m[0x20A42a5a785622c6Ba2576B2D6e924aA82BFA11D]
+
+  >  [94m_deployProxy RoninRandomBeacon[0m ...
+  [92m([94mlocalhost[0m)[93mRoninRandomBeaconLogic[0m[0xDeF3bca8c80064589E6787477FFa7Dd616B5574F] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0xdef3bca8c80064589e6787477ffa7dd616b5574f[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mRoninRandomBeaconLogic[0m[0xDeF3bca8c80064589E6787477FFa7Dd616B5574F]
+
+  [92m([94mlocalhost[0m)[93mRoninRandomBeaconProxy[0m[0xc7B87b2b892EA5C3CfF47168881FE168C00377FB] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0xc7b87b2b892ea5c3cff47168881fe168c00377fb[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mRoninRandomBeaconProxy[0m[0xc7B87b2b892EA5C3CfF47168881FE168C00377FB]
+
+  >  [94m_initStaking[0m ...
+  >  [94m_initTrustedOrg[0m ...
+  >  [94m_initValidatorSet[0m ...
+  >  [94m_deployLogic RoninValidatorSet[0m ...
+  [92m([94mlocalhost[0m)[93mRoninValidatorSetLogic[0m[0x29C66C9208f106f34754814f488FA80b6d566790] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0x29c66c9208f106f34754814f488fa80b6d566790[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mRoninValidatorSetLogic[0m[0x29C66C9208f106f34754814f488FA80b6d566790]
+
+  >  [94m_deployLogic RoninValidatorSetREP10Migrator[0m ...
+  [92m([94mlocalhost[0m)[93mRoninValidatorSetREP10MigratorLogic[0m[0xcae746B46013Bf4D43B8E2B9e98F9DBE2461532A] at: [96mhttps://unknown-explorer.com/[0m[96maddress/[0m[96m0xcae746b46013bf4d43b8e2b9e98f9dbe2461532a[0m[0m
+  Skipping artifact generation for: ([94mlocalhost[0m)[93mRoninValidatorSetREP10MigratorLogic[0m[0xcae746B46013Bf4D43B8E2B9e98F9DBE2461532A]
+
+  [93mVoting on RoninGovernanceAdmin for upgrading...[0m
+  [95m
+================================= Proposal Detail =================================
+[0m
+  	Governance Admin:          	([94mlocalhost[0m)[93mRoninGovernanceAdmin[0m[0x50EEf481cae4250d252Ae577A09bF514f224C6C4]
+	Nonce:                   	1
+	Expiry:                  	3601
+	Number of internal calls:	1
+
+  [94m
+========================== Index: 0 ==========================
+[0mTarget:      	([94mlocalhost[0m)[93mRoninValidatorSet[0m[0xA8452Ec99ce0C64f20701dB7dD3abDb607c00496]
+Value:     	0
+Gas amount:	1000000
+Calldata:
+[93m1) "upgradeTo(address)"
+0x794aC86b74c89e4c4f5722e8cdB15e982ecD1C92[0m
+  [95m
+==============================================================================
+[0m
+  [93mVoting on RoninGovernanceAdmin for upgrading...[0m
+  [95m
+================================= Proposal Detail =================================
+[0m
+  	Governance Admin:          	([94mlocalhost[0m)[93mRoninGovernanceAdmin[0m[0x50EEf481cae4250d252Ae577A09bF514f224C6C4]
+	Nonce:                   	2
+	Expiry:                  	3601
+	Number of internal calls:	1
+
+  [94m
+========================== Index: 0 ==========================
+[0mTarget:      	([94mlocalhost[0m)[93mRoninValidatorSet[0m[0xA8452Ec99ce0C64f20701dB7dD3abDb607c00496]
+Value:     	0
+Gas amount:	1000000
+Calldata:
+[93m1) "upgradeToAndCall(address,bytes)"
+0xcae746B46013Bf4D43B8E2B9e98F9DBE2461532A
+0xc4d66de8000000000000000000000000c7b87b2b892ea5c3cff47168881fe168c00377fb[0m
+  [95m
+==============================================================================
+[0m
+  >  [94m_initProfile[0m ...
+  >  [94m_initMaintenance[0m ...
+  >  [94m_initSlashIndicator[0m ...
+  >  [94m_initStakingVesting[0m ...
+  >  [94m_initFastFinalityTracking[0m ...
+  >  [94m_initRoninRandomBeacon[0m ...
+  id,	css,	amt,	gv,	vRate,	cRate
+  0,	0xf459B33176Ceb12Bb2178c7B57bAF33CEC2301e3,	6904000000000000000000,	true,	100,	500
+  1,	0x6DC805D515796712c06D40b121A10FB4436d32eC,	9014000000000000000000,	true,	100,	1000
+  2,	0x658702C841F2530518B63cC02D7C3A1529Be9976,	7812000000000000000000,	true,	100,	500
+  3,	0xE281F6E5aD3d73dB4a8539c05a91867Aa91C5407,	9180000000000000000000,	true,	100,	500
+  4,	0x46B74B234b9EDFE72a7e07851aEb6Ae1E982171A,	7362000000000000000000,	true,	100,	2000
+  5,	0x6fFea97cf8272373A3E0E39dD43ec64C4dfd0fbe,	7210000000000000000000,	false,	100,	2000
+  6,	0xFd1986e6A40Ea50b9871D6582cA7a2500dAE0A4F,	5611000000000000000000,	false,	80,	500
+  7,	0x88015835A3e1402Fa5228Bcc63Fb2A3B39468fdF,	7212000000000000000000,	false,	100,	500
+  8,	0xd0e5b58E25bAd4A6472E8e4F8008631082533613,	6277000000000000000000,	false,	100,	500
+  9,	0xD97D9d0D4F1847b234614e4A2F448c1a56755E39,	6579000000000000000000,	false,	90,	500
+  10,	0x58534aC1A60910A17e412bf26B6c4CBb833B0959,	7380000000000000000000,	false,	100,	500
+  11,	0x86C1D92FEB8003A9202aBFe44231556BB98865b6,	6066000000000000000000,	false,	100,	500
+  12,	0xc8C80d63c0539D9023Da7786a63C505150875c5a,	5218000000000000000000,	false,	100,	500
+
+Suite result: [31mFAILED[0m. [32m0[0m passed; [31m1[0m failed; [33m0[0m skipped; finished in 2.63s (0.00ns CPU time)
+
+Ran 2 test suites in 2.69s (5.26s CPU time): [32m0[0m tests passed, [31m2[0m failed, [33m0[0m skipped (2 total tests)
+
+Failing tests:
+Encountered 1 failing test in test/foundry/ronin/REP-10/fast-finality-tracking/REP-10_FastFinalityTracking.t.sol:REP_10_FastFinalityTrackingTest
+[31m[FAIL. Reason: setup failed: panic: array out-of-bounds access (0x32)][0m setUp() (gas: 0)
+
+Encountered 1 failing test in test/foundry/ronin/REP-10/fast-finality-tracking/REP-10_FastFinalityTracking_Light.t.sol:REP_10_FastFinalityTrackingTest_Light
+[31m[FAIL. Reason: setup failed: panic: array out-of-bounds access (0x32)][0m setUp() (gas: 0)
+
+Encountered a total of [31m2[0m failing tests, [32m0[0m tests succeeded
