@@ -55,11 +55,9 @@ interface ICoinbaseExecution is ISlashingExecution {
   );
 
   /// @dev Emitted when the amount of block mining reward is distributed to staking contract for delegators.
-  event BlockMiningRewardDelegatorsDistributed(address[] cids, uint256[] delegatingAmounts);
+  event MiningRewardDelegatorsDistributed(address[] cids, uint256[] delegatingAmounts);
   /// @dev Emitted when the contracts fails when distributing the amount of RON to the staking contract for delegators.
-  event BlockMiningRewardDelegatorsDistributionFailed(
-    address[] cids, uint256[] delegatingAmounts, uint256 contractBalance
-  );
+  event MiningRewardDelegatorsDistributionFailed(address[] cids, uint256[] delegatingAmounts, uint256 contractBalance);
   /// @dev Emitted when the fast finality rewards for delegators is distributed to staking contract for delegators.
   event FastFinalityRewardDelegatorsDistributed(address[] cids, uint256[] delegatingAmounts);
   /// @dev Emitted when the contract fails when distributing the fast finality rewards for delegators to the staking contract for delegators.

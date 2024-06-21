@@ -286,7 +286,7 @@ contract REP_10_FastFinalityTrackingTest is REP10_BaseTest {
             console.log("FF Delegator Reward:", vm.getLabel(cids[j]), "Amount:", vm.toString(ffAmounts[j]).green());
           }
         }
-        if (logs[i].topics[0] == ICoinbaseExecution.BlockMiningRewardDelegatorsDistributed.selector) {
+        if (logs[i].topics[0] == ICoinbaseExecution.MiningRewardDelegatorsDistributed.selector) {
           (cids, bmAmounts) = abi.decode(logs[i].data, (address[], uint256[]));
           uint256 total = bmAmounts.sum();
           sumDelegatorReward += total;

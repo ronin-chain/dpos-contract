@@ -305,14 +305,14 @@ abstract contract CoinbaseExecution is ICoinbaseExecution, CoinbaseExecutionDepe
         staking.execRecordRewards({ poolIds: cids, rewards: totalRewards, period: period });
 
         emit FastFinalityRewardDelegatorsDistributed(cids, delegatorFFRewards);
-        emit BlockMiningRewardDelegatorsDistributed(cids, delegatorMiningRewards);
+        emit MiningRewardDelegatorsDistributed(cids, delegatorMiningRewards);
 
         return;
       }
 
       uint256 selfBalance = address(this).balance;
       emit FastFinalityRewardDelegatorsDistributionFailed(cids, delegatorFFRewards, selfBalance);
-      emit BlockMiningRewardDelegatorsDistributionFailed(cids, delegatorMiningRewards, selfBalance);
+      emit MiningRewardDelegatorsDistributionFailed(cids, delegatorMiningRewards, selfBalance);
     }
   }
 
