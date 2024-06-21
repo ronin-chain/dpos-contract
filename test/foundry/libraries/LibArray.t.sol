@@ -1,10 +1,36 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.5;
 
 import { Test } from "forge-std/Test.sol";
 import { LibArray } from "@ronin/contracts/libraries/LibArray.sol";
 
 contract LibArrayTest is Test {
+  function test_Add() public pure {
+    uint[] memory arr1 = new uint[](3);
+    arr1[0] = 1;
+    arr1[1] = 2;
+    arr1[2] = 3;
+    uint[] memory arr2 = new uint[](3);
+    arr2[0] = 0;
+    arr2[1] = 2;
+    arr2[2] = 5;
+    uint[] memory expected = new uint[](3);
+    expected[0] = 1;
+    expected[1] = 4;
+    expected[2] = 8;
+    uint256[] memory actual = LibArray.add(arr1, arr2);
+
+    for (uint256 i; i < arr1.length; ++i) {
+      assertEq(actual[i], expected[i], "actual[i] == expected[i]");
+    }
+
+    assertEq(
+      keccak256(abi.encodePacked(actual)),
+      keccak256(abi.encodePacked(expected)),
+      "keccak256(abi.encodePacked(actual)) == keccak256(abi.encodePacked(expected))"
+    );
+  }
+
   function testFuzz_Add(uint256[1000] memory arr1_, uint256[1000] memory arr2_) public pure {
     uint256[] memory arr1 = new uint256[](arr1_.length);
     uint256[] memory arr2 = new uint256[](arr2_.length);
