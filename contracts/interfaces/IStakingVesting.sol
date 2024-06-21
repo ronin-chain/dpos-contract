@@ -28,6 +28,8 @@ interface IStakingVesting {
   event FastFinalityRewardPercentageUpdated(uint256);
   /// @dev Emitted when the percent of fast finality reward for REP10 is updated
   event FastFinalityRewardPercentageUpdatedForREP10(uint256);
+  /// @dev Emitted when the REP10 is activated
+  event REP10FastFinalityRewardActivated(uint256 period, uint256 fastFinalityPercentage);
 
   function initialize(
     address validatorContract,
@@ -40,6 +42,11 @@ interface IStakingVesting {
   function initializeV3(uint256 fastFinalityRewardPercent) external;
 
   function initializeV4(uint256 activatedAtPeriod, uint256 fastFinalityRewardPercentREP10) external;
+
+  /**
+   * @dev Returns the destined period that REP10 is activated.
+   */
+  function getREP10ActivatedAtPeriod() external view returns (uint256);
 
   /**
    * @dev Returns the bonus amount for the block producer at `blockNum`.

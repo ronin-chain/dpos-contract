@@ -31,6 +31,8 @@ contract StakingVesting is
   uint256 internal _fastFinalityRewardPercentageREP10;
   /// @dev The period that REP-10 is activated.
   uint256 internal _rep10ActivationPeriod;
+  /// @dev The boolean flag to check if REP-10 is activated.
+  bool internal _isREP10Activated;
 
   constructor() {
     _disableInitializers();
@@ -62,6 +64,13 @@ contract StakingVesting is
     _rep10ActivationPeriod = activatedAtPeriod;
     _fastFinalityRewardPercentageREP10 = fastFinalityRewardPercentREP10;
     emit FastFinalityRewardPercentageUpdatedForREP10(fastFinalityRewardPercentREP10);
+  }
+
+  /**
+   * @inheritdoc IStakingVesting
+   */
+  function getREP10ActivatedAtPeriod() external view override returns (uint256) {
+    return _rep10ActivationPeriod;
   }
 
   /**
@@ -116,10 +125,12 @@ contract StakingVesting is
     blockProducerBonus = forBlockProducer ? blockProducerBlockBonus(block.number) : 0;
     bridgeOperatorBonus = forBridgeOperator ? bridgeOperatorBlockBonus(block.number) : 0;
 
-    if (_fastFinalityRewardPercentage != _fastFinalityRewardPercentageREP10) {
+    if (!_isREP10Activated) {
       uint256 currPeriod = IRoninValidatorSet(getContract(ContractType.VALIDATOR)).currentPeriod();
       if (currPeriod >= _rep10ActivationPeriod) {
+        _isREP10Activated = true;
         _fastFinalityRewardPercentage = _fastFinalityRewardPercentageREP10;
+        emit REP10FastFinalityRewardActivated(currPeriod, _fastFinalityRewardPercentage);
       }
     }
 
