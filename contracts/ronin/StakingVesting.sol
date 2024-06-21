@@ -116,9 +116,11 @@ contract StakingVesting is
     blockProducerBonus = forBlockProducer ? blockProducerBlockBonus(block.number) : 0;
     bridgeOperatorBonus = forBridgeOperator ? bridgeOperatorBlockBonus(block.number) : 0;
 
-    uint256 currPeriod = IRoninValidatorSet(getContract(ContractType.VALIDATOR)).currentPeriod();
-    if (currPeriod >= _rep10ActivationPeriod) {
-      _fastFinalityRewardPercentage = _fastFinalityRewardPercentageREP10;
+    if (_fastFinalityRewardPercentage != _fastFinalityRewardPercentageREP10) {
+      uint256 currPeriod = IRoninValidatorSet(getContract(ContractType.VALIDATOR)).currentPeriod();
+      if (currPeriod >= _rep10ActivationPeriod) {
+        _fastFinalityRewardPercentage = _fastFinalityRewardPercentageREP10;
+      }
     }
 
     fastFinalityRewardPercent = _fastFinalityRewardPercentage;
