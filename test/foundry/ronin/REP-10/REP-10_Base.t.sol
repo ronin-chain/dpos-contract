@@ -10,6 +10,8 @@ import { ISharedArgument } from "script/interfaces/ISharedArgument.sol";
 import { Contract } from "script/utils/Contract.sol";
 import { loadContract } from "@fdk/utils/Helpers.sol";
 import { LibWrapUpEpoch } from "script/shared/libraries/LibWrapUpEpoch.sol";
+import { ICoinbaseExecution } from "@ronin/contracts/interfaces/validator/ICoinbaseExecution.sol";
+import { IRoninGovernanceAdmin } from "@ronin/contracts/interfaces/IRoninGovernanceAdmin.sol";
 import { IRandomBeacon } from "@ronin/contracts/interfaces/random-beacon/IRandomBeacon.sol";
 import { ICandidateManager } from "@ronin/contracts/interfaces/validator/ICandidateManager.sol";
 import { IRoninValidatorSet } from "@ronin/contracts/interfaces/validator/IRoninValidatorSet.sol";
@@ -32,10 +34,11 @@ import { TConsensus } from "@ronin/contracts/udvts/Types.sol";
 import { TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
 
 contract REP10_BaseTest is Test, GlobalConfigConsumer {
+  DeployDPoS dposDeployHelper;
   bytes param;
-  address governanceAdmin;
   IProfile public profile;
   IStaking public staking;
+  IRoninGovernanceAdmin governanceAdmin;
   IStakingVesting public stakingVesting;
   ISlashIndicator public slashIndicator;
   IRandomBeacon public roninRandomBeacon;
@@ -44,28 +47,39 @@ contract REP10_BaseTest is Test, GlobalConfigConsumer {
   IRoninTrustedOrganization public roninTrustedOrganization;
 
   function setUp() public virtual {
-    DeployDPoS dposDeployHelper = new DeployDPoS();
-    dposDeployHelper.setUp();
-    param = vme.getRawSharedArguments();
-    dposDeployHelper.run();
-    LibPrecompile.deployPrecompile();
-
-    governanceAdmin = loadContract(Contract.RoninGovernanceAdmin.key());
-    profile = IProfile(loadContract(Contract.Profile.key()));
-    staking = IStaking(loadContract(Contract.Staking.key()));
-    stakingVesting = IStakingVesting(loadContract(Contract.StakingVesting.key()));
-    slashIndicator = ISlashIndicator(loadContract(Contract.SlashIndicator.key()));
-    roninValidatorSet = IRoninValidatorSet(loadContract(Contract.RoninValidatorSet.key()));
-    fastFinalityTracking = IFastFinalityTracking(loadContract(Contract.FastFinalityTracking.key()));
-    roninRandomBeacon = IRandomBeacon(loadContract(Contract.RoninRandomBeacon.key()));
-    roninTrustedOrganization = IRoninTrustedOrganization(loadContract(Contract.RoninTrustedOrganization.key()));
+    _setUpDPoSDeployHelper();
+    _loadContracts();
 
     dposDeployHelper.cheatSetUpValidators();
 
+    _cheatTime();
+  }
+
+  function _cheatTime() internal virtual {
     vm.warp(_bound(vm.getBlockTimestamp(), vm.unixTime() / 1_000, type(uint40).max));
     vme.rollUpTo(1000);
 
     LibWrapUpEpoch.wrapUpEpoch();
+  }
+
+  function _loadContracts() internal virtual {
+    profile = IProfile(loadContract(Contract.Profile.key()));
+    staking = IStaking(loadContract(Contract.Staking.key()));
+    stakingVesting = IStakingVesting(loadContract(Contract.StakingVesting.key()));
+    slashIndicator = ISlashIndicator(loadContract(Contract.SlashIndicator.key()));
+    roninRandomBeacon = IRandomBeacon(loadContract(Contract.RoninRandomBeacon.key()));
+    roninValidatorSet = IRoninValidatorSet(loadContract(Contract.RoninValidatorSet.key()));
+    governanceAdmin = IRoninGovernanceAdmin(loadContract(Contract.RoninGovernanceAdmin.key()));
+    fastFinalityTracking = IFastFinalityTracking(loadContract(Contract.FastFinalityTracking.key()));
+    roninTrustedOrganization = IRoninTrustedOrganization(loadContract(Contract.RoninTrustedOrganization.key()));
+  }
+
+  function _setUpDPoSDeployHelper() internal virtual {
+    dposDeployHelper = new DeployDPoS();
+    dposDeployHelper.setUp();
+    param = vme.getRawSharedArguments();
+    dposDeployHelper.run();
+    LibPrecompile.deployPrecompile();
   }
 
   /**
