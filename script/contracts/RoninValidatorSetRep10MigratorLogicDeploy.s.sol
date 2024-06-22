@@ -15,15 +15,24 @@ contract RoninValidatorSetREP10MigratorLogicDeploy is RoninMigration {
   using LibProxy for *;
 
   uint256 private _activatedAtPeriod;
+  address private _prevImpl;
 
   function _injectDependencies() internal virtual override {
     _setDependencyDeployScript(Contract.RoninValidatorSet.key(), new RoninValidatorSetDeploy());
     _setDependencyDeployScript(Contract.RoninRandomBeacon.key(), new RoninRandomBeaconDeploy());
   }
 
-  function overrideActivatedAtPeriod(uint256 activatedAtPeriod) public returns (IMigrationScript) {
+  function overrideActivatedAtPeriod(uint256 activatedAtPeriod)
+    public
+    returns (RoninValidatorSetREP10MigratorLogicDeploy)
+  {
     _activatedAtPeriod = activatedAtPeriod;
-    return IMigrationScript(address(this));
+    return RoninValidatorSetREP10MigratorLogicDeploy(address(this));
+  }
+
+  function overridePrevImpl(address prevImpl) public returns (RoninValidatorSetREP10MigratorLogicDeploy) {
+    _prevImpl = prevImpl;
+    return RoninValidatorSetREP10MigratorLogicDeploy(address(this));
   }
 
   function _logicArgs() internal returns (bytes memory args) {
@@ -31,7 +40,7 @@ contract RoninValidatorSetREP10MigratorLogicDeploy is RoninMigration {
       config.sharedArguments().roninValidatorSetREP10Migrator;
 
     address payable currProxy = loadContractOrDeploy(Contract.RoninValidatorSet.key());
-    address prevImpl = currProxy.getProxyImplementation();
+    address prevImpl = _prevImpl == address(0x0) ? currProxy.getProxyImplementation() : _prevImpl;
     address newImpl = _deployLogic(Contract.RoninValidatorSet.key());
     uint256 activatedAtPeriod = _activatedAtPeriod > 0 ? _activatedAtPeriod : param.activatedAtPeriod;
     args = abi.encode(currProxy, prevImpl, newImpl, activatedAtPeriod);
