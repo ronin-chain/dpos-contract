@@ -137,7 +137,12 @@ contract PostChecker is
 
     for (uint256 i; i < vrfKeys.length; ++i) {
       address cid = profile.getConsensus2Id(allTrustedOrgs[i].consensusAddr);
-      address admin = profile.getId2Admin(cid);
+      address admin;
+      try profile.getId2Admin(cid) returns (address adm) {
+        admin = adm;
+      } catch {
+        admin = profile.getId2Profile(cid).admin;
+      }
 
       vm.prank(admin);
       profile.changeVRFKeyHash(cid, vrfKeys[i].keyHash);
