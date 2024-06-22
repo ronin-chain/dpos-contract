@@ -11,5 +11,5 @@ Validator[13] memory mValidators = [
   Validator({ adm: makeAddr("adm-09"), css: makeAddr("css-09"), amt: 6579 ether, gv: false, vRate: 90, cRate: 500 }),
   Validator({ adm: makeAddr("adm-10"), css: makeAddr("css-10"), amt: 7380 ether, gv: false, vRate: 100, cRate: 500 }),
   Validator({ adm: makeAddr("adm-11"), css: makeAddr("css-11"), amt: 6066 ether, gv: false, vRate: 100, cRate: 500 }),
-  Validator({ adm: makeAddr("adm-12"), css: makeAddr("css-12"), amt: 5218 ether, gv: false, vRate: 100, cRate: 500 }),
+  Validator({ adm: makeAddr("adm-12"), css: makeAddr("css-12"), amt: 5218 ether, gv: false, vRate: 100, cRate: 500 })
 ];

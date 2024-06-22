@@ -7,7 +7,7 @@ contract REP_10_FastFinalityTrackingTest_Light is REP10_BaseTest {
   using StdStyle for *;
   using LibArray for uint256[];
 
-  struct Delegator {
+  struct DelegatorWithVesting {
     address addr;
     uint256 vIdx;
     uint256 amt;
@@ -27,7 +27,8 @@ contract REP_10_FastFinalityTrackingTest_Light is REP10_BaseTest {
 
 
   uint256 private fastFinalityRewardPercentage = 8500;
-  Delegator[] private delegators;
+  address[] private delegators;
+  DelegatorWithVesting[] private delegatorVestings;
   Validator[] private validators;
   mapping(address css => address adm) private cssToAdm;
   mapping(address adm => uint256) private admBalance;
@@ -79,36 +80,38 @@ contract REP_10_FastFinalityTrackingTest_Light is REP10_BaseTest {
   }
 
   function _setUpValidatorAndDelegatorData() private {
-    Delegator[10] memory mDelegators = [
-      Delegator({ addr: makeAddr("dlg-css-02"), vIdx: 2, amt: 263 ether }),
-      Delegator({ addr: makeAddr("dlg-css-08"), vIdx: 8, amt: 245 ether }),
-      Delegator({ addr: makeAddr("dlg-css-11"), vIdx: 11, amt: 384 ether }),
-      Delegator({ addr: makeAddr("dlg-css-03"), vIdx: 3, amt: 401 ether }),
-      Delegator({ addr: makeAddr("dlg-css-07"), vIdx: 7, amt: 155 ether }),
-      Delegator({ addr: makeAddr("dlg-css-10"), vIdx: 10, amt: 350 ether }),
-      Delegator({ addr: makeAddr("dlg-css-00"), vIdx: 0, amt: 148 ether }),
-      Delegator({ addr: makeAddr("dlg-css-11"), vIdx: 11, amt: 392 ether }),
-      Delegator({ addr: makeAddr("dlg-css-10"), vIdx: 10, amt: 200 ether }),
-      Delegator({ addr: makeAddr("dlg-css-11"), vIdx: 11, amt: 455 ether })
+    DelegatorWithVesting[7] memory mDelegators = [
+      DelegatorWithVesting({ addr: makeAddr("dlg-css-00"), vIdx: 0, amt: 148 ether }),
+      DelegatorWithVesting({ addr: makeAddr("dlg-css-02"), vIdx: 2, amt: 263 ether }),
+      DelegatorWithVesting({ addr: makeAddr("dlg-css-03"), vIdx: 3, amt: 401 ether }),
+      DelegatorWithVesting({ addr: makeAddr("dlg-css-07"), vIdx: 7, amt: 155 ether }),
+      DelegatorWithVesting({ addr: makeAddr("dlg-css-08"), vIdx: 8, amt: 245 ether }),
+      DelegatorWithVesting({ addr: makeAddr("dlg-css-10"), vIdx: 10, amt: 550 ether }),
+      // DelegatorWithVesting({ addr: makeAddr("dlg-css-10"), vIdx: 10, amt: 350 ether }),
+      // DelegatorWithVesting({ addr: makeAddr("dlg-css-10"), vIdx: 10, amt: 200 ether }),
+      DelegatorWithVesting({ addr: makeAddr("dlg-css-11"), vIdx: 11, amt: 1231 ether })
+      // DelegatorWithVesting({ addr: makeAddr("dlg-css-11"), vIdx: 11, amt: 384 ether }),
+      // DelegatorWithVesting({ addr: makeAddr("dlg-css-11"), vIdx: 11, amt: 392 ether }),
+      // DelegatorWithVesting({ addr: makeAddr("dlg-css-11"), vIdx: 11, amt: 455 ether })
     ];
     for (uint256 i; i < mDelegators.length; i++) {
-      delegators.push(mDelegators[i]);
+      delegatorVestings.push(mDelegators[i]);
     }
 
     Validator[13] memory mValidators = [
-  Validator({ adm: makeAddr("adm-00"), css: makeAddr("css-00"), amt: 8112 ether, gv: true, vRate: 0, cRate: 500 }),
-  Validator({ adm: makeAddr("adm-01"), css: makeAddr("css-01"), amt: 5678 ether, gv: true, vRate: 0, cRate: 1000 }),
-  Validator({ adm: makeAddr("adm-02"), css: makeAddr("css-02"), amt: 8337 ether, gv: true, vRate: 0, cRate: 500 }),
-  Validator({ adm: makeAddr("adm-03"), css: makeAddr("css-03"), amt: 5917 ether, gv: true, vRate: 0, cRate: 500 }),
-  Validator({ adm: makeAddr("adm-04"), css: makeAddr("css-04"), amt: 5308 ether, gv: true, vRate: 0, cRate: 2000 }),
-  Validator({ adm: makeAddr("adm-05"), css: makeAddr("css-05"), amt: 8660 ether, gv: true, vRate: 0, cRate: 2000 }),
-  Validator({ adm: makeAddr("adm-06"), css: makeAddr("css-06"), amt: 8343 ether, gv: true, vRate: 0, cRate: 500 }),
-  Validator({ adm: makeAddr("adm-07"), css: makeAddr("css-07"), amt: 7142 ether, gv: true, vRate: 0, cRate: 500 }),
-  Validator({ adm: makeAddr("adm-08"), css: makeAddr("css-08"), amt: 7481 ether, gv: true, vRate: 0, cRate: 500 }),
-  Validator({ adm: makeAddr("adm-09"), css: makeAddr("css-09"), amt: 8521 ether, gv: true, vRate: 0, cRate: 500 }),
-  Validator({ adm: makeAddr("adm-10"), css: makeAddr("css-10"), amt: 7245 ether, gv: true, vRate: 0, cRate: 500 }),
-  Validator({ adm: makeAddr("adm-11"), css: makeAddr("css-11"), amt: 8315 ether, gv: true, vRate: 0, cRate: 500 }),
-  Validator({ adm: makeAddr("adm-12"), css: makeAddr("css-12"), amt: 8141 ether, gv: true, vRate: 0, cRate: 500 })
+  Validator({ adm: makeAddr("adm-00"), css: makeAddr("css-00"), amt: 6904 ether, gv: true, vRate: 100, cRate: 500 }),
+  Validator({ adm: makeAddr("adm-01"), css: makeAddr("css-01"), amt: 9014 ether, gv: true, vRate: 100, cRate: 1000 }),
+  Validator({ adm: makeAddr("adm-02"), css: makeAddr("css-02"), amt: 7812 ether, gv: true, vRate: 100, cRate: 500 }),
+  Validator({ adm: makeAddr("adm-03"), css: makeAddr("css-03"), amt: 9180 ether, gv: true, vRate: 100, cRate: 500 }),
+  Validator({ adm: makeAddr("adm-04"), css: makeAddr("css-04"), amt: 7362 ether, gv: true, vRate: 100, cRate: 2000 }),
+  Validator({ adm: makeAddr("adm-05"), css: makeAddr("css-05"), amt: 7210 ether, gv: false, vRate: 100, cRate: 2000 }),
+  Validator({ adm: makeAddr("adm-06"), css: makeAddr("css-06"), amt: 5611 ether, gv: false, vRate: 80, cRate: 500 }),
+  Validator({ adm: makeAddr("adm-07"), css: makeAddr("css-07"), amt: 7212 ether, gv: false, vRate: 100, cRate: 500 }),
+  Validator({ adm: makeAddr("adm-08"), css: makeAddr("css-08"), amt: 6277 ether, gv: false, vRate: 100, cRate: 500 }),
+  Validator({ adm: makeAddr("adm-09"), css: makeAddr("css-09"), amt: 6579 ether, gv: false, vRate: 90, cRate: 500 }),
+  Validator({ adm: makeAddr("adm-10"), css: makeAddr("css-10"), amt: 7380 ether, gv: false, vRate: 100, cRate: 500 }),
+  Validator({ adm: makeAddr("adm-11"), css: makeAddr("css-11"), amt: 6066 ether, gv: false, vRate: 100, cRate: 500 }),
+  Validator({ adm: makeAddr("adm-12"), css: makeAddr("css-12"), amt: 5218 ether, gv: false, vRate: 100, cRate: 500 })
     ];
 
     console.log("--------------------- TEST INPUT ----------------------\n\n");
@@ -196,10 +199,10 @@ contract REP_10_FastFinalityTrackingTest_Light is REP10_BaseTest {
   }
 
   function _delegate() private {
-    for (uint256 i; i < delegators.length; ++i) {
-      vm.deal(delegators[i].addr, delegators[i].amt);
-      vm.prank(delegators[i].addr);
-      staking.delegate{ value: delegators[i].amt }(TConsensus.wrap(validators[delegators[i].vIdx].css));
+    for (uint256 i; i < delegatorVestings.length; ++i) {
+      vm.deal(delegatorVestings[i].addr, delegatorVestings[i].amt);
+      vm.prank(delegatorVestings[i].addr);
+      staking.delegate{ value: delegatorVestings[i].amt }(TConsensus.wrap(validators[delegatorVestings[i].vIdx].css));
     }
   }
 
@@ -336,13 +339,14 @@ contract REP_10_FastFinalityTrackingTest_Light is REP10_BaseTest {
         }
       }
     }
-    uint256[] memory delegatorRewards = LibArray.add(ffAmounts, bmAmounts);
+    uint256[] memory delegatorsRewards = LibArray.add(ffAmounts, bmAmounts);
     for (uint256 i; i < cids.length; ++i) {
       address adm = cssToAdm[cids[i]];
       uint256 validatorReward = adm.balance - admBalance[adm];
       sumValidatorReward += validatorReward;
       console.log(
         string.concat(
+          "    ",
           " Validator: ",
           vm.getLabel(adm),
           " CRate: ",
@@ -350,9 +354,32 @@ contract REP_10_FastFinalityTrackingTest_Light is REP10_BaseTest {
           " Commission Reward: ",
           vm.toString(validatorReward).green(),
           " Delegator Reward: ",
-          vm.toString(delegatorRewards[i]).green(),
+          vm.toString(delegatorsRewards[i]).green(),
           " Total Reward: ",
-          vm.toString(validatorReward + delegatorRewards[i]).green()
+          vm.toString(validatorReward + delegatorsRewards[i]).green()
+        )
+      );
+    }
+
+    console.log("[Staking Contract Distribution] Delegator Reward".yellow());
+    for (uint i; i < delegatorVestings.length; ++i) {
+      TConsensus[] memory cssLst = new TConsensus[](1);
+      cssLst[0] = TConsensus.wrap(validators[delegatorVestings[i].vIdx].css);
+      uint[] memory dRewards =  staking.getRewards(delegatorVestings[i].addr, cssLst);
+      uint[] memory vRewards =  staking.getRewards(validators[delegatorVestings[i].vIdx].adm, cssLst);
+
+      console.log(
+        string.concat(
+          "    Validator: ",
+          vm.getLabel(TConsensus.unwrap(cssLst[0])),
+          "\n        Validator admin: ",
+          vm.getLabel(validators[delegatorVestings[i].vIdx].adm),
+          "\t Amount: ",
+          vm.toString(vRewards[0]).green(),
+          "\n        Delegator: ",
+          vm.getLabel(delegatorVestings[i].addr),
+          "\t Amount: ",
+          vm.toString(dRewards[0]).green()
         )
       );
     }
