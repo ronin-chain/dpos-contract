@@ -3,15 +3,15 @@ pragma solidity ^0.8.19;
 
 import "./REP10_Config_Mainnet_Base.s.sol";
 
-contract Migration__02_ProposeNewProposal_ShadowMainnet_Release_V0_8_1 is REP10_Config_Mainnet_Base {
+contract Migration__02_ProposeAndExecuteNewProposal_ShadowMainnet_Release_V0_8_1 is REP10_Config_Mainnet_Base {
   using LibProxy for *;
   using StdStyle for *;
 
   Proposal.ProposalDetail internal _proposal;
 
-  function run() public virtual override onlyOn(DefaultNetwork.RoninMainnet.key()) {
+  function run() public virtual override onlyOn(Network.ShadowForkMainnet.key()) {
     super.run();
-
+    vm.chainId(2020);
     address payable[] memory allContracts = config.getAllAddresses(network());
 
     _deployAndInitializeRoninRandomBeacon();
@@ -33,15 +33,11 @@ contract Migration__02_ProposeNewProposal_ShadowMainnet_Release_V0_8_1 is REP10_
     for (uint256 i; i < _values.length; ++i) {
       console.log("Value:", i, vm.toString(_values[i]));
     }
-  }
 
-  function _postCheck() internal virtual override {
-    // Simulate Executing Proposal
-    _proposal =
-      LibProposal.buildProposal(roninGovernanceAdmin, vm.getBlockTimestamp() + 14 days, _targets, _values, _callDatas);
+    _proposal = LibProposal.buildProposal(
+      roninGovernanceAdmin, vm.getBlockTimestamp() + 45 minutes, _targets, _values, _callDatas
+    );
     LibProposal.executeProposal(roninGovernanceAdmin, roninTrustedOrganization, _proposal);
-
-    super._postCheck();
   }
 
   function _deployRoninValidatorSetREP10MigratorLogic() internal {

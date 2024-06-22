@@ -49,7 +49,7 @@ abstract contract REP10_Config_Mainnet_Base is RoninMigration {
   uint256 internal constant MAX_SV = 0; // Max Standard Validator Pick Threshold
 
   uint256 internal constant RANDOM_BEACON_SLASH_THRESHOLD = 3; // Random Beacon Slash Threshold
-  uint256 internal constant REP10_ACTIVATION_PERIOD = 19896; // Sun, 2024-June-22 00:00:00 UTC
+  uint256 internal constant REP10_ACTIVATION_PERIOD = 19897; // Sun, 2024-June-22 00:00:00 UTC
   uint256 internal constant SLASH_RANDOM_BEACON_AMOUNT = 1_000 ether; // Random Beacon Slash Amount
   uint256 internal constant NEW_MAX_VALIDATOR_CANDIDATE = 64; // New Max Validator Candidate
 
@@ -71,7 +71,7 @@ abstract contract REP10_Config_Mainnet_Base is RoninMigration {
   IRoninGovernanceAdmin internal roninGovernanceAdmin;
   IRoninTrustedOrganization internal roninTrustedOrganization;
 
-  function run() public virtual onlyOn(DefaultNetwork.RoninMainnet.key()) {
+  function run() public virtual onlyOn(Network.ShadowForkMainnet.key()) {
     staking = IStaking(loadContract(Contract.Staking.key()));
     slashIndicator = ISlashIndicator(loadContract(Contract.SlashIndicator.key()));
     roninValidatorSet = IRoninValidatorSet(loadContract(Contract.RoninValidatorSet.key()));
