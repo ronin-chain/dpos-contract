@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Check if go version is less than v18
+if [[ "$(go version | awk '{print $3}' | cut -c 3-)" < "1.18" ]]; then
+    echo "Go version must be at least v18"
+    exit 1
+fi
+
 # Set the log file path
 log_file="logs/temp.log"
 ./bin/ronin-random-beacon generate-key &> $log_file;
