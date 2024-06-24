@@ -284,8 +284,8 @@ abstract contract CoinbaseExecution is ICoinbaseExecution, CoinbaseExecutionDepe
    * Emits the `MiningRewardDelegatorsDistributed` once the block mining reward is distributed successfully.
    * Emits the `MiningRewardDelegatorsDistributionFailed` once the contract fails to distribute block mining reward.
    *
-   * Emits the `DelegatingFastFinalityRewardDistributed` once the fast finality reward is distributed successfully.
-   * Emits the `DelegatingFastFinalityRewardDistributionFailed` once the contract fails to distribute fast finality reward.
+   * Emits the `FastFinalityRewardDelegatorsDistributed` once the fast finality reward is distributed successfully.
+   * Emits the `FastFinalityRewardDelegatorsDistributionFailed` once the contract fails to distribute fast finality reward.
    *
    * Note: This method should be called once in the end of each period.
    * - `delegatorFFRewards` is the fast finality rewards for delegators.
