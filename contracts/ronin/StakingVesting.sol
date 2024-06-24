@@ -129,7 +129,7 @@ contract StakingVesting is
       uint256 currPeriod = IRoninValidatorSet(getContract(ContractType.VALIDATOR)).currentPeriod();
       if (currPeriod >= _rep10ActivationPeriod) {
         _isREP10Activated = true;
-        _fastFinalityRewardPercentage = _fastFinalityRewardPercentageREP10;
+        _setFastFinalityRewardPercentage(_fastFinalityRewardPercentageREP10);
         emit REP10FastFinalityRewardActivated(currPeriod, _fastFinalityRewardPercentage);
       }
     }
