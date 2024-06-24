@@ -62,7 +62,7 @@ library LibVRFProof {
 
     for (uint256 i; i < count; ++i) {
       string memory raw = string(vm.ffi(cmdInput));
-      string[] memory s = raw.split(",");
+      string[] memory s = vm.split(raw, ",");
 
       keys[i].keyHash = vm.parseBytes32(s[1]);
       keys[i].secretKey = vm.parseBytes32(s[2]);
