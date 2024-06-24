@@ -3,7 +3,7 @@ pragma solidity ^0.8.19;
 
 import "./REP10_Config_Mainnet_Base.s.sol";
 
-contract Migration__04_ProposeAndExecuteProposalBatch_ShadowMainnet_Release_V0_8_1B is REP10_Config_Mainnet_Base {
+contract Migration__04_ProposeAndExecuteProposalPatch_ShadowMainnet_Release_V0_8_1B is REP10_Config_Mainnet_Base {
   using LibProxy for *;
   using StdStyle for *;
 
