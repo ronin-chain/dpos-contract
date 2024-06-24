@@ -30,6 +30,8 @@ contract RoninMigration is BaseMigration {
   using LibString for bytes32;
 
   ISharedArgument internal constant config = ISharedArgument(address(vme));
+  uint256 internal constant OFFSET_TO_ACTIVATE = 3;
+  uint256 internal REP10_ACTIVATED_PERIOD = (vm.unixTime() / 1_000) / 1 days + OFFSET_TO_ACTIVATE;
 
   function _configByteCode() internal virtual override returns (bytes memory) {
     return vm.getCode("out/GeneralConfig.sol/GeneralConfig.json");
@@ -69,16 +71,14 @@ contract RoninMigration is BaseMigration {
 
   function _setRoninValidatorSetREP10Migrator(ISharedArgument.RoninValidatorSetREP10MigratorParam memory param)
     internal
+    view
   {
-    param.activatedAtPeriod =
-      vm.envOr("RONIN_VALIDATOR_SET_REP10_MIGRATOR_ACTIVATED_AT_PERIOD", (vm.unixTime() / 1_000) / 1 days);
-    console.log("RONIN_VALIDATOR_SET_REP10_MIGRATOR_ACTIVATED_AT_PERIOD: ", param.activatedAtPeriod);
+    param.activatedAtPeriod = vm.envOr("RONIN_VALIDATOR_SET_REP10_MIGRATOR_ACTIVATED_AT_PERIOD", REP10_ACTIVATED_PERIOD);
   }
 
-  function _setRoninRandomBeaconParam(ISharedArgument.RoninRandomBeaconParam memory param) internal {
+  function _setRoninRandomBeaconParam(ISharedArgument.RoninRandomBeaconParam memory param) internal view {
     param.slashThreshold = vm.envOr("RANDOM_BEACON_SLASH_THRESHOLD", uint256(3));
-    param.activatedAtPeriod = vm.envOr("RANDOM_BEACON_ACTIVATED_AT_PERIOD", (vm.unixTime() / 1_000) / 1 days);
-    console.log("RANDOM_BEACON_ACTIVATED_AT_PERIOD: ", param.activatedAtPeriod);
+    param.activatedAtPeriod = vm.envOr("RANDOM_BEACON_ACTIVATED_AT_PERIOD", REP10_ACTIVATED_PERIOD);
 
     param.validatorTypes = new IRandomBeacon.ValidatorType[](4);
     param.validatorTypes[0] = IRandomBeacon.ValidatorType.Governing;
@@ -108,17 +108,16 @@ contract RoninMigration is BaseMigration {
     param.cooldownSecsToUndelegate = vm.envOr("COOLDOWN_SECS_TO_UNDELEGATE", uint256(3 days));
   }
 
-  function _setStakingVestingParam(ISharedArgument.StakingVestingParam memory param) internal {
+  function _setStakingVestingParam(ISharedArgument.StakingVestingParam memory param) internal view {
     param.topupAmount = vm.envOr("TOPUP_AMOUNT", uint256(100_000_000_000));
     param.fastFinalityRewardPercent = vm.envOr("FAST_FINALITY_REWARD_PERCENT", uint256(1_00)); // 1%
     param.fastFinalityRewardPercentREP10 = vm.envOr("FAST_FINALITY_REWARD_PERCENT_REP10", uint256(8_500)); // 85%
-    param.activatedAtPeriod =
-      vm.envOr("FAST_FINALITY_REWARD_ACTIVATED_AT_PERIOD", uint256((vm.unixTime() / 1_000) / 1 days));
+    param.activatedAtPeriod = vm.envOr("FAST_FINALITY_REWARD_ACTIVATED_AT_PERIOD", uint256(REP10_ACTIVATED_PERIOD));
     param.blockProducerBonusPerBlock = vm.envOr("BLOCK_PRODUCER_BONUS_PER_BLOCK", uint256(1_000));
     param.bridgeOperatorBonusPerBlock = vm.envOr("BRIDGE_OPERATOR_BONUS_PER_BLOCK", uint256(1_100));
   }
 
-  function _setSlashIndicatorParam(ISharedArgument.SlashIndicatorParam memory param) internal {
+  function _setSlashIndicatorParam(ISharedArgument.SlashIndicatorParam memory param) internal view {
     // Deprecated slash bridge operator
     param.__deprecatedSlashBridgeOperator.missingVotesRatioTier1 = vm.envOr("MISSING_VOTES_RATIO_TIER1", uint256(10_00)); // 10%
     param.__deprecatedSlashBridgeOperator.missingVotesRatioTier2 = vm.envOr("MISSING_VOTES_RATIO_TIER2", uint256(20_00)); // 20%
@@ -149,8 +148,7 @@ contract RoninMigration is BaseMigration {
     // Slash random beacon
     param.slashRandomBeacon.randomBeaconSlashAmount = vm.envOr("SLASH_RANDOM_BEACON_AMOUNT", uint256(10 ether));
     param.slashRandomBeacon.activatedAtPeriod =
-      vm.envOr("SLASH_RANDOM_BEACON_ACTIVATED_AT_PERIOD", uint256((vm.unixTime() / 1_000) / 1 days + 3));
-    console.log("SLASH_RANDOM_BEACON_ACTIVATED_AT_PERIOD: ", param.slashRandomBeacon.activatedAtPeriod);
+      vm.envOr("SLASH_RANDOM_BEACON_ACTIVATED_AT_PERIOD", uint256(REP10_ACTIVATED_PERIOD));
 
     // Credit score
     param.creditScore.gainCreditScore = vm.envOr("GAIN_CREDIT_SCORE", uint256(100));

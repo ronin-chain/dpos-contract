@@ -156,32 +156,39 @@ contract PostChecker is
       profile.changeVRFKeyHash(cid, vrfKeys[i].keyHash);
     }
 
-    console.log(StdStyle.green("Cheat fast forward to 2 epochs ..."));
+    console.log(StdStyle.green("Cheat fast forward to 2 epochs ...\n"));
     LibWrapUpEpoch.wrapUpEpoch();
     LibWrapUpEpoch.wrapUpEpoch();
 
     uint256 activatedAtPeriod = randomBeacon.getActivatedAtPeriod();
     uint256 currPeriod = validatorSet.currentPeriod();
     if (currPeriod < activatedAtPeriod) {
+      console.log("Logic before REP-10:".yellow(), address(validatorSet).getProxyImplementation());
+      console.log("FF Percentage before REP-10".yellow(), stakingVesting.fastFinalityRewardPercentage(), "\n");
       console.log(
-        StdStyle.green("Cheat fast forward to activated period for number of periods:"), activatedAtPeriod - currPeriod
+        string.concat(
+          StdStyle.green("Cheat fast forward to activated period for number of periods: "),
+          vm.toString(activatedAtPeriod - currPeriod),
+          " - Current Period: ",
+          vm.toString(currPeriod),
+          " - REP-10 Activated Period: ",
+          vm.toString(activatedAtPeriod),
+          "\n"
+        )
       );
+
+      console.log("Submitting block reward before REP-10 activated...".yellow());
+      _randomlySubmitBlockReward({ validatorSet: validatorSet, txFee: 0.1 ether });
+
       LibWrapUpEpoch.wrapUpPeriods({ times: activatedAtPeriod - currPeriod, shouldSubmitBeacon: false });
-      console.log("Expected Switch Logic to REP10 Logic".yellow());
-      console.log("Logic now:".yellow(), address(validatorSet).getProxyImplementation());
+
+      console.log("Expected to switch Logic to REP10 Logic".yellow());
+      console.log("Logic after REP-10:".yellow(), address(validatorSet).getProxyImplementation());
 
       console.log("Submitting block reward at next block number after REP10 activated...".yellow());
+      VmSafe.Log[] memory logs = _randomlySubmitBlockReward({ validatorSet: validatorSet, txFee: 0.2 ether });
+      console.log("FF Percentage after REP-10".yellow(), stakingVesting.fastFinalityRewardPercentage());
 
-      TConsensus[] memory blockProducers = validatorSet.getBlockProducers();
-      uint256 currUnixTimestamp;
-      TConsensus randomProducer = blockProducers[currUnixTimestamp % blockProducers.length];
-      vm.coinbase(TConsensus.unwrap(randomProducer));
-      vme.rollUpTo(vm.getBlockNumber() + 1);
-      vm.prank(TConsensus.unwrap(randomProducer));
-      vm.recordLogs();
-      validatorSet.submitBlockReward{ value: 0.5 ether }();
-
-      VmSafe.Log[] memory logs = vm.getRecordedLogs();
       bool emitted;
       uint256 newPercentage;
       uint256 rep10Period;
@@ -192,23 +199,45 @@ contract PostChecker is
         ) {
           emitted = true;
           (rep10Period, newPercentage) = abi.decode(logs[i].data, (uint256, uint256));
-          console.log("Fast Finality Reward Percentage", newPercentage, "Period:", rep10Period);
+          console.log(
+            string.concat(
+              "Fast Finality Reward Percentage ".yellow(),
+              vm.toString(newPercentage),
+              " Period: ",
+              vm.toString(rep10Period)
+            )
+          );
         }
       }
 
       assertTrue(emitted, "REP10FastFinalityRewardActivated event not emitted");
-      assertEq(stakingVesting.fastFinalityRewardPercentage(), newPercentage, "REP10 percentage not match");
       assertEq(rep10Period, activatedAtPeriod, "REP10 period not match");
+      assertEq(stakingVesting.fastFinalityRewardPercentage(), newPercentage, "REP10 percentage not match");
 
-      randomProducer = blockProducers[currUnixTimestamp % blockProducers.length];
-      vm.coinbase(TConsensus.unwrap(randomProducer));
-      vme.rollUpTo(vm.getBlockNumber() + 1);
-      vm.prank(TConsensus.unwrap(randomProducer));
-      vm.recordLogs();
-      validatorSet.submitBlockReward{ value: 1 ether }();
+      _randomlySubmitBlockReward({ validatorSet: validatorSet, txFee: 0.3 ether });
     }
 
-    console.log(StdStyle.green("Cheat fast forward to 1 epoch ..."));
+    console.log(StdStyle.green("Cheat fast forward to 1 epoch ...\n"));
     LibWrapUpEpoch.wrapUpEpoch();
+  }
+
+  function _randomlySubmitBlockReward(
+    IRoninValidatorSet validatorSet,
+    uint256 txFee
+  ) private returns (VmSafe.Log[] memory logs) {
+    console.log(
+      "Submitting block reward at: - Period:", validatorSet.currentPeriod(), " - Block:", vm.getBlockNumber() + 1
+    );
+    TConsensus[] memory blockProducers = validatorSet.getBlockProducers();
+    uint256 currUnixTimestamp = vm.unixTime();
+
+    TConsensus randomProducer = blockProducers[currUnixTimestamp % blockProducers.length];
+    vm.deal(TConsensus.unwrap(randomProducer), txFee);
+    vm.coinbase(TConsensus.unwrap(randomProducer));
+    vme.rollUpTo(vm.getBlockNumber() + 1);
+    vm.prank(TConsensus.unwrap(randomProducer));
+    vm.recordLogs();
+    validatorSet.submitBlockReward{ value: txFee }();
+    logs = vm.getRecordedLogs();
   }
 }
