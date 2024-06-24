@@ -281,8 +281,8 @@ abstract contract CoinbaseExecution is ICoinbaseExecution, CoinbaseExecutionDepe
    * @dev Helper function to settle rewards for delegators of `currValidatorIds` at the end of each period,
    * then transfer the rewards from this contract to the staking contract, in order to finalize a period.
    *
-   * Emits the `DelegatingBlockMiningRewardDistributed` once the block mining reward is distributed successfully.
-   * Emits the `DelegatingBlockMiningRewardDistributionFailed` once the contract fails to distribute block mining reward.
+   * Emits the `MiningRewardDelegatorsDistributed` once the block mining reward is distributed successfully.
+   * Emits the `MiningRewardDelegatorsDistributionFailed` once the contract fails to distribute block mining reward.
    *
    * Emits the `DelegatingFastFinalityRewardDistributed` once the fast finality reward is distributed successfully.
    * Emits the `DelegatingFastFinalityRewardDistributionFailed` once the contract fails to distribute fast finality reward.
