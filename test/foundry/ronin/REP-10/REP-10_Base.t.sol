@@ -60,6 +60,10 @@ contract REP10_BaseTest is Test, GlobalConfigConsumer {
     vme.rollUpTo(1000);
 
     LibWrapUpEpoch.wrapUpEpoch();
+
+    uint256 currPeriod = _computePeriod(vm.getBlockTimestamp());
+    uint256 rep10ActivationPeriod = ISharedArgument(address(vme)).sharedArguments().roninRandomBeacon.activatedAtPeriod;
+    LibWrapUpEpoch.wrapUpPeriods({ times: rep10ActivationPeriod - currPeriod, shouldSubmitBeacon: false });
   }
 
   function _loadContracts() internal virtual {
