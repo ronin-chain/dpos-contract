@@ -146,7 +146,7 @@ contract RoninMigration is BaseMigration {
     // Slash random beacon
     param.slashRandomBeacon.randomBeaconSlashAmount = vm.envOr("SLASH_RANDOM_BEACON_AMOUNT", uint256(10 ether));
     param.slashRandomBeacon.activatedAtPeriod =
-      vm.envOr("SLASH_RANDOM_BEACON_ACTIVATED_AT_PERIOD", uint256((vm.unixTime() / 1_000) / 1 days));
+      vm.envOr("SLASH_RANDOM_BEACON_ACTIVATED_AT_PERIOD", uint256((vm.unixTime() / 1_000) / 1 days + 3));
     console.log("SLASH_RANDOM_BEACON_ACTIVATED_AT_PERIOD: ", param.slashRandomBeacon.activatedAtPeriod);
 
     // Credit score
