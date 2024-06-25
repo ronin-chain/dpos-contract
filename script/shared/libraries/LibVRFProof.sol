@@ -43,13 +43,13 @@ library LibVRFProof {
       return;
     }
 
-    (bytes32 reqHash, RandomRequest memory req) = LibVRFProof.parseRequest(logs, randomBeacon);
+    (bytes32 reqHash, RandomRequest memory req) = parseRequest(logs, randomBeacon);
     if (reqHash == 0x0) return;
 
     console.log("Submit proof for request", vm.toString(reqHash), req.period, req.prevBeacon);
     for (uint256 i; i < keys.length; ++i) {
-      LibVRFProof.VRFKey memory key = keys[i];
-      VRF.Proof memory proof = LibVRFProof.genProof(key, randomBeacon, req);
+      VRFKey memory key = keys[i];
+      VRF.Proof memory proof = genProof(key, randomBeacon, req);
       vm.prank(key.oracle);
       IRandomBeacon(randomBeacon).fulfillRandomSeed(req, proof);
     }
@@ -65,7 +65,7 @@ library LibVRFProof {
       string[] memory s = vm.split(raw, ",");
 
       keys[i].keyHash = vm.parseBytes32(s[1]);
-      keys[i].secretKey = vm.parseBytes32(s[2]);
+      keys[i].secretKey = bytes32(vm.parseUint(s[2]));
       (keys[i].oracle, keys[i].privateKey) = makeAddrAndKey(string.concat("oracle-", vm.toString(i)));
     }
   }
@@ -90,8 +90,9 @@ library LibVRFProof {
 
     vm.ffi(cmdInput);
 
-    string memory outDir = string.concat("script/data/cache", "/", vm.toString(msg.sig));
-    if (!vm.exists(outDir)) vm.createDir(outDir, false);
+    string memory outDir =
+      string.concat("script/data/cache", "/", string.concat(vm.toString(msg.sig), "-", vm.toString(vm.unixTime())));
+    if (!vm.exists(outDir)) vm.createDir({ path: outDir, recursive: true });
 
     cmdInput = new string[](9);
 
