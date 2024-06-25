@@ -32,8 +32,9 @@ contract MaintenanceTest is Test {
     DeployDPoS dposDeployHelper = new DeployDPoS();
     dposDeployHelper.setUp();
     dposDeployHelper.run();
-
     LibPrecompile.deployPrecompile();
+    dposDeployHelper.cheatSetUpValidators();
+
 
     profile = Profile(config.getAddressFromCurrentNetwork(Contract.Profile.key()));
     staking = Staking(config.getAddressFromCurrentNetwork(Contract.Staking.key()));
@@ -85,7 +86,7 @@ contract MaintenanceTest is Test {
 
   function testConcrete_CanSchedule_AfterAutoEndSchedules_schedule() external {
     address[] memory validatorIds = validatorSet.getValidatorIds();
-    assertEq(validatorIds.length, 4);
+    assertEq(validatorIds.length, 4, "validatorIds.length != 4");
 
     _schedule(validatorIds[0], 100);
     _schedule(validatorIds[1], 200);
@@ -100,11 +101,11 @@ contract MaintenanceTest is Test {
 
     _fastForwardToNextDay();
     _wrapUpEpoch();
-    assertEq(maintenance.totalSchedule(), 0);
+    assertEq(maintenance.totalSchedule(), 0, "total schedule is not 0");
 
     _schedule(validatorIds[3], 300);
 
-    assertEq(maintenance.totalSchedule(), 1);
+    assertEq(maintenance.totalSchedule(), 1, "total schedule is not 1");
   }
 
   function testConcrete_totalSchedule() external {

@@ -280,6 +280,17 @@ contract DeployDPoS is RoninMigration {
   function _initValidatorSet(ISharedArgument.RoninValidatorSetParam memory param) internal logFn("_initValidatorSet") {
     address migrator = new RoninValidatorSetREP10MigratorLogicDeploy().run();
 
+    UpgradeInfo({
+      proxy: address(validatorSet),
+      logic: deployCode("RoninValidatorSetConstructor.sol:RoninValidatorSetConstructor"),
+      callValue: 0,
+      shouldPrompt: true,
+      callData: "",
+      proxyInterface: ProxyInterface.Transparent,
+      upgradeCallback: this.upgradeCallback,
+      shouldUseCallback: true
+    }).upgrade();
+
     uint256[2] memory emergencyConfig;
     emergencyConfig[0] = param.emergencyExitLockedAmount;
     emergencyConfig[1] = param.emergencyExpiryDuration;
@@ -337,6 +348,7 @@ contract DeployDPoS is RoninMigration {
     );
     // stakingVesting.initializeV2();
     stakingVesting.initializeV3(param.fastFinalityRewardPercent);
+    stakingVesting.initializeV4(param.activatedAtPeriod, param.fastFinalityRewardPercentREP10);
     vm.stopBroadcast();
   }
 

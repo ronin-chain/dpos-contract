@@ -2,20 +2,16 @@
 
 pragma solidity ^0.8.9;
 
-import "../../extensions/collections/HasContracts.sol";
-import "../../interfaces/validator/ISlashingExecution.sol";
-import "../../interfaces/staking/IStaking.sol";
-import "../../libraries/Math.sol";
+import { HasContracts } from "../../extensions/collections/HasContracts.sol";
+import { ISlashingExecution } from "../../interfaces/validator/ISlashingExecution.sol";
+import { IStaking } from "../../interfaces/staking/IStaking.sol";
+import { Math } from "../../libraries/Math.sol";
+import { ContractType } from "../../utils/ContractType.sol";
 import { HasSlashIndicatorDeprecated, HasStakingDeprecated } from "../../utils/DeprecatedSlots.sol";
-import "./storage-fragments/CommonStorage.sol";
+import { CommonStorage } from "./storage-fragments/CommonStorage.sol";
+import { SlashingExecutionDependant } from "./SlashingExecutionDependant.sol";
 
-abstract contract SlashingExecution is
-  ISlashingExecution,
-  HasContracts,
-  HasSlashIndicatorDeprecated,
-  HasStakingDeprecated,
-  CommonStorage
-{
+abstract contract SlashingExecution is ISlashingExecution, SlashingExecutionDependant {
   /**
    * @inheritdoc ISlashingExecution
    */
@@ -28,10 +24,10 @@ abstract contract SlashingExecution is
     uint256 period = currentPeriod();
     _miningRewardDeprecatedAtPeriod[validatorId][period] = true;
 
-    _totalDeprecatedReward += _miningReward[validatorId] + _delegatingReward[validatorId];
+    _totalDeprecatedReward += _validatorMiningReward[validatorId] + _delegatorMiningReward[validatorId];
 
-    delete _miningReward[validatorId];
-    delete _delegatingReward[validatorId];
+    delete _validatorMiningReward[validatorId];
+    delete _delegatorMiningReward[validatorId];
 
     _blockProducerJailedBlock[validatorId] = Math.max(newJailedUntil, _blockProducerJailedBlock[validatorId]);
 
