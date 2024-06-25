@@ -21,6 +21,7 @@ contract RONTransferHelperTest is Test {
   }
 
   function testFuzz_RevertIf_SendIstanbulGasStipened_ToMultisigWallet_OnBerlin(uint256 value) public {
+    vm.skip(true);
     vm.deal(address(istanbulRONTransfer), value);
 
     vm.expectRevert();

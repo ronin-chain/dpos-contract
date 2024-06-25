@@ -64,6 +64,8 @@ interface ISharedArgument is IGeneralConfig {
     uint256 blockProducerBonusPerBlock;
     uint256 bridgeOperatorBonusPerBlock;
     uint256 fastFinalityRewardPercent;
+    uint256 fastFinalityRewardPercentREP10; // REP-10 fast finality reward percentage
+    uint256 activatedAtPeriod; // REP-10 activation period
   }
 
   struct RoninValidatorSetParam {

@@ -47,18 +47,22 @@ interface ICoinbaseExecution is ISlashingExecution {
     uint256 contractBalance
   );
 
-  /// @dev Emitted when the fast finality reward is distributed.
+  /// @dev Emitted when the fast finality reward is distributed to validator.
   event FastFinalityRewardDistributed(address indexed cid, address indexed recipient, uint256 amount);
-  /// @dev Emitted when the contract fails when distributing the fast finality reward.
+  /// @dev Emitted when the contract fails when distributing the fast finality reward to validator.
   event FastFinalityRewardDistributionFailed(
     address indexed cid, address indexed recipient, uint256 amount, uint256 contractBalance
   );
 
-  /// @dev Emitted when the amount of RON reward is distributed to staking contract.
-  event StakingRewardDistributed(uint256 totalAmount, address[] cids, uint256[] amounts);
-  /// @dev Emitted when the contracts fails when distributing the amount of RON to the staking contract.
-  event StakingRewardDistributionFailed(
-    uint256 totalAmount, address[] cids, uint256[] amounts, uint256 contractBalance
+  /// @dev Emitted when the amount of block mining reward is distributed to staking contract for delegators.
+  event MiningRewardDelegatorsDistributed(address[] cids, uint256[] delegatingAmounts);
+  /// @dev Emitted when the contracts fails when distributing the amount of RON to the staking contract for delegators.
+  event MiningRewardDelegatorsDistributionFailed(address[] cids, uint256[] delegatingAmounts, uint256 contractBalance);
+  /// @dev Emitted when the fast finality rewards for delegators is distributed to staking contract for delegators.
+  event FastFinalityRewardDelegatorsDistributed(address[] cids, uint256[] delegatingAmounts);
+  /// @dev Emitted when the contract fails when distributing the fast finality rewards for delegators to the staking contract for delegators.
+  event FastFinalityRewardDelegatorsDistributionFailed(
+    address[] cids, uint256[] delegatingAmounts, uint256 contractBalance
   );
 
   /// @dev Emitted when the epoch is wrapped up.
