@@ -7,12 +7,13 @@ if [[ "$(go version | awk '{print $3}' | cut -c 3-)" < "1.18" ]]; then
 fi
 
 # Set the log file path
-log_file="logs/temp.log"
-./bin/ronin-random-beacon generate-key &> $log_file;
-
-# Extract the generated public key, key hash, and secret key using grep and awk
-public_key=$(grep "Generated public key is" "$log_file" | awk '{print $7}')
-key_hash=$(grep "Key hash is:" "$log_file" | awk '{print $6}')
-secret_key=$(grep "Secret key is:" "$log_file" | awk '{print $6}')
+# Execute the command and capture its output
+output=$(./bin/ronin-random-beacon generate-key 2>&1)
+# Extract the generated public key using grep and awk
+public_key=$(echo "$output" | grep 'Generated public key is:' | awk -F': ' '{print $2}' | awk '{print $1}')
+# Extract the key hash using grep and awk
+key_hash=$(echo "$output" | grep 'Key hash is:' | awk -F': ' '{print $2}')
+# Extract the secret key using grep and awk
+secret_key=$(echo "$output" | grep 'Secret key is:' | awk -F': ' '{print $2}')
 
 echo $public_key,$key_hash,$secret_key

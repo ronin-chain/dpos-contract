@@ -9,9 +9,9 @@ import "./ValidatorInfoStorageV2.sol";
 
 abstract contract CommonStorage is ICommonInfo, TimingStorage, JailingStorage, ValidatorInfoStorageV2 {
   /// @dev Mapping from consensus address => pending reward from producing block
-  mapping(address => uint256) internal _miningReward;
-  /// @dev Mapping from consensus address => pending reward from delegating
-  mapping(address => uint256) internal _delegatingReward;
+  mapping(address consensus => uint256 miningReward) internal _validatorMiningReward;
+  /// @dev Mapping from consensus address => pending reward from producing block for delegator
+  mapping(address consensus => uint256 miningReward) internal _delegatorMiningReward;
 
   /// @dev The total reward for fast finality
   uint256 internal _totalFastFinalityReward;

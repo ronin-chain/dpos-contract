@@ -10,64 +10,80 @@ import { ISharedArgument } from "script/interfaces/ISharedArgument.sol";
 import { Contract } from "script/utils/Contract.sol";
 import { loadContract } from "@fdk/utils/Helpers.sol";
 import { LibWrapUpEpoch } from "script/shared/libraries/LibWrapUpEpoch.sol";
+import { ICoinbaseExecution } from "@ronin/contracts/interfaces/validator/ICoinbaseExecution.sol";
+import { IRoninGovernanceAdmin } from "@ronin/contracts/interfaces/IRoninGovernanceAdmin.sol";
 import { IRandomBeacon } from "@ronin/contracts/interfaces/random-beacon/IRandomBeacon.sol";
 import { ICandidateManager } from "@ronin/contracts/interfaces/validator/ICandidateManager.sol";
 import { IRoninValidatorSet } from "@ronin/contracts/interfaces/validator/IRoninValidatorSet.sol";
 import { GlobalConfigConsumer } from "@ronin/contracts/extensions/consumers/GlobalConfigConsumer.sol";
-import { RoninRandomBeacon } from "@ronin/contracts/ronin/random-beacon/RoninRandomBeacon.sol";
 import { LibPrecompile } from "script/shared/libraries/LibPrecompile.sol";
-import { Profile } from "@ronin/contracts/ronin/profile/Profile.sol";
+import { IProfile } from "@ronin/contracts/interfaces/IProfile.sol";
 import { LibArray } from "@ronin/contracts/libraries/LibArray.sol";
 import { LibSortValidatorsByBeacon } from "@ronin/contracts/libraries/LibSortValidatorsByBeacon.sol";
 import { IRoninTrustedOrganization } from "@ronin/contracts/interfaces/IRoninTrustedOrganization.sol";
-import { RoninTrustedOrganization } from "@ronin/contracts/multi-chains/RoninTrustedOrganization.sol";
 import { ISlashRandomBeacon } from "@ronin/contracts/interfaces/slash-indicator/ISlashRandomBeacon.sol";
-import { SlashIndicator } from "@ronin/contracts/ronin/slash-indicator/SlashIndicator.sol";
+import { ISlashIndicator } from "@ronin/contracts/interfaces/slash-indicator/ISlashIndicator.sol";
 import { LibVRFProof } from "script/shared/libraries/LibVRFProof.sol";
 import { IBaseSlash } from "@ronin/contracts/interfaces/slash-indicator/IBaseSlash.sol";
 import { RandomRequest } from "@ronin/contracts/libraries/LibSLA.sol";
 import { LibApplyCandidate } from "script/shared/libraries/LibApplyCandidate.sol";
-import { Staking } from "@ronin/contracts/ronin/staking/Staking.sol";
-import { StakingVesting } from "@ronin/contracts/ronin/StakingVesting.sol";
-import { FastFinalityTracking } from "@ronin/contracts/ronin/fast-finality/FastFinalityTracking.sol";
+import { IStaking } from "@ronin/contracts/interfaces/staking/IStaking.sol";
+import { IStakingVesting } from "@ronin/contracts/interfaces/IStakingVesting.sol";
+import { IFastFinalityTracking } from "@ronin/contracts/interfaces/IFastFinalityTracking.sol";
 import { TConsensus } from "@ronin/contracts/udvts/Types.sol";
 import { TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
 
 contract REP10_BaseTest is Test, GlobalConfigConsumer {
+  DeployDPoS dposDeployHelper;
   bytes param;
-  address governanceAdmin;
-  Profile public profile;
-  Staking public staking;
-  StakingVesting public stakingVesting;
-  SlashIndicator public slashIndicator;
-  RoninRandomBeacon public roninRandomBeacon;
+  IProfile public profile;
+  IStaking public staking;
+  IRoninGovernanceAdmin governanceAdmin;
+  IStakingVesting public stakingVesting;
+  ISlashIndicator public slashIndicator;
+  IRandomBeacon public roninRandomBeacon;
   IRoninValidatorSet public roninValidatorSet;
-  FastFinalityTracking public fastFinalityTracking;
-  RoninTrustedOrganization public roninTrustedOrganization;
+  IFastFinalityTracking public fastFinalityTracking;
+  IRoninTrustedOrganization public roninTrustedOrganization;
 
   function setUp() public virtual {
-    DeployDPoS dposDeployHelper = new DeployDPoS();
-    dposDeployHelper.setUp();
-    param = vme.getRawSharedArguments();
-    dposDeployHelper.run();
-    LibPrecompile.deployPrecompile();
-
-    governanceAdmin = loadContract(Contract.RoninGovernanceAdmin.key());
-    profile = Profile(loadContract(Contract.Profile.key()));
-    staking = Staking(loadContract(Contract.Staking.key()));
-    stakingVesting = StakingVesting(loadContract(Contract.StakingVesting.key()));
-    slashIndicator = SlashIndicator(loadContract(Contract.SlashIndicator.key()));
-    roninValidatorSet = IRoninValidatorSet(loadContract(Contract.RoninValidatorSet.key()));
-    fastFinalityTracking = FastFinalityTracking(loadContract(Contract.FastFinalityTracking.key()));
-    roninRandomBeacon = RoninRandomBeacon(loadContract(Contract.RoninRandomBeacon.key()));
-    roninTrustedOrganization = RoninTrustedOrganization(loadContract(Contract.RoninTrustedOrganization.key()));
+    _setUpDPoSDeployHelper();
+    _loadContracts();
 
     dposDeployHelper.cheatSetUpValidators();
 
+    _cheatTime();
+  }
+
+  function _cheatTime() internal virtual {
     vm.warp(_bound(vm.getBlockTimestamp(), vm.unixTime() / 1_000, type(uint40).max));
     vme.rollUpTo(1000);
 
     LibWrapUpEpoch.wrapUpEpoch();
+
+    uint256 currPeriod = _computePeriod(vm.getBlockTimestamp());
+    uint256 rep10ActivationPeriod = ISharedArgument(address(vme)).sharedArguments().roninRandomBeacon.activatedAtPeriod;
+    LibWrapUpEpoch.wrapUpPeriods({ times: rep10ActivationPeriod - currPeriod, shouldSubmitBeacon: false });
+  }
+
+  function _loadContracts() internal virtual {
+    profile = IProfile(loadContract(Contract.Profile.key()));
+    staking = IStaking(loadContract(Contract.Staking.key()));
+    stakingVesting = IStakingVesting(loadContract(Contract.StakingVesting.key()));
+    slashIndicator = ISlashIndicator(loadContract(Contract.SlashIndicator.key()));
+    roninRandomBeacon = IRandomBeacon(loadContract(Contract.RoninRandomBeacon.key()));
+    roninValidatorSet = IRoninValidatorSet(loadContract(Contract.RoninValidatorSet.key()));
+    governanceAdmin = IRoninGovernanceAdmin(loadContract(Contract.RoninGovernanceAdmin.key()));
+    fastFinalityTracking = IFastFinalityTracking(loadContract(Contract.FastFinalityTracking.key()));
+    roninTrustedOrganization = IRoninTrustedOrganization(loadContract(Contract.RoninTrustedOrganization.key()));
+  }
+
+  function _setUpDPoSDeployHelper() internal virtual {
+    dposDeployHelper = new DeployDPoS();
+    dposDeployHelper.setUp();
+    param = vme.getRawSharedArguments();
+    dposDeployHelper.run();
+    LibPrecompile.deployPrecompile();
   }
 
   /**
