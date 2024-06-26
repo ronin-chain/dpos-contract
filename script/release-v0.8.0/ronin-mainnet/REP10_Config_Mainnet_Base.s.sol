@@ -15,6 +15,7 @@ import { ISlashIndicator } from "@ronin/contracts/interfaces/slash-indicator/ISl
 
 import { IRandomBeacon } from "@ronin/contracts/interfaces/random-beacon/IRandomBeacon.sol";
 import { IFastFinalityTracking } from "@ronin/contracts/interfaces/IFastFinalityTracking.sol";
+import { IStakingVesting } from "@ronin/contracts/interfaces/IStakingVesting.sol";
 
 import { IRoninTrustedOrganization } from "@ronin/contracts/interfaces/IRoninTrustedOrganization.sol";
 import { IBaseStaking } from "@ronin/contracts/interfaces/staking/IBaseStaking.sol";
@@ -65,6 +66,7 @@ abstract contract REP10_Config_Mainnet_Base is RoninMigration {
   address internal roninValidatorSetREP10LogicMigrator;
 
   IStaking internal staking;
+  IStakingVesting internal stakingVesting;
   ISlashIndicator internal slashIndicator;
   IRandomBeacon internal roninRandomBeacon;
   IRoninValidatorSet internal roninValidatorSet;
@@ -73,6 +75,7 @@ abstract contract REP10_Config_Mainnet_Base is RoninMigration {
 
   function run() public virtual onlyOn(DefaultNetwork.RoninMainnet.key()) {
     staking = IStaking(loadContract(Contract.Staking.key()));
+    stakingVesting = IStakingVesting(loadContract(Contract.StakingVesting.key()));
     slashIndicator = ISlashIndicator(loadContract(Contract.SlashIndicator.key()));
     roninValidatorSet = IRoninValidatorSet(loadContract(Contract.RoninValidatorSet.key()));
     roninGovernanceAdmin = IRoninGovernanceAdmin(loadContract(Contract.RoninGovernanceAdmin.key()));
