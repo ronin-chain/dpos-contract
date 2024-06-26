@@ -93,14 +93,18 @@ library LibWrapUpEpoch {
         if (logs[i].topics[0] == ICoinbaseExecution.EmptyValidatorSet.selector) {
           console.log("LibWrapUpEpoch: WARNING: EMPTY VALIDATOR SET".yellow());
         }
-        if (logs[i].topics[0] == ICoinbaseExecution.FastFinalityRewardDistributionFailed.selector) {
-          revert("PANIC: Fast finality reward distribution failed");
+
+        if (logs[i].topics[0] == ICoinbaseExecution.FastFinalityRewardDelegatorsDistributionFailed.selector) {
+          revert("PANIC: Fast finality reward distribution for delegators failed");
+        }
+        if (logs[i].topics[0] == ICoinbaseExecution.MiningRewardDelegatorsDistributionFailed.selector) {
+          revert("PANIC: Block mining reward distribution for delegators failed");
         }
         if (logs[i].topics[0] == ICoinbaseExecution.MiningRewardDistributionFailed.selector) {
-          revert("PANIC: Mining reward distribution failed");
+          revert("PANIC: Mining reward distribution failed for validator");
         }
-        if (logs[i].topics[0] == ICoinbaseExecution.StakingRewardDistributionFailed.selector) {
-          revert("PANIC: Validator set update failed");
+        if (logs[i].topics[0] == ICoinbaseExecution.FastFinalityRewardDistributionFailed.selector) {
+          revert("PANIC: Fast finality reward distribution failed for validator");
         }
       }
     }

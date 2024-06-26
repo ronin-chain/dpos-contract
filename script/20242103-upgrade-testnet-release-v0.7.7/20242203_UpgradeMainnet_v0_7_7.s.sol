@@ -102,7 +102,7 @@ contract Migration__20242103_UpgradeReleaseV0_7_7_Mainnet is RoninMigration {
     v0_7_7_Precheck();
 
     vme.setPostCheckingStatus(true);
-    LibProposal.voteProposalUntilSuccess(governanceAdmin, trustedOrg, proposal);
+    LibProposal.voteProposalUntilExecute(governanceAdmin, trustedOrg, proposal);
     vme.setPostCheckingStatus(false);
 
     v0_7_7Postcheck();
