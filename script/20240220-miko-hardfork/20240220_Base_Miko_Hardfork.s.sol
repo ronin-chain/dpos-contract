@@ -1,33 +1,29 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { TContract } from "foundry-deployment-kit/types/Types.sol";
-import { LibProxy } from "foundry-deployment-kit/libraries/LibProxy.sol";
+import { TContract } from "@fdk/types/Types.sol";
+import { LibProxy } from "@fdk/libraries/LibProxy.sol";
+import { JSONParserLib } from "@solady/utils/JSONParserLib.sol";
+
+import { IStaking } from "@ronin/contracts/interfaces/staking/IStaking.sol";
+import { IProfile } from "@ronin/contracts/interfaces/IProfile.sol";
+import { IRoninValidatorSet } from "@ronin/contracts/interfaces/validator/IRoninValidatorSet.sol";
+import { IMaintenance } from "@ronin/contracts/interfaces/IMaintenance.sol";
+import { IStakingVesting } from "@ronin/contracts/interfaces/IStakingVesting.sol";
+import { IFastFinalityTracking } from "@ronin/contracts/interfaces/IFastFinalityTracking.sol";
+import { ISlashIndicator } from "@ronin/contracts/interfaces/slash-indicator/ISlashIndicator.sol";
+import { IAccessControl } from "@openzeppelin/contracts/access/IAccessControl.sol";
+import { IRoninGovernanceAdmin } from "@ronin/contracts/interfaces/IRoninGovernanceAdmin.sol";
+import { IRoninTrustedOrganization } from "@ronin/contracts/interfaces/IRoninTrustedOrganization.sol";
+import { DefaultNetwork } from "@fdk/utils/DefaultNetwork.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
-import { JSONParserLib } from "lib/foundry-deployment-kit/lib/solady/src/utils/JSONParserLib.sol";
-
-import {
-  BridgeTrackingRecoveryLogic,
-  BridgeTracking
-} from "../20231019-recover-fund/contracts/BridgeTrackingRecoveryLogic.sol";
-
-import { SlashIndicator } from "@ronin/contracts/ronin/slash-indicator/SlashIndicator.sol";
-import { Staking, IStaking } from "@ronin/contracts/ronin/staking/Staking.sol";
-import { Profile } from "@ronin/contracts/ronin/profile/Profile.sol";
-import { Maintenance } from "@ronin/contracts/ronin/Maintenance.sol";
-import { RoninValidatorSet } from "@ronin/contracts/ronin/validator/RoninValidatorSet.sol";
-import { StakingVesting } from "@ronin/contracts/ronin/StakingVesting.sol";
-import { FastFinalityTracking } from "@ronin/contracts/ronin/fast-finality/FastFinalityTracking.sol";
-
-import { AccessControl } from "@openzeppelin/contracts/access/AccessControl.sol";
-
-import "./ArrayReplaceLib.sol";
-import "./MikoConfig.s.sol";
+import { MikoConfig } from "./MikoConfig.s.sol";
+import { console } from "forge-std/console.sol";
+import { Contract } from "script/utils/Contract.sol";
 
 contract Proposal__Base_20240220_MikoHardfork is MikoConfig {
   using LibProxy for *;
   using StdStyle for *;
-  using ArrayReplaceLib for *;
   using JSONParserLib for *;
 
   uint256 balanceBefore;
@@ -40,18 +36,18 @@ contract Proposal__Base_20240220_MikoHardfork is MikoConfig {
   address[] internal contractsToChangeDefaultAdminRole;
   TContract[] internal contractTypesToUpgrade;
 
-  RoninGovernanceAdmin internal roninGovernanceAdmin;
-  RoninTrustedOrganization internal trustedOrgContract;
+  IRoninGovernanceAdmin internal roninGovernanceAdmin;
+  IRoninTrustedOrganization internal trustedOrgContract;
 
   address internal bridgeTracking;
   address internal roninBridgeManager;
-  SlashIndicator internal slashIndicatorContract;
-  FastFinalityTracking internal fastFinalityTrackingContract;
-  Profile internal profileContract;
-  Staking internal stakingContract;
-  StakingVesting internal stakingVestingContract;
-  Maintenance internal maintenanceContract;
-  RoninValidatorSet internal validatorContract;
+  ISlashIndicator internal slashIndicatorContract;
+  IFastFinalityTracking internal fastFinalityTrackingContract;
+  IProfile internal profileContract;
+  IStaking internal stakingContract;
+  IStakingVesting internal stakingVestingContract;
+  IMaintenance internal maintenanceContract;
+  IRoninValidatorSet internal validatorContract;
 
   /**
    * See `README.md`
@@ -65,22 +61,19 @@ contract Proposal__Base_20240220_MikoHardfork is MikoConfig {
   }
 
   function _sys__loadContracts() internal {
-    roninGovernanceAdmin =
-      RoninGovernanceAdmin(config.getAddressFromCurrentNetwork(Contract.RoninGovernanceAdmin.key()));
-    trustedOrgContract =
-      RoninTrustedOrganization(config.getAddressFromCurrentNetwork(Contract.RoninTrustedOrganization.key()));
-    roninBridgeManager = config.getAddressFromCurrentNetwork(Contract.RoninBridgeManager.key());
+    roninGovernanceAdmin = IRoninGovernanceAdmin(loadContract(Contract.RoninGovernanceAdmin.key()));
+    trustedOrgContract = IRoninTrustedOrganization(loadContract(Contract.RoninTrustedOrganization.key()));
+    roninBridgeManager = loadContract(Contract.RoninBridgeManager.key());
 
-    bridgeTracking = config.getAddressFromCurrentNetwork(Contract.BridgeTracking.key());
+    bridgeTracking = loadContract(Contract.BridgeTracking.key());
 
-    fastFinalityTrackingContract =
-      FastFinalityTracking(config.getAddressFromCurrentNetwork(Contract.FastFinalityTracking.key()));
-    maintenanceContract = Maintenance(config.getAddressFromCurrentNetwork(Contract.Maintenance.key()));
-    profileContract = Profile(config.getAddressFromCurrentNetwork(Contract.Profile.key()));
-    slashIndicatorContract = SlashIndicator(config.getAddressFromCurrentNetwork(Contract.SlashIndicator.key()));
-    stakingContract = Staking(config.getAddressFromCurrentNetwork(Contract.Staking.key()));
-    stakingVestingContract = StakingVesting(config.getAddressFromCurrentNetwork(Contract.StakingVesting.key()));
-    validatorContract = RoninValidatorSet(config.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key()));
+    fastFinalityTrackingContract = IFastFinalityTracking(loadContract(Contract.FastFinalityTracking.key()));
+    maintenanceContract = IMaintenance(loadContract(Contract.Maintenance.key()));
+    profileContract = IProfile(loadContract(Contract.Profile.key()));
+    slashIndicatorContract = ISlashIndicator(loadContract(Contract.SlashIndicator.key()));
+    stakingContract = IStaking(loadContract(Contract.Staking.key()));
+    stakingVestingContract = IStakingVesting(loadContract(Contract.StakingVesting.key()));
+    validatorContract = IRoninValidatorSet(loadContract(Contract.RoninValidatorSet.key()));
 
     allDPoSContracts.push(payable(address(trustedOrgContract)));
     allDPoSContracts.push(payable(address(fastFinalityTrackingContract)));

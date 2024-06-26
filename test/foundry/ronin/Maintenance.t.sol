@@ -6,20 +6,21 @@ import { Test, console } from "forge-std/Test.sol";
 import { IStaking, Staking } from "@ronin/contracts/ronin/staking/Staking.sol";
 import { Maintenance } from "@ronin/contracts/ronin/Maintenance.sol";
 import { TConsensus, Profile, IProfile } from "@ronin/contracts/ronin/profile/Profile.sol";
-import { RoninValidatorSet } from "@ronin/contracts/ronin/validator/RoninValidatorSet.sol";
+import { IRoninValidatorSet } from "@ronin/contracts/interfaces/validator/IRoninValidatorSet.sol";
 import { TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
-import { LibSharedAddress } from "foundry-deployment-kit/libraries/LibSharedAddress.sol";
-import { ISharedArgument } from "script/deploy-dpos/interfaces/ISharedArgument.sol";
+import { LibSharedAddress } from "@fdk/libraries/LibSharedAddress.sol";
+import { ISharedArgument } from "script/interfaces/ISharedArgument.sol";
 import { DeployDPoS } from "script/deploy-dpos/DeployDPoS.s.sol";
 import { Contract } from "script/utils/Contract.sol";
+import { LibPrecompile } from "script/shared/libraries/LibPrecompile.sol";
 
 contract MaintenanceTest is Test {
   address coinbase;
   Profile profile;
   Staking staking;
   Maintenance maintenance;
-  RoninValidatorSet validatorSet;
-  ISharedArgument config = ISharedArgument(LibSharedAddress.CONFIG);
+  IRoninValidatorSet validatorSet;
+  ISharedArgument config = ISharedArgument(LibSharedAddress.VME);
 
   function setUp() public {
     coinbase = makeAddr("coinbase");
@@ -28,12 +29,16 @@ contract MaintenanceTest is Test {
     vm.roll(block.number + 1000);
     vm.warp(block.timestamp + 3000);
 
-    new DeployDPoS().run();
+    DeployDPoS dposDeployHelper = new DeployDPoS();
+    dposDeployHelper.setUp();
+    dposDeployHelper.run();
+
+    LibPrecompile.deployPrecompile();
 
     profile = Profile(config.getAddressFromCurrentNetwork(Contract.Profile.key()));
     staking = Staking(config.getAddressFromCurrentNetwork(Contract.Staking.key()));
     maintenance = Maintenance(config.getAddressFromCurrentNetwork(Contract.Maintenance.key()));
-    validatorSet = RoninValidatorSet(config.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key()));
+    validatorSet = IRoninValidatorSet(config.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key()));
 
     _applyValidatorCandidate();
   }
@@ -64,7 +69,6 @@ contract MaintenanceTest is Test {
     uint startBlock = latestEpochBlock + numberOfBlocksInEpoch + 1
       + ((minOffset + numberOfBlocksInEpoch) / numberOfBlocksInEpoch) * numberOfBlocksInEpoch;
     uint endBlock = startBlock - 1 + (durationInBlock / numberOfBlocksInEpoch + 1) * numberOfBlocksInEpoch;
-
 
     vm.prank(admin);
     maintenance.schedule(consensus, startBlock, endBlock);

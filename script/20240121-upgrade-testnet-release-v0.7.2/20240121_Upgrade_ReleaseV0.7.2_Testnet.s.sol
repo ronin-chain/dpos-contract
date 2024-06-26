@@ -1,15 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { Staking } from "@ronin/contracts/ronin/staking/Staking.sol";
-import { TransparentUpgradeableProxy } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
+import { IStaking } from "@ronin/contracts/interfaces/staking/IStaking.sol";
+import { TransparentUpgradeableProxy } from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
-import { console2 as console } from "forge-std/console2.sol";
-import { TContract } from "foundry-deployment-kit/types/Types.sol";
-import { LibProxy } from "foundry-deployment-kit/libraries/LibProxy.sol";
-import { DefaultNetwork } from "foundry-deployment-kit/utils/DefaultNetwork.sol";
-import { RoninTrustedOrganization, Proposal, RoninMigration, RoninGovernanceAdmin } from "script/RoninMigration.s.sol";
+import { console } from "forge-std/console.sol";
+import { TContract } from "@fdk/types/Types.sol";
+import { LibProxy } from "@fdk/libraries/LibProxy.sol";
+import { DefaultNetwork } from "@fdk/utils/DefaultNetwork.sol";
+import { IRoninTrustedOrganization, Proposal, RoninMigration, IRoninGovernanceAdmin } from "script/RoninMigration.s.sol";
 import { Contract } from "script/utils/Contract.sol";
+import { LibProposal } from "script/shared/libraries/LibProposal.sol";
 
 contract Migration__20240121_UpgradeReleaseV0_7_2_Testnet is RoninMigration {
   using LibProxy for *;
@@ -22,9 +23,9 @@ contract Migration__20240121_UpgradeReleaseV0_7_2_Testnet is RoninMigration {
   TContract[] private contractTypesToUpgrade;
 
   function run() public onlyOn(DefaultNetwork.RoninTestnet.key()) {
-    RoninGovernanceAdmin governanceAdmin = RoninGovernanceAdmin(loadContract(Contract.RoninGovernanceAdmin.key()));
-    RoninTrustedOrganization trustedOrg =
-      RoninTrustedOrganization(loadContract(Contract.RoninTrustedOrganization.key()));
+    IRoninGovernanceAdmin governanceAdmin = IRoninGovernanceAdmin(loadContract(Contract.RoninGovernanceAdmin.key()));
+    IRoninTrustedOrganization trustedOrg =
+      IRoninTrustedOrganization(loadContract(Contract.RoninTrustedOrganization.key()));
     address payable[] memory allContracts = config.getAllAddresses(network());
 
     for (uint256 i; i < allContracts.length; ++i) {
@@ -42,7 +43,7 @@ contract Migration__20240121_UpgradeReleaseV0_7_2_Testnet is RoninMigration {
         );
       } else {
         address implementation = allContracts[i].getProxyImplementation();
-        TContract contractType = config.getContractTypeFromCurrentNetwok(allContracts[i]);
+        TContract contractType = config.getContractTypeFromCurrentNetwork(allContracts[i]);
 
         if (implementation.codehash != keccak256(vm.getDeployedCode(config.getContractAbsolutePath(contractType)))) {
           console.log(
@@ -71,7 +72,7 @@ contract Migration__20240121_UpgradeReleaseV0_7_2_Testnet is RoninMigration {
       callDatas[i] = contractTypesToUpgrade[i] == Contract.Staking.key()
         ? abi.encodeCall(
           TransparentUpgradeableProxy.upgradeToAndCall,
-          (logics[i], abi.encodeCall(Staking.initializeV4, (STAKING_DEFAULT_ADMIN, STAKING_MIGRATOR)))
+          (logics[i], abi.encodeCall(IStaking.initializeV4, (STAKING_DEFAULT_ADMIN, STAKING_MIGRATOR)))
         )
         : abi.encodeCall(TransparentUpgradeableProxy.upgradeTo, (logics[i]));
 
@@ -83,7 +84,7 @@ contract Migration__20240121_UpgradeReleaseV0_7_2_Testnet is RoninMigration {
     }
 
     Proposal.ProposalDetail memory proposal =
-      _buildProposal(governanceAdmin, block.timestamp + 14 days, targets, values, callDatas);
-    _executeProposal(governanceAdmin, trustedOrg, proposal);
+      LibProposal.buildProposal(governanceAdmin, vm.getBlockTimestamp() + 14 days, targets, values, callDatas);
+    LibProposal.executeProposal(governanceAdmin, trustedOrg, proposal);
   }
 }

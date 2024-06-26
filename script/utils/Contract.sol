@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { LibString, TContract } from "foundry-deployment-kit/types/Types.sol";
+import { LibString, TContract } from "@fdk/types/TContract.sol";
 
 enum Contract {
   Profile,
@@ -27,7 +27,10 @@ enum Contract {
   HardForkRoninGovernanceAdmin,
   TemporalRoninTrustedOrganization,
   RoninValidatorSetTimedMigrator,
-  Profile_Mainnet
+  Profile_Mainnet,
+  PostChecker,
+  RoninRandomBeacon,
+  RoninValidatorSetREP10Migrator
 }
 
 using { key, name } for Contract global;
@@ -61,5 +64,9 @@ function name(Contract contractEnum) pure returns (string memory) {
   if (contractEnum == Contract.HardForkRoninGovernanceAdmin) return "HardForkGovernanceAdmin";
   if (contractEnum == Contract.TemporalRoninTrustedOrganization) return "TemporalTrustedOrganization";
   if (contractEnum == Contract.RoninValidatorSetTimedMigrator) return "RoninValidatorSetTimedMigrator";
+  if (contractEnum == Contract.RoninRandomBeacon) return "RoninRandomBeacon";
+  if (contractEnum == Contract.PostChecker) return "PostChecker";
+  if (contractEnum == Contract.RoninValidatorSetREP10Migrator) return "RoninValidatorSetREP10Migrator";
+
   revert("Contract: Unknown contract");
 }

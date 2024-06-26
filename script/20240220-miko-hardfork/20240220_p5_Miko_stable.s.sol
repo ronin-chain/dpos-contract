@@ -1,33 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { TContract } from "foundry-deployment-kit/types/Types.sol";
-import { LibProxy } from "foundry-deployment-kit/libraries/LibProxy.sol";
-import { StdStyle } from "forge-std/StdStyle.sol";
+import { IStaking } from "@ronin/contracts/interfaces/staking/IStaking.sol";
+import { IProfile } from "@ronin/contracts/interfaces/IProfile.sol";
+import { IAccessControl } from "@openzeppelin/contracts/access/IAccessControl.sol";
 
-import {
-  BridgeTrackingRecoveryLogic,
-  BridgeTracking
-} from "../20231019-recover-fund/contracts/BridgeTrackingRecoveryLogic.sol";
-
-import { SlashIndicator } from "@ronin/contracts/ronin/slash-indicator/SlashIndicator.sol";
-import { Staking, IStaking } from "@ronin/contracts/ronin/staking/Staking.sol";
-import { Profile } from "@ronin/contracts/ronin/profile/Profile.sol";
-import { Maintenance } from "@ronin/contracts/ronin/Maintenance.sol";
-import { RoninValidatorSet } from "@ronin/contracts/ronin/validator/RoninValidatorSet.sol";
-import { StakingVesting } from "@ronin/contracts/ronin/StakingVesting.sol";
-import { FastFinalityTracking } from "@ronin/contracts/ronin/fast-finality/FastFinalityTracking.sol";
-
-import { AccessControl } from "@openzeppelin/contracts/access/AccessControl.sol";
-
-import "./ArrayReplaceLib.sol";
-import "./20240220_Base_Miko_Hardfork.s.sol";
+import { Proposal__Base_20240220_MikoHardfork } from "./20240220_Base_Miko_Hardfork.s.sol";
+import { DefaultNetwork } from "@fdk/utils/DefaultNetwork.sol";
 
 contract Proposal__20240220_MikoHardfork_Stable is Proposal__Base_20240220_MikoHardfork {
-  using LibProxy for *;
-  using StdStyle for *;
-  using ArrayReplaceLib for *;
-
   /**
    * See `README.md`
    */
@@ -42,7 +23,7 @@ contract Proposal__20240220_MikoHardfork_Stable is Proposal__Base_20240220_MikoH
   }
 
   function _migrator__disableMigrate() internal {
-    bool shouldPrankOnly = CONFIG.isPostChecking();
+    bool shouldPrankOnly = vme.isPostChecking();
     if (shouldPrankOnly) {
       vm.prank(STAKING_MIGRATOR);
     } else {

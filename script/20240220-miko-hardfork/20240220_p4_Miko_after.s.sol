@@ -1,32 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { TContract } from "foundry-deployment-kit/types/Types.sol";
-import { LibProxy } from "foundry-deployment-kit/libraries/LibProxy.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
-
-import {
-  BridgeTrackingRecoveryLogic,
-  BridgeTracking
-} from "../20231019-recover-fund/contracts/BridgeTrackingRecoveryLogic.sol";
-
-import { SlashIndicator } from "@ronin/contracts/ronin/slash-indicator/SlashIndicator.sol";
-import { Staking, IStaking } from "@ronin/contracts/ronin/staking/Staking.sol";
-import { Profile } from "@ronin/contracts/ronin/profile/Profile.sol";
-import { Maintenance } from "@ronin/contracts/ronin/Maintenance.sol";
-import { RoninValidatorSet } from "@ronin/contracts/ronin/validator/RoninValidatorSet.sol";
-import { StakingVesting } from "@ronin/contracts/ronin/StakingVesting.sol";
-import { FastFinalityTracking } from "@ronin/contracts/ronin/fast-finality/FastFinalityTracking.sol";
-
-import { AccessControl } from "@openzeppelin/contracts/access/AccessControl.sol";
-
-import "./ArrayReplaceLib.sol";
-import "./20240220_Base_Miko_Hardfork.s.sol";
+import { BridgeTrackingRecoveryLogic } from "../20231019-recover-fund/contracts/BridgeTrackingRecoveryLogic.sol";
+import { Proposal__Base_20240220_MikoHardfork } from "./20240220_Base_Miko_Hardfork.s.sol";
+import { DefaultNetwork } from "@fdk/utils/DefaultNetwork.sol";
+import { console } from "forge-std/console.sol";
+import { TransparentUpgradeableProxy } from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
+import { ITransparentUpgradeableProxyV2 } from
+  "@ronin/contracts/interfaces/extensions/ITransparentUpgradeableProxyV2.sol";
 
 contract Proposal__20240220_MikoHardfork_After is Proposal__Base_20240220_MikoHardfork {
-  using LibProxy for *;
   using StdStyle for *;
-  using ArrayReplaceLib for *;
 
   uint256 _lockedAmount;
   uint256 _recoveredFund;
@@ -53,14 +38,14 @@ contract Proposal__20240220_MikoHardfork_After is Proposal__Base_20240220_MikoHa
   }
 
   function _doctor__recoverFund() internal {
-    console2.log("\n---- Recover fund to doctor's account ---".magenta());
+    console.log("\n---- Recover fund to doctor's account ---".magenta());
 
     address doctor = ADMIN_TMP_BRIDGE_TRACKING;
     balanceBefore = doctor.balance;
     _lockedAmount = address(DEPRECATED_BRIDGE_REWARD).balance;
 
     // Step 3
-    bool shouldPrankOnly = CONFIG.isPostChecking();
+    bool shouldPrankOnly = vme.isPostChecking();
 
     if (shouldPrankOnly) {
       vm.prank(DEPLOYER);
@@ -74,14 +59,14 @@ contract Proposal__20240220_MikoHardfork_After is Proposal__Base_20240220_MikoHa
     } else {
       vm.broadcast(doctor);
     }
-    TransparentUpgradeableProxyV2(payable((bridgeTracking))).upgradeTo(logic);
+    TransparentUpgradeableProxy(payable((bridgeTracking))).upgradeTo(logic);
 
     if (shouldPrankOnly) {
       vm.prank(doctor);
     } else {
       vm.broadcast(doctor);
     }
-    TransparentUpgradeableProxyV2(payable((bridgeTracking))).functionDelegateCall(
+    ITransparentUpgradeableProxyV2(bridgeTracking).functionDelegateCall(
       abi.encodeCall(BridgeTrackingRecoveryLogic.recoverFund, ())
     );
 
@@ -103,32 +88,32 @@ contract Proposal__20240220_MikoHardfork_After is Proposal__Base_20240220_MikoHa
   }
 
   function _doctor__rollbackBridgeTracking() internal {
-    console2.log("\n---- Transfer to Andy's account ---".magenta());
+    console.log("\n---- Transfer to Andy's account ---".magenta());
     console.log("Andy", ANDY_TREZOR);
 
     address doctor = ADMIN_TMP_BRIDGE_TRACKING;
-    bool shouldPrankOnly = CONFIG.isPostChecking();
+    bool shouldPrankOnly = vme.isPostChecking();
 
     if (shouldPrankOnly) {
       vm.prank(DEPLOYER);
     } else {
       vm.broadcast(DEPLOYER);
     }
-    address logic = address(new BridgeTracking());
+    address logic = address(makeAddr("new BridgeTracking()")); // logic is removed from this repo
 
     if (shouldPrankOnly) {
       vm.prank(doctor);
     } else {
       vm.broadcast(doctor);
     }
-    TransparentUpgradeableProxyV2(payable((bridgeTracking))).upgradeTo(logic);
+    TransparentUpgradeableProxy(payable((bridgeTracking))).upgradeTo(logic);
 
     if (shouldPrankOnly) {
       vm.prank(doctor);
     } else {
       vm.broadcast(doctor);
     }
-    TransparentUpgradeableProxyV2(payable((bridgeTracking))).changeAdmin(roninBridgeManager);
+    TransparentUpgradeableProxy(payable((bridgeTracking))).changeAdmin(roninBridgeManager);
 
     uint256 andyBalanceBefore = ANDY_TREZOR.balance;
 
@@ -141,10 +126,10 @@ contract Proposal__20240220_MikoHardfork_After is Proposal__Base_20240220_MikoHa
 
     uint256 andyBalanceAfter = ANDY_TREZOR.balance;
     uint256 andyBalanceChange = andyBalanceAfter - andyBalanceBefore;
-    console2.log("Recovered fund:         ".green().bold(), _recoveredFund, "wei");
-    console2.log("Andy's balance change: +", andyBalanceChange, "wei");
-    console2.log("Andy's balance before:  ", andyBalanceBefore, "wei");
-    console2.log("Andy's balance after:   ", andyBalanceAfter, "wei");
+    console.log("Recovered fund:         ".green().bold(), _recoveredFund, "wei");
+    console.log("Andy's balance change: +", andyBalanceChange, "wei");
+    console.log("Andy's balance before:  ", andyBalanceBefore, "wei");
+    console.log("Andy's balance after:   ", andyBalanceAfter, "wei");
     assertTrue(andyBalanceChange > 0, "Error Andy Balance not change!!!");
     assertTrue(andyBalanceChange == _recoveredFund, "Error Andy Balance not equal recovered fund!!!");
   }

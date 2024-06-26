@@ -1,77 +1,68 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { console2 as console } from "forge-std/console2.sol";
-import { TContract } from "foundry-deployment-kit/types/Types.sol";
-import { BaseGeneralConfig } from "foundry-deployment-kit/BaseGeneralConfig.sol";
+import { console } from "forge-std/console.sol";
+import { BaseGeneralConfig } from "@fdk/BaseGeneralConfig.sol";
 import { Network } from "./utils/Network.sol";
 import { Contract } from "./utils/Contract.sol";
+import { DefaultNetwork } from "@fdk/utils/DefaultNetwork.sol";
+import { TNetwork } from "@fdk/types/TNetwork.sol";
 
 contract GeneralConfig is BaseGeneralConfig {
   constructor() BaseGeneralConfig("", "deployments/") { }
 
   function _setUpNetworks() internal virtual override {
-    setNetworkInfo(
-      Network.Goerli.chainId(),
-      Network.Goerli.key(),
-      Network.Goerli.chainAlias(),
-      Network.Goerli.deploymentDir(),
-      Network.Goerli.envLabel(),
-      Network.Goerli.explorer()
-    );
-    setNetworkInfo(
-      Network.EthMainnet.chainId(),
-      Network.EthMainnet.key(),
-      Network.EthMainnet.chainAlias(),
-      Network.EthMainnet.deploymentDir(),
-      Network.EthMainnet.envLabel(),
-      Network.EthMainnet.explorer()
-    );
-    setNetworkInfo(
-      Network.RoninDevnet.chainId(),
-      Network.RoninDevnet.key(),
-      Network.RoninDevnet.chainAlias(),
-      Network.RoninDevnet.deploymentDir(),
-      Network.RoninDevnet.envLabel(),
-      Network.RoninDevnet.explorer()
-    );
+    setNetworkInfo(Network.Goerli.data());
+    setNetworkInfo(Network.EthMainnet.data());
+    setNetworkInfo(Network.RoninDevnet.data());
+    setNetworkInfo(Network.ShadowForkMainnet.data());
   }
 
   function _setUpContracts() internal virtual override {
-    _mapContractname(Contract.Profile);
-    _mapContractname(Contract.Staking);
-    _mapContractname(Contract.Maintenance);
-    _mapContractname(Contract.BridgeSlash);
-    _mapContractname(Contract.BridgeReward);
-    _mapContractname(Contract.RoninGatewayV3);
-    _mapContractname(Contract.SlashIndicator);
-    _mapContractname(Contract.NotifiedMigrator);
-    _mapContractname(Contract.MockPrecompile);
-    _mapContractname(Contract.BridgeTracking);
-    _mapContractname(Contract.StakingVesting);
-    _mapContractname(Contract.RoninValidatorSet);
-    _mapContractname(Contract.MainchainGatewayV3);
-    _mapContractname(Contract.RoninBridgeManager);
-    _mapContractname(Contract.RoninGovernanceAdmin);
-    _mapContractname(Contract.FastFinalityTracking);
-    _mapContractname(Contract.MainchainBridgeManager);
-    _mapContractname(Contract.MainchainGovernanceAdmin);
-    _mapContractname(Contract.RoninTrustedOrganization);
-    _mapContractname(Contract.RoninValidatorSetTimedMigrator);
+    _mapContractName(Contract.Profile);
+    _mapContractName(Contract.Staking);
+    _mapContractName(Contract.Maintenance);
+    _mapContractName(Contract.BridgeSlash);
+    _mapContractName(Contract.BridgeReward);
+    _mapContractName(Contract.RoninGatewayV3);
+    _mapContractName(Contract.SlashIndicator);
+    _mapContractName(Contract.NotifiedMigrator);
+    _mapContractName(Contract.MockPrecompile);
+    _mapContractName(Contract.BridgeTracking);
+    _mapContractName(Contract.StakingVesting);
+    _mapContractName(Contract.RoninValidatorSet);
+    _mapContractName(Contract.MainchainGatewayV3);
+    _mapContractName(Contract.RoninBridgeManager);
+    _mapContractName(Contract.RoninGovernanceAdmin);
+    _mapContractName(Contract.FastFinalityTracking);
+    _mapContractName(Contract.MainchainBridgeManager);
+    _mapContractName(Contract.MainchainGovernanceAdmin);
+    _mapContractName(Contract.RoninTrustedOrganization);
+    _mapContractName(Contract.RoninValidatorSetTimedMigrator);
+    _mapContractName(Contract.RoninRandomBeacon);
+    _mapContractName(Contract.PostChecker);
+    _mapContractName(Contract.RoninValidatorSetREP10Migrator);
+
+    setContractAbsolutePathMap(Contract.PostChecker.key(), "out/PostChecker.sol/PostChecker.json");
 
     // override artifact name with contract name
+    _contractNameMap[Contract.Profile.key()] = "Profile";
+    _contractNameMap[Contract.RoninRandomBeacon.key()] = "RoninRandomBeacon_Devnet";
     _contractNameMap[Contract.RoninGatewayPauseEnforcer.key()] = "PauseEnforcer";
     _contractNameMap[Contract.HardForkRoninGovernanceAdmin.key()] = Contract.RoninGovernanceAdmin.name();
     _contractNameMap[Contract.TemporalRoninTrustedOrganization.key()] = Contract.RoninTrustedOrganization.name();
 
-    if (block.chainid == 2021) {
+    TNetwork currNetwork = getCurrentNetwork();
+    if (currNetwork == DefaultNetwork.RoninTestnet.key()) {
       _contractNameMap[Contract.Profile.key()] = "Profile";
-    } else if (block.chainid == 2020) {
+      _contractNameMap[Contract.RoninRandomBeacon.key()] = "RoninRandomBeacon_Testnet";
+    } else if (currNetwork == DefaultNetwork.RoninMainnet.key()) {
       _contractNameMap[Contract.Profile.key()] = "Profile_Mainnet";
+      _contractNameMap[Contract.RoninRandomBeacon.key()] = "RoninRandomBeacon_Mainnet";
     }
   }
 
-  function _mapContractname(Contract contractEnum) internal {
+  function _mapContractName(Contract contractEnum) internal {
     _contractNameMap[contractEnum.key()] = contractEnum.name();
   }
 }

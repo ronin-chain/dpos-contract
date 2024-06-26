@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { RoninMigration } from "../RoninMigration.s.sol";
+import { RoninMigration } from "script/RoninMigration.s.sol";
+
 import { Contract } from "../utils/Contract.sol";
-import { RoninBridgeManager, GlobalProposal } from "@ronin/contracts/ronin/gateway/RoninBridgeManager.sol";
 import { BridgeSlashDeploy } from "./BridgeSlashDeploy.s.sol";
+import { IBridgeManager } from "@ronin/contracts/interfaces/bridge/IBridgeManager.sol";
+import { GlobalProposal } from "@ronin/contracts/libraries/GlobalProposal.sol";
 
 contract RoninBridgeManagerDeploy is RoninMigration {
   function _injectDependencies() internal override {
@@ -34,7 +36,7 @@ contract RoninBridgeManagerDeploy is RoninMigration {
       4, //DEFAULT_DENOMINATOR,
       block.chainid,
       5 minutes, // DEFAULT_EXPIRY_DURATION,
-      config.getAddressFromCurrentNetwork(Contract.RoninGatewayV3.key()),
+      loadContract(Contract.RoninGatewayV3.key()),
       callbackRegisters,
       operators,
       governors,
@@ -44,7 +46,7 @@ contract RoninBridgeManagerDeploy is RoninMigration {
     );
   }
 
-  function run() public returns (RoninBridgeManager) {
-    return RoninBridgeManager(_deployImmutable(Contract.RoninBridgeManager.key()));
+  function run() public returns (IBridgeManager) {
+    return IBridgeManager(_deployImmutable(Contract.RoninBridgeManager.key()));
   }
 }

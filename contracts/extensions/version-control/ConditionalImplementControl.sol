@@ -1,29 +1,33 @@
 /// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import { Initializable as InitializableV5 } from "@openzeppelin-v5/contracts/proxy/utils/Initializable.sol";
+import { StorageSlot } from "@openzeppelin/contracts/utils/StorageSlot.sol";
 import { HasContracts } from "../collections/HasContracts.sol";
 import { IConditionalImplementControl } from "../../interfaces/version-control/IConditionalImplementControl.sol";
 import { ErrorHandler } from "../../libraries/ErrorHandler.sol";
-import { AddressArrayUtils } from "../../libraries/AddressArrayUtils.sol";
+import { LibArray } from "../../libraries/LibArray.sol";
 import { ErrOnlySelfCall, IdentityGuard } from "../../utils/IdentityGuard.sol";
 
 /**
  * @title ConditionalImplementControl
  * @dev A contract that allows conditional version control of contract implementations.
  */
-abstract contract ConditionalImplementControl is IConditionalImplementControl, IdentityGuard, HasContracts {
+abstract contract ConditionalImplementControl is
+  IConditionalImplementControl,
+  IdentityGuard,
+  InitializableV5,
+  HasContracts
+{
   using ErrorHandler for bool;
-  using AddressArrayUtils for address[];
+  using LibArray for address[];
 
   /**
    * @dev Storage slot with the address of the current implementation.
    * This is the keccak-256 hash of "eip1967.proxy.implementation" subtracted by 1, and is
    * validated in the constructor.
    */
-  bytes32 internal constant _IMPLEMENTATION_SLOT = 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc;
-
-  /// @dev value is equal to keccak256("@ronin.extensions.version-control.ConditionalImplementControl.calldatas.slot") - 1
-  bytes32 internal constant CALLDATAS_SLOT = 0x330d87be17f5b23d41285647e0e9b0e7124a778feb3f952590ed6a023ae02633;
+  bytes32 internal constant IMPLEMENTATION_SLOT = 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc;
 
   /**
    * @dev address of the proxy that delegates to this contract.
@@ -75,11 +79,15 @@ abstract contract ConditionalImplementControl is IConditionalImplementControl, I
     addrs[0] = proxyStorage;
     addrs[1] = prevImpl;
     addrs[2] = newImpl;
-    if (addrs.hasDuplicate()) revert AddressArrayUtils.ErrDuplicated(msg.sig);
+    if (addrs.hasDuplicate()) revert LibArray.ErrDuplicated(msg.sig);
 
     PROXY_STORAGE = proxyStorage;
     NEW_IMPL = newImpl;
     PREV_IMPL = prevImpl;
+
+    _disableInitializers();
+
+    emit Constructed(proxyStorage, prevImpl, newImpl);
   }
 
   /**
@@ -103,49 +111,9 @@ abstract contract ConditionalImplementControl is IConditionalImplementControl, I
     _upgradeTo(NEW_IMPL);
   }
 
-  /**
-   * @dev See {IConditionalImplementControl-setCallDatas}.
-   */
-  function setCallDatas(bytes[] calldata args) external onlyAdmin onlyDelegateFromProxyStorage {
-    bytes[] storage callDatas = _callDatas();
-    uint256 length = args.length;
-    for (uint256 i; i < length;) {
-      callDatas.push(args[i]);
-
-      unchecked {
-        ++i;
-      }
-    }
-  }
-
-  /**
-   * @dev Internal function to access the array of calldatas.
-   * @return callDatas the storage array of calldatas.
-   */
-  function _callDatas() internal pure returns (bytes[] storage callDatas) {
-    assembly ("memory-safe") {
-      callDatas.slot := CALLDATAS_SLOT
-    }
-  }
-
   function _upgradeTo(address newImplementation) internal {
-    assembly ("memory-safe") {
-      sstore(_IMPLEMENTATION_SLOT, newImplementation)
-    }
+    StorageSlot.getAddressSlot(IMPLEMENTATION_SLOT).value = newImplementation;
     emit Upgraded(newImplementation);
-
-    bytes[] storage callDatas = _callDatas();
-    uint256 length = callDatas.length;
-    bool success;
-    bytes memory returnOrRevertData;
-    for (uint256 i; i < length;) {
-      (success, returnOrRevertData) = newImplementation.delegatecall(callDatas[i]);
-      success.handleRevert(bytes4(callDatas[i]), returnOrRevertData);
-
-      unchecked {
-        ++i;
-      }
-    }
   }
 
   /**
@@ -180,7 +148,7 @@ abstract contract ConditionalImplementControl is IConditionalImplementControl, I
   function _dispatchCall(address impl) internal virtual whenConditionsAreMet returns (bytes memory returnData) {
     (bool success, bytes memory returnOrRevertData) = impl.delegatecall(msg.data);
     success.handleRevert(msg.sig, returnOrRevertData);
-    assembly {
+    assembly ("memory-safe") {
       returnData := returnOrRevertData
     }
   }
@@ -210,7 +178,7 @@ abstract contract ConditionalImplementControl is IConditionalImplementControl, I
    */
   function _gasStipenedNoGrief() internal pure virtual returns (uint256) {
     // Gas stipend for contract to perform a few read and write operations on storage, but
-    // low enough to prevent comsuming gas exhaustively when function call are reverted.
+    // low enough to prevent consuming gas exhaustively when function call are reverted.
     // Multiply by a small constant (e.g. 2), if needed.
     return 50_000;
   }

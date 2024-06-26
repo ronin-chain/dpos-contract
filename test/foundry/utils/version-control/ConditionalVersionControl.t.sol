@@ -3,13 +3,11 @@ pragma solidity ^0.8.0;
 
 import { Vm, Test } from "forge-std/Test.sol";
 import { console } from "forge-std/console.sol";
-import {
-  TransparentUpgradeableProxyV2, ERC1967Upgrade
-} from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
+import { TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
 import { ILogic, MockLogicV1, MockLogicV2 } from "@ronin/contracts/mocks/utils/version-control/MockLogic.sol";
 import { IConditionalImplementControl } from
   "@ronin/contracts/interfaces/version-control/IConditionalImplementControl.sol";
-import { AddressArrayUtils } from "@ronin/contracts/libraries/AddressArrayUtils.sol";
+import { LibArray } from "@ronin/contracts/libraries/LibArray.sol";
 import { ErrOnlySelfCall } from "@ronin/contracts/utils/CommonErrors.sol";
 import { MockActor } from "@ronin/contracts/mocks/utils/version-control/MockActor.sol";
 import {
@@ -85,7 +83,7 @@ contract ConditionalImplementControlTest is Test {
       if ((instruction >> i) & 1 == 1) inputs[i] = dupAddr;
     }
 
-    vm.expectRevert(AddressArrayUtils.ErrDuplicated.selector);
+    vm.expectRevert(LibArray.ErrDuplicated.selector);
     _createConditionalImplementControl(inputs);
   }
 

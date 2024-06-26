@@ -1,21 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { StdStyle } from "forge-std/StdStyle.sol";
-import { console2 as console } from "forge-std/console2.sol";
-
-import { LibErrorHandler } from "contract-libs/LibErrorHandler.sol";
-import { TContract } from "foundry-deployment-kit/types/Types.sol";
-import { LibProxy } from "foundry-deployment-kit/libraries/LibProxy.sol";
-import { LibSharedAddress } from "foundry-deployment-kit/libraries/LibSharedAddress.sol";
-import { BaseMigration } from "foundry-deployment-kit/BaseMigration.s.sol";
+import { LibErrorHandler } from "@fdk/libraries/LibErrorHandler.sol";
+import { LibProxy } from "@fdk/libraries/LibProxy.sol";
+import { BaseMigration } from "@fdk/BaseMigration.s.sol";
 import { Contract } from "../utils/Contract.sol";
 
-import { ICandidateStaking } from "@ronin/contracts/interfaces/staking/ICandidateStaking.sol";
-import { IDelegatorStaking } from "@ronin/contracts/interfaces/staking/IDelegatorStaking.sol";
 import { ICandidateManager } from "@ronin/contracts/interfaces/validator/ICandidateManager.sol";
 import { IValidatorInfoV2 } from "@ronin/contracts/interfaces/validator/info-fragments/IValidatorInfoV2.sol";
-import { RoninValidatorSet } from "@ronin/contracts/ronin/validator/RoninValidatorSet.sol";
+import { IRoninValidatorSet } from "@ronin/contracts/interfaces/validator/IRoninValidatorSet.sol";
 import { IMaintenance } from "@ronin/contracts/interfaces/IMaintenance.sol";
 
 import "./PostChecker_Helper.sol";
@@ -34,9 +27,9 @@ abstract contract PostChecker_Maintenance is BaseMigration, PostChecker_Helper {
   uint256 private _delegatingValue;
 
   function _postCheck__Maintenance() internal {
-    _validatorSet = CONFIG.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key());
-    _staking = CONFIG.getAddressFromCurrentNetwork(Contract.Staking.key());
-    _maintenance = CONFIG.getAddressFromCurrentNetwork(Contract.Maintenance.key());
+    _validatorSet = loadContract(Contract.RoninValidatorSet.key());
+    _staking = loadContract(Contract.Staking.key());
+    _maintenance = loadContract(Contract.Maintenance.key());
 
     {
       (, bytes memory returnedData) =
@@ -58,9 +51,9 @@ abstract contract PostChecker_Maintenance is BaseMigration, PostChecker_Helper {
   function _postCheck_scheduleMaintenance() private logPostCheck("[Maintenance] full flow of on schedule") {
     vm.startPrank(_candidateAdmin);
 
-    uint256 latestEpochBlock = RoninValidatorSet(_validatorSet).getLastUpdatedBlock();
+    uint256 latestEpochBlock = IRoninValidatorSet(_validatorSet).getLastUpdatedBlock();
     uint256 minOffset = IMaintenance(_maintenance).minOffsetToStartSchedule();
-    uint256 numberOfBlocksInEpoch = RoninValidatorSet(_validatorSet).numberOfBlocksInEpoch();
+    uint256 numberOfBlocksInEpoch = IRoninValidatorSet(_validatorSet).numberOfBlocksInEpoch();
     uint256 minDuration = IMaintenance(_maintenance).minMaintenanceDurationInBlock();
 
     uint startBlock = latestEpochBlock + numberOfBlocksInEpoch + 1

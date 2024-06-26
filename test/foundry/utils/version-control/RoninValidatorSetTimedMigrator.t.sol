@@ -14,7 +14,7 @@ import {
   MockLogicV1,
   MockLogicV2,
   IConditionalImplementControl,
-  AddressArrayUtils,
+  LibArray,
   ConditionalImplementControlTest,
   TransparentUpgradeableProxyV2
 } from "./ConditionalVersionControl.t.sol";
@@ -84,7 +84,7 @@ contract RoninValidatorSetTimedMigratorTest is ConditionalImplementControlTest {
   /**
    * @notice Checks before upgrading.
    */
-  function test_BeforeUpgrading() public override {
+  function test_BeforeUpgrading() public view override {
     assertEq(ILogicValidatorSet(_proxy).currentPeriod(), 0);
   }
 

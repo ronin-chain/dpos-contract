@@ -60,15 +60,15 @@ interface IRewardPool is PeriodWrapperConsumer {
   /**
    * @dev Returns the staking amounts of the users.
    */
-  function getManyStakingAmounts(TConsensus[] calldata consensusAddrs, address[] calldata userList)
-    external
-    view
-    returns (uint256[] memory);
+  function getManyStakingAmounts(
+    TConsensus[] calldata consensusAddrs,
+    address[] calldata userList
+  ) external view returns (uint256[] memory);
 
-  function getManyStakingAmountsById(address[] calldata poolIds, address[] calldata userList)
-    external
-    view
-    returns (uint256[] memory);
+  function getManyStakingAmountsById(
+    address[] calldata poolIds,
+    address[] calldata userList
+  ) external view returns (uint256[] memory);
 
   /**
    * @dev Returns the total staking amount of all users for a pool.

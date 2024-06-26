@@ -1,31 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { console2 as console } from "forge-std/console2.sol";
-import { StdStyle } from "forge-std/StdStyle.sol";
-
 import { TConsensus } from "@ronin/contracts/udvts/Types.sol";
-import { Proposal, RoninMigration } from "script/RoninMigration.s.sol";
-import { Contract } from "script/utils/Contract.sol";
-import { DefaultNetwork } from "foundry-deployment-kit/utils/DefaultNetwork.sol";
-import { DefaultContract } from "foundry-deployment-kit/utils/DefaultContract.sol";
-import { BridgeTracking } from "@ronin/contracts/ronin/gateway/BridgeTracking.sol";
-import { RoninTrustedOrganization } from "@ronin/contracts/multi-chains/RoninTrustedOrganization.sol";
-import { BridgeReward } from "@ronin/contracts/ronin/gateway/BridgeReward.sol";
-import {
-  TransparentUpgradeableProxy,
-  TransparentUpgradeableProxyV2
-} from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
-
-import {
-  IRoninTrustedOrganization,
-  RoninTrustedOrganization
-} from "@ronin/contracts/multi-chains/RoninTrustedOrganization.sol";
-import { GovernanceAdmin, RoninGovernanceAdmin } from "@ronin/contracts/ronin/RoninGovernanceAdmin.sol";
+import { RoninMigration } from "script/RoninMigration.s.sol";
+import { IBridgeReward } from "@ronin/contracts/interfaces/bridge/IBridgeReward.sol";
 
 abstract contract MikoConfig is RoninMigration {
-  using StdStyle for *;
-
   bytes32 public constant $_IMPL_SLOT = 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc;
   bytes32 public constant $_ADMIN_SLOT = 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103;
   bytes32 public constant MIGRATOR_ROLE = keccak256("MIGRATOR_ROLE");
@@ -54,7 +34,7 @@ abstract contract MikoConfig is RoninMigration {
   address public constant TRUSTED_ORG_RECOVERY_LOGIC = 0x59646258Ec25CC329f5ce93223e0A50ccfA3e885;
 
   uint256 public constant PROPOSAL_DURATION = 14 days; // FIXME: `20 minutes` on mainnet shadow
-  BridgeReward public constant DEPRECATED_BRIDGE_REWARD = BridgeReward(0x1C952D6717eBFd2E92E5f43Ef7C1c3f7677F007D);
+  IBridgeReward public constant DEPRECATED_BRIDGE_REWARD = IBridgeReward(0x1C952D6717eBFd2E92E5f43Ef7C1c3f7677F007D);
 
   uint256 public constant PROFILE_PUBKEY_CHANGE_COOLDOWN = 7 days;
 

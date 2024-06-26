@@ -5,22 +5,13 @@ import "../../libraries/Proposal.sol";
 import "../../libraries/GlobalProposal.sol";
 import "../../utils/CommonErrors.sol";
 import "../../libraries/Ballot.sol";
+import { ICoreGovernance } from "../../interfaces/extensions/sequential-governance/ICoreGovernance.sol";
 import "../../interfaces/consumers/ChainTypeConsumer.sol";
 import "../../interfaces/consumers/SignatureConsumer.sol";
 import "../../interfaces/consumers/VoteStatusConsumer.sol";
 
-abstract contract CoreGovernance is SignatureConsumer, VoteStatusConsumer, ChainTypeConsumer {
+abstract contract CoreGovernance is ICoreGovernance, ChainTypeConsumer {
   using Proposal for Proposal.ProposalDetail;
-
-  /**
-   * @dev Error thrown when attempting to interact with a finalized vote.
-   */
-  error ErrVoteIsFinalized();
-
-  /**
-   * @dev Error thrown when the current proposal is not completed.
-   */
-  error ErrCurrentProposalIsNotCompleted();
 
   struct ProposalVote {
     VoteStatus status;
@@ -34,32 +25,11 @@ abstract contract CoreGovernance is SignatureConsumer, VoteStatusConsumer, Chain
     mapping(address => bool) voted;
   }
 
-  /// @dev Emitted when a proposal is created
-  event ProposalCreated(
-    uint256 indexed chainId,
-    uint256 indexed round,
-    bytes32 indexed proposalHash,
-    Proposal.ProposalDetail proposal,
-    address creator
-  );
-  /// @dev Emitted when the proposal is voted
-  event ProposalVoted(bytes32 indexed proposalHash, address indexed voter, Ballot.VoteType support, uint256 weight);
-  /// @dev Emitted when the proposal is approved
-  event ProposalApproved(bytes32 indexed proposalHash);
-  /// @dev Emitted when the vote is reject
-  event ProposalRejected(bytes32 indexed proposalHash);
-  /// @dev Emitted when the vote is expired
-  event ProposalExpired(bytes32 indexed proposalHash);
-  /// @dev Emitted when the proposal is executed
-  event ProposalExecuted(bytes32 indexed proposalHash, bool[] successCalls, bytes[] returnDatas);
-  /// @dev Emitted when the proposal expiry duration is changed.
-  event ProposalExpiryDurationChanged(uint256 indexed duration);
-
   /// @dev Mapping from chain id => vote round
   /// @notice chain id = 0 for global proposal
-  mapping(uint256 => uint256) public round;
+  mapping(uint256 chainId => uint256 round) public round;
   /// @dev Mapping from chain id => vote round => proposal vote
-  mapping(uint256 => mapping(uint256 => ProposalVote)) public vote;
+  mapping(uint256 chainId => mapping(uint256 voteRound => ProposalVote)) public vote;
 
   uint256 internal _proposalExpiryDuration;
 

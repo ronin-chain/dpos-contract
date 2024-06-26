@@ -35,7 +35,33 @@ contract MockValidatorSet is
     _minEffectiveDaysOnwards = __minEffectiveDaysOnwards;
   }
 
+  /**
+   * @dev Initializes the contract storage.
+   */
+  function initialize(
+    address __slashIndicatorContract,
+    address __stakingContract,
+    address __stakingVestingContract,
+    address __maintenanceContract,
+    address __roninTrustedOrganizationContract,
+    address, /* __bridgeTrackingContract */
+    uint256, /* __maxValidatorNumber */
+    uint256 __maxValidatorCandidate,
+    uint256, /* __maxPrioritizedValidatorNumber */
+    uint256 __minEffectiveDaysOnwards,
+    uint256 __numberOfBlocksInEpoch,
+    // __emergencyExitConfigs[0]: emergencyExitLockedAmount
+    // __emergencyExitConfigs[1]: emergencyExpiryDuration
+    uint256[2] calldata __emergencyExitConfigs
+  ) external { }
+
+  function initializeV2() external { }
+  function initializeV3(address fastFinalityTrackingContract) external { }
+  function initializeV4(address profileContract) external { }
+
   function submitBlockReward() external payable override { }
+
+  function getPeriodEndBlock(uint256 period) external view override returns (uint256) { }
 
   function wrapUpEpoch() external payable override {
     _syncCandidateSet(_lastUpdatedPeriod + 1);
@@ -68,10 +94,6 @@ contract MockValidatorSet is
   function execSlash(address cid, uint256 newJailedUntil, uint256 slashAmount, bool cannotBailout) external override { }
 
   function execBailOut(address, uint256) external override { }
-
-  function setMaxValidatorNumber(uint256 _maxValidatorNumber) external override { }
-
-  function setMaxPrioritizedValidatorNumber(uint256 _maxPrioritizedValidatorNumber) external override { }
 
   function maxValidatorNumber() external view override returns (uint256 _maximumValidatorNumber) { }
 
@@ -152,6 +174,4 @@ contract MockValidatorSet is
   function isOperatingBridge(TConsensus) external view returns (bool) { }
 
   function _emergencyExitLockedFundReleased(address _consensusAddr) internal virtual override returns (bool) { }
-
-  function _isTrustedOrg(address validatorId) internal virtual override returns (bool) { }
 }

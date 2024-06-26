@@ -1,30 +1,27 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { RoninGovernanceAdmin } from "@ronin/contracts/ronin/RoninGovernanceAdmin.sol";
-import { RoninGatewayV3 } from "@ronin/contracts/ronin/gateway/RoninGatewayV3.sol";
-import { MainchainGatewayV3 } from "@ronin/contracts/mainchain/MainchainGatewayV3.sol";
-import { Staking } from "@ronin/contracts/ronin/staking/Staking.sol";
-import { Maintenance } from "@ronin/contracts/ronin/Maintenance.sol";
-import { BridgeTracking } from "@ronin/contracts/ronin/gateway/BridgeTracking.sol";
-import { SlashIndicator } from "@ronin/contracts/ronin/slash-indicator/SlashIndicator.sol";
-import { RoninTrustedOrganization } from "@ronin/contracts/multi-chains/RoninTrustedOrganization.sol";
-import { Staking } from "@ronin/contracts/ronin/staking/Staking.sol";
-import { StakingVesting } from "@ronin/contracts/ronin/StakingVesting.sol";
-import { FastFinalityTracking } from "@ronin/contracts/ronin/fast-finality/FastFinalityTracking.sol";
-import { BridgeTracking } from "@ronin/contracts/ronin/gateway/BridgeTracking.sol";
-import { BridgeReward } from "@ronin/contracts/ronin/gateway/BridgeReward.sol";
-import { BridgeSlash } from "@ronin/contracts/ronin/gateway/BridgeSlash.sol";
-import { RoninBridgeManager } from "@ronin/contracts/ronin/gateway/RoninBridgeManager.sol";
+import { IRoninGovernanceAdmin } from "@ronin/contracts/interfaces/IRoninGovernanceAdmin.sol";
+import { IRoninValidatorSet } from "@ronin/contracts/interfaces/validator/IRoninValidatorSet.sol";
+import { IRoninGatewayV3 } from "@ronin/contracts/interfaces/IRoninGatewayV3.sol";
+import { IMainchainGatewayV3 } from "@ronin/contracts/interfaces/IMainchainGatewayV3.sol";
+import { IMaintenance } from "@ronin/contracts/interfaces/IMaintenance.sol";
+import { IBridgeTracking } from "@ronin/contracts/interfaces/bridge/IBridgeTracking.sol";
+import { ISlashIndicator } from "@ronin/contracts/interfaces/slash-indicator/ISlashIndicator.sol";
+import { IRoninTrustedOrganization } from "@ronin/contracts/interfaces/IRoninTrustedOrganization.sol";
+import { IStaking } from "@ronin/contracts/interfaces/staking/IStaking.sol";
+import { IStakingVesting } from "@ronin/contracts/interfaces/IStakingVesting.sol";
+import { IFastFinalityTracking } from "@ronin/contracts/interfaces/IFastFinalityTracking.sol";
+import { IBridgeTracking } from "@ronin/contracts/interfaces/bridge/IBridgeTracking.sol";
+import { IBridgeReward } from "@ronin/contracts/interfaces/bridge/IBridgeReward.sol";
+import { IBridgeSlash } from "@ronin/contracts/interfaces/bridge/IBridgeSlash.sol";
+import { IBridgeManager } from "@ronin/contracts/interfaces/bridge/IBridgeManager.sol";
 import { MockPrecompile } from "@ronin/contracts/mocks/MockPrecompile.sol";
 import { MappedTokenConsumer } from "@ronin/contracts/interfaces/consumers/MappedTokenConsumer.sol";
 import { Token } from "@ronin/contracts/libraries/Token.sol";
 import { Transfer } from "@ronin/contracts/libraries/Transfer.sol";
 
-import {
-  RoninValidatorSet,
-  RoninValidatorSetTimedMigratorUpgrade
-} from "script/contracts/RoninValidatorSetTimedMigratorUpgrade.s.sol";
+import { RoninValidatorSetTimedMigratorUpgrade } from "script/contracts/RoninValidatorSetTimedMigratorUpgrade.s.sol";
 import { NotifiedMigratorUpgrade } from "script/contracts/NotifiedMigratorUpgrade.s.sol";
 import { ProfileDeploy } from "script/contracts/ProfileDeploy.s.sol";
 import { DefaultNetwork, RoninMigration } from "script/RoninMigration.s.sol";
@@ -34,20 +31,20 @@ import { Contract } from "script/utils/Contract.sol";
 contract Simulation__20231003_UpgradeREP002AndREP003_Base is RoninMigration, MappedTokenConsumer {
   using Transfer for *;
 
-  Staking internal _staking;
-  RoninGatewayV3 internal _roninGateway;
-  BridgeTracking internal _bridgeTracking;
-  SlashIndicator internal _slashIndicator;
-  RoninValidatorSet internal _validatorSet;
-  StakingVesting internal _stakingVesting;
-  RoninTrustedOrganization internal _trustedOrgs;
-  FastFinalityTracking internal _fastFinalityTracking;
-  RoninGovernanceAdmin internal _roninGovernanceAdmin;
+  IStaking internal _staking;
+  IRoninGatewayV3 internal _roninGateway;
+  IBridgeTracking internal _bridgeTracking;
+  ISlashIndicator internal _slashIndicator;
+  IRoninValidatorSet internal _validatorSet;
+  IStakingVesting internal _stakingVesting;
+  IRoninTrustedOrganization internal _trustedOrgs;
+  IFastFinalityTracking internal _fastFinalityTracking;
+  IRoninGovernanceAdmin internal _roninGovernanceAdmin;
 
   // new contracts
-  BridgeSlash internal _bridgeSlash;
-  BridgeReward internal _bridgeReward;
-  RoninBridgeManager internal _roninBridgeManager;
+  IBridgeSlash internal _bridgeSlash;
+  IBridgeReward internal _bridgeReward;
+  IBridgeManager internal _roninBridgeManager;
 
   uint256 _depositCount;
 
@@ -72,19 +69,16 @@ contract Simulation__20231003_UpgradeREP002AndREP003_Base is RoninMigration, Map
       vm.makePersistent(address(0x68));
     }
 
-    _staking = Staking(config.getAddressFromCurrentNetwork(Contract.Staking.key()));
-    _roninGateway = RoninGatewayV3(config.getAddressFromCurrentNetwork(Contract.RoninGatewayV3.key()));
-    _bridgeTracking = BridgeTracking(config.getAddressFromCurrentNetwork(Contract.BridgeTracking.key()));
-    _slashIndicator = SlashIndicator(config.getAddressFromCurrentNetwork(Contract.SlashIndicator.key()));
-    _stakingVesting = StakingVesting(config.getAddressFromCurrentNetwork(Contract.StakingVesting.key()));
-    _validatorSet = RoninValidatorSet(config.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key()));
-    _trustedOrgs =
-      RoninTrustedOrganization(config.getAddressFromCurrentNetwork(Contract.RoninTrustedOrganization.key()));
-    _fastFinalityTracking =
-      FastFinalityTracking(config.getAddressFromCurrentNetwork(Contract.FastFinalityTracking.key()));
-    _roninGovernanceAdmin =
-      RoninGovernanceAdmin(config.getAddressFromCurrentNetwork(Contract.RoninGovernanceAdmin.key()));
-    _roninBridgeManager = RoninBridgeManager(config.getAddressFromCurrentNetwork(Contract.RoninBridgeManager.key()));
+    _staking = IStaking(loadContract(Contract.Staking.key()));
+    _roninGateway = IRoninGatewayV3(loadContract(Contract.RoninGatewayV3.key()));
+    _bridgeTracking = IBridgeTracking(loadContract(Contract.BridgeTracking.key()));
+    _slashIndicator = ISlashIndicator(loadContract(Contract.SlashIndicator.key()));
+    _stakingVesting = IStakingVesting(loadContract(Contract.StakingVesting.key()));
+    _validatorSet = IRoninValidatorSet(loadContract(Contract.RoninValidatorSet.key()));
+    _trustedOrgs = IRoninTrustedOrganization(loadContract(Contract.RoninTrustedOrganization.key()));
+    _fastFinalityTracking = IFastFinalityTracking(loadContract(Contract.FastFinalityTracking.key()));
+    _roninGovernanceAdmin = IRoninGovernanceAdmin(loadContract(Contract.RoninGovernanceAdmin.key()));
+    _roninBridgeManager = IBridgeManager(loadContract(Contract.RoninBridgeManager.key()));
 
     _depositCount = _hookSetDepositCount();
   }
@@ -97,8 +91,8 @@ contract Simulation__20231003_UpgradeREP002AndREP003_Base is RoninMigration, Map
     Transfer.Request memory request =
       Transfer.Request(user.addr, address(0), Token.Info(Token.Standard.ERC20, 0, 1 ether));
 
-    MainchainGatewayV3 mainchainGateway =
-      MainchainGatewayV3(config.getAddress(Network.EthMainnet.key(), Contract.MainchainGatewayV3.key()));
+    IMainchainGatewayV3 mainchainGateway =
+      IMainchainGatewayV3(config.getAddress(Network.EthMainnet.key(), Contract.MainchainGatewayV3.key()));
 
     // switch rpc to eth mainnet
     config.switchTo(Network.EthMainnet.key());

@@ -2,12 +2,12 @@
 pragma solidity ^0.8.19;
 
 import { IBridgeReward } from "@ronin/contracts/interfaces/bridge/IBridgeReward.sol";
-import { ContractType, BridgeTracking } from "@ronin/contracts/ronin/gateway/BridgeTracking.sol";
+import { ContractType } from "@ronin/contracts/utils/ContractType.sol";
 
-contract BridgeTrackingRecoveryLogic is BridgeTracking {
+contract BridgeTrackingRecoveryLogic {
   event TotalInternalTxCount(uint indexed count);
 
-  function recoverFund() external onlyAdmin {
+  function recoverFund() external {
     IBridgeReward bridgeRewardContract = IBridgeReward(0x1C952D6717eBFd2E92E5f43Ef7C1c3f7677F007D);
     address receiver = msg.sender;
 

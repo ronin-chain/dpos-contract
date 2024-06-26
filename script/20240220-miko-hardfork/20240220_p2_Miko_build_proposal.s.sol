@@ -1,27 +1,27 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { TContract } from "foundry-deployment-kit/types/Types.sol";
-import { LibProxy } from "foundry-deployment-kit/libraries/LibProxy.sol";
+import { TContract } from "@fdk/types/Types.sol";
+import { LibProxy } from "@fdk/libraries/LibProxy.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
-
-import {
-  BridgeTrackingRecoveryLogic,
-  BridgeTracking
-} from "../20231019-recover-fund/contracts/BridgeTrackingRecoveryLogic.sol";
-
-import { SlashIndicator } from "@ronin/contracts/ronin/slash-indicator/SlashIndicator.sol";
-import { Staking, IStaking } from "@ronin/contracts/ronin/staking/Staking.sol";
-import { Profile } from "@ronin/contracts/ronin/profile/Profile.sol";
-import { Maintenance } from "@ronin/contracts/ronin/Maintenance.sol";
-import { RoninValidatorSet } from "@ronin/contracts/ronin/validator/RoninValidatorSet.sol";
-import { StakingVesting } from "@ronin/contracts/ronin/StakingVesting.sol";
-import { FastFinalityTracking } from "@ronin/contracts/ronin/fast-finality/FastFinalityTracking.sol";
-
-import { AccessControl } from "@openzeppelin/contracts/access/AccessControl.sol";
-
-import "./ArrayReplaceLib.sol";
-import "./20240220_Base_Miko_Hardfork.s.sol";
+import { IStaking } from "@ronin/contracts/interfaces/staking/IStaking.sol";
+import { IProfile } from "@ronin/contracts/interfaces/IProfile.sol";
+import { IMaintenance } from "@ronin/contracts/interfaces/IMaintenance.sol";
+import { RoninGovernanceAdmin } from "@ronin/contracts/ronin/RoninGovernanceAdmin.sol";
+import { IBridgeReward } from "@ronin/contracts/interfaces/bridge/IBridgeReward.sol";
+import { IGovernanceAdmin } from "@ronin/contracts/interfaces/extensions/IGovernanceAdmin.sol";
+import { IRoninTrustedOrganization } from "@ronin/contracts/interfaces/IRoninTrustedOrganization.sol";
+import { IRoninValidatorSet } from "@ronin/contracts/interfaces/validator/IRoninValidatorSet.sol";
+import { IFastFinalityTracking } from "@ronin/contracts/interfaces/IFastFinalityTracking.sol";
+import { IAccessControl } from "@openzeppelin/contracts/access/IAccessControl.sol";
+import { ArrayReplaceLib } from "./ArrayReplaceLib.sol";
+import { Proposal__Base_20240220_MikoHardfork } from "./20240220_Base_Miko_Hardfork.s.sol";
+import { LibProposal } from "script/shared/libraries/LibProposal.sol";
+import { Proposal } from "@ronin/contracts/libraries/Proposal.sol";
+import { TConsensus } from "@ronin/contracts/udvts/Types.sol";
+import { TransparentUpgradeableProxy } from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
+import { TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
+import { console } from "forge-std/console.sol";
 
 abstract contract Proposal__20240220_MikoHardfork_BuildProposal is Proposal__Base_20240220_MikoHardfork {
   using LibProxy for *;
@@ -108,7 +108,9 @@ abstract contract Proposal__20240220_MikoHardfork_BuildProposal is Proposal__Bas
       mstore(values, prCnt)
     }
 
-    proposal = _buildProposal(roninGovernanceAdmin, block.timestamp + PROPOSAL_DURATION, tos, values, callDatas);
+    proposal = LibProposal.buildProposal(
+      roninGovernanceAdmin, vm.getBlockTimestamp() + PROPOSAL_DURATION, tos, values, callDatas
+    );
   }
 
   function _ga__changeAdminBridgeTracking()
@@ -125,10 +127,10 @@ abstract contract Proposal__20240220_MikoHardfork_BuildProposal is Proposal__Bas
     console.log("balanceBefore", balanceBefore);
 
     targets[0] = address(roninGovernanceAdmin);
-    callDatas[0] = abi.encodeCall(GovernanceAdmin.changeProxyAdmin, (bridgeTracking, doctor));
+    callDatas[0] = abi.encodeCall(IGovernanceAdmin.changeProxyAdmin, (bridgeTracking, doctor));
 
     targets[1] = address(DEPRECATED_BRIDGE_REWARD);
-    callDatas[1] = abi.encodeCall(BridgeReward.initializeREP2, ());
+    callDatas[1] = abi.encodeCall(IBridgeReward.initializeREP2, ());
   }
 
   function _ga__upgradeAllDPoSContracts()
@@ -153,7 +155,7 @@ abstract contract Proposal__20240220_MikoHardfork_BuildProposal is Proposal__Bas
         revert();
       } else {
         address implementation = allContracts[i].getProxyImplementation();
-        TContract contractType = config.getContractTypeFromCurrentNetwok(allContracts[i]);
+        TContract contractType = config.getContractTypeFromCurrentNetwork(allContracts[i]);
 
         if (implementation.codehash != keccak256(vm.getDeployedCode(config.getContractAbsolutePath(contractType)))) {
           console.log(
@@ -202,49 +204,49 @@ abstract contract Proposal__20240220_MikoHardfork_BuildProposal is Proposal__Bas
     targets[0] = address(maintenanceContract);
     callDatas[0] = abi.encodeCall(
       TransparentUpgradeableProxyV2.functionDelegateCall,
-      abi.encodeCall(Maintenance.initializeV3, (address(profileContract)))
+      abi.encodeCall(IMaintenance.initializeV3, (address(profileContract)))
     );
 
     targets[1] = address(validatorContract);
     callDatas[1] = abi.encodeCall(
       TransparentUpgradeableProxyV2.functionDelegateCall,
-      abi.encodeCall(RoninValidatorSet.initializeV4, (address(profileContract)))
+      abi.encodeCall(IRoninValidatorSet.initializeV4, (address(profileContract)))
     );
 
     targets[2] = address(profileContract);
     callDatas[2] = abi.encodeCall(
       TransparentUpgradeableProxyV2.functionDelegateCall,
-      abi.encodeCall(Profile.initializeV2, (address(stakingContract), address(trustedOrgContract)))
+      abi.encodeCall(IProfile.initializeV2, (address(stakingContract), address(trustedOrgContract)))
     );
 
     targets[3] = address(profileContract);
     callDatas[3] = abi.encodeCall(
       TransparentUpgradeableProxyV2.functionDelegateCall,
-      abi.encodeCall(Profile.initializeV3, (PROFILE_PUBKEY_CHANGE_COOLDOWN))
+      abi.encodeCall(IProfile.initializeV3, (PROFILE_PUBKEY_CHANGE_COOLDOWN))
     );
 
     targets[4] = address(trustedOrgContract);
     callDatas[4] = abi.encodeCall(
       TransparentUpgradeableProxyV2.functionDelegateCall,
-      abi.encodeCall(RoninTrustedOrganization.initializeV2, (address(profileContract)))
+      abi.encodeCall(IRoninTrustedOrganization.initializeV2, (address(profileContract)))
     );
 
     targets[5] = address(stakingContract);
     callDatas[5] = abi.encodeCall(
       TransparentUpgradeableProxyV2.functionDelegateCall,
-      abi.encodeCall(Staking.initializeV3, (address(profileContract)))
+      abi.encodeCall(IStaking.initializeV3, (address(profileContract)))
     );
 
     targets[6] = address(stakingContract);
     callDatas[6] = abi.encodeCall(
       TransparentUpgradeableProxyV2.functionDelegateCall,
-      abi.encodeCall(Staking.initializeV4, (address(roninGovernanceAdmin), STAKING_MIGRATOR))
+      abi.encodeCall(IStaking.initializeV4, (address(roninGovernanceAdmin), STAKING_MIGRATOR))
     );
 
     targets[7] = address(fastFinalityTrackingContract);
     callDatas[7] = abi.encodeCall(
       TransparentUpgradeableProxyV2.functionDelegateCall,
-      abi.encodeCall(FastFinalityTracking.initializeV2, (address(profileContract)))
+      abi.encodeCall(IFastFinalityTracking.initializeV2, (address(profileContract)))
     );
 
     // [C1.] The `MIGRATOR_ROLE` in the Staking will migrate the list of `wasAdmin`.
@@ -252,7 +254,7 @@ abstract contract Proposal__20240220_MikoHardfork_BuildProposal is Proposal__Bas
       targets[8] = address(stakingContract);
       callDatas[8] = abi.encodeCall(
         TransparentUpgradeableProxyV2.functionDelegateCall,
-        abi.encodeCall(AccessControl.grantRole, (MIGRATOR_ROLE, address(roninGovernanceAdmin)))
+        abi.encodeCall(IAccessControl.grantRole, (MIGRATOR_ROLE, address(roninGovernanceAdmin)))
       );
 
       targets[9] = address(stakingContract);
@@ -276,7 +278,7 @@ abstract contract Proposal__20240220_MikoHardfork_BuildProposal is Proposal__Bas
     targets[0] = address(trustedOrgContract);
     callDatas[0] = abi.encodeCall(
       TransparentUpgradeableProxyV2.functionDelegateCall,
-      abi.encodeCall(RoninTrustedOrganization.removeTrustedOrganizations, (cssList))
+      abi.encodeCall(IRoninTrustedOrganization.removeTrustedOrganizations, (cssList))
     );
 
     // Add new governor for StableNode
@@ -289,13 +291,13 @@ abstract contract Proposal__20240220_MikoHardfork_BuildProposal is Proposal__Bas
     targets[1] = address(trustedOrgContract);
     callDatas[1] = abi.encodeCall(
       TransparentUpgradeableProxyV2.functionDelegateCall,
-      abi.encodeCall(RoninTrustedOrganization.addTrustedOrganizations, (trOrgLst))
+      abi.encodeCall(IRoninTrustedOrganization.addTrustedOrganizations, (trOrgLst))
     );
   }
 
   function _migrator__migrateWasAdmin() internal view returns (bytes memory) {
     (address[] memory poolIds, address[] memory admins, bool[] memory flags) = _sys__parseMigrateData(MIGRATE_DATA_PATH);
-    return abi.encodeCall(Staking.migrateWasAdmin, (poolIds, admins, flags));
+    return abi.encodeCall(IStaking.migrateWasAdmin, (poolIds, admins, flags));
   }
 
   function _ga__changeAdminAllContracts()
@@ -304,7 +306,7 @@ abstract contract Proposal__20240220_MikoHardfork_BuildProposal is Proposal__Bas
   {
     address payable[] memory allContracts = allDPoSContracts;
 
-    bool shouldPrankOnly = CONFIG.isPostChecking();
+    bool shouldPrankOnly = vme.isPostChecking();
 
     if (shouldPrankOnly) {
       vm.prank(DEPLOYER);
@@ -337,7 +339,7 @@ abstract contract Proposal__20240220_MikoHardfork_BuildProposal is Proposal__Bas
 
       // Change default admin role if it exist in the proxy
       (bool success, bytes memory returnData) =
-        allContracts[i].call(abi.encodeCall(AccessControl.hasRole, (DEFAULT_ADMIN_ROLE, proxyAdmin)));
+        allContracts[i].call(abi.encodeCall(IAccessControl.hasRole, (DEFAULT_ADMIN_ROLE, proxyAdmin)));
       // AccessControl(allContracts[i]).hasRole(DEFAULT_ADMIN_ROLE, proxyAdmin);
       if (success && abi.decode(returnData, (bool))) {
         console.log("Contract to change default admin role:".cyan(), vm.getLabel(allContracts[i]));
@@ -361,10 +363,11 @@ abstract contract Proposal__20240220_MikoHardfork_BuildProposal is Proposal__Bas
     for (uint i; i < contractsToChangeDefaultAdminRole.length; ++i) {
       uint j = contractsToChangeAdmin.length + i;
       targets[j] = contractsToChangeDefaultAdminRole[i];
-      callDatas[j] = abi.encodeCall(AccessControl.grantRole, (DEFAULT_ADMIN_ROLE, _newGA));
+      callDatas[j] = abi.encodeCall(IAccessControl.grantRole, (DEFAULT_ADMIN_ROLE, _newGA));
 
       targets[j + 1] = contractsToChangeDefaultAdminRole[i];
-      callDatas[j + 1] = abi.encodeCall(AccessControl.renounceRole, (DEFAULT_ADMIN_ROLE, address(roninGovernanceAdmin)));
+      callDatas[j + 1] =
+        abi.encodeCall(IAccessControl.renounceRole, (DEFAULT_ADMIN_ROLE, address(roninGovernanceAdmin)));
     }
   }
 
@@ -378,9 +381,9 @@ abstract contract Proposal__20240220_MikoHardfork_BuildProposal is Proposal__Bas
     values = new uint256[](2);
 
     targets[0] = address(stakingContract);
-    callDatas[0] = abi.encodeCall(AccessControl.grantRole, (DEFAULT_ADMIN_ROLE, _newGA));
+    callDatas[0] = abi.encodeCall(IAccessControl.grantRole, (DEFAULT_ADMIN_ROLE, _newGA));
 
     targets[1] = address(stakingContract);
-    callDatas[1] = abi.encodeCall(AccessControl.renounceRole, (DEFAULT_ADMIN_ROLE, address(roninGovernanceAdmin)));
+    callDatas[1] = abi.encodeCall(IAccessControl.renounceRole, (DEFAULT_ADMIN_ROLE, address(roninGovernanceAdmin)));
   }
 }

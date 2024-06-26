@@ -22,3 +22,9 @@ out
 dry-run/
 script/data/*
 *.env
+logs/temp.log
+deployments/**/exported_address
+config/config.json
+config/config.yaml
+dependencies
+deployments/ronin-mainnet-shadow
