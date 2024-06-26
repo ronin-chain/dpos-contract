@@ -11,11 +11,10 @@ contract RoninRandomBacon_PickValidatorSet_Test is REP10_BaseTest {
 
   function testConcrete_LogPickCount_pickValidatorSet() external {
     LibWrapUpEpoch.wrapUpPeriods({ times: 1, shouldSubmitBeacon: true });
-    LibVRFProof.VRFKey[] memory keys = abi.decode(vme.getUserDefinedConfig("vrf-keys"), (LibVRFProof.VRFKey[]));
     uint256 wrapUpCount = 1000;
 
     for (uint256 i; i < wrapUpCount; ++i) {
-      LibWrapUpEpoch.wrapUpEpochAndSubmitBeacons(keys);
+      LibWrapUpEpoch.wrapUpEpoch();
 
       address[] memory validatorIds =
         roninRandomBeacon.pickValidatorSetForCurrentPeriod(roninValidatorSet.epochOf(block.number) + 1);

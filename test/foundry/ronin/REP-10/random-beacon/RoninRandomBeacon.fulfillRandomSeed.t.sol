@@ -20,7 +20,7 @@ contract RoninRandomBeacon_FulfillRandomSeed_Test is REP10_BaseTest {
 
     IRoninTrustedOrganization.TrustedOrganization[] memory gvs = new IRoninTrustedOrganization.TrustedOrganization[](1);
     gvs[0] = gov;
-    vm.prank(governanceAdmin);
+    vm.prank(address(governanceAdmin));
     TransparentUpgradeableProxyV2(payable(address(roninTrustedOrganization))).functionDelegateCall(
       abi.encodeCall(IRoninTrustedOrganization.addTrustedOrganizations, (gvs))
     );
@@ -128,7 +128,7 @@ contract RoninRandomBeacon_FulfillRandomSeed_Test is REP10_BaseTest {
 
     IRoninTrustedOrganization.TrustedOrganization[] memory gvs = new IRoninTrustedOrganization.TrustedOrganization[](1);
     gvs[0] = gov;
-    vm.prank(governanceAdmin);
+    vm.prank(address(governanceAdmin));
     TransparentUpgradeableProxyV2(payable(address(roninTrustedOrganization))).functionDelegateCall(
       abi.encodeCall(IRoninTrustedOrganization.addTrustedOrganizations, (gvs))
     );

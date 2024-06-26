@@ -2,43 +2,25 @@
 
 pragma solidity ^0.8.9;
 
-import "../../extensions/collections/HasContracts.sol";
-import "../../extensions/RONTransferHelper.sol";
-import "../../interfaces/IProfile.sol";
-import "../../interfaces/IStakingVesting.sol";
-import "../../interfaces/IMaintenance.sol";
-import "../../interfaces/IFastFinalityTracking.sol";
-import "../../interfaces/staking/IStaking.sol";
-import "../../interfaces/IRoninTrustedOrganization.sol";
-import "../../interfaces/slash-indicator/ISlashIndicator.sol";
-import "../../interfaces/random-beacon/IRandomBeacon.sol";
-import "../../interfaces/validator/ICoinbaseExecution.sol";
-import "../../libraries/EnumFlags.sol";
-import "../../libraries/Math.sol";
-import { LibArray } from "../../libraries/LibArray.sol";
-import {
-  HasStakingVestingDeprecated,
-  HasBridgeTrackingDeprecated,
-  HasMaintenanceDeprecated,
-  HasSlashIndicatorDeprecated
-} from "../../utils/DeprecatedSlots.sol";
-import "./storage-fragments/CommonStorage.sol";
+import { Math } from "../../libraries/Math.sol";
 import { EmergencyExit } from "./EmergencyExit.sol";
-import { TPoolId } from "../../udvts/Types.sol";
+import { IProfile } from "../../interfaces/IProfile.sol";
+import { IStaking } from "../../interfaces/staking/IStaking.sol";
+import { IMaintenance } from "../../interfaces/IMaintenance.sol";
+import { IStakingVesting } from "../../interfaces/IStakingVesting.sol";
+import { IRandomBeacon } from "../../interfaces/random-beacon/IRandomBeacon.sol";
+import { IFastFinalityTracking } from "../../interfaces/IFastFinalityTracking.sol";
+import { ICoinbaseExecution } from "../../interfaces/validator/ICoinbaseExecution.sol";
+import { ISlashIndicator } from "../../interfaces/slash-indicator/ISlashIndicator.sol";
+import { IRoninTrustedOrganization } from "../../interfaces/IRoninTrustedOrganization.sol";
+import { LibArray } from "../../libraries/LibArray.sol";
+import { ContractType } from "../../utils/ContractType.sol";
+import { TConsensus } from "../../udvts/Types.sol";
 import { ErrCallerMustBeCoinbase } from "../../utils/CommonErrors.sol";
+import { CoinbaseExecutionDependant } from "./CoinbaseExecutionDependant.sol";
 
-abstract contract CoinbaseExecution is
-  ICoinbaseExecution,
-  RONTransferHelper,
-  HasContracts,
-  HasStakingVestingDeprecated,
-  HasBridgeTrackingDeprecated,
-  HasMaintenanceDeprecated,
-  HasSlashIndicatorDeprecated,
-  EmergencyExit
-{
+abstract contract CoinbaseExecution is ICoinbaseExecution, CoinbaseExecutionDependant {
   using LibArray for uint256[];
-  using EnumFlags for EnumFlags.ValidatorFlag;
 
   modifier onlyCoinbase() {
     _requireCoinbase();
@@ -104,72 +86,76 @@ abstract contract CoinbaseExecution is
     }
 
     rewardProducingBlock -= cutOffReward;
-    (uint256 minRate, uint256 maxRate) = IStaking(getContract(ContractType.STAKING)).getCommissionRateRange();
-    uint256 rate = Math.max(Math.min(_candidateInfo[id].commissionRate, maxRate), minRate);
-    uint256 miningAmount = (rate * rewardProducingBlock) / _MAX_PERCENTAGE;
-    _miningReward[id] += miningAmount;
-    _delegatingReward[id] += (rewardProducingBlock - miningAmount);
+    (uint256 validatorMiningReward, uint256 delegatorMiningReward) =
+      _calcCommissionReward({ vId: id, totalReward: rewardProducingBlock });
+
+    _validatorMiningReward[id] += validatorMiningReward;
+    _delegatorMiningReward[id] += delegatorMiningReward;
   }
 
   /**
    * @inheritdoc ICoinbaseExecution
    */
   function wrapUpEpoch() external payable virtual override onlyCoinbase whenEpochEnding oncePerEpoch {
-    uint256 newPeriod = _computePeriod(block.timestamp);
-    bool periodEnding = _isPeriodEnding(newPeriod);
+    unchecked {
+      uint256 newPeriod = _computePeriod(block.timestamp);
+      bool periodEnding = _isPeriodEnding(newPeriod);
 
-    uint256 lastPeriod = currentPeriod();
-    uint256 epoch = epochOf(block.number);
-    uint256 nextEpoch = epoch + 1;
+      uint256 lastPeriod = currentPeriod();
+      uint256 epoch = epochOf(block.number);
+      uint256 nextEpoch = epoch + 1;
 
-    IRandomBeacon randomBeacon = IRandomBeacon(getContract(ContractType.RANDOM_BEACON));
-    // This request is actually only invoked at the first epoch of the period.
-    randomBeacon.execRequestRandomSeedForNextPeriod(lastPeriod, newPeriod);
+      IRandomBeacon randomBeacon = IRandomBeacon(getContract(ContractType.RANDOM_BEACON));
+      // This request is actually only invoked at the first epoch of the period.
+      randomBeacon.execRequestRandomSeedForNextPeriod(lastPeriod, newPeriod);
 
-    // Get all candidate ids
-    address[] memory allCids = _candidateIds;
+      // Get all candidate ids
+      address[] memory allCids = _candidateIds;
 
-    _syncFastFinalityReward({ epoch: epoch, validatorIds: allCids });
+      _syncFastFinalityReward({ epoch: epoch, validatorIds: allCids });
 
-    if (periodEnding) {
-      ISlashIndicator slashIndicatorContract = ISlashIndicator(getContract(ContractType.SLASH_INDICATOR));
-      // Slash submit random beacon proof unavailability first, then update credit scores.
-      randomBeacon.execRecordAndSlashUnavailability(lastPeriod, newPeriod, address(slashIndicatorContract), allCids);
-      slashIndicatorContract.execUpdateCreditScores(allCids, lastPeriod);
+      if (periodEnding) {
+        ISlashIndicator slashIndicatorContract = ISlashIndicator(getContract(ContractType.SLASH_INDICATOR));
+        // Slash submit random beacon proof unavailability first, then update credit scores.
+        randomBeacon.execRecordAndSlashUnavailability(lastPeriod, newPeriod, address(slashIndicatorContract), allCids);
+        slashIndicatorContract.execUpdateCreditScores(allCids, lastPeriod);
 
-      (uint256 totalDelegatingReward, uint256[] memory delegatingRewards) =
-        _distributeRewardToTreasuriesAndCalculateTotalDelegatingReward(lastPeriod, allCids);
-      _settleAndTransferDelegatingRewards(lastPeriod, allCids, totalDelegatingReward, delegatingRewards);
-      _tryRecycleLockedFundsFromEmergencyExits();
-      _recycleDeprecatedRewards();
+        (uint256[] memory delegatorBlockMiningRewards, uint256[] memory delegatorFastFinalityRewards) =
+          _distributeRewardToTreasuriesAndCalculateTotalDelegatorsReward(lastPeriod, allCids);
+        _settleAndTransferDelegatingRewards(
+          lastPeriod, allCids, delegatorBlockMiningRewards, delegatorFastFinalityRewards
+        );
+        _tryRecycleLockedFundsFromEmergencyExits();
+        _recycleDeprecatedRewards();
 
-      address[] memory revokedCandidateIds = _syncCandidateSet(newPeriod);
-      if (revokedCandidateIds.length > 0) {
-        // Re-update `allCids` after unsatisfied candidates get removed.
-        allCids = _candidateIds;
-        slashIndicatorContract.execResetCreditScores(revokedCandidateIds);
+        address[] memory revokedCandidateIds = _syncCandidateSet(newPeriod);
+        if (revokedCandidateIds.length > 0) {
+          // Re-update `allCids` after unsatisfied candidates get removed.
+          allCids = _candidateIds;
+          slashIndicatorContract.execResetCreditScores(revokedCandidateIds);
+        }
+
+        // Wrap up the beacon period includes (1) finalizing the beacon proof, and (2) determining the validator list for the next period by new proof.
+        // Should wrap up the beacon after unsatisfied candidates get removed.
+        randomBeacon.execFinalizeBeaconAndPendingCids(lastPeriod, newPeriod, allCids);
+
+        _periodEndBlock[lastPeriod] = block.number;
+        _currentPeriodStartAtBlock = block.number + 1;
       }
 
-      // Wrap up the beacon period includes (1) finalizing the beacon proof, and (2) determining the validator list for the next period by new proof.
-      // Should wrap up the beacon after unsatisfied candidates get removed.
-      randomBeacon.execFinalizeBeaconAndPendingCids(lastPeriod, newPeriod, allCids);
+      // Clear the previous validator set and block producer set before sync the new set from beacon.
+      _clearPreviousValidatorSetAndBlockProducerSet();
+      // Query the new validator set for upcoming epoch from the random beacon contract.
+      // Save new set into the contract storage.
+      address[] memory newValidatorIds = _syncValidatorSet(randomBeacon, newPeriod, nextEpoch);
+      // Activate applicable validators into the block producer set.
+      _updateApplicableValidatorToBlockProducerSet(newPeriod, nextEpoch, newValidatorIds);
 
-      _periodEndBlock[lastPeriod] = block.number;
-      _currentPeriodStartAtBlock = block.number + 1;
+      emit WrappedUpEpoch(lastPeriod, epoch, periodEnding);
+
+      _periodOf[nextEpoch] = newPeriod;
+      _lastUpdatedPeriod = newPeriod;
     }
-
-    // Clear the previous validator set and block producer set before sync the new set from beacon.
-    _clearPreviousValidatorSetAndBlockProducerSet();
-    // Query the new validator set for upcoming epoch from the random beacon contract.
-    // Save new set into the contract storage.
-    address[] memory newValidatorIds = _syncValidatorSet(randomBeacon, newPeriod, nextEpoch);
-    // Activate applicable validators into the block producer set.
-    _updateApplicableValidatorToBlockProducerSet(newPeriod, nextEpoch, newValidatorIds);
-
-    emit WrappedUpEpoch(lastPeriod, epoch, periodEnding);
-
-    _periodOf[nextEpoch] = newPeriod;
-    _lastUpdatedPeriod = newPeriod;
   }
 
   /**
@@ -206,42 +192,51 @@ abstract contract CoinbaseExecution is
   }
 
   /**
-   * @dev This loops over all current validators to:
-   * - Update delegating reward for and calculate total delegating rewards to be sent to the staking contract,
+   * @dev This loops over all validator candidates to:
+   * - Update delegator reward for and calculate total delegator rewards to be sent to the staking contract,
    * - Distribute the reward of block producers and bridge operators to their treasury addresses,
    * - Update the total deprecated reward if the two previous conditions do not satisfy.
    *
    * Note: This method should be called once in the end of each period.
    *
    */
-  function _distributeRewardToTreasuriesAndCalculateTotalDelegatingReward(
+  function _distributeRewardToTreasuriesAndCalculateTotalDelegatorsReward(
     uint256 lastPeriod,
-    address[] memory currValidatorIds
-  ) private returns (uint256 totalDelegatingReward, uint256[] memory delegatingRewards) {
+    address[] memory cids
+  ) private returns (uint256[] memory delegatorBlockMiningRewards, uint256[] memory delegatorFastFinalityRewards) {
     address vId; // validator id
     address payable treasury;
-    delegatingRewards = new uint256[](currValidatorIds.length);
 
-    for (uint _i; _i < currValidatorIds.length;) {
-      vId = currValidatorIds[_i];
+    uint256 length = cids.length;
+    delegatorBlockMiningRewards = new uint256[](length);
+    delegatorFastFinalityRewards = new uint256[](length);
+
+    (uint256 minRate, uint256 maxRate) = IStaking(getContract(ContractType.STAKING)).getCommissionRateRange();
+
+    for (uint i; i < length; ++i) {
+      vId = cids[i];
       treasury = _candidateInfo[vId].__shadowedTreasury;
 
       if (!_isJailedById(vId) && !_miningRewardDeprecatedById(vId, lastPeriod)) {
-        totalDelegatingReward += _delegatingReward[vId];
-        delegatingRewards[_i] = _delegatingReward[vId];
+        (uint256 validatorFFReward, uint256 delegatorFFReward) = _calcCommissionReward({
+          vId: vId,
+          totalReward: _fastFinalityReward[vId],
+          maxCommissionRate: maxRate,
+          minCommissionRate: minRate
+        });
+
+        delegatorBlockMiningRewards[i] = _delegatorMiningReward[vId];
+        delegatorFastFinalityRewards[i] = delegatorFFReward;
+
         _distributeMiningReward(vId, treasury);
-        _distributeFastFinalityReward(vId, treasury);
+        _distributeFastFinalityReward(vId, treasury, validatorFFReward);
       } else {
-        _totalDeprecatedReward += _miningReward[vId] + _delegatingReward[vId] + _fastFinalityReward[vId];
+        _totalDeprecatedReward += _validatorMiningReward[vId] + _delegatorMiningReward[vId] + _fastFinalityReward[vId];
       }
 
-      delete _delegatingReward[vId];
-      delete _miningReward[vId];
+      delete _delegatorMiningReward[vId];
+      delete _validatorMiningReward[vId];
       delete _fastFinalityReward[vId];
-
-      unchecked {
-        ++_i;
-      }
     }
   }
 
@@ -255,7 +250,7 @@ abstract contract CoinbaseExecution is
    *
    */
   function _distributeMiningReward(address cid, address payable treasury) private {
-    uint256 amount = _miningReward[cid];
+    uint256 amount = _validatorMiningReward[cid];
     if (amount > 0) {
       if (_unsafeSendRONLimitGas(treasury, amount, DEFAULT_ADDITION_GAS)) {
         emit MiningRewardDistributed(cid, treasury, amount);
@@ -266,8 +261,12 @@ abstract contract CoinbaseExecution is
     }
   }
 
-  function _distributeFastFinalityReward(address cid, address payable treasury) private {
-    uint256 amount = _fastFinalityReward[cid];
+  /**
+   * @dev Distributes the fast finality reward to the validator.
+   *
+   * Note: This amount must exclude the fast finality reward for delegators.
+   */
+  function _distributeFastFinalityReward(address cid, address payable treasury, uint256 amount) private {
     if (amount > 0) {
       if (_unsafeSendRONLimitGas(treasury, amount, DEFAULT_ADDITION_GAS)) {
         emit FastFinalityRewardDistributed(cid, treasury, amount);
@@ -282,29 +281,38 @@ abstract contract CoinbaseExecution is
    * @dev Helper function to settle rewards for delegators of `currValidatorIds` at the end of each period,
    * then transfer the rewards from this contract to the staking contract, in order to finalize a period.
    *
-   * Emits the `StakingRewardDistributed` once the reward is distributed successfully.
-   * Emits the `StakingRewardDistributionFailed` once the contract fails to distribute reward.
+   * Emits the `MiningRewardDelegatorsDistributed` once the block mining reward is distributed successfully.
+   * Emits the `MiningRewardDelegatorsDistributionFailed` once the contract fails to distribute block mining reward.
+   *
+   * Emits the `FastFinalityRewardDelegatorsDistributed` once the fast finality reward is distributed successfully.
+   * Emits the `FastFinalityRewardDelegatorsDistributionFailed` once the contract fails to distribute fast finality reward.
    *
    * Note: This method should be called once in the end of each period.
-   *
+   * - `delegatorFFRewards` is the fast finality rewards for delegators.
+   * - `delegatorMiningRewards` is the block mining rewards for delegators.
    */
   function _settleAndTransferDelegatingRewards(
     uint256 period,
-    address[] memory currValidatorIds,
-    uint256 totalDelegatingReward,
-    uint256[] memory delegatingRewards
+    address[] memory cids,
+    uint256[] memory delegatorMiningRewards,
+    uint256[] memory delegatorFFRewards
   ) private {
-    IStaking _staking = IStaking(getContract(ContractType.STAKING));
-    if (totalDelegatingReward > 0) {
-      if (_unsafeSendRON(payable(address(_staking)), totalDelegatingReward)) {
-        _staking.execRecordRewards(currValidatorIds, delegatingRewards, period);
-        emit StakingRewardDistributed(totalDelegatingReward, currValidatorIds, delegatingRewards);
+    IStaking staking = IStaking(getContract(ContractType.STAKING));
+    (uint256[] memory totalRewards, uint256 sumReward) = LibArray.addAndSum(delegatorMiningRewards, delegatorFFRewards);
+
+    if (sumReward != 0) {
+      if (_unsafeSendRON(payable(address(staking)), sumReward)) {
+        staking.execRecordRewards({ poolIds: cids, rewards: totalRewards, period: period });
+
+        emit FastFinalityRewardDelegatorsDistributed(cids, delegatorFFRewards);
+        emit MiningRewardDelegatorsDistributed(cids, delegatorMiningRewards);
+
         return;
       }
 
-      emit StakingRewardDistributionFailed(
-        totalDelegatingReward, currValidatorIds, delegatingRewards, address(this).balance
-      );
+      uint256 selfBalance = address(this).balance;
+      emit FastFinalityRewardDelegatorsDistributionFailed(cids, delegatorFFRewards, selfBalance);
+      emit MiningRewardDelegatorsDistributionFailed(cids, delegatorMiningRewards, selfBalance);
     }
   }
 
@@ -346,24 +354,45 @@ abstract contract CoinbaseExecution is
     uint256 newPeriod,
     uint256 nextEpoch
   ) private returns (address[] memory newValidatorIds) {
-    newValidatorIds = randomBeacon.pickValidatorSetForCurrentPeriod(nextEpoch);
+    try randomBeacon.pickValidatorSetForCurrentPeriod(nextEpoch) returns (address[] memory pickedCids) {
+      newValidatorIds = pickedCids;
 
-    // Fallback to all governing validators if the retrieved validator set is empty.
-    if (newValidatorIds.length == 0) {
-      IProfile profile = IProfile(getContract(ContractType.PROFILE));
-      IRoninTrustedOrganization.TrustedOrganization[] memory allTrustedOrgs =
-        IRoninTrustedOrganization(getContract(ContractType.RONIN_TRUSTED_ORGANIZATION)).getAllTrustedOrganizations();
-
-      uint256 length = allTrustedOrgs.length;
-      newValidatorIds = new address[](length);
-      for (uint256 i; i < length; ++i) {
-        newValidatorIds[i] = profile.getConsensus2Id(allTrustedOrgs[i].consensusAddr);
+      // Fall back to governing validators if the new validator set is empty
+      if (newValidatorIds.length == 0) {
+        newValidatorIds = _fallbackToGoverningValidators(newPeriod, nextEpoch);
       }
-
-      emit EmptyValidatorSet(newPeriod, nextEpoch, newValidatorIds);
+    } catch {
+      // Fall back to governing validators if the random beacon fails to pick the validator set
+      newValidatorIds = _fallbackToGoverningValidators(newPeriod, nextEpoch);
     }
 
     _updateNewValidatorSet(newValidatorIds, newPeriod, nextEpoch);
+  }
+
+  /**
+   * @dev Fallback to governing validators if the random beacon fails to pick the validator set.
+   *
+   * Emits the `EmptyValidatorSet` event.
+   *
+   */
+  function _fallbackToGoverningValidators(
+    uint256 newPeriod,
+    uint256 nextEpoch
+  ) private returns (address[] memory allGVs) {
+    // TODO(TuDo1403): should add a method to query all cids of governor in Trusted Org contract
+    IProfile profile = IProfile(getContract(ContractType.PROFILE));
+    IRoninTrustedOrganization trustedOrg =
+      IRoninTrustedOrganization(getContract(ContractType.RONIN_TRUSTED_ORGANIZATION));
+
+    IRoninTrustedOrganization.TrustedOrganization[] memory allTrustedOrgs = trustedOrg.getAllTrustedOrganizations();
+    uint256 length = allTrustedOrgs.length;
+    allGVs = new address[](length);
+
+    for (uint256 i; i < length; ++i) {
+      allGVs[i] = profile.getConsensus2Id(allTrustedOrgs[i].consensusAddr);
+    }
+
+    emit EmptyValidatorSet(newPeriod, nextEpoch, allGVs);
   }
 
   /**
@@ -416,21 +445,57 @@ abstract contract CoinbaseExecution is
     uint256 nextEpoch,
     address[] memory newValidatorIds
   ) private {
-    uint256 nextBlock = block.number + 1;
-    bool[] memory maintainedList =
-      IMaintenance(getContract(ContractType.MAINTENANCE)).checkManyMaintainedById(newValidatorIds, nextBlock);
+    unchecked {
+      uint256 nextBlock = block.number + 1;
+      bool[] memory maintainedList =
+        IMaintenance(getContract(ContractType.MAINTENANCE)).checkManyMaintainedById(newValidatorIds, nextBlock);
 
-    // Add block producer flag for applicable validators
-    uint256 length = newValidatorIds.length;
+      // Add block producer flag for applicable validators
+      uint256 length = newValidatorIds.length;
 
-    for (uint256 i; i < length; ++i) {
-      address validatorId = newValidatorIds[i];
-      bool emergencyExitRequested = block.timestamp <= _emergencyExitJailedTimestamp[validatorId];
-      bool isApplicable = !(_isJailedAtBlockById(validatorId, nextBlock) || maintainedList[i] || emergencyExitRequested);
+      for (uint256 i; i < length; ++i) {
+        address validatorId = newValidatorIds[i];
+        bool emergencyExitRequested = block.timestamp <= _emergencyExitJailedTimestamp[validatorId];
+        bool isApplicable =
+          !(_isJailedAtBlockById(validatorId, nextBlock) || maintainedList[i] || emergencyExitRequested);
 
-      if (isApplicable) _validatorMap[validatorId] = true;
+        if (isApplicable) _validatorMap[validatorId] = true;
+      }
+
+      emit BlockProducerSetUpdated(newPeriod, nextEpoch, getBlockProducerIds());
     }
+  }
 
-    emit BlockProducerSetUpdated(newPeriod, nextEpoch, getBlockProducerIds());
+  /**
+   * @dev Helper function to split the reward between the validator and the delegator base on the commission rate.
+   *
+   * @param vId The validator id.
+   * @param totalReward The total reward to be split.
+   * @return validatorReward The reward for the validator.
+   * @return delegatorReward The reward for the delegators.
+   */
+  function _calcCommissionReward(
+    address vId,
+    uint256 totalReward
+  ) private view returns (uint256 validatorReward, uint256 delegatorReward) {
+    (uint256 minRate, uint256 maxRate) = IStaking(getContract(ContractType.STAKING)).getCommissionRateRange();
+    return _calcCommissionReward(vId, totalReward, minRate, maxRate);
+  }
+
+  /**
+   * @dev Helper function to split the reward between the validator and the delegator base on the commission rate.
+   */
+  function _calcCommissionReward(
+    address vId,
+    uint256 totalReward,
+    uint minCommissionRate,
+    uint maxCommissionRate
+  ) private view returns (uint256 validatorReward, uint256 delegatorReward) {
+    unchecked {
+      uint256 rate = Math.max(Math.min(_candidateInfo[vId].commissionRate, maxCommissionRate), minCommissionRate);
+
+      validatorReward = (rate * totalReward) / _MAX_PERCENTAGE;
+      delegatorReward = totalReward - validatorReward;
+    }
   }
 }

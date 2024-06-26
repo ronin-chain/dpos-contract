@@ -58,7 +58,7 @@ contract Migration__02_ProposeProposal_REP10_Mainnet_v0_8_0 is REP10_Config_Main
   }
 
   function _postCheck() internal virtual override {
-    LibProposal.voteProposalUntilSuccess(roninGovernanceAdmin, roninTrustedOrganization, _proposal);
+    LibProposal.voteProposalUntilExecute(roninGovernanceAdmin, roninTrustedOrganization, _proposal);
     super._postCheck();
   }
 }
