@@ -153,15 +153,15 @@ library LibArray {
    *                                ^         ^        ^
    *                                a[2]      a[3]     a[4]
    *
-   *
+   * WARNING: This function modifies `cids` and `values`
    */
-  function findNormalizedSumAndPivot(
+  function inplaceFindNormalizedSumAndPivot(
     address[] memory cids,
     uint256[] memory values,
     uint256 divisor
   ) internal pure returns (uint256 normSum, uint256 pivot) {
     divisor = Math.min(values.length, divisor);
-    inplaceDescSortByValue(cids, values);
+    inplaceDescSortByValue({ self: cids, values: values });
 
     uint256 sLeft;
     uint256 nLeft;
