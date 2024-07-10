@@ -3,7 +3,7 @@
 | Address                                 | 0.086     | 24.49       |
 | ArrayReplaceLib                         | 0.086     | 24.49       |
 | Ballot                                  | 0.086     | 24.49       |
-| BaseGeneralConfig                       | 31.341    | -6.765      |
+| BaseGeneralConfig                       | 30.519    | -5.943      |
 | BridgeOperatorsBallot                   | 0.166     | 24.41       |
 | BridgeTrackingRecoveryLogic             | 0.913     | 23.663      |
 | ECDSA                                   | 0.086     | 24.49       |
@@ -16,7 +16,7 @@
 | ErrorHandler                            | 0.086     | 24.49       |
 | FastFinalityTracking                    | 6.312     | 18.264      |
 | Forwarder                               | 3.816     | 20.76       |
-| GeneralConfig                           | 34.714    | -10.138     |
+| GeneralConfig                           | 33.891    | -9.315      |
 | GlobalProposal                          | 0.166     | 24.41       |
 | HasBridgeDeprecated                     | 0.063     | 24.513      |
 | HasBridgeTrackingDeprecated             | 0.063     | 24.513      |
@@ -74,8 +74,8 @@
 | MockProfile                             | 12.79     | 11.786      |
 | MockRONTransferHelperConsumer_Berlin    | 0.442     | 24.134      |
 | MockRONTransferHelperConsumer_Istanbul  | 0.442     | 24.134      |
-| MockRoninValidatorSetExtended           | 28.974    | -4.398      |
-| MockRoninValidatorSetOverridePrecompile | 28.197    | -3.621      |
+| MockRoninValidatorSetExtended           | 27.99     | -3.414      |
+| MockRoninValidatorSetOverridePrecompile | 27.213    | -2.637      |
 | MockSlashIndicatorExtended              | 19.067    | 5.509       |
 | MockSorting                             | 3.165     | 21.411      |
 | MockStaking                             | 4.859     | 19.717      |
@@ -94,7 +94,8 @@
 | RoninRandomBeacon_Mainnet               | 17.619    | 6.957       |
 | RoninRandomBeacon_Testnet               | 19.987    | 4.589       |
 | RoninTrustedOrganization                | 10.372    | 14.204      |
-| RoninValidatorSet                       | 24.124    | 0.452       |
+| RoninValidatorSet                       | 23.156    | 1.42        |
+| RoninValidatorSetConstructor            | 13.755    | 10.821      |
 | RoninValidatorSetREP10Migrator          | 2.957     | 21.619      |
 | RoninValidatorSetTimedMigrator          | 3.602     | 20.974      |
 | Safe                                    | 13.651    | 10.925      |
@@ -103,7 +104,7 @@
 | SlashIndicator                          | 15.407    | 9.169       |
 | Sorting                                 | 0.086     | 24.49       |
 | Staking                                 | 22.45     | 2.126       |
-| StakingVesting                          | 3.483     | 21.093      |
+| StakingVesting                          | 4.151     | 20.425      |
 | StdStyle                                | 0.086     | 24.49       |
 | StorageSlot                             | 0.086     | 24.49       |
 | Strings                                 | 0.086     | 24.49       |
