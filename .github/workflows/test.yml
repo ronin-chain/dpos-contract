@@ -76,6 +76,19 @@ jobs:
         with:
           node-version: v16.16.0
 
+      - name: Fetch more history
+        run: |
+          git fetch --unshallow || git fetch --all
+
+      - name: Verify commit
+        run: |
+          if git cat-file -e d3148e01234d2e1ed1d100c82a9610432b129ac9; then
+            echo "Commit exists"
+          else
+            echo "Commit does not exist in current history"
+            git log --oneline -n 10  # Show last 10 commits
+          fi
+
       - name: Storage Layout Check
         run: |
           forge soldeer install 
