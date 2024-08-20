@@ -33,6 +33,13 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 2
+      
+      - name: Get previous commit hash of target branch
+        run: |
+          git fetch --depth=2 origin ${{ github.ref }}
+          PREV_COMMIT=$(git rev-parse HEAD~1)
+          echo "Previous commit: $PREV_COMMIT"
+          echo "TARGET_COMMIT_HASH=$PREV_COMMIT" >> $GITHUB_ENV
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
@@ -68,13 +75,6 @@ jobs:
         uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 #v3.4.1
         with:
           node-version: v16.16.0
-
-      - name: Get previous commit hash of target branch
-        run: |
-          git fetch --depth=2 origin ${{ github.ref }}
-          PREV_COMMIT=$(git rev-parse HEAD~1)
-          echo "Previous commit: $PREV_COMMIT"
-          echo "TARGET_COMMIT_HASH=$PREV_COMMIT" >> $GITHUB_ENV
 
       - name: Storage Layout Check
         run: |
