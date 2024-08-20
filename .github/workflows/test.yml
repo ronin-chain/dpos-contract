@@ -78,3 +78,19 @@ jobs:
           echo "CURRENT_COMMIT_HASH: ${{ github.sha }}"
           echo "TARGET_COMMIT_HASH: ${{ env.TARGET_COMMIT_HASH }}"
           dependencies/@storage-delta-0.3.1/run.sh ${{ env.TARGET_COMMIT_HASH }} --omit new --contracts contracts
+
+      - name: Check for storage_delta folder
+        id: check-folder
+        run: |
+          if [ -d "storage_delta" ]; then
+            echo "storage_delta_exists=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and changes
+        if: steps.check-folder.outputs.storage_delta_exists == 'true'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add storage_delta
+          git commit -m "Add contract layout changes [CI]"
+          git push
