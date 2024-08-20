@@ -9,3 +9,4 @@ hardhat/=./node_modules/hardhat/
 solady/=lib/solady/src
 foundry-deployment-kit/=lib/foundry-deployment-kit/script
 contract-libs/=lib/contract-libs/src
+@storage-delta-0.3.1=dependencies/@storage-delta-0.3.1

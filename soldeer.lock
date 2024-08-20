@@ -1,0 +1,6 @@
+
+[[dependencies]]
+name = "@storage-delta"
+version = "0.3.1"
+source = "https://github.com/TuDo1403/storage-delta/archive/refs/tags/0.3.1.zip"
+checksum = "6ff6dad83b29fcec375d314c876c8731f37742363576b883d146824a7a57ab52"

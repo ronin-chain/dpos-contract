@@ -55,3 +55,6 @@ ronin-devnet = "https://hcm-rpc.skymavis.one/rpc"
 localhost = "http://localhost:8545"
 ronin-testnet-shadow = "http://34.27.172.168:8545"
 ronin-mainnet-shadow = "http://35.225.161.81:8545"
+
+[dependencies]
+"@storage-delta" = { version = "0.3.1", url = "https://github.com/TuDo1403/storage-delta/archive/refs/tags/0.3.1.zip" }

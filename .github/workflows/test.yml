@@ -64,7 +64,8 @@ jobs:
 
       - name: Storage Layout Check
         run: |
+          forge soldeer install 
           echo "Checking storage layout..."
           echo "CURRENT_COMMIT_HASH: ${{ github.sha }}"
           echo "TARGET_COMMIT_HASH: ${{ env.TARGET_COMMIT_HASH }}"
-          lib/storage-delta/run.sh ${{ env.TARGET_COMMIT_HASH }} --omit new --contracts contracts
+          dependencies/@storage-delta-0.3.1/run.sh ${{ env.TARGET_COMMIT_HASH }} --omit new --contracts contracts
