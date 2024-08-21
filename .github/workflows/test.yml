@@ -17,7 +17,6 @@ on:
       - "release/*"
       - "feature/*"
       - "features/*"
-      - "feature/ci"
 
 env:
   FOUNDRY_PROFILE: ci
@@ -51,7 +50,7 @@ jobs:
       - name: Run Forge build
         run: |
           forge --version
-          forge build --skip scripts
+          forge build
         id: build
 
       # - name: Run Forge tests
