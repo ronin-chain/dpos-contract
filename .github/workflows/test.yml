@@ -89,7 +89,7 @@ jobs:
           echo "PR head commit (latest in source branch): ${{ github.event.pull_request.head.sha }}"
           echo "CURRENT_COMMIT_HASH: ${{ github.sha }}"
           echo "TARGET_COMMIT_HASH: ${{ env.TARGET_COMMIT_HASH }}"
-      
+          git fetch --unshallow || git fetch --all
           dependencies/@storage-delta-0.3.1/run.sh ${{ github.event.pull_request.base.sha }} --omit new --contracts contracts
 
       - name: Check for storage_delta folder
