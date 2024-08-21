@@ -1,14 +1,13 @@
---- storage_delta//contracts//mocks//MockBridge-OLD	2024-08-20 10:31:01.735393293 +0000
-+++ storage_delta//contracts//mocks//MockBridge-NEW	2024-08-20 10:31:01.735393293 +0000
-@@ -1,5 +1,5 @@
-     0          _collisionVariable           uint256
--    1          _collisionVariable1          uint256
--    2          _collisionVariable2          uint256
--    3          bridgeOperatorAddedBlock     mapping(address => uint256)
--    4          bridgeOperators              address[]
-\ No newline at end of file
-+🏁  1          bridgeOperatorAddedBlock     mapping(address => uint256)
-+🏁  2          bridgeOperators              address[]
-+🪦
-+🪦
+--- storage_delta//contracts//mocks//MockBridge-OLD	2024-08-21 22:03:09
++++ storage_delta//contracts//mocks//MockBridge-NEW	2024-08-21 22:03:09
+@@ -1,4 +1,5 @@
+-    0          bridgeOperatorAddedBlock     mapping(address => uint256)
+-    1          bridgeOperators              address[]
+-
+-
++🏴  0          _collisionVariable           uint256
++🏴  1          _collisionVariable1          uint256
++🌱  2          _collisionVariable2          uint256
++🏳️  3          bridgeOperatorAddedBlock     mapping(address => uint256)
++🏳️  4          bridgeOperators              address[]
 \ No newline at end of file
