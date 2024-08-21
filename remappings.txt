@@ -12,4 +12,3 @@ hardhat/=./node_modules/hardhat/
 @chainlink/contracts/=dependencies/@chainlink-1.6.0/contracts/
 safe-smart-account/contracts/=dependencies/safe-smart-account-1.4.1/contracts/
 @storage-delta-0.3.1=dependencies/@storage-delta-0.3.1
-script/=script/
