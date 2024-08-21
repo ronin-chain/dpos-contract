@@ -9,8 +9,6 @@ contract MockBridge is IBridge {
   uint256 private _collisionVariable;
   uint256 private _collisionVariable1;
   uint256 private _collisionVariable2;
-  address private _a;
-  address private _b;
   /// @dev Mapping from validator address => last block that the bridge operator is added
   mapping(address => uint256) public bridgeOperatorAddedBlock;
   /// @dev Bridge operators array

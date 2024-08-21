@@ -59,36 +59,17 @@ jobs:
       #     forge test --no-match-path '*forking/*' -vvv
       # #   id: test
 
-      # - name: Get lastest commit hash of target branch
-      #   run: |
-      #     echo "TARGET_COMMIT_HASH=$(git rev-parse origin/${{ github.event.pull_request.base.ref }})" >> $GITHUB_ENV
-
       - name: "Setup Node"
         uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 #v3.4.1
         with:
           node-version: v16.16.0
-
-      # - name: Fetch more history
-      #   run: |
-      #     git fetch --unshallow || git fetch --all
-
-      # - name: Verify commit
-      #   run: |
-      #     if git cat-file -e d3148e01234d2e1ed1d100c82a9610432b129ac9; then
-      #       echo "Commit exists"
-      #     else
-      #       echo "Commit does not exist in current history"
-      #       git log --oneline -n 10  # Show last 10 commits
-      #     fi
 
       - name: Storage Layout Check
         run: |
           echo "Checking storage layout..."
           echo "Current branch: ${{ github.head_ref || github.ref_name }}"
           echo "BASE_BRANCH: ${{ github.event.pull_request.base.ref }}"
-          echo "PR head commit (latest in source branch): ${{ github.event.pull_request.head.sha }}"
           echo "CURRENT_COMMIT_HASH: ${{ github.sha }}"
-          echo "TARGET_COMMIT_HASH: ${{ env.TARGET_COMMIT_HASH }}"
           git fetch --unshallow || git fetch --all
           dependencies/@storage-delta-0.3.1/run.sh ${{ github.event.pull_request.base.sha }} --omit new --contracts contracts
 
