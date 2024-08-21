@@ -70,14 +70,16 @@ abstract contract REP10_Config_Mainnet_Base is RoninMigration {
   ISlashIndicator internal slashIndicator;
   IRandomBeacon internal roninRandomBeacon;
   IRoninValidatorSet internal roninValidatorSet;
+  IFastFinalityTracking internal fastFinalityTracking;
   IRoninGovernanceAdmin internal roninGovernanceAdmin;
   IRoninTrustedOrganization internal roninTrustedOrganization;
 
   function run() public virtual onlyOn(DefaultNetwork.RoninMainnet.key()) {
     staking = IStaking(loadContract(Contract.Staking.key()));
-    stakingVesting = IStakingVesting(loadContract(Contract.StakingVesting.key()));
     slashIndicator = ISlashIndicator(loadContract(Contract.SlashIndicator.key()));
+    stakingVesting = IStakingVesting(loadContract(Contract.StakingVesting.key()));
     roninValidatorSet = IRoninValidatorSet(loadContract(Contract.RoninValidatorSet.key()));
+    fastFinalityTracking = IFastFinalityTracking(loadContract(Contract.FastFinalityTracking.key()));
     roninGovernanceAdmin = IRoninGovernanceAdmin(loadContract(Contract.RoninGovernanceAdmin.key()));
     roninTrustedOrganization = IRoninTrustedOrganization(loadContract(Contract.RoninTrustedOrganization.key()));
   }
