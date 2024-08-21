@@ -106,4 +106,4 @@ jobs:
           git config --local user.name "GitHub Action"
           git add storage_delta
           git commit -m "Add contract layout changes [CI]"
-          git push
+          git push origin HEAD:${{ github.head_ref || github.ref_name }}
