@@ -1,6 +1,6 @@
 forge-std/=dependencies/@fdk-0.3.0-beta/dependencies/forge-std-1.8.2/src/
-@openzeppelin/contracts/=dependencies/@openzeppelin-contracts-4.7.3
-@openzeppelin-v5/contracts/=dependencies/@openzeppelin-contracts-5.0.2/
+@openzeppelin/contracts/=dependencies/@openzeppelin-4.7.3/contracts/
+@openzeppelin-v5/contracts/=dependencies/@openzeppelin-v5-5.0.2/contracts/
 hardhat/=./node_modules/hardhat/
 @ronin/contracts/=./contracts/
 @ronin/test/=./test/foundry/
@@ -9,5 +9,5 @@ hardhat/=./node_modules/hardhat/
 @solady/=dependencies/@fdk-0.3.0-beta/dependencies/solady-0.0.206/src/
 @fdk/=dependencies/@fdk-0.3.0-beta/script/
 @contract-libs/=lib/foundry-deployment-kit/lib/contract-libs/src/
-@chainlink/contracts/=lib/chainlink/contracts/
-safe-smart-account/contracts/=lib/safe-smart-account/contracts/
+@chainlink/contracts/=dependencies/@chainlink-1.6.0/contracts/
+safe-smart-account/contracts/=dependencies/safe-smart-account-1.4.1/contracts/
