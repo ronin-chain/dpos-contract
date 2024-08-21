@@ -57,11 +57,11 @@ jobs:
       # - name: Run Forge tests
       #   run: |
       #     forge test --no-match-path '*forking/*' -vvv
-      #   id: test
+      # #   id: test
 
-      - name: Get lastest commit hash of target branch
-        run: |
-          echo "TARGET_COMMIT_HASH=$(git rev-parse origin/${{ github.event.pull_request.base.ref }})" >> $GITHUB_ENV
+      # - name: Get lastest commit hash of target branch
+      #   run: |
+      #     echo "TARGET_COMMIT_HASH=$(git rev-parse origin/${{ github.event.pull_request.base.ref }})" >> $GITHUB_ENV
 
       - name: "Setup Node"
         uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 #v3.4.1
@@ -83,8 +83,6 @@ jobs:
 
       - name: Storage Layout Check
         run: |
-          forge soldeer install 
-
           echo "Checking storage layout..."
           echo "Current branch: ${{ github.head_ref || github.ref_name }}"
           echo "BASE_BRANCH: ${{ github.event.pull_request.base.ref }}"
