@@ -74,6 +74,7 @@ jobs:
           dependencies/@storage-delta-0.3.1/run.sh ${{ github.event.pull_request.base.sha }} --omit new --contracts contracts
 
       - name: Check for storage_delta folder
+        if: github.event_name == 'pull_request'
         id: check-folder
         run: |
           if [ -d "storage_delta" ]; then
