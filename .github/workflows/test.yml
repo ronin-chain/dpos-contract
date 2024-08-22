@@ -80,11 +80,11 @@ jobs:
             echo "storage_delta_exists=true" >> $GITHUB_OUTPUT
           fi
 
-      # - name: Commit and changes
-      #   if: steps.check-folder.outputs.storage_delta_exists == 'true'
-      #   run: |
-      #     git config --local user.email "action@github.com"
-      #     git config --local user.name "GitHub Action"
-      #     git add storage_delta
-      #     git commit -m "Add contract layout changes [CI]"
-      #     git push origin HEAD:${{ github.head_ref || github.ref_name }}
+      - name: Commit and changes
+        if: steps.check-folder.outputs.storage_delta_exists == 'true'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add storage_delta
+          git commit -m "Add contract layout changes [CI]"
+          git push origin HEAD:${{ github.head_ref || github.ref_name }}
