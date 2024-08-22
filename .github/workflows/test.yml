@@ -50,41 +50,15 @@ jobs:
       - name: Run Forge build
         run: |
           forge --version
-          forge build --skip scripts
+          forge build
         id: build
 
-      # - name: Run Forge tests
-      #   run: |
-      #     forge test --no-match-path '*forking/*' -vvv
-      # #   id: test
+      - name: Run Forge tests
+        run: |
+          forge test --no-match-path '*forking/*' -vvv
+        id: test
 
       - name: "Setup Node"
         uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 #v3.4.1
         with:
           node-version: v16.16.0
-
-      - name: Storage Layout Check
-        if: github.event_name == 'pull_request'
-        run: |
-          echo "Checking storage layout..."
-          echo "Current branch: ${{ github.head_ref || github.ref_name }}"
-          echo "BASE_BRANCH: ${{ github.event.pull_request.base.ref }}"
-          echo "CURRENT_COMMIT_HASH: ${{ github.sha }}"
-          git fetch --unshallow || git fetch --all
-          dependencies/@storage-delta-0.3.1/run.sh ${{ github.event.pull_request.base.sha }} --omit new --contracts contracts
-
-      - name: Check for storage_delta folder
-        id: check-folder
-        run: |
-          if [ -d "storage_delta" ]; then
-            echo "storage_delta_exists=true" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Commit and changes
-        if: steps.check-folder.outputs.storage_delta_exists == 'true'
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add storage_delta
-          git commit -m "Add contract layout changes [CI]"
-          git push origin HEAD:${{ github.head_ref || github.ref_name }}
