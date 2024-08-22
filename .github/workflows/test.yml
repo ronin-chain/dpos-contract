@@ -50,7 +50,7 @@ jobs:
       - name: Run Forge build
         run: |
           forge --version
-          forge build --skip scripts
+          forge build
         id: build
 
       # - name: Run Forge tests
@@ -64,6 +64,7 @@ jobs:
           node-version: v16.16.0
 
       - name: Storage Layout Check
+        if: github.event_name == 'pull_request'
         run: |
           echo "Checking storage layout..."
           echo "Current branch: ${{ github.head_ref || github.ref_name }}"
@@ -73,7 +74,6 @@ jobs:
           dependencies/@storage-delta-0.3.1/run.sh ${{ github.event.pull_request.base.sha }} --omit new --contracts contracts
 
       - name: Check for storage_delta folder
-        if: github.event_name == 'pull_request'
         id: check-folder
         run: |
           if [ -d "storage_delta" ]; then
