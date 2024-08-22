@@ -1,5 +1,5 @@
---- storage_delta//contracts//mocks//MockBridge-OLD	2024-08-22 07:30:34.822123005 +0000
-+++ storage_delta//contracts//mocks//MockBridge-NEW	2024-08-22 07:30:34.822123005 +0000
+--- storage_delta//contracts//mocks//MockBridge-OLD	2024-08-22 08:33:33.182201481 +0000
++++ storage_delta//contracts//mocks//MockBridge-NEW	2024-08-22 08:33:33.182201481 +0000
 @@ -1,4 +1,5 @@
 -    0          bridgeOperatorAddedBlock     mapping(address => uint256)
 -    1          bridgeOperators              address[]
