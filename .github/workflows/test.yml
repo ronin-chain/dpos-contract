@@ -8,6 +8,8 @@ on:
       - "release/*"
       - "feature/*"
       - "features/*"
+      - "implement-feature/**"
+      - "implement-feature/**/**"
   pull_request:
     branches:
       - mainnet
@@ -30,7 +32,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
-
+       
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
@@ -55,3 +57,8 @@ jobs:
         run: |
           forge test --no-match-path '*forking/*' -vvv
         id: test
+
+      - name: "Setup Node"
+        uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 #v3.4.1
+        with:
+          node-version: v16.16.0

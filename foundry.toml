@@ -63,3 +63,4 @@ ronin-mainnet-shadow = "http://35.192.217.237:8545"
 "@openzeppelin-v5" = { version = "5.0.2", url = "https://github.com/OpenZeppelin/openzeppelin-contracts/archive/refs/tags/v5.0.2.zip" }
 "@chainlink" = { version = "1.6.0", url = "https://github.com/smartcontractkit/chainlink/archive/refs/tags/v1.6.0.zip" }
 safe-smart-account = { version = "1.4.1", url = "https://github.com/safe-global/safe-smart-account/archive/refs/tags/v1.4.1.zip" }
+"@storage-delta" = { version = "0.3.1", url = "https://github.com/tringuyenskymavis/storage-delta/archive/refs/tags/0.3.1.zip" }
