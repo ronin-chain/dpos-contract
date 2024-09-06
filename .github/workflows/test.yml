@@ -34,7 +34,16 @@ jobs:
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
-          version: nightly
+          version: nightly-2b1f8d6dd90f9790faf0528e05e60e573a7569ce
+
+      - name: Install package with soldeer
+        run: forge soldeer install
+
+      - name: Recursively update dependencies
+        run: |
+          chmod +x ./update-deps.sh
+          ./update-deps.sh
+        id: update-deps
 
       - name: Run Forge build
         run: |

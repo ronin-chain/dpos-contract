@@ -23,7 +23,7 @@ import { IRandomBeacon, RoninRandomBeaconDeploy } from "script/contracts/RoninRa
 import {
   RoninValidatorSetREP10Migrator,
   RoninValidatorSetREP10MigratorLogicDeploy
-} from "script/contracts/RoninValidatorSetREP10MigratorLogicDeploy.s.sol";
+} from "script/contracts/RoninValidatorSetRep10MigratorLogicDeploy.s.sol";
 
 contract Migration_01_Upgrade_ShadowForkTestnet_Release_V0_8_0 is RoninMigration {
   using LibProxy for *;

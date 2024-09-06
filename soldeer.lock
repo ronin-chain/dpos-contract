@@ -6,19 +6,37 @@ source = "https://github.com/axieinfinity/foundry-deployment-kit/archive/refs/ta
 checksum = "aabeda6cc1fe02227d26f3edd86d4af6c91e2167e8b9f1971cc1ea7ce33d34f9"
 
 [[dependencies]]
-name = "@openzeppelin-contracts"
-version = "4.7.3"
-source = "https://soldeer-revisions.s3.amazonaws.com/@openzeppelin-contracts/4_7_3_22-01-2024_13:13:35_contracts.zip"
-checksum = "e677fb282883990e101ed4acaebbfb55a283c5fb1eae128e2fc9933fd10ecc17"
-
-[[dependencies]]
 name = "@prb-test"
 version = "0.6.4"
 source = "https://soldeer-revisions.s3.amazonaws.com/@prb-test/0_6_4_22-01-2024_13:22:10_test.zip"
 checksum = "35fc7fd91e79985c87869e00a9bdb863643c76e2c1d777c161486e4b0086107a"
 
 [[dependencies]]
-name = "@openzeppelin-contracts"
+name = "@openzeppelin"
+version = "4.7.3"
+source = "https://github.com/OpenZeppelin/openzeppelin-contracts/archive/refs/tags/v4.7.3.zip"
+checksum = "e25b51f352864703de7b35e5030d63b38cbe4e8d61d7858f9ff9f77e18e370dd"
+
+[[dependencies]]
+name = "@openzeppelin-v5"
 version = "5.0.2"
-source = "https://soldeer-revisions.s3.amazonaws.com/@openzeppelin-contracts/5_0_2_14-03-2024_06:11:59_contracts.zip"
-checksum = "8bc4f0acc7c187771b878d46f7de4bfad1acad2eb5d096d9d05d34035853f5c3"
+source = "https://github.com/OpenZeppelin/openzeppelin-contracts/archive/refs/tags/v5.0.2.zip"
+checksum = "ca49e0776066328da0087977864dfaef0d5e54a0ea9859236a7cd9ad02abb9e5"
+
+[[dependencies]]
+name = "@chainlink-contracts"
+version = "0.4.1"
+source = "https://soldeer-revisions.s3.amazonaws.com/@chainlink-contracts/0_4_1_19-08-2024_05:20:08_contracts.zip"
+checksum = "912d509a74086ae9adecee89186dca8efb46e0ed271be50b3fd9184842498cf3"
+
+[[dependencies]]
+name = "@chainlink"
+version = "1.6.0"
+source = "https://github.com/smartcontractkit/chainlink/archive/refs/tags/v1.6.0.zip"
+checksum = "4b7055e4c006e36a5853e24cb2a96e336ee0966721db412b5bb2d989703c4da7"
+
+[[dependencies]]
+name = "safe-smart-account"
+version = "1.4.1"
+source = "https://github.com/safe-global/safe-smart-account/archive/refs/tags/v1.4.1.zip"
+checksum = "84348d4a1cf975f5d013cf8bdb74b8713bcccb40fceb5a1e7fc9debd27489e99"

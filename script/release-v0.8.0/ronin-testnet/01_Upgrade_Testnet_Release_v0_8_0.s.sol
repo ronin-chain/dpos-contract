@@ -24,7 +24,7 @@ import { Proposal } from "@ronin/contracts/libraries/Proposal.sol";
 import { RoninMigration } from "script/RoninMigration.s.sol";
 import { RoninRandomBeaconDeploy } from "script/contracts/RoninRandomBeaconDeploy.s.sol";
 import { RoninValidatorSetREP10MigratorLogicDeploy } from
-  "script/contracts/RoninValidatorSetREP10MigratorLogicDeploy.s.sol";
+  "script/contracts/RoninValidatorSetRep10MigratorLogicDeploy.s.sol";
 import { ISharedArgument } from "script/interfaces/ISharedArgument.sol";
 import { LibProxy } from "@fdk/libraries/LibProxy.sol";
 import { TContract } from "@fdk/types/Types.sol";
