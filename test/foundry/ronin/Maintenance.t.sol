@@ -482,21 +482,4 @@ contract MaintenanceTest is Test {
     uint256 nextDayTimestamp = block.timestamp + 1 days;
     vm.warp(nextDayTimestamp);
   }
-
-  function _checkMaintenanceStatus(address validatorId, uint256 startBlock, uint256 endBlock) internal {
-    IProfile.CandidateProfile memory candidateProfile = profile.getId2Profile(validatorId);
-    TConsensus consensus = candidateProfile.consensus;
-
-    // Before maintenance
-    vm.roll(startBlock - 10);
-    assertFalse(maintenance.checkScheduled(consensus), "Should not be in maintenance before start");
-
-    // During maintenance
-    vm.roll(startBlock);
-    assertTrue(maintenance.checkScheduled(consensus), "Should be in maintenance after start");
-
-    // After maintenance
-    vm.roll(endBlock + 1);
-    assertFalse(maintenance.checkScheduled(consensus), "Should not be in maintenance after end");
-  }
 }
