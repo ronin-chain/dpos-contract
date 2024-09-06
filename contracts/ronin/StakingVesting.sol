@@ -8,6 +8,7 @@ import "../extensions/collections/HasContracts.sol";
 import "../extensions/consumers/PercentageConsumer.sol";
 import { RONTransferHelper } from "../extensions/RONTransferHelper.sol";
 import { HasValidatorDeprecated } from "../utils/DeprecatedSlots.sol";
+import { IRoninValidatorSet } from "../interfaces/validator/IRoninValidatorSet.sol";
 import "../utils/CommonErrors.sol";
 
 contract StakingVesting is
@@ -26,6 +27,12 @@ contract StakingVesting is
   uint256 internal _lastBlockSendingBonus;
   /// @dev The percentage that extracted from reward of block producer for fast finality.
   uint256 internal _fastFinalityRewardPercentage;
+  /// @dev The fast finality reward percentage after REP-10 upgrade.
+  uint256 internal _fastFinalityRewardPercentageREP10;
+  /// @dev The period that REP-10 is activated.
+  uint256 internal _rep10ActivationPeriod;
+  /// @dev The boolean flag to check if REP-10 is activated.
+  bool internal _isREP10Activated;
 
   constructor() {
     _disableInitializers();
@@ -51,6 +58,19 @@ contract StakingVesting is
 
   function initializeV3(uint256 fastFinalityRewardPercent) external reinitializer(3) {
     _setFastFinalityRewardPercentage(fastFinalityRewardPercent);
+  }
+
+  function initializeV4(uint256 activatedAtPeriod, uint256 fastFinalityRewardPercentREP10) external reinitializer(4) {
+    _rep10ActivationPeriod = activatedAtPeriod;
+    _fastFinalityRewardPercentageREP10 = fastFinalityRewardPercentREP10;
+    emit FastFinalityRewardPercentageUpdatedForREP10(fastFinalityRewardPercentREP10);
+  }
+
+  /**
+   * @inheritdoc IStakingVesting
+   */
+  function getREP10ActivatedAtPeriod() external view override returns (uint256) {
+    return _rep10ActivationPeriod;
   }
 
   /**
@@ -104,6 +124,16 @@ contract StakingVesting is
 
     blockProducerBonus = forBlockProducer ? blockProducerBlockBonus(block.number) : 0;
     bridgeOperatorBonus = forBridgeOperator ? bridgeOperatorBlockBonus(block.number) : 0;
+
+    if (!_isREP10Activated) {
+      uint256 currPeriod = IRoninValidatorSet(getContract(ContractType.VALIDATOR)).currentPeriod();
+      if (currPeriod >= _rep10ActivationPeriod) {
+        _isREP10Activated = true;
+        _setFastFinalityRewardPercentage(_fastFinalityRewardPercentageREP10);
+        emit REP10FastFinalityRewardActivated(currPeriod, _fastFinalityRewardPercentage);
+      }
+    }
+
     fastFinalityRewardPercent = _fastFinalityRewardPercentage;
 
     uint256 totalAmount = blockProducerBonus + bridgeOperatorBonus;

@@ -23,7 +23,7 @@ contract Proposal__20240220_MikoHardfork_ProposeProposal is Proposal__20240220_M
     LibProposal.proposeProposal(roninGovernanceAdmin, trustedOrgContract, proposal, SKY_MAVIS_GOVERNOR);
 
     vme.setPostCheckingStatus(true);
-    LibProposal.voteProposalUntilSuccess(roninGovernanceAdmin, trustedOrgContract, proposal);
+    LibProposal.voteProposalUntilExecute(roninGovernanceAdmin, trustedOrgContract, proposal);
     vme.setPostCheckingStatus(false);
 
     vme.setAddress(network(), Contract.RoninGovernanceAdmin.key(), address(_newGA));

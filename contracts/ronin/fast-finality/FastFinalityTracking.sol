@@ -122,8 +122,11 @@ contract FastFinalityTracking is IFastFinalityTracking, Initializable, HasContra
       uint256[] memory stakeAmounts = staking.getManyStakingTotalsById({ poolIds: allCids });
       uint256 pivot;
 
-      (normalizedSum_, pivot) =
-        LibArray.findNormalizedSumAndPivot({ values: stakeAmounts, divisor: validator.maxValidatorNumber() });
+      (normalizedSum_, pivot) = LibArray.inplaceFindNormalizedSumAndPivot({
+        cids: allCids,
+        values: stakeAmounts,
+        divisor: validator.maxValidatorNumber()
+      });
 
       uint256[] memory normalizedStakeAmounts = LibArray.inplaceClip({ values: stakeAmounts, lower: 0, upper: pivot });
       for (uint256 i; i < allCids.length; ++i) {

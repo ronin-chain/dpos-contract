@@ -27,15 +27,33 @@ library LibProposal {
     Proposal.ProposalDetail memory proposal
   ) internal {
     proposeProposal(governanceAdmin, roninTrustedOrg, proposal, address(0));
-    voteProposalUntilSuccess(governanceAdmin, roninTrustedOrg, proposal);
+    voteProposalUntilExecute(governanceAdmin, roninTrustedOrg, proposal);
   }
 
-  function voteProposalUntilSuccess(
+  function voteProposalUntilExecute(
     IRoninGovernanceAdmin governanceAdmin,
     IRoninTrustedOrganization roninTrustedOrg,
     Proposal.ProposalDetail memory proposal
   ) internal {
     Ballot.VoteType support = Ballot.VoteType.For;
+    voteProposalUntilSuccess(governanceAdmin, roninTrustedOrg, proposal, support);
+  }
+
+  function voteProposalUntilReject(
+    IRoninGovernanceAdmin governanceAdmin,
+    IRoninTrustedOrganization roninTrustedOrg,
+    Proposal.ProposalDetail memory proposal
+  ) internal {
+    Ballot.VoteType support = Ballot.VoteType.Against;
+    voteProposalUntilSuccess(governanceAdmin, roninTrustedOrg, proposal, support);
+  }
+
+  function voteProposalUntilSuccess(
+    IRoninGovernanceAdmin governanceAdmin,
+    IRoninTrustedOrganization roninTrustedOrg,
+    Proposal.ProposalDetail memory proposal,
+    Ballot.VoteType support
+  ) internal {
     IRoninTrustedOrganization.TrustedOrganization[] memory allTrustedOrgs = roninTrustedOrg.getAllTrustedOrganizations();
 
     bool shouldPrankOnly = config.isPostChecking();
@@ -107,7 +125,7 @@ library LibProposal {
     address proposer
   ) internal {
     proposeProposal(governanceAdmin, roninTrustedOrg, proposal, proposer);
-    voteProposalUntilSuccess(governanceAdmin, roninTrustedOrg, proposal);
+    voteProposalUntilExecute(governanceAdmin, roninTrustedOrg, proposal);
   }
 
   function buildProposal(
