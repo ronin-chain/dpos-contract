@@ -158,7 +158,6 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
     IRoninValidatorSet validatorContract = IRoninValidatorSet(getContract(ContractType.VALIDATOR));
     address candidateId = __css2cid(consensusAddr);
 
-    if (!validatorContract.isBlockProducerById(candidateId)) revert ErrUnauthorized(msg.sig, RoleAccess.BLOCK_PRODUCER);
     _requireCandidateAdmin(candidateId);
     if (_checkScheduledById(candidateId)) revert ErrAlreadyScheduled();
     if (!_checkCooldownEndedById(candidateId)) revert ErrCooldownTimeNotYetEnded();
