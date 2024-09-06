@@ -347,10 +347,7 @@ contract MaintenanceTest is Test {
     console.log("endBlock", endBlock);
 
     uint256 maintenanceElapsed = endBlock - startBlock + 1;
-    require(
-      maintenanceElapsed >= minDuration && maintenanceElapsed <= maxDuration,
-      string.concat("Invalid maintenance duration")
-    );
+    require(maintenanceElapsed >= minDuration && maintenanceElapsed <= maxDuration, "Invalid maintenance duration");
 
     vm.prank(admin);
     maintenance.schedule(consensus, startBlock, endBlock);
