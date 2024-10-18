@@ -1,6 +1,6 @@
 [profile.default]
 src = 'src'
-test = 'test/foundry/'
+test = 'test/foundry'
 script = 'script'
 out = 'out'
 optimizer = true
