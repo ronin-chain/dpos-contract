@@ -285,7 +285,7 @@ abstract contract CoinbaseExecution is ICoinbaseExecution, CoinbaseExecutionDepe
   function _distributeL2MiningReward(address cid, address payable treasury) private {
     uint256 amount = _validatorL2MiningReward[cid];
     if (amount > 0) {
-      if (_unsafeSendRON(treasury, amount)) {
+      if (_unsafeSendRONLimitGas(treasury, amount, DEFAULT_ADDITION_GAS)) {
         emit L2MiningRewardDistributed(cid, treasury, amount);
         return;
       }
