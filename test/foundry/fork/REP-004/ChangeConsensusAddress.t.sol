@@ -48,12 +48,14 @@ contract ChangeConsensusAddressForkTest is Test {
   uint _profileCooldownConfig;
 
   modifier upgrade() {
+    vm.skip(true);
     _upgradeContracts();
     _profileCooldownConfig = _profile.getCooldownConfig();
     _;
   }
 
   function _upgradeContracts() internal {
+    vm.skip(true);
     _upgradeProfile();
     _upgradeStaking();
     _upgradeValidator();

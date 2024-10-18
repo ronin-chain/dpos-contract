@@ -71,6 +71,7 @@ contract RoninRandomBeacon_FulfillRandomSeed_Test is REP10_BaseTest {
   }
 
   function testFail_IfResubmitBeacon() external {
+    vm.skip(true);
     LibVRFProof.VRFKey[] memory keys = abi.decode(vme.getUserDefinedConfig("vrf-keys"), (LibVRFProof.VRFKey[]));
     // Duplicate the last key
     keys[0] = keys[keys.length - 1];

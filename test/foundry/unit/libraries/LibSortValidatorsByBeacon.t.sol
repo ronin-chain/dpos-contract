@@ -5,7 +5,7 @@ import { console } from "forge-std/console.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
 import { Test } from "forge-std/Test.sol";
 import { LibSortValidatorsByBeacon } from "@ronin/contracts/libraries/LibSortValidatorsByBeacon.sol";
-import { LibSortValidatorsByBeaconOld } from "./mocks/LibSortValidatorsByBeaconOld.sol";
+import { LibSortValidatorsByBeaconOld } from "test/foundry/mocks/libraries/LibSortValidatorsByBeaconOld.sol";
 import { LibArray } from "@ronin/contracts/libraries/LibArray.sol";
 
 contract LibSortValidatorsByBeaconTest is Test {

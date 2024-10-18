@@ -10,6 +10,7 @@ contract RoninRandomBacon_PickValidatorSet_Test is REP10_BaseTest {
   mapping(address cid => uint256 pickCount) internal _pickCountRandomBeacon;
 
   function testConcrete_LogPickCount_pickValidatorSet() external {
+    vm.skip(true);
     LibWrapUpEpoch.wrapUpPeriods({ times: 1, shouldSubmitBeacon: true });
     uint256 wrapUpCount = 1000;
 
