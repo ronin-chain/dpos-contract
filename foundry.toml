@@ -27,7 +27,6 @@ multiline_func_header = 'params_first'
 single_line_statement_blocks = 'preserve'
 sort_imports = true
 number_underscore = "thousands"
-wrap_comments = true
 
 
 [rpc_endpoints]
