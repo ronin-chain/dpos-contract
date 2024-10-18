@@ -57,9 +57,30 @@ ronin-testnet-shadow = "http://34.27.172.168:8545"
 ronin-mainnet-shadow = "http://35.192.217.237:8545"
 
 [dependencies]
-"@fdk" = { version = "0.3.0-beta", url = "https://github.com/axieinfinity/foundry-deployment-kit/archive/refs/tags/v0.3.0-beta.zip" }
-"@prb-test" = { version = "0.6.4" }
-"@openzeppelin" = { version = "4.7.3", url = "https://github.com/OpenZeppelin/openzeppelin-contracts/archive/refs/tags/v4.7.3.zip" }
-"@openzeppelin-v5" = { version = "5.0.2", url = "https://github.com/OpenZeppelin/openzeppelin-contracts/archive/refs/tags/v5.0.2.zip" }
-"@chainlink" = { version = "1.6.0", url = "https://github.com/smartcontractkit/chainlink/archive/refs/tags/v1.6.0.zip" }
-safe-smart-account = { version = "1.4.1", url = "https://github.com/safe-global/safe-smart-account/archive/refs/tags/v1.4.1.zip" }
+"fdk" = { version = "0.3.5-beta", url = "https://github.com/axieinfinity/foundry-deployment-kit/archive/refs/tags/v0.3.5-beta.zip" }
+"openzeppelin-v4" = { version = "4.7.3", url = "https://github.com/OpenZeppelin/openzeppelin-contracts/archive/refs/tags/v4.7.3.zip" }
+"openzeppelin-v5" = { version = "5.0.2", url = "https://github.com/OpenZeppelin/openzeppelin-contracts/archive/refs/tags/v5.0.2.zip" }
+"chainlink" = { version = "1.6.0", url = "https://github.com/smartcontractkit/chainlink/archive/refs/tags/v1.6.0.zip" }
+"safe-smart-account" = { version = "1.4.1", url = "https://github.com/safe-global/safe-smart-account/archive/refs/tags/v1.4.1.zip" }
+"prb-test" = { version = "0.6.4", url = "https://github.com/PaulRBerg/prb-test/archive/refs/tags/v0.6.4.zip" }
+"prb-math" = { version = "4.0.1", url = "https://github.com/PaulRBerg/prb-math/archive/refs/tags/v4.0.1.zip" }
+
+[soldeer]
+# whether soldeer manages remappings
+remappings_generate = false
+
+# whether soldeer re-generates all remappings when installing, updating or uninstalling deps
+remappings_regenerate = false
+
+# whether to suffix the remapping with the version: `name-a.b.c`
+remappings_version = true
+
+# a prefix to add to the remappings ("@" would give `@name`)
+remappings_prefix = "@"
+
+# where to store the remappings ("txt" for `remappings.txt` or "config" for `foundry.toml`)
+# ignored when `soldeer.toml` is used as config (uses `remappings.txt`)
+remappings_location = "txt"
+
+# whether to install sub-dependencies or not. If true this wil install the dependencies of dependencies 1 level down.
+recursive_deps = true

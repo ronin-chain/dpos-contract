@@ -20,7 +20,8 @@ function data(
     network: key(network),
     chainAlias: chainAlias(network),
     blockTime: blockTime(network),
-    explorer: explorer(network)
+    explorer: explorer(network),
+    chainId: chainId(network)
   });
 }
 

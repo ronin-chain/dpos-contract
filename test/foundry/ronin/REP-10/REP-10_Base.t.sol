@@ -67,15 +67,15 @@ contract REP10_BaseTest is Test, GlobalConfigConsumer {
   }
 
   function _loadContracts() internal virtual {
-    profile = IProfile(loadContract(Contract.Profile.key()));
-    staking = IStaking(loadContract(Contract.Staking.key()));
-    stakingVesting = IStakingVesting(loadContract(Contract.StakingVesting.key()));
-    slashIndicator = ISlashIndicator(loadContract(Contract.SlashIndicator.key()));
-    roninRandomBeacon = IRandomBeacon(loadContract(Contract.RoninRandomBeacon.key()));
-    roninValidatorSet = IRoninValidatorSet(loadContract(Contract.RoninValidatorSet.key()));
-    governanceAdmin = IRoninGovernanceAdmin(loadContract(Contract.RoninGovernanceAdmin.key()));
-    fastFinalityTracking = IFastFinalityTracking(loadContract(Contract.FastFinalityTracking.key()));
-    roninTrustedOrganization = IRoninTrustedOrganization(loadContract(Contract.RoninTrustedOrganization.key()));
+    profile = IProfile(loadContract(Contract.Profile.key(), true));
+    staking = IStaking(loadContract(Contract.Staking.key(), true));
+    stakingVesting = IStakingVesting(loadContract(Contract.StakingVesting.key(), true));
+    slashIndicator = ISlashIndicator(loadContract(Contract.SlashIndicator.key(), true));
+    roninRandomBeacon = IRandomBeacon(loadContract(Contract.RoninRandomBeacon.key(), true));
+    roninValidatorSet = IRoninValidatorSet(loadContract(Contract.RoninValidatorSet.key(), true));
+    governanceAdmin = IRoninGovernanceAdmin(loadContract(Contract.RoninGovernanceAdmin.key(), true));
+    fastFinalityTracking = IFastFinalityTracking(loadContract(Contract.FastFinalityTracking.key(), true));
+    roninTrustedOrganization = IRoninTrustedOrganization(loadContract(Contract.RoninTrustedOrganization.key(), true));
   }
 
   function _setUpDPoSDeployHelper() internal virtual {
