@@ -30,7 +30,7 @@ interface ICoinbaseExecution is ISlashingExecution {
   /// @dev Emitted when the mining reward of corresponding l2 is distributed.
   event L2MiningRewardDistributed(address indexed cid, address indexed recipient, uint256 amount);
   /// @dev Emitted when the contract fails when distributing the mining reward of corresponding l2.
-  event MiningRewardL2DistributionFailed(
+  event L2MiningRewardDistributionFailed(
     address indexed cid, address indexed recipient, uint256 amount, uint256 contractBalance
   );
   /// @dev Emitted when the block producer reward is distributed.

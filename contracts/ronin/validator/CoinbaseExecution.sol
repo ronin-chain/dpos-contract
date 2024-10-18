@@ -287,7 +287,7 @@ abstract contract CoinbaseExecution is ICoinbaseExecution, CoinbaseExecutionDepe
         return;
       }
 
-      emit MiningRewardL2DistributionFailed(cid, treasury, amount, address(this).balance);
+      emit L2MiningRewardDistributionFailed(cid, treasury, amount, address(this).balance);
     }
   }
 
