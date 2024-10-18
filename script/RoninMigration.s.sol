@@ -73,7 +73,7 @@ contract RoninMigration is BaseMigration {
   function _setProfileParam(
     ISharedArgument.ProfileParam memory param
   ) internal {
-    param.cooldown = vm.envOr("COOLDOWN", uint256(1 days));
+    param.cooldown = vm.envOr("COOLDOWN", uint256(0 days));
     param.rollupManager = makeAddr("rollup-manager");
   }
 
