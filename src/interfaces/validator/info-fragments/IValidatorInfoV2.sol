@@ -2,7 +2,6 @@
 
 pragma solidity ^0.8.9;
 
-import "../../../libraries/EnumFlags.sol";
 import { TConsensus } from "../../../udvts/Types.sol";
 
 interface IValidatorInfoV2 {
