@@ -21,7 +21,9 @@ library LibTUint256Slot {
    * @param self The TUint256Slot variable.
    * @return val The loaded value.
    */
-  function load(TUint256Slot self) internal view returns (uint256 val) {
+  function load(
+    TUint256Slot self
+  ) internal view returns (uint256 val) {
     assembly {
       val := sload(self)
     }
@@ -141,7 +143,9 @@ library LibTUint256Slot {
    * @param self The TUint256Slot variable.
    * @return res The resulting value after incrementing.
    */
-  function preIncrement(TUint256Slot self) internal returns (uint256 res) {
+  function preIncrement(
+    TUint256Slot self
+  ) internal returns (uint256 res) {
     res = addAssign(self, 1);
   }
 
@@ -150,7 +154,9 @@ library LibTUint256Slot {
    * @param self The TUint256Slot variable.
    * @return res The original value before incrementing.
    */
-  function postIncrement(TUint256Slot self) internal returns (uint256 res) {
+  function postIncrement(
+    TUint256Slot self
+  ) internal returns (uint256 res) {
     res = load(self);
     store(self, res + 1);
   }
@@ -160,7 +166,9 @@ library LibTUint256Slot {
    * @param self The TUint256Slot variable.
    * @return res The resulting value after decrementing.
    */
-  function preDecrement(TUint256Slot self) internal returns (uint256 res) {
+  function preDecrement(
+    TUint256Slot self
+  ) internal returns (uint256 res) {
     res = subAssign(self, 1);
   }
 
@@ -169,7 +177,9 @@ library LibTUint256Slot {
    * @param self The TUint256Slot variable.
    * @return res The resulting value before decrementing.
    */
-  function postDecrement(TUint256Slot self) internal returns (uint256 res) {
+  function postDecrement(
+    TUint256Slot self
+  ) internal returns (uint256 res) {
     res = load(self);
     store(self, res - 1);
   }
