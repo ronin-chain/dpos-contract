@@ -1,13 +1,13 @@
 [profile.default]
 src = 'contracts'
-test = 'test/foundry/'
+test = 'test/foundry'
 script = 'script'
 out = 'out'
 optimizer = true
 optimizer_runs = 1_000
 ffi = true
 
-libs = ['lib', 'node_modules/@openzeppelin', 'node_modules/hardhat']
+libs = ['dependencies']
 
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config
 
