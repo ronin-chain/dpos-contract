@@ -2,7 +2,6 @@
 pragma solidity ^0.8.0;
 
 import "../../libraries/Proposal.sol";
-import "../../libraries/GlobalProposal.sol";
 import "../../utils/CommonErrors.sol";
 import "../../libraries/Ballot.sol";
 import { ICoreGovernance } from "../../interfaces/extensions/sequential-governance/ICoreGovernance.sol";
