@@ -2,17 +2,19 @@
 
 pragma solidity ^0.8.9;
 
-import { Test, console } from "forge-std/Test.sol";
-import { IStaking, Staking } from "src/ronin/staking/Staking.sol";
-import { Maintenance } from "src/ronin/Maintenance.sol";
-import { TConsensus, Profile, IProfile } from "src/ronin/profile/Profile.sol";
-import { IRoninValidatorSet } from "src/interfaces/validator/IRoninValidatorSet.sol";
-import { TransparentUpgradeableProxyV2 } from "src/extensions/TransparentUpgradeableProxyV2.sol";
 import { LibSharedAddress } from "@fdk/libraries/LibSharedAddress.sol";
-import { ISharedArgument } from "script/interfaces/ISharedArgument.sol";
+import { Test, console } from "forge-std/Test.sol";
+
 import { DeployDPoS } from "script/deploy-dpos/DeployDPoS.s.sol";
-import { Contract } from "script/utils/Contract.sol";
+import { ISharedArgument } from "script/interfaces/ISharedArgument.sol";
+
 import { LibPrecompile } from "script/shared/libraries/LibPrecompile.sol";
+import { Contract } from "script/utils/Contract.sol";
+import { TransparentUpgradeableProxyV2 } from "src/extensions/TransparentUpgradeableProxyV2.sol";
+import { IRoninValidatorSet } from "src/interfaces/validator/IRoninValidatorSet.sol";
+import { Maintenance } from "src/ronin/Maintenance.sol";
+import { IProfile, Profile, TConsensus } from "src/ronin/profile/Profile.sol";
+import { IStaking, Staking } from "src/ronin/staking/Staking.sol";
 
 contract MaintenanceTest is Test {
   address coinbase;
@@ -35,7 +37,6 @@ contract MaintenanceTest is Test {
     LibPrecompile.deployPrecompile();
     dposDeployHelper.cheatSetUpValidators();
 
-
     profile = Profile(config.getAddressFromCurrentNetwork(Contract.Profile.key()));
     staking = Staking(config.getAddressFromCurrentNetwork(Contract.Staking.key()));
     maintenance = Maintenance(config.getAddressFromCurrentNetwork(Contract.Maintenance.key()));
@@ -51,7 +52,9 @@ contract MaintenanceTest is Test {
     _schedule(validatorId, durationInBlock);
   }
 
-  function testFuzz_cancelSchedule(uint256 index) external {
+  function testFuzz_cancelSchedule(
+    uint256 index
+  ) external {
     address[] memory validatorIds = validatorSet.getValidatorIds();
     address validatorId = validatorIds[index % validatorIds.length];
 
@@ -67,9 +70,9 @@ contract MaintenanceTest is Test {
 
     uint256 durationInBlock = _bound(100, minDuration, maxDuration);
 
-    uint startBlock = latestEpochBlock + numberOfBlocksInEpoch + 1
+    uint256 startBlock = latestEpochBlock + numberOfBlocksInEpoch + 1
       + ((minOffset + numberOfBlocksInEpoch) / numberOfBlocksInEpoch) * numberOfBlocksInEpoch;
-    uint endBlock = startBlock - 1 + (durationInBlock / numberOfBlocksInEpoch + 1) * numberOfBlocksInEpoch;
+    uint256 endBlock = startBlock - 1 + (durationInBlock / numberOfBlocksInEpoch + 1) * numberOfBlocksInEpoch;
 
     vm.prank(admin);
     maintenance.schedule(consensus, startBlock, endBlock);
@@ -190,7 +193,9 @@ contract MaintenanceTest is Test {
     assertEq(maintenance.totalSchedule(), totalSchedule + 1);
   }
 
-  function testFuzz_exitMaintenance(uint256 index) external {
+  function testFuzz_exitMaintenance(
+    uint256 index
+  ) external {
     address[] memory validatorIds = validatorSet.getValidatorIds();
     console.log("validatorIds.length", validatorIds.length);
     address validatorId = validatorIds[index == 0 ? 0 : index % validatorIds.length];
@@ -204,9 +209,9 @@ contract MaintenanceTest is Test {
     uint256 numberOfBlocksInEpoch = validatorSet.numberOfBlocksInEpoch();
     uint256 minDuration = maintenance.minMaintenanceDurationInBlock();
 
-    uint startBlock = latestEpochBlock + numberOfBlocksInEpoch + 1
+    uint256 startBlock = latestEpochBlock + numberOfBlocksInEpoch + 1
       + ((minOffset + numberOfBlocksInEpoch) / numberOfBlocksInEpoch) * numberOfBlocksInEpoch;
-    uint endBlock = startBlock - 1 + (minDuration / numberOfBlocksInEpoch + 1) * numberOfBlocksInEpoch;
+    uint256 endBlock = startBlock - 1 + (minDuration / numberOfBlocksInEpoch + 1) * numberOfBlocksInEpoch;
 
     vm.prank(admin);
     maintenance.schedule(consensus, startBlock, endBlock);
@@ -230,7 +235,7 @@ contract MaintenanceTest is Test {
       candidateAdmin,
       consensusAddr,
       payable(candidateAdmin),
-      15_00,
+      1500,
       bytes(string.concat("mock-pub-key", vm.toString(candidateAdmin))),
       bytes(string.concat("mock-proof-of-possession", vm.toString(candidateAdmin)))
     );
@@ -280,7 +285,9 @@ contract MaintenanceTest is Test {
     _wrapUpEpoch();
   }
 
-  function _wrapUpEpochs(uint256 times) internal {
+  function _wrapUpEpochs(
+    uint256 times
+  ) internal {
     for (uint256 i; i < times; ++i) {
       _fastForwardToNextDay();
       _wrapUpEpoch();
@@ -291,7 +298,9 @@ contract MaintenanceTest is Test {
     _wrapUpEpoch(block.coinbase);
   }
 
-  function _wrapUpEpoch(address caller) internal {
+  function _wrapUpEpoch(
+    address caller
+  ) internal {
     vm.startPrank(caller);
     try validatorSet.wrapUpEpoch() { } catch { }
     vm.stopPrank();

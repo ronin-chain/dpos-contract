@@ -15,7 +15,9 @@ abstract contract DelegatorStaking is BaseStaking, IDelegatorStaking {
   /**
    * @inheritdoc IDelegatorStaking
    */
-  function delegate(TConsensus consensusAddr) external payable noEmptyValue poolOfConsensusIsActive(consensusAddr) {
+  function delegate(
+    TConsensus consensusAddr
+  ) external payable noEmptyValue poolOfConsensusIsActive(consensusAddr) {
     if (isAdminOfActivePool(msg.sender)) revert ErrAdminOfAnyActivePoolForbidden(msg.sender);
     _delegate(_poolDetail[__css2cid(consensusAddr)], msg.sender, msg.value);
   }
@@ -39,7 +41,7 @@ abstract contract DelegatorStaking is BaseStaking, IDelegatorStaking {
     uint256 total;
 
     address[] memory poolIds = __css2cidBatch(consensusAddrs);
-    for (uint i = 0; i < poolIds.length;) {
+    for (uint256 i = 0; i < poolIds.length;) {
       total += amounts[i];
       _undelegate(consensusAddrs[i], _poolDetail[poolIds[i]], delegator, amounts[i]);
 
@@ -67,12 +69,9 @@ abstract contract DelegatorStaking is BaseStaking, IDelegatorStaking {
   /**
    * @inheritdoc IDelegatorStaking
    */
-  function claimRewards(TConsensus[] calldata consensusAddrList)
-    external
-    override
-    nonReentrant
-    returns (uint256 amount)
-  {
+  function claimRewards(
+    TConsensus[] calldata consensusAddrList
+  ) external override nonReentrant returns (uint256 amount) {
     amount = _claimRewards(msg.sender, __css2cidBatch(consensusAddrList));
     _transferRON(payable(msg.sender), amount);
   }
@@ -105,8 +104,8 @@ abstract contract DelegatorStaking is BaseStaking, IDelegatorStaking {
    * @inheritdoc IDelegatorStaking
    */
   function getRewardsById(address user, address[] memory poolIds) public view returns (uint256[] memory rewards_) {
-    uint length = poolIds.length;
-    uint period = IRoninValidatorSet(getContract(ContractType.VALIDATOR)).currentPeriod();
+    uint256 length = poolIds.length;
+    uint256 period = IRoninValidatorSet(getContract(ContractType.VALIDATOR)).currentPeriod();
     rewards_ = new uint256[](length);
 
     for (uint256 i = 0; i < length; i++) {

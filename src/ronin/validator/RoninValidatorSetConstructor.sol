@@ -2,10 +2,10 @@
 
 pragma solidity ^0.8.9;
 
-import "@openzeppelin-v4/contracts/proxy/utils/Initializable.sol";
 import "../../interfaces/validator/IRoninValidatorSet.sol";
 import "./CoinbaseExecutionDependant.sol";
 import "./SlashingExecutionDependant.sol";
+import "@openzeppelin-v4/contracts/proxy/utils/Initializable.sol";
 
 contract RoninValidatorSetConstructor is Initializable, CoinbaseExecutionDependant, SlashingExecutionDependant {
   constructor() {
@@ -67,11 +67,15 @@ contract RoninValidatorSetConstructor is Initializable, CoinbaseExecutionDependa
     delete ______deprecatedTrustedOrg;
   }
 
-  function initializeV3(address fastFinalityTrackingContract) external reinitializer(3) {
+  function initializeV3(
+    address fastFinalityTrackingContract
+  ) external reinitializer(3) {
     _setContract(ContractType.FAST_FINALITY_TRACKING, fastFinalityTrackingContract);
   }
 
-  function initializeV4(address profileContract) external reinitializer(4) {
+  function initializeV4(
+    address profileContract
+  ) external reinitializer(4) {
     _setContract(ContractType.PROFILE, profileContract);
   }
 
@@ -88,31 +92,27 @@ contract RoninValidatorSetConstructor is Initializable, CoinbaseExecutionDependa
   /**
    * @dev Convert consensus address to corresponding id from the Profile contract.
    */
-  function __css2cid(TConsensus consensusAddr) internal view override(EmergencyExit, CommonStorage) returns (address) {
+  function __css2cid(
+    TConsensus consensusAddr
+  ) internal view override(EmergencyExit, CommonStorage) returns (address) {
     return IProfile(getContract(ContractType.PROFILE)).getConsensus2Id(consensusAddr);
   }
 
   /**
    * @dev Convert many consensus addresses to corresponding ids from the Profile contract.
    */
-  function __css2cidBatch(TConsensus[] memory consensusAddrs)
-    internal
-    view
-    override(EmergencyExit, CommonStorage)
-    returns (address[] memory)
-  {
+  function __css2cidBatch(
+    TConsensus[] memory consensusAddrs
+  ) internal view override(EmergencyExit, CommonStorage) returns (address[] memory) {
     return IProfile(getContract(ContractType.PROFILE)).getManyConsensus2Id(consensusAddrs);
   }
 
   /**
    * @dev Convert many id to corresponding consensus addresses from the Profile contract.
    */
-  function __cid2cssBatch(address[] memory cids)
-    internal
-    view
-    override(EmergencyExit, ValidatorInfoStorageV2)
-    returns (TConsensus[] memory)
-  {
+  function __cid2cssBatch(
+    address[] memory cids
+  ) internal view override(EmergencyExit, ValidatorInfoStorageV2) returns (TConsensus[] memory) {
     return IProfile(getContract(ContractType.PROFILE)).getManyId2Consensus(cids);
   }
 }

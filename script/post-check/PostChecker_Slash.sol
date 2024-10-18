@@ -1,20 +1,21 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
+import { Contract } from "../utils/Contract.sol";
+import { BaseMigration } from "@fdk/BaseMigration.s.sol";
 import { LibErrorHandler } from "@fdk/libraries/LibErrorHandler.sol";
 import { LibProxy } from "@fdk/libraries/LibProxy.sol";
-import { BaseMigration } from "@fdk/BaseMigration.s.sol";
-import { Contract } from "../utils/Contract.sol";
 
-import { IStaking } from "src/interfaces/staking/IStaking.sol";
-import { IBaseStaking } from "src/interfaces/staking/IBaseStaking.sol";
+import "./PostChecker_Helper.sol";
+import { LibWrapUpEpoch } from "script/shared/libraries/LibWrapUpEpoch.sol";
+import { ICreditScore } from "src/interfaces/slash-indicator/ICreditScore.sol";
 import { ISlashIndicator } from "src/interfaces/slash-indicator/ISlashIndicator.sol";
 import { ISlashUnavailability } from "src/interfaces/slash-indicator/ISlashUnavailability.sol";
-import { ICreditScore } from "src/interfaces/slash-indicator/ICreditScore.sol";
+import { IBaseStaking } from "src/interfaces/staking/IBaseStaking.sol";
+import { IStaking } from "src/interfaces/staking/IStaking.sol";
+
 import { ICandidateManager } from "src/interfaces/validator/ICandidateManager.sol";
 import { IValidatorInfoV2 } from "src/interfaces/validator/info-fragments/IValidatorInfoV2.sol";
-import { LibWrapUpEpoch } from "script/shared/libraries/LibWrapUpEpoch.sol";
-import "./PostChecker_Helper.sol";
 
 abstract contract PostChecker_Slash is BaseMigration, PostChecker_Helper {
   event BailedOut(address indexed validator, uint256 period, uint256 usedCreditScore);

@@ -2,19 +2,23 @@
 
 pragma solidity ^0.8.9;
 
-import "@openzeppelin-v4/contracts/proxy/transparent/ProxyAdmin.sol";
 import "../libraries/Sorting.sol";
+import "@openzeppelin-v4/contracts/proxy/transparent/ProxyAdmin.sol";
 
 contract MockSorting {
   uint256[] public data;
 
-  function addData(uint256[] memory _data) public {
+  function addData(
+    uint256[] memory _data
+  ) public {
     for (uint256 i; i < _data.length; i++) {
       data.push(_data[i]);
     }
   }
 
-  function sort(uint256[] memory _data) public pure returns (uint256[] memory) {
+  function sort(
+    uint256[] memory _data
+  ) public pure returns (uint256[] memory) {
     return Sorting.sort(_data);
   }
 

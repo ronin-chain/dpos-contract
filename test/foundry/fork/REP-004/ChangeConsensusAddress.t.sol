@@ -1,34 +1,32 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.22;
 
+import { StdStyle } from "forge-std/StdStyle.sol";
 import { Test } from "forge-std/Test.sol";
 import { console2 } from "forge-std/console2.sol";
-import { StdStyle } from "forge-std/StdStyle.sol";
-import { TConsensus } from "src/udvts/Types.sol";
-import { Maintenance } from "src/ronin/Maintenance.sol";
-import { ContractType } from "src/utils/ContractType.sol";
-import { MockPrecompile } from "src/mocks/MockPrecompile.sol";
-import { IProfile, Profile } from "src/ronin/profile/Profile.sol";
-import { Profile_Mainnet } from "src/ronin/profile/Profile_Mainnet.sol";
-import { IBaseStaking, Staking } from "src/ronin/staking/Staking.sol";
+
+import {
+  TransparentUpgradeableProxy, TransparentUpgradeableProxyV2
+} from "src/extensions/TransparentUpgradeableProxyV2.sol";
 import { HasContracts } from "src/extensions/collections/HasContracts.sol";
-import { CandidateManager } from "src/ronin/validator/CandidateManager.sol";
-import { EmergencyExitBallot } from "src/libraries/EmergencyExitBallot.sol";
-import { SlashIndicator } from "src/ronin/slash-indicator/SlashIndicator.sol";
-import { RoninValidatorSet, IRoninValidatorSet } from "src/ronin/validator/RoninValidatorSet.sol";
 import { ICandidateManager } from "src/interfaces/validator/ICandidateManager.sol";
 import { ICandidateManagerCallback } from "src/interfaces/validator/ICandidateManagerCallback.sol";
-import {
-  TransparentUpgradeableProxy,
-  TransparentUpgradeableProxyV2
-} from "src/extensions/TransparentUpgradeableProxyV2.sol";
-import { IRoninGovernanceAdmin, RoninGovernanceAdmin } from "src/ronin/RoninGovernanceAdmin.sol";
-import {
-  IRoninTrustedOrganization,
-  RoninTrustedOrganization
-} from "src/multi-chains/RoninTrustedOrganization.sol";
-import { Proposal } from "src/libraries/Proposal.sol";
+
 import { Ballot } from "src/libraries/Ballot.sol";
+import { EmergencyExitBallot } from "src/libraries/EmergencyExitBallot.sol";
+import { Proposal } from "src/libraries/Proposal.sol";
+import { MockPrecompile } from "src/mocks/MockPrecompile.sol";
+import { IRoninTrustedOrganization, RoninTrustedOrganization } from "src/multi-chains/RoninTrustedOrganization.sol";
+import { Maintenance } from "src/ronin/Maintenance.sol";
+import { IRoninGovernanceAdmin, RoninGovernanceAdmin } from "src/ronin/RoninGovernanceAdmin.sol";
+import { IProfile, Profile } from "src/ronin/profile/Profile.sol";
+import { Profile_Mainnet } from "src/ronin/profile/Profile_Mainnet.sol";
+import { SlashIndicator } from "src/ronin/slash-indicator/SlashIndicator.sol";
+import { IBaseStaking, Staking } from "src/ronin/staking/Staking.sol";
+import { CandidateManager } from "src/ronin/validator/CandidateManager.sol";
+import { IRoninValidatorSet, RoninValidatorSet } from "src/ronin/validator/RoninValidatorSet.sol";
+import { TConsensus } from "src/udvts/Types.sol";
+import { ContractType } from "src/utils/ContractType.sol";
 
 contract ChangeConsensusAddressForkTest is Test {
   using StdStyle for *;
@@ -45,7 +43,7 @@ contract ChangeConsensusAddressForkTest is Test {
   SlashIndicator internal _slashIndicator;
   RoninTrustedOrganization internal _roninTO;
 
-  uint _profileCooldownConfig;
+  uint256 _profileCooldownConfig;
 
   modifier upgrade() {
     vm.skip(true);
@@ -71,7 +69,7 @@ contract ChangeConsensusAddressForkTest is Test {
     vm.etch(address(0x6a), address(mockPrecompile).code);
     vm.makePersistent(address(0x6a));
 
-    vm.createSelectFork(RONIN_TEST_RPC, 21901973);
+    vm.createSelectFork(RONIN_TEST_RPC, 21_901_973);
     // vm.createSelectFork(RONIN_MAIN_RPC, 29225255);
 
     if (block.chainid == 2021) {
@@ -103,7 +101,9 @@ contract ChangeConsensusAddressForkTest is Test {
     vm.label(address(_slashIndicator), "SlashIndicator");
   }
 
-  function _toSingletonArrayConsensuses(address consensus) private pure returns (TConsensus[] memory arr) {
+  function _toSingletonArrayConsensuses(
+    address consensus
+  ) private pure returns (TConsensus[] memory arr) {
     arr = new TConsensus[](1);
     arr[0] = TConsensus.wrap(consensus);
   }
@@ -931,7 +931,9 @@ contract ChangeConsensusAddressForkTest is Test {
     _maintenance.schedule(consensus, startAtBlock, endedAtBlock);
   }
 
-  function _bulkWrapUpEpoch(uint256 times) internal {
+  function _bulkWrapUpEpoch(
+    uint256 times
+  ) internal {
     for (uint256 i; i < times; ++i) {
       _fastForwardToNextDay();
       _wrapUpEpoch();
@@ -947,7 +949,9 @@ contract ChangeConsensusAddressForkTest is Test {
     vm.stopPrank();
   }
 
-  function _bulkSubmitBlockReward(uint256 times) internal {
+  function _bulkSubmitBlockReward(
+    uint256 times
+  ) internal {
     for (uint256 i; i < times; ++i) {
       vm.roll(block.number + 1);
       vm.deal(block.coinbase, 1000 ether);
@@ -967,7 +971,7 @@ contract ChangeConsensusAddressForkTest is Test {
       logic = new Profile();
     }
 
-    uint gl1 = gasleft();
+    uint256 gl1 = gasleft();
     console2.log("gasleft 1", gl1);
 
     vm.prank(_getProxyAdmin(address(_profile)));
@@ -975,7 +979,7 @@ contract ChangeConsensusAddressForkTest is Test {
       address(logic), abi.encodeCall(Profile.initializeV2, (address(_staking), address(_roninTO)))
     );
 
-    uint gl2 = gasleft();
+    uint256 gl2 = gasleft();
     console2.log("gasleft 2", gl2);
     console2.log("consume", gl1 - gl2);
   }
@@ -1029,7 +1033,9 @@ contract ChangeConsensusAddressForkTest is Test {
     );
   }
 
-  function _getProxyAdmin(address proxy) internal view returns (address payable proxyAdmin) {
+  function _getProxyAdmin(
+    address proxy
+  ) internal view returns (address payable proxyAdmin) {
     return payable(address(uint160(uint256(vm.load(address(proxy), ADMIN_SLOT)))));
   }
 
@@ -1052,10 +1058,9 @@ contract ChangeConsensusAddressForkTest is Test {
     vm.roll(epochEndingBlockNumber);
   }
 
-  function _addTrustedOrg(IRoninTrustedOrganization.TrustedOrganization memory trustedOrg)
-    internal
-    returns (IRoninTrustedOrganization.TrustedOrganization[] memory trustedOrgs)
-  {
+  function _addTrustedOrg(
+    IRoninTrustedOrganization.TrustedOrganization memory trustedOrg
+  ) internal returns (IRoninTrustedOrganization.TrustedOrganization[] memory trustedOrgs) {
     trustedOrgs = new IRoninTrustedOrganization.TrustedOrganization[](1);
     trustedOrgs[0] = trustedOrg;
     vm.prank(_getProxyAdmin(address(_roninTO)));
@@ -1073,13 +1078,13 @@ contract ChangeConsensusAddressForkTest is Test {
     vm.deal(candidateAdmin, amount);
     vm.prank(candidateAdmin, candidateAdmin);
     _staking.applyValidatorCandidate{ value: amount }(
-      candidateAdmin, consensusAddr, payable(candidateAdmin), 15_00, pubKey, ""
+      candidateAdmin, consensusAddr, payable(candidateAdmin), 1500, pubKey, ""
     );
   }
 
   function _pickOneStandardCandidate() internal view returns (address standardId, TConsensus standardConsensus) {
     address[] memory validatorCids = _validator.getValidatorCandidateIds();
-    for (uint i; i < validatorCids.length; i++) {
+    for (uint256 i; i < validatorCids.length; i++) {
       if (_roninTO.getConsensusWeightById(validatorCids[i]) == 0) {
         standardId = validatorCids[i];
         standardConsensus = _profile.getId2Profile(standardId).consensus;

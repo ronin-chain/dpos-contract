@@ -19,7 +19,7 @@ contract Profile_Mainnet is Profile {
     omittedCssList[2] = 0xbD4bf317Da1928CC2f9f4DA9006401f3944A0Ab5;
 
     CandidateProfile storage _profile;
-    for (uint i; i < omittedCssList.length; ++i) {
+    for (uint256 i; i < omittedCssList.length; ++i) {
       address id = omittedCssList[i];
       TConsensus css = TConsensus.wrap(id);
 

@@ -2,13 +2,13 @@
 
 pragma solidity ^0.8.9;
 
-import "@openzeppelin-v4/contracts/proxy/utils/Initializable.sol";
-import "@openzeppelin-v4/contracts/access/AccessControlEnumerable.sol";
-import "../../libraries/Math.sol";
 import "../../interfaces/staking/IStaking.sol";
 import "../../interfaces/validator/IRoninValidatorSet.sol";
+import "../../libraries/Math.sol";
 import "../../utils/CommonErrors.sol";
 import "./StakingCallback.sol";
+import "@openzeppelin-v4/contracts/access/AccessControlEnumerable.sol";
+import "@openzeppelin-v4/contracts/proxy/utils/Initializable.sol";
 
 contract Staking is IStaking, StakingCallback, Initializable, AccessControlEnumerable {
   bytes32 public constant MIGRATOR_ROLE = keccak256("MIGRATOR_ROLE");
@@ -63,7 +63,9 @@ contract Staking is IStaking, StakingCallback, Initializable, AccessControlEnume
   /**
    * @dev Initializes the contract storage V3.
    */
-  function initializeV3(address __profileContract) external reinitializer(3) {
+  function initializeV3(
+    address __profileContract
+  ) external reinitializer(3) {
     _setContract(ContractType.PROFILE, __profileContract);
   }
 
@@ -84,7 +86,7 @@ contract Staking is IStaking, StakingCallback, Initializable, AccessControlEnume
       revert ErrInvalidArguments(msg.sig);
     }
 
-    for (uint i; i < poolIds.length; ++i) {
+    for (uint256 i; i < poolIds.length; ++i) {
       _poolDetail[poolIds[i]].wasAdmin[admins[i]] = flags[i];
     }
 

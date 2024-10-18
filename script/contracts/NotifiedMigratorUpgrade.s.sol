@@ -2,8 +2,9 @@
 pragma solidity ^0.8.19;
 
 import { LibProxy } from "@fdk/libraries/LibProxy.sol";
-import { NotifiedMigrator } from "src/ronin/validator/migrations/NotifiedMigrator.sol";
+
 import { RoninMigration } from "script/RoninMigration.s.sol";
+import { NotifiedMigrator } from "src/ronin/validator/migrations/NotifiedMigrator.sol";
 
 import { Contract } from "../utils/Contract.sol";
 

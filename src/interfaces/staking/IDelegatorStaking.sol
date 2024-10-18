@@ -27,7 +27,9 @@ interface IDelegatorStaking is IRewardPool {
    * Emits the `Delegated` event.
    *
    */
-  function delegate(TConsensus consensusAddr) external payable;
+  function delegate(
+    TConsensus consensusAddr
+  ) external payable;
 
   /**
    * @dev Unstakes from a validator candidate `_consensusAddr` for `_amount`.
@@ -82,7 +84,9 @@ interface IDelegatorStaking is IRewardPool {
    * Emits the `RewardClaimed` event.
    *
    */
-  function claimRewards(TConsensus[] calldata consensusAddrList) external returns (uint256 amount);
+  function claimRewards(
+    TConsensus[] calldata consensusAddrList
+  ) external returns (uint256 amount);
 
   /**
    * @dev Claims the rewards and delegates them to the consensus address.

@@ -1,38 +1,41 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { ICandidateStaking } from "src/interfaces/staking/ICandidateStaking.sol";
-import { IProfile } from "src/interfaces/IProfile.sol";
-import { IRoninValidatorSet } from "src/interfaces/validator/IRoninValidatorSet.sol";
-import { IStakingVesting } from "src/interfaces/IStakingVesting.sol";
-import { IRandomBeacon } from "src/interfaces/random-beacon/IRandomBeacon.sol";
-import { IRoninTrustedOrganization } from "src/interfaces/IRoninTrustedOrganization.sol";
-import { TConsensus } from "src/udvts/Types.sol";
-import { ContractType } from "src/utils/ContractType.sol";
-import { ITransparentUpgradeableProxyV2 } from
-  "src/interfaces/extensions/ITransparentUpgradeableProxyV2.sol";
-import { StdStyle } from "forge-std/StdStyle.sol";
-import { console } from "forge-std/console.sol";
-import { VmSafe } from "forge-std/Vm.sol";
-import { LibErrorHandler } from "@fdk/libraries/LibErrorHandler.sol";
-import { TContract } from "@fdk/types/Types.sol";
-import { LibProxy } from "@fdk/libraries/LibProxy.sol";
-import { BaseMigration } from "@fdk/BaseMigration.s.sol";
-import { ScriptExtended } from "@fdk/extensions/ScriptExtended.s.sol";
-import { Contract } from "./utils/Contract.sol";
-import { PostChecker_GovernanceAdmin } from "./post-check/PostChecker_GovernanceAdmin.s.sol";
-import { PostChecker_ApplyCandidate } from "./post-check/PostChecker_ApplyCandidate.sol";
-import { PostChecker_Staking } from "./post-check/PostChecker_Staking.sol";
-import { PostChecker_Renounce } from "./post-check/PostChecker_Renounce.sol";
-import { PostChecker_EmergencyExit } from "./post-check/PostChecker_EmergencyExit.sol";
-import { PostChecker_Maintenance } from "./post-check/PostChecker_Maintenance.sol";
-import { PostChecker_Slash } from "./post-check/PostChecker_Slash.sol";
 import { RoninMigration } from "./RoninMigration.s.sol";
 import { ISharedArgument } from "./interfaces/ISharedArgument.sol";
-import { LibWrapUpEpoch } from "script/shared/libraries/LibWrapUpEpoch.sol";
+import { PostChecker_ApplyCandidate } from "./post-check/PostChecker_ApplyCandidate.sol";
+import { PostChecker_EmergencyExit } from "./post-check/PostChecker_EmergencyExit.sol";
+import { PostChecker_GovernanceAdmin } from "./post-check/PostChecker_GovernanceAdmin.s.sol";
+import { PostChecker_Maintenance } from "./post-check/PostChecker_Maintenance.sol";
+import { PostChecker_Renounce } from "./post-check/PostChecker_Renounce.sol";
+import { PostChecker_Slash } from "./post-check/PostChecker_Slash.sol";
+import { PostChecker_Staking } from "./post-check/PostChecker_Staking.sol";
+import { Contract } from "./utils/Contract.sol";
+import { BaseMigration } from "@fdk/BaseMigration.s.sol";
+import { ScriptExtended } from "@fdk/extensions/ScriptExtended.s.sol";
+
+import { ProxyInterface } from "@fdk/libraries/LibDeploy.sol";
+import { LibErrorHandler } from "@fdk/libraries/LibErrorHandler.sol";
+import { LibProxy } from "@fdk/libraries/LibProxy.sol";
+import { TContract } from "@fdk/types/Types.sol";
+import { StdStyle } from "forge-std/StdStyle.sol";
+import { VmSafe } from "forge-std/Vm.sol";
+import { console } from "forge-std/console.sol";
+
 import { LibPrecompile } from "script/shared/libraries/LibPrecompile.sol";
 import { LibVRFProof } from "script/shared/libraries/LibVRFProof.sol";
-import { ProxyInterface } from "@fdk/libraries/LibDeploy.sol";
+import { LibWrapUpEpoch } from "script/shared/libraries/LibWrapUpEpoch.sol";
+import { IProfile } from "src/interfaces/IProfile.sol";
+import { IRoninTrustedOrganization } from "src/interfaces/IRoninTrustedOrganization.sol";
+import { IStakingVesting } from "src/interfaces/IStakingVesting.sol";
+
+import { ITransparentUpgradeableProxyV2 } from "src/interfaces/extensions/ITransparentUpgradeableProxyV2.sol";
+import { IRandomBeacon } from "src/interfaces/random-beacon/IRandomBeacon.sol";
+import { ICandidateStaking } from "src/interfaces/staking/ICandidateStaking.sol";
+import { IRoninValidatorSet } from "src/interfaces/validator/IRoninValidatorSet.sol";
+
+import { TConsensus } from "src/udvts/Types.sol";
+import { ContractType } from "src/utils/ContractType.sol";
 
 contract PostChecker is
   RoninMigration,
@@ -77,12 +80,9 @@ contract PostChecker is
     return RoninMigration._upgradeProxy(contractType, args, argsLogicConstructor);
   }
 
-  function _deployProxy(TContract contractType)
-    internal
-    virtual
-    override(BaseMigration, RoninMigration)
-    returns (address payable)
-  {
+  function _deployProxy(
+    TContract contractType
+  ) internal virtual override(BaseMigration, RoninMigration) returns (address payable) {
     return RoninMigration._deployProxy(contractType);
   }
 

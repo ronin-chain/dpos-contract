@@ -1,29 +1,31 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import {
-  TransparentUpgradeableProxy,
-  TransparentUpgradeableProxyV2
-} from "src/extensions/TransparentUpgradeableProxyV2.sol";
+import { LibProxy } from "@fdk/libraries/LibProxy.sol";
+import { TContract } from "@fdk/types/Types.sol";
+import { DefaultNetwork } from "@fdk/utils/DefaultNetwork.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
 import { console } from "forge-std/console.sol";
-import { TContract } from "@fdk/types/Types.sol";
-import { LibProxy } from "@fdk/libraries/LibProxy.sol";
-import { DefaultNetwork } from "@fdk/utils/DefaultNetwork.sol";
-import { ISharedArgument, IRoninTrustedOrganization, Proposal, RoninMigration } from "script/RoninMigration.s.sol";
-import { IRoninGovernanceAdmin } from "src/interfaces/IRoninGovernanceAdmin.sol";
+import { IRoninTrustedOrganization, ISharedArgument, Proposal, RoninMigration } from "script/RoninMigration.s.sol";
+
 import { ISharedArgument } from "script/interfaces/ISharedArgument.sol";
-import { Network } from "script/utils/Network.sol";
-import { Contract } from "script/utils/Contract.sol";
+
 import { LibProposal } from "script/shared/libraries/LibProposal.sol";
+import { Contract } from "script/utils/Contract.sol";
+import { Network } from "script/utils/Network.sol";
+import {
+  TransparentUpgradeableProxy, TransparentUpgradeableProxyV2
+} from "src/extensions/TransparentUpgradeableProxyV2.sol";
+import { IRoninGovernanceAdmin } from "src/interfaces/IRoninGovernanceAdmin.sol";
+
 import { ISlashIndicator } from "src/interfaces/slash-indicator/ISlashIndicator.sol";
 
-import { IFastFinalityTracking } from "src/interfaces/IFastFinalityTracking.sol";
 import { IRandomBeacon, RoninRandomBeaconDeploy } from "script/contracts/RoninRandomBeaconDeploy.s.sol";
 import {
   RoninValidatorSetREP10Migrator,
   RoninValidatorSetREP10MigratorLogicDeploy
 } from "script/contracts/RoninValidatorSetRep10MigratorLogicDeploy.s.sol";
+import { IFastFinalityTracking } from "src/interfaces/IFastFinalityTracking.sol";
 
 contract Migration_01_Upgrade_ShadowForkTestnet_Release_V0_8_0 is RoninMigration {
   using LibProxy for *;
@@ -83,10 +85,9 @@ contract Migration_01_Upgrade_ShadowForkTestnet_Release_V0_8_0 is RoninMigration
     LibProposal.executeProposal(governanceAdmin, trustedOrg, proposal);
   }
 
-  function _buildProposalData(ISharedArgument.SharedParameter memory param)
-    internal
-    returns (address[] memory targets, uint256[] memory values, bytes[] memory callDatas)
-  {
+  function _buildProposalData(
+    ISharedArgument.SharedParameter memory param
+  ) internal returns (address[] memory targets, uint256[] memory values, bytes[] memory callDatas) {
     uint256 innerCallCount = contractTypesToUpgrade.length;
     console.log("Number contract to upgrade:", innerCallCount);
 

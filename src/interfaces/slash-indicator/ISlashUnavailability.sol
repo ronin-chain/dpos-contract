@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.9;
 
-import "./IBaseSlash.sol";
 import { TConsensus } from "../../udvts/Types.sol";
+import "./IBaseSlash.sol";
 
 interface ISlashUnavailability is IBaseSlash {
   /**
@@ -36,12 +36,16 @@ interface ISlashUnavailability is IBaseSlash {
    * Emits the event `Slashed` when the threshold is reached.
    *
    */
-  function slashUnavailability(TConsensus consensusAddr) external;
+  function slashUnavailability(
+    TConsensus consensusAddr
+  ) external;
 
   /**
    * @dev Returns the current unavailability indicator of a block producer.
    */
-  function currentUnavailabilityIndicator(TConsensus consensusAddr) external view returns (uint256);
+  function currentUnavailabilityIndicator(
+    TConsensus consensusAddr
+  ) external view returns (uint256);
 
   /**
    * @dev Returns the unavailability indicator in the period `period` of a block producer.

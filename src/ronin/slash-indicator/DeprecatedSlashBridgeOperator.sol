@@ -2,9 +2,10 @@
 
 pragma solidity ^0.8.9;
 
-import "../../extensions/consumers/PercentageConsumer.sol";
-import "../../extensions/collections/HasProxyAdmin.sol";
 import "../../extensions/collections/HasContracts.sol";
+import "../../extensions/collections/HasProxyAdmin.sol";
+import "../../extensions/consumers/PercentageConsumer.sol";
+
 import { HasValidatorDeprecated } from "../../utils/DeprecatedSlots.sol";
 
 abstract contract DeprecatedSlashBridgeOperator is

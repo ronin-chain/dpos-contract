@@ -1,15 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { ISharedArgument } from "script/interfaces/ISharedArgument.sol";
-import { RoninValidatorSetREP10Migrator } from
-  "src/ronin/validator/migrations/RoninValidatorSetREP10Migrator.sol";
-import { Contract } from "script/utils/Contract.sol";
-import { RoninMigration } from "script/RoninMigration.s.sol";
-import { LibProxy } from "@fdk/libraries/LibProxy.sol";
-import { RoninValidatorSetDeploy } from "./RoninValidatorSetDeploy.s.sol";
 import { RoninRandomBeaconDeploy } from "./RoninRandomBeaconDeploy.s.sol";
+import { RoninValidatorSetDeploy } from "./RoninValidatorSetDeploy.s.sol";
 import { IMigrationScript } from "@fdk/interfaces/IMigrationScript.sol";
+import { LibProxy } from "@fdk/libraries/LibProxy.sol";
+import { RoninMigration } from "script/RoninMigration.s.sol";
+import { ISharedArgument } from "script/interfaces/ISharedArgument.sol";
+import { Contract } from "script/utils/Contract.sol";
+import { RoninValidatorSetREP10Migrator } from "src/ronin/validator/migrations/RoninValidatorSetREP10Migrator.sol";
 
 contract RoninValidatorSetREP10MigratorLogicDeploy is RoninMigration {
   using LibProxy for *;
@@ -22,15 +21,16 @@ contract RoninValidatorSetREP10MigratorLogicDeploy is RoninMigration {
     _setDependencyDeployScript(Contract.RoninRandomBeacon.key(), new RoninRandomBeaconDeploy());
   }
 
-  function overrideActivatedAtPeriod(uint256 activatedAtPeriod)
-    public
-    returns (RoninValidatorSetREP10MigratorLogicDeploy)
-  {
+  function overrideActivatedAtPeriod(
+    uint256 activatedAtPeriod
+  ) public returns (RoninValidatorSetREP10MigratorLogicDeploy) {
     _activatedAtPeriod = activatedAtPeriod;
     return RoninValidatorSetREP10MigratorLogicDeploy(address(this));
   }
 
-  function overridePrevImpl(address prevImpl) public returns (RoninValidatorSetREP10MigratorLogicDeploy) {
+  function overridePrevImpl(
+    address prevImpl
+  ) public returns (RoninValidatorSetREP10MigratorLogicDeploy) {
     _prevImpl = prevImpl;
     return RoninValidatorSetREP10MigratorLogicDeploy(address(this));
   }

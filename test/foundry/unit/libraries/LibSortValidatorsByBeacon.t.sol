@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import { console } from "forge-std/console.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
 import { Test } from "forge-std/Test.sol";
+import { console } from "forge-std/console.sol";
+
+import { LibArray } from "src/libraries/LibArray.sol";
 import { LibSortValidatorsByBeacon } from "src/libraries/LibSortValidatorsByBeacon.sol";
 import { LibSortValidatorsByBeaconOld } from "test/foundry/mocks/libraries/LibSortValidatorsByBeaconOld.sol";
-import { LibArray } from "src/libraries/LibArray.sol";
 
 contract LibSortValidatorsByBeaconTest is Test {
   using StdStyle for *;
@@ -20,24 +21,24 @@ contract LibSortValidatorsByBeaconTest is Test {
   uint256 internal constant MAX_EPOCH = 144;
 
   uint96[] stakeAmounts = [
-    uint96(1450000 ether),
-    uint96(690000 ether),
-    uint96(830990 ether),
-    uint96(470000 ether),
-    uint96(550000 ether),
-    uint96(450000 ether),
-    uint96(599999 ether),
-    uint96(500000 ether),
-    uint96(500000 ether),
-    uint96(790000 ether),
-    uint96(500000 ether),
-    uint96(500000 ether),
-    uint96(1450000 ether),
-    uint96(1450000 ether),
-    uint96(790000 ether),
-    uint96(500000 ether),
-    uint96(500000 ether),
-    uint96(500000 ether)
+    uint96(1_450_000 ether),
+    uint96(690_000 ether),
+    uint96(830_990 ether),
+    uint96(470_000 ether),
+    uint96(550_000 ether),
+    uint96(450_000 ether),
+    uint96(599_999 ether),
+    uint96(500_000 ether),
+    uint96(500_000 ether),
+    uint96(790_000 ether),
+    uint96(500_000 ether),
+    uint96(500_000 ether),
+    uint96(1_450_000 ether),
+    uint96(1_450_000 ether),
+    uint96(790_000 ether),
+    uint96(500_000 ether),
+    uint96(500_000 ether),
+    uint96(500_000 ether)
   ];
   address[] idValues = [
     address(vm.addr(uint256(keccak256(abi.encodePacked("0x0", vm.unixTime()))))),
@@ -166,7 +167,9 @@ contract LibSortValidatorsByBeaconTest is Test {
     }
   }
 
-  function testConcrete_shouldReplaceHoldSet_whenRequestAgain(uint256 r) external {
+  function testConcrete_shouldReplaceHoldSet_whenRequestAgain(
+    uint256 r
+  ) external {
     uint256 numGovernanceValidator = 2;
     uint256 numStandardValidator = 2;
     uint256 numRotatingValidator = 1;

@@ -7,11 +7,15 @@ import "../../precompile-usages/PCUSortValidators.sol";
 contract MockPCUSortValidators is PCUSortValidators {
   address internal _precompileSortValidatorAddress;
 
-  constructor(address _precompile) {
+  constructor(
+    address _precompile
+  ) {
     setPrecompileSortValidatorAddress(_precompile);
   }
 
-  function setPrecompileSortValidatorAddress(address _addr) public {
+  function setPrecompileSortValidatorAddress(
+    address _addr
+  ) public {
     _precompileSortValidatorAddress = _addr;
   }
 

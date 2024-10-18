@@ -2,18 +2,19 @@
 
 pragma solidity ^0.8.9;
 
-import "@openzeppelin-v4/contracts/proxy/utils/Initializable.sol";
-import "../../interfaces/slash-indicator/ISlashIndicator.sol";
-import "../../interfaces/validator/IRoninValidatorSet.sol";
 import "../../interfaces/IMaintenance.sol";
 import "../../interfaces/IProfile.sol";
+import "../../interfaces/slash-indicator/ISlashIndicator.sol";
+import "../../interfaces/validator/IRoninValidatorSet.sol";
+
+import "./CreditScore.sol";
 import "./DeprecatedSlashBridgeOperator.sol";
 import "./DeprecatedSlashBridgeVoting.sol";
 import "./SlashDoubleSign.sol";
 import "./SlashFastFinality.sol";
-import "./SlashUnavailability.sol";
 import "./SlashRandomBeacon.sol";
-import "./CreditScore.sol";
+import "./SlashUnavailability.sol";
+import "@openzeppelin-v4/contracts/proxy/utils/Initializable.sol";
 
 contract SlashIndicator is
   ISlashIndicator,
@@ -74,7 +75,9 @@ contract SlashIndicator is
     );
   }
 
-  function initializeV2(address roninGovernanceAdminContract) external reinitializer(2) {
+  function initializeV2(
+    address roninGovernanceAdminContract
+  ) external reinitializer(2) {
     _setContract(ContractType.VALIDATOR, ______deprecatedValidator);
     _setContract(ContractType.MAINTENANCE, ______deprecatedMaintenance);
     _setContract(ContractType.GOVERNANCE_ADMIN, roninGovernanceAdminContract);
@@ -86,7 +89,9 @@ contract SlashIndicator is
     delete ______deprecatedGovernanceAdmin;
   }
 
-  function initializeV3(address profileContract) external reinitializer(3) {
+  function initializeV3(
+    address profileContract
+  ) external reinitializer(3) {
     _setContract(ContractType.PROFILE, profileContract);
     _setFastFinalitySlashingConfigs(_slashDoubleSignAmount, _doubleSigningJailUntilBlock);
   }
@@ -144,20 +149,21 @@ contract SlashIndicator is
     && !IMaintenance(getContract(ContractType.MAINTENANCE)).checkMaintainedById(validatorId, block.number);
   }
 
-  function __css2cid(TConsensus consensusAddr)
-    internal
-    view
-    override(CreditScore, SlashUnavailability, SlashFastFinality)
-    returns (address)
-  {
+  function __css2cid(
+    TConsensus consensusAddr
+  ) internal view override(CreditScore, SlashUnavailability, SlashFastFinality) returns (address) {
     return IProfile(getContract(ContractType.PROFILE)).getConsensus2Id(consensusAddr);
   }
 
-  function __tryCss2cid(TConsensus consensusAddr) internal view override(SlashDoubleSign) returns (bool, address) {
+  function __tryCss2cid(
+    TConsensus consensusAddr
+  ) internal view override(SlashDoubleSign) returns (bool, address) {
     return IProfile(getContract(ContractType.PROFILE)).tryGetConsensus2Id(consensusAddr);
   }
 
-  function __css2cidBatch(TConsensus[] memory consensusAddrs) internal view override returns (address[] memory) {
+  function __css2cidBatch(
+    TConsensus[] memory consensusAddrs
+  ) internal view override returns (address[] memory) {
     return IProfile(getContract(ContractType.PROFILE)).getManyConsensus2Id(consensusAddrs);
   }
 }

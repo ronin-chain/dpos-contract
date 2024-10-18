@@ -3,9 +3,10 @@
 pragma solidity ^0.8.9;
 
 import "./IBaseStaking.sol";
-import "./IStakingCallback.sol";
+
 import "./ICandidateStaking.sol";
 import "./IDelegatorStaking.sol";
+import "./IStakingCallback.sol";
 
 interface IStaking is IRewardPool, IBaseStaking, ICandidateStaking, IDelegatorStaking, IStakingCallback {
   /// @dev Event emitted when the `wasAdmin` is finished to migrate.
@@ -34,7 +35,9 @@ interface IStaking is IRewardPool, IBaseStaking, ICandidateStaking, IDelegatorSt
   /**
    * @dev Initializes the contract storage V3.
    */
-  function initializeV3(address __profileContract) external;
+  function initializeV3(
+    address __profileContract
+  ) external;
 
   function initializeV4(address admin, address migrator) external;
 

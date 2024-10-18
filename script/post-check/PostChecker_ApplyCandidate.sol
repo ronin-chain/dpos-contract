@@ -1,13 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { ICandidateManager } from "src/interfaces/validator/ICandidateManager.sol";
-import { LibProxy } from "@fdk/libraries/LibProxy.sol";
-import { BaseMigration } from "@fdk/BaseMigration.s.sol";
 import { Contract } from "../utils/Contract.sol";
-import { LibWrapUpEpoch } from "script/shared/libraries/LibWrapUpEpoch.sol";
+
 import "./PostChecker_Helper.sol";
+import { BaseMigration } from "@fdk/BaseMigration.s.sol";
+import { LibProxy } from "@fdk/libraries/LibProxy.sol";
+
 import { LibApplyCandidate } from "script/shared/libraries/LibApplyCandidate.sol";
+import { LibWrapUpEpoch } from "script/shared/libraries/LibWrapUpEpoch.sol";
+import { ICandidateManager } from "src/interfaces/validator/ICandidateManager.sol";
 
 abstract contract PostChecker_ApplyCandidate is BaseMigration, PostChecker_Helper {
   using LibProxy for *;

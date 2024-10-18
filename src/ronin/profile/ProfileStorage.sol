@@ -2,11 +2,12 @@
 
 pragma solidity ^0.8.9;
 
-import "../../udvts/Types.sol";
 import "../../extensions/collections/HasContracts.sol";
-import "../../utils/RoleAccess.sol";
+
 import { IProfile } from "../../interfaces/IProfile.sol";
 import { ITimingInfo } from "../../interfaces/validator/info-fragments/ITimingInfo.sol";
+import "../../udvts/Types.sol";
+import "../../utils/RoleAccess.sol";
 
 abstract contract ProfileStorage is IProfile, HasContracts {
   /// @dev Mapping from id address => candidate profile.
@@ -119,14 +120,18 @@ abstract contract ProfileStorage is IProfile, HasContracts {
     emit VRFKeyHashChanged(_profile.id, vrfKeyHash);
   }
 
-  function _startCooldown(CandidateProfile storage _profile) internal {
+  function _startCooldown(
+    CandidateProfile storage _profile
+  ) internal {
     _profile.profileLastChange = block.timestamp;
   }
 
   /**
    * @dev Get an existed profile struct from `id`. Revert if the profile does not exists.
    */
-  function _getId2ProfileHelper(address id) internal view returns (CandidateProfile storage _profile) {
+  function _getId2ProfileHelper(
+    address id
+  ) internal view returns (CandidateProfile storage _profile) {
     _profile = _id2Profile[id];
     if (_profile.id == address(0)) revert ErrNonExistentProfile();
   }
@@ -134,11 +139,15 @@ abstract contract ProfileStorage is IProfile, HasContracts {
   /**
    * @dev Returns hash of a public key.
    */
-  function _hashPubkey(bytes memory pubkey) internal pure returns (uint256) {
+  function _hashPubkey(
+    bytes memory pubkey
+  ) internal pure returns (uint256) {
     return uint256(keccak256(pubkey));
   }
 
-  function _setCooldownConfig(uint256 cooldown) internal {
+  function _setCooldownConfig(
+    uint256 cooldown
+  ) internal {
     _profileChangeCooldown = cooldown;
   }
 }

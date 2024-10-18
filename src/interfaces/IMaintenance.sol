@@ -94,7 +94,9 @@ interface IMaintenance {
 
   function initializeV2() external;
 
-  function initializeV3(address profileContract_) external;
+  function initializeV3(
+    address profileContract_
+  ) external;
 
   function initializeV4() external;
 
@@ -102,7 +104,9 @@ interface IMaintenance {
    * @dev Exits the maintenance status.
    * @param consensusAddr The address of the consensus to exit maintenance status for.
    */
-  function exitMaintenance(TConsensus consensusAddr) external;
+  function exitMaintenance(
+    TConsensus consensusAddr
+  ) external;
 
   /**
    * @dev Returns whether the validator `consensusAddr` maintained at the block number `_block`.
@@ -154,17 +158,23 @@ interface IMaintenance {
   /**
    * @dev Returns whether the validator `consensusAddr` has finished cooldown.
    */
-  function checkCooldownEnded(TConsensus consensusAddr) external view returns (bool);
+  function checkCooldownEnded(
+    TConsensus consensusAddr
+  ) external view returns (bool);
 
   /**
    * @dev Returns whether the validator `consensusAddr` has schedule.
    */
-  function checkScheduled(TConsensus consensusAddr) external view returns (bool);
+  function checkScheduled(
+    TConsensus consensusAddr
+  ) external view returns (bool);
 
   /**
    * @dev Returns the detailed schedule of the validator `consensusAddr`.
    */
-  function getSchedule(TConsensus consensusAddr) external view returns (Schedule memory);
+  function getSchedule(
+    TConsensus consensusAddr
+  ) external view returns (Schedule memory);
 
   /**
    * @dev Returns the total of current schedules.
@@ -250,5 +260,7 @@ interface IMaintenance {
    *
    * Emits the event `MaintenanceScheduleCancelled`.
    */
-  function cancelSchedule(TConsensus consensusAddr) external;
+  function cancelSchedule(
+    TConsensus consensusAddr
+  ) external;
 }

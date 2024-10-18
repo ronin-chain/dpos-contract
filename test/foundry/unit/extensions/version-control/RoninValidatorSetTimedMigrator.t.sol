@@ -2,23 +2,22 @@
 pragma solidity ^0.8.0;
 
 import {
+  ConditionalImplementControlTest,
+  IConditionalImplementControl,
+  LibArray,
+  MockActor,
+  MockLogicV1,
+  MockLogicV2,
+  TransparentUpgradeableProxyV2
+} from "./ConditionalVersionControl.t.sol";
+import { IHasContracts } from "src/interfaces/collections/IHasContracts.sol";
+import {
   ILogicValidatorSet,
   MockLogicValidatorSetV1,
   MockLogicValidatorSetV2
 } from "src/mocks/utils/version-control/MockLogicValidatorSet.sol";
 import { NotifiedMigrator } from "src/ronin/validator/migrations/NotifiedMigrator.sol";
-import { RoninValidatorSetTimedMigrator } from
-  "src/ronin/validator/migrations/RoninValidatorSetTimedMigrator.sol";
-import {
-  MockActor,
-  MockLogicV1,
-  MockLogicV2,
-  IConditionalImplementControl,
-  LibArray,
-  ConditionalImplementControlTest,
-  TransparentUpgradeableProxyV2
-} from "./ConditionalVersionControl.t.sol";
-import { IHasContracts } from "src/interfaces/collections/IHasContracts.sol";
+import { RoninValidatorSetTimedMigrator } from "src/ronin/validator/migrations/RoninValidatorSetTimedMigrator.sol";
 import { ContractType } from "src/utils/ContractType.sol";
 
 contract RoninValidatorSetTimedMigratorTest is ConditionalImplementControlTest {
@@ -64,7 +63,9 @@ contract RoninValidatorSetTimedMigratorTest is ConditionalImplementControlTest {
     TransparentUpgradeableProxyV2(payable(_roninTrustedOrgProxy)).upgradeTo(roninTrustedOrgSwitcher);
   }
 
-  function _manualUpgradeTo(address impl) internal virtual override {
+  function _manualUpgradeTo(
+    address impl
+  ) internal virtual override {
     super._manualUpgradeTo(impl);
 
     vm.startPrank(_proxyAdmin, _proxyAdmin);
@@ -155,7 +156,9 @@ contract RoninValidatorSetTimedMigratorTest is ConditionalImplementControlTest {
   /**
    * @dev Creates a new conditional implement control for testing purposes.
    */
-  function _createConditionalImplementControl(address[3] memory inputs) internal override returns (address) {
+  function _createConditionalImplementControl(
+    address[3] memory inputs
+  ) internal override returns (address) {
     return address(new RoninValidatorSetTimedMigrator(inputs[0], inputs[1], inputs[2]));
   }
 }

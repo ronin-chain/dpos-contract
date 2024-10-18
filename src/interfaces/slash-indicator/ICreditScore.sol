@@ -61,7 +61,9 @@ interface ICreditScore {
    * Emits the event `CreditScoresUpdated`.
    *
    */
-  function execResetCreditScores(address[] calldata validatorIds) external;
+  function execResetCreditScores(
+    address[] calldata validatorIds
+  ) external;
 
   /**
    * @dev A slashed validator use this method to get out of jail.
@@ -73,7 +75,9 @@ interface ICreditScore {
    * Emits the event `BailedOut`.
    *
    */
-  function bailOut(TConsensus consensusAddr) external;
+  function bailOut(
+    TConsensus consensusAddr
+  ) external;
 
   /**
    * @dev Sets the configs to credit score.
@@ -118,15 +122,16 @@ interface ICreditScore {
   /**
    * @dev Returns the current credit score of the validator.
    */
-  function getCreditScore(TConsensus consensus) external view returns (uint256);
+  function getCreditScore(
+    TConsensus consensus
+  ) external view returns (uint256);
 
   /**
    * @dev Returns the current credit score of a list of validators.
    */
-  function getManyCreditScores(TConsensus[] calldata consensusAddrs)
-    external
-    view
-    returns (uint256[] memory _resultList);
+  function getManyCreditScores(
+    TConsensus[] calldata consensusAddrs
+  ) external view returns (uint256[] memory _resultList);
 
   /**
    * @dev Returns the whether the `consensus` has been bailed out at the `period`.

@@ -2,12 +2,13 @@
 
 pragma solidity ^0.8.9;
 
-import "./CreditScore.sol";
-import "../../interfaces/validator/IRoninValidatorSet.sol";
-import "../../interfaces/slash-indicator/ISlashUnavailability.sol";
 import "../../extensions/collections/HasContracts.sol";
-import { HasValidatorDeprecated } from "../../utils/DeprecatedSlots.sol";
+import "../../interfaces/slash-indicator/ISlashUnavailability.sol";
+import "../../interfaces/validator/IRoninValidatorSet.sol";
+
 import { ErrInvalidThreshold } from "../../utils/CommonErrors.sol";
+import { HasValidatorDeprecated } from "../../utils/DeprecatedSlots.sol";
+import "./CreditScore.sol";
 
 abstract contract SlashUnavailability is ISlashUnavailability, HasContracts, HasValidatorDeprecated {
   /// @dev The last block that a validator is slashed for unavailability.
@@ -56,7 +57,9 @@ abstract contract SlashUnavailability is ISlashUnavailability, HasContracts, Has
   /**
    * @inheritdoc ISlashUnavailability
    */
-  function slashUnavailability(TConsensus consensusAddr) external override oncePerBlock {
+  function slashUnavailability(
+    TConsensus consensusAddr
+  ) external override oncePerBlock {
     if (msg.sender != block.coinbase) revert ErrUnauthorized(msg.sig, RoleAccess.COINBASE);
 
     address validatorId = __css2cid(consensusAddr);
@@ -131,7 +134,9 @@ abstract contract SlashUnavailability is ISlashUnavailability, HasContracts, Has
   /**
    * @inheritdoc ISlashUnavailability
    */
-  function currentUnavailabilityIndicator(TConsensus consensus) external view override returns (uint256) {
+  function currentUnavailabilityIndicator(
+    TConsensus consensus
+  ) external view override returns (uint256) {
     return _getUnavailabilityIndicatorById(
       __css2cid(consensus), IRoninValidatorSet(getContract(ContractType.VALIDATOR)).currentPeriod()
     );
@@ -186,5 +191,7 @@ abstract contract SlashUnavailability is ISlashUnavailability, HasContracts, Has
    */
   function _checkBailedOutAtPeriodById(address validatorId, uint256 period) internal view virtual returns (bool);
 
-  function __css2cid(TConsensus consensusAddr) internal view virtual returns (address);
+  function __css2cid(
+    TConsensus consensusAddr
+  ) internal view virtual returns (address);
 }

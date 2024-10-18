@@ -25,8 +25,8 @@ abstract contract PCUVerifyBLSPublicKey is PrecompiledUsage {
 
     bytes memory payload =
       abi.encodeWithSignature("validateProofOfPossession(bytes,bytes)", publicKey, proofOfPossession);
-    uint payloadLength = payload.length;
-    uint[1] memory output;
+    uint256 payloadLength = payload.length;
+    uint256[1] memory output;
 
     assembly {
       let payloadStart := add(payload, 0x20)

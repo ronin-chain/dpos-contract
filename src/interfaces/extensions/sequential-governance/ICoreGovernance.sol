@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import { Ballot } from "src/libraries/Ballot.sol";
-import { Proposal } from "src/libraries/Proposal.sol";
 import { SignatureConsumer } from "src/interfaces/consumers/SignatureConsumer.sol";
 import { VoteStatusConsumer } from "src/interfaces/consumers/VoteStatusConsumer.sol";
+import { Ballot } from "src/libraries/Ballot.sol";
+import { Proposal } from "src/libraries/Proposal.sol";
 
 interface ICoreGovernance is VoteStatusConsumer, SignatureConsumer {
   /**
@@ -39,7 +39,9 @@ interface ICoreGovernance is VoteStatusConsumer, SignatureConsumer {
 
   /// @dev Mapping from chain id => vote round
   /// @notice chain id = 0 for global proposal
-  function round(uint256) external view returns (uint256);
+  function round(
+    uint256
+  ) external view returns (uint256);
 
   /// @dev Mapping from chain id => vote round => proposal vote
   function vote(

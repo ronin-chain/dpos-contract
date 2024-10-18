@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.9;
 
-import "./IQuorum.sol";
 import "../udvts/Types.sol";
+import "./IQuorum.sol";
 
 interface IRoninTrustedOrganization is IQuorum {
   /**
@@ -61,7 +61,9 @@ interface IRoninTrustedOrganization is IQuorum {
    */
   function initialize(TrustedOrganization[] calldata trustedOrgs, uint256 num, uint256 denom) external;
 
-  function initializeV2(address profileContract) external;
+  function initializeV2(
+    address profileContract
+  ) external;
 
   /**
    * @dev Adds a list of addresses into the trusted organization.
@@ -74,7 +76,9 @@ interface IRoninTrustedOrganization is IQuorum {
    * Emits the event `TrustedOrganizationAdded` once an organization is added.
    *
    */
-  function addTrustedOrganizations(TrustedOrganization[] calldata) external;
+  function addTrustedOrganizations(
+    TrustedOrganization[] calldata
+  ) external;
 
   /**
    * @dev Updates weights for a list of existent trusted organization.
@@ -86,7 +90,9 @@ interface IRoninTrustedOrganization is IQuorum {
    * Emits the `TrustedOrganizationUpdated` event.
    *
    */
-  function updateTrustedOrganizations(TrustedOrganization[] calldata list) external;
+  function updateTrustedOrganizations(
+    TrustedOrganization[] calldata list
+  ) external;
 
   /**
    * @dev Removes a list of addresses from the trusted organization.
@@ -98,7 +104,9 @@ interface IRoninTrustedOrganization is IQuorum {
    *
    * @param consensusAddrs The list of consensus addresses linked to corresponding trusted organization that to be removed.
    */
-  function removeTrustedOrganizations(TConsensus[] calldata consensusAddrs) external;
+  function removeTrustedOrganizations(
+    TConsensus[] calldata consensusAddrs
+  ) external;
 
   /**
    * @dev Fallback function of `Profile-changeConsensusAddr`.
@@ -118,47 +126,65 @@ interface IRoninTrustedOrganization is IQuorum {
   /**
    * @dev Returns the weight of a consensus.
    */
-  function getConsensusWeight(TConsensus consensusAddr) external view returns (uint256);
+  function getConsensusWeight(
+    TConsensus consensusAddr
+  ) external view returns (uint256);
 
   /**
    * @dev Returns the weight of a consensus.
    */
-  function getConsensusWeightById(address cid) external view returns (uint256);
+  function getConsensusWeightById(
+    address cid
+  ) external view returns (uint256);
 
   /**
    * @dev Returns the weight of a governor.
    */
-  function getGovernorWeight(address governor) external view returns (uint256);
+  function getGovernorWeight(
+    address governor
+  ) external view returns (uint256);
 
   /**
    * @dev Returns the weights of a list of consensus addresses.
    */
-  function getConsensusWeights(TConsensus[] calldata list) external view returns (uint256[] memory);
+  function getConsensusWeights(
+    TConsensus[] calldata list
+  ) external view returns (uint256[] memory);
 
   /**
    * @dev Returns the weights of a list of consensus addresses.
    */
-  function getConsensusWeightsById(address[] calldata cids) external view returns (uint256[] memory);
+  function getConsensusWeightsById(
+    address[] calldata cids
+  ) external view returns (uint256[] memory);
 
   /**
    * @dev Returns the weights of a list of governor addresses.
    */
-  function getGovernorWeights(address[] calldata list) external view returns (uint256[] memory);
+  function getGovernorWeights(
+    address[] calldata list
+  ) external view returns (uint256[] memory);
 
   /**
    * @dev Returns total weights of the consensus list.
    */
-  function sumConsensusWeight(TConsensus[] calldata list) external view returns (uint256 _res);
+  function sumConsensusWeight(
+    TConsensus[] calldata list
+  ) external view returns (uint256 _res);
 
   /**
    * @dev Returns total weights of the governor list.
    */
-  function sumGovernorWeight(address[] calldata list) external view returns (uint256 _res);
+  function sumGovernorWeight(
+    address[] calldata list
+  ) external view returns (uint256 _res);
 
   /**
    * @dev Returns the trusted organization at `_index`.
    */
-  function getTrustedOrganizationAt(uint256 index) external view returns (TrustedOrganization memory);
+  function getTrustedOrganizationAt(
+    uint256 index
+  ) external view returns (TrustedOrganization memory);
 
   /**
    * @dev Returns the number of trusted organizations.
@@ -175,5 +201,7 @@ interface IRoninTrustedOrganization is IQuorum {
    *
    * Reverts once the consensus address is non-existent.
    */
-  function getTrustedOrganization(TConsensus consensusAddr) external view returns (TrustedOrganization memory);
+  function getTrustedOrganization(
+    TConsensus consensusAddr
+  ) external view returns (TrustedOrganization memory);
 }

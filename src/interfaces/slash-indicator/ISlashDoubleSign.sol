@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.9;
 
-import "./IBaseSlash.sol";
 import { TConsensus } from "../../udvts/Types.sol";
+import "./IBaseSlash.sol";
 
 interface ISlashDoubleSign is IBaseSlash {
   /**

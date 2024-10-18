@@ -8,7 +8,9 @@ contract MockValidatorContract {
     return _currentPeriod;
   }
 
-  function setCurrentPeriod(uint256 period) external {
+  function setCurrentPeriod(
+    uint256 period
+  ) external {
     _currentPeriod = period;
   }
 }

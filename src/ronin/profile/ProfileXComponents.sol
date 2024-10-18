@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT
 
 import "../../interfaces/IProfile.sol";
+
+import { ITimingInfo } from "../../interfaces/validator/info-fragments/ITimingInfo.sol";
 import { ContractType } from "../../utils/ContractType.sol";
 import "./ProfileHandler.sol";
-import { ITimingInfo } from "../../interfaces/validator/info-fragments/ITimingInfo.sol";
 
 pragma solidity ^0.8.9;
 
@@ -46,9 +47,11 @@ abstract contract ProfileXComponents is IProfile, ProfileHandler {
   /**
    * @inheritdoc IProfile
    */
-  function arePublicKeysRegistered(bytes[][2] calldata listOfPublicKey) external view returns (bool) {
-    for (uint i; i < listOfPublicKey.length;) {
-      for (uint j; j < listOfPublicKey[i].length;) {
+  function arePublicKeysRegistered(
+    bytes[][2] calldata listOfPublicKey
+  ) external view returns (bool) {
+    for (uint256 i; i < listOfPublicKey.length;) {
+      for (uint256 j; j < listOfPublicKey[i].length;) {
         if (!_isRegisteredPubkey(listOfPublicKey[i][j])) {
           return false;
         }

@@ -1,44 +1,48 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { TransparentUpgradeableProxy } from "@openzeppelin-v4/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
+import { TransparentUpgradeableProxy } from
+  "@openzeppelin-v4/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 
 import { StdStyle } from "forge-std/StdStyle.sol";
 import { console } from "forge-std/console.sol";
 
-import { IStaking } from "src/interfaces/staking/IStaking.sol";
-import { RoninValidatorSetREP10Migrator } from
-  "src/ronin/validator/migrations/RoninValidatorSetREP10Migrator.sol";
 import { IRoninGovernanceAdmin } from "src/interfaces/IRoninGovernanceAdmin.sol";
-import { IRoninValidatorSet } from "src/interfaces/validator/IRoninValidatorSet.sol";
+
 import { ISlashIndicator } from "src/interfaces/slash-indicator/ISlashIndicator.sol";
+import { IStaking } from "src/interfaces/staking/IStaking.sol";
+import { IRoninValidatorSet } from "src/interfaces/validator/IRoninValidatorSet.sol";
+import { RoninValidatorSetREP10Migrator } from "src/ronin/validator/migrations/RoninValidatorSetREP10Migrator.sol";
 
-import { IRandomBeacon } from "src/interfaces/random-beacon/IRandomBeacon.sol";
 import { IFastFinalityTracking } from "src/interfaces/IFastFinalityTracking.sol";
-
-import { IRoninTrustedOrganization } from "src/interfaces/IRoninTrustedOrganization.sol";
-import { IBaseStaking } from "src/interfaces/staking/IBaseStaking.sol";
 import { IRandomBeacon } from "src/interfaces/random-beacon/IRandomBeacon.sol";
-import { ICandidateManager } from "src/interfaces/validator/ICandidateManager.sol";
-import { ISlashUnavailability } from "src/interfaces/slash-indicator/ISlashUnavailability.sol";
-import { TransparentUpgradeableProxyV2 } from "src/extensions/TransparentUpgradeableProxyV2.sol";
-import { Proposal } from "src/libraries/Proposal.sol";
-import { ContractType } from "src/utils/ContractType.sol";
-import { TConsensus } from "src/udvts/Types.sol";
 
+import { TransparentUpgradeableProxyV2 } from "src/extensions/TransparentUpgradeableProxyV2.sol";
+import { IRoninTrustedOrganization } from "src/interfaces/IRoninTrustedOrganization.sol";
+import { IRandomBeacon } from "src/interfaces/random-beacon/IRandomBeacon.sol";
+import { ISlashUnavailability } from "src/interfaces/slash-indicator/ISlashUnavailability.sol";
+import { IBaseStaking } from "src/interfaces/staking/IBaseStaking.sol";
+import { ICandidateManager } from "src/interfaces/validator/ICandidateManager.sol";
+
+import { Proposal } from "src/libraries/Proposal.sol";
+
+import { TConsensus } from "src/udvts/Types.sol";
+import { ContractType } from "src/utils/ContractType.sol";
+
+import { LibProxy } from "@fdk/libraries/LibProxy.sol";
+import { TContract } from "@fdk/types/Types.sol";
+import { DefaultNetwork } from "@fdk/utils/DefaultNetwork.sol";
 import { RoninMigration } from "script/RoninMigration.s.sol";
 import { RoninRandomBeaconDeploy } from "script/contracts/RoninRandomBeaconDeploy.s.sol";
 import { RoninValidatorSetREP10MigratorLogicDeploy } from
   "script/contracts/RoninValidatorSetRep10MigratorLogicDeploy.s.sol";
 import { ISharedArgument } from "script/interfaces/ISharedArgument.sol";
-import { LibProxy } from "@fdk/libraries/LibProxy.sol";
-import { TContract } from "@fdk/types/Types.sol";
-import { DefaultNetwork } from "@fdk/utils/DefaultNetwork.sol";
-import { Network } from "script/utils/Network.sol";
-import { Contract } from "script/utils/Contract.sol";
+
 import { LibProposal } from "script/shared/libraries/LibProposal.sol";
 import { LibVRFProof } from "script/shared/libraries/LibVRFProof.sol";
 import { LibWrapUpEpoch } from "script/shared/libraries/LibWrapUpEpoch.sol";
+import { Contract } from "script/utils/Contract.sol";
+import { Network } from "script/utils/Network.sol";
 
 contract Migration__01_Upgrade_ShadowForkMainnet_Release_V0_8_0 is RoninMigration {
   using LibProxy for *;
@@ -49,7 +53,7 @@ contract Migration__01_Upgrade_ShadowForkMainnet_Release_V0_8_0 is RoninMigratio
   uint256 private constant MAX_SV = 0;
 
   uint256 private constant RANDOM_BEACON_SLASH_THRESHOLD = 3;
-  uint256 private constant REP10_ACTIVATION_PERIOD = 19879; // Wed, 2024-Jun-5 00:00:00 UTC
+  uint256 private constant REP10_ACTIVATION_PERIOD = 19_879; // Wed, 2024-Jun-5 00:00:00 UTC
   uint256 private constant SLASH_RANDOM_BEACON_AMOUNT = 10_000 ether;
   uint256 private constant WAITING_SECS_TO_REVOKE = 1 days;
 

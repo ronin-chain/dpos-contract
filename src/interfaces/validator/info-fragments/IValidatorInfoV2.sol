@@ -42,12 +42,16 @@ interface IValidatorInfoV2 {
   /**
    * @dev Returns whether the consensus address is block producer or not.
    */
-  function isBlockProducer(TConsensus consensusAddr) external view returns (bool);
+  function isBlockProducer(
+    TConsensus consensusAddr
+  ) external view returns (bool);
 
   /**
    * @dev Returns whether the id is block producer or not.
    */
-  function isBlockProducerById(address id) external view returns (bool);
+  function isBlockProducerById(
+    address id
+  ) external view returns (bool);
 
   /**
    * @dev Returns total numbers of the block producers.

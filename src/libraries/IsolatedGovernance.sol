@@ -61,7 +61,7 @@ library IsolatedGovernance {
     _voters = new address[](_v.voters.length);
 
     unchecked {
-      for (uint _i; _i < _voters.length; ++_i) {
+      for (uint256 _i; _i < _voters.length; ++_i) {
         address _voter = _v.voters[_i];
         if (_v.voteHashOf[_voter] == _hash) {
           _voters[_count++] = _voter;

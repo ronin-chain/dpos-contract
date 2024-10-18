@@ -4,8 +4,9 @@ pragma solidity ^0.8.9;
 
 import { RandomRequest } from "../../libraries/LibSLA.sol";
 import { LibSortValidatorsByBeacon } from "../../libraries/LibSortValidatorsByBeacon.sol";
-import { VRF } from "@chainlink/contracts/src/v0.8/VRF.sol";
+
 import { TConsensus } from "../../udvts/Types.sol";
+import { VRF } from "@chainlink/contracts/src/v0.8/VRF.sol";
 
 interface IRandomBeacon {
   /// @dev Throws if current period is less than the target activation period
@@ -175,7 +176,9 @@ interface IRandomBeacon {
    *
    * @param slashThreshold The new value.
    */
-  function setUnavailabilitySlashThreshold(uint256 slashThreshold) external;
+  function setUnavailabilitySlashThreshold(
+    uint256 slashThreshold
+  ) external;
 
   /**
    * @dev Fulfills the random seed.
@@ -226,12 +229,16 @@ interface IRandomBeacon {
   /**
    * @dev Calculates the key hash from public keys.
    */
-  function calcKeyHash(uint256[2] memory publicKeys) external pure returns (bytes32 keyHash);
+  function calcKeyHash(
+    uint256[2] memory publicKeys
+  ) external pure returns (bytes32 keyHash);
 
   /**
    * @dev Get request hash for a given period.
    */
-  function getRequestHash(uint256 period) external view returns (bytes32 reqHash);
+  function getRequestHash(
+    uint256 period
+  ) external view returns (bytes32 reqHash);
 
   /**
    * @dev Get last finalized period.
@@ -248,7 +255,9 @@ interface IRandomBeacon {
    * @param validatorType The validator type.
    * @return threshold The pick threshold.
    */
-  function getValidatorThreshold(ValidatorType validatorType) external view returns (uint256 threshold);
+  function getValidatorThreshold(
+    ValidatorType validatorType
+  ) external view returns (uint256 threshold);
 
   /**
    * @dev Retrieves the beacon data for a given period.
@@ -257,17 +266,23 @@ interface IRandomBeacon {
    * @return finalized A boolean indicating whether the beacon value has been finalized.
    * @return submissionCount The number of submissions for the given period.
    */
-  function getBeaconData(uint256 period) external view returns (uint256 value, bool finalized, uint256 submissionCount);
+  function getBeaconData(
+    uint256 period
+  ) external view returns (uint256 value, bool finalized, uint256 submissionCount);
 
   /**
    * @dev Retrieves the unavailability count for a given consensus address.
    */
-  function getUnavailabilityCount(TConsensus consensus) external view returns (uint256 count);
+  function getUnavailabilityCount(
+    TConsensus consensus
+  ) external view returns (uint256 count);
 
   /**
    * @dev Retrieves the unavailability count for a given candidate id.
    */
-  function getUnavailabilityCountById(address cid) external view returns (uint256 count);
+  function getUnavailabilityCountById(
+    address cid
+  ) external view returns (uint256 count);
 
   /**
    * @dev Returns the period at which the random beacon sorting was activated.
@@ -277,15 +292,16 @@ interface IRandomBeacon {
   /**
    * @dev Picks validator IDs for given `epoch` number.
    */
-  function pickValidatorSetForCurrentPeriod(uint256 epoch) external view returns (address[] memory pickedCids);
+  function pickValidatorSetForCurrentPeriod(
+    uint256 epoch
+  ) external view returns (address[] memory pickedCids);
 
   /**
    * @dev Get pending validator ids that will be chosen in given `period`.
    */
-  function getSavedValidatorSet(uint256 period)
-    external
-    view
-    returns (LibSortValidatorsByBeacon.ValidatorStorage memory savedValidators);
+  function getSavedValidatorSet(
+    uint256 period
+  ) external view returns (LibSortValidatorsByBeacon.ValidatorStorage memory savedValidators);
 
   /**
    * @dev Get selected validator ids that have been chosen in given `period` and `epoch`.

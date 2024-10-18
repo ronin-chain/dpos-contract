@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.9;
 
-import "./libraries/Sorting.sol";
 import "../libraries/Math.sol";
+import "./libraries/Sorting.sol";
 
 contract MockPrecompile {
   function sortValidators(
@@ -58,14 +58,14 @@ contract MockPrecompile {
   function _arrangeValidatorCandidates(
     address[] memory _candidates,
     uint256[] memory _trustedWeights,
-    uint _newValidatorCount,
-    uint _maxPrioritizedValidatorNumber
+    uint256 _newValidatorCount,
+    uint256 _maxPrioritizedValidatorNumber
   ) internal pure {
     address[] memory _waitingCandidates = new address[](_candidates.length);
-    uint _waitingCounter;
-    uint _prioritySlotCounter;
+    uint256 _waitingCounter;
+    uint256 _prioritySlotCounter;
 
-    for (uint _i = 0; _i < _candidates.length; _i++) {
+    for (uint256 _i = 0; _i < _candidates.length; _i++) {
       if (_trustedWeights[_i] > 0 && _prioritySlotCounter < _maxPrioritizedValidatorNumber) {
         _candidates[_prioritySlotCounter++] = _candidates[_i];
         continue;
@@ -74,7 +74,7 @@ contract MockPrecompile {
     }
 
     _waitingCounter = 0;
-    for (uint _i = _prioritySlotCounter; _i < _newValidatorCount; _i++) {
+    for (uint256 _i = _prioritySlotCounter; _i < _newValidatorCount; _i++) {
       _candidates[_i] = _waitingCandidates[_waitingCounter++];
     }
 

@@ -1,19 +1,20 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import { Vm, Test } from "forge-std/Test.sol";
+import { Test, Vm } from "forge-std/Test.sol";
 import { console } from "forge-std/console.sol";
 import { TransparentUpgradeableProxyV2 } from "src/extensions/TransparentUpgradeableProxyV2.sol";
-import { ILogic, MockLogicV1, MockLogicV2 } from "src/mocks/utils/version-control/MockLogic.sol";
-import { IConditionalImplementControl } from
-  "src/interfaces/version-control/IConditionalImplementControl.sol";
+
+import { IConditionalImplementControl } from "src/interfaces/version-control/IConditionalImplementControl.sol";
 import { LibArray } from "src/libraries/LibArray.sol";
-import { ErrOnlySelfCall } from "src/utils/CommonErrors.sol";
+
 import { MockActor } from "src/mocks/utils/version-control/MockActor.sol";
 import {
-  MockConditionalImplementControl,
-  ConditionalImplementControl
+  ConditionalImplementControl,
+  MockConditionalImplementControl
 } from "src/mocks/utils/version-control/MockConditionalImplementControl.sol";
+import { ILogic, MockLogicV1, MockLogicV2 } from "src/mocks/utils/version-control/MockLogic.sol";
+import { ErrOnlySelfCall } from "src/utils/CommonErrors.sol";
 import { ErrZeroCodeContract } from "src/utils/CommonErrors.sol";
 
 contract ConditionalImplementControlTest is Test {
@@ -90,7 +91,9 @@ contract ConditionalImplementControlTest is Test {
   /**
    * @notice Tests invalid inputs with null addresses.
    */
-  function testFail_NullInputs(uint8 nullIdx) external virtual {
+  function testFail_NullInputs(
+    uint8 nullIdx
+  ) external virtual {
     nullIdx %= 3;
     address[3] memory inputs = _getTestAddresses();
     delete inputs[nullIdx];
@@ -174,7 +177,9 @@ contract ConditionalImplementControlTest is Test {
   /**
    * @notice Tests unauthorized EOA calls to the method `selfUpgrade`.
    */
-  function testFail_CallSelfUpgrade_Unauthorized_EOA(address user) external virtual {
+  function testFail_CallSelfUpgrade_Unauthorized_EOA(
+    address user
+  ) external virtual {
     vm.assume(user != _proxyAdmin);
     _manualUpgradeTo(_switcher);
     vm.prank(user);
@@ -203,7 +208,9 @@ contract ConditionalImplementControlTest is Test {
   /**
    * @notice Tests unauthorized EOA calls to the non-view methods.
    */
-  function testFail_CallToContractSwitcher_NonViewMethod_FromEOA(address user) external virtual {
+  function testFail_CallToContractSwitcher_NonViewMethod_FromEOA(
+    address user
+  ) external virtual {
     vm.assume(user != _proxyAdmin);
     vm.expectRevert(abi.encodePacked(IConditionalImplementControl.ErrDelegateFromUnknownOrigin.selector, _switcher));
     vm.prank(user);
@@ -222,7 +229,9 @@ contract ConditionalImplementControlTest is Test {
   /**
    * @notice Tests unauthorized EOA calls to the view methods.
    */
-  function testFail_CallToContractSwitcher_ViewMethod_FromEOA(address user) external virtual {
+  function testFail_CallToContractSwitcher_ViewMethod_FromEOA(
+    address user
+  ) external virtual {
     vm.assume(user != _proxyAdmin);
     vm.expectRevert(abi.encodePacked(IConditionalImplementControl.ErrDelegateFromUnknownOrigin.selector, _switcher));
     vm.prank(user);
@@ -241,7 +250,9 @@ contract ConditionalImplementControlTest is Test {
   /**
    * @dev Upgrades the proxy to address `impl`.
    */
-  function _manualUpgradeTo(address impl) internal virtual {
+  function _manualUpgradeTo(
+    address impl
+  ) internal virtual {
     vm.prank(_proxyAdmin);
     TransparentUpgradeableProxyV2(_proxy).upgradeTo(impl);
   }
@@ -256,7 +267,9 @@ contract ConditionalImplementControlTest is Test {
   /**
    * @dev Creates a new conditional implement control for testing purposes.
    */
-  function _createConditionalImplementControl(address[3] memory inputs) internal virtual returns (address) {
+  function _createConditionalImplementControl(
+    address[3] memory inputs
+  ) internal virtual returns (address) {
     return address(new MockConditionalImplementControl(inputs[0], inputs[1], inputs[2], _upgradedAtBlock));
   }
 }

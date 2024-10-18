@@ -2,12 +2,12 @@
 
 pragma solidity ^0.8.9;
 
-import {
-  HasValidatorDeprecated,
-  HasTrustedOrgDeprecated,
-  HasGovernanceAdminDeprecated
-} from "../../utils/DeprecatedSlots.sol";
 import "../../extensions/collections/HasContracts.sol";
+import {
+  HasGovernanceAdminDeprecated,
+  HasTrustedOrgDeprecated,
+  HasValidatorDeprecated
+} from "../../utils/DeprecatedSlots.sol";
 
 // TODO: remove this from slashing logic of consensus contract
 abstract contract DeprecatedSlashBridgeVoting is

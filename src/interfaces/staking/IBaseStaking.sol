@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.9;
 
-import { TPoolId, TConsensus } from "../../udvts/Types.sol";
+import { TConsensus, TPoolId } from "../../udvts/Types.sol";
 
 interface IBaseStaking {
   struct PoolDetail {
@@ -51,35 +51,41 @@ interface IBaseStaking {
   /**
    * @dev Returns whether the `admin` is currently active.
    */
-  function isAdminOfActivePool(address admin) external view returns (bool);
+  function isAdminOfActivePool(
+    address admin
+  ) external view returns (bool);
 
   /**
    * @dev Returns the consensus address corresponding to the pool admin.
    */
-  function getPoolAddressOf(address admin) external view returns (address);
+  function getPoolAddressOf(
+    address admin
+  ) external view returns (address);
 
   /**
    * @dev Returns the staking pool details.
    */
-  function getPoolDetail(TConsensus consensusAddr)
-    external
-    view
-    returns (address admin, uint256 stakingAmount, uint256 stakingTotal);
+  function getPoolDetail(
+    TConsensus consensusAddr
+  ) external view returns (address admin, uint256 stakingAmount, uint256 stakingTotal);
 
-  function getPoolDetailById(address poolId)
-    external
-    view
-    returns (address admin, uint256 stakingAmount, uint256 stakingTotal);
+  function getPoolDetailById(
+    address poolId
+  ) external view returns (address admin, uint256 stakingAmount, uint256 stakingTotal);
 
   /**
    * @dev Returns the self-staking amounts of the pools.
    */
-  function getManySelfStakings(TConsensus[] calldata consensusAddrs) external view returns (uint256[] memory);
+  function getManySelfStakings(
+    TConsensus[] calldata consensusAddrs
+  ) external view returns (uint256[] memory);
 
   /**
    * @dev Returns the self-staking amounts of the pools.
    */
-  function getManySelfStakingsById(address[] calldata poolIds) external view returns (uint256[] memory);
+  function getManySelfStakingsById(
+    address[] calldata poolIds
+  ) external view returns (uint256[] memory);
 
   /**
    * @dev Returns The cooldown time in seconds to undelegate from the last timestamp (s)he delegated.
@@ -100,7 +106,9 @@ interface IBaseStaking {
    * Emits the event `CooldownSecsToUndelegateUpdated`.
    *
    */
-  function setCooldownSecsToUndelegate(uint256 cooldownSecs) external;
+  function setCooldownSecsToUndelegate(
+    uint256 cooldownSecs
+  ) external;
 
   /**
    * @dev Sets the number of seconds that a candidate must wait to be revoked.
@@ -111,5 +119,7 @@ interface IBaseStaking {
    * Emits the event `WaitingSecsToRevokeUpdated`.
    *
    */
-  function setWaitingSecsToRevoke(uint256 secs) external;
+  function setWaitingSecsToRevoke(
+    uint256 secs
+  ) external;
 }

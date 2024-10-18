@@ -4,9 +4,11 @@ pragma solidity ^0.8.9;
 
 import "../../extensions/consumers/GlobalConfigConsumer.sol";
 import "../../extensions/consumers/PercentageConsumer.sol";
-import { LibArray } from "../../libraries/LibArray.sol";
-import "../../interfaces/staking/ICandidateStaking.sol";
+
 import "../../interfaces/IProfile.sol";
+import "../../interfaces/staking/ICandidateStaking.sol";
+import { LibArray } from "../../libraries/LibArray.sol";
+
 import "./BaseStaking.sol";
 
 abstract contract CandidateStaking is BaseStaking, ICandidateStaking, GlobalConfigConsumer, PercentageConsumer {
@@ -41,7 +43,9 @@ abstract contract CandidateStaking is BaseStaking, ICandidateStaking, GlobalConf
   /**
    * @inheritdoc ICandidateStaking
    */
-  function setMinValidatorStakingAmount(uint256 threshold) external override onlyAdmin {
+  function setMinValidatorStakingAmount(
+    uint256 threshold
+  ) external override onlyAdmin {
     _setMinValidatorStakingAmount(threshold);
   }
 
@@ -121,7 +125,7 @@ abstract contract CandidateStaking is BaseStaking, ICandidateStaking, GlobalConf
       return;
     }
 
-    for (uint i = 0; i < poolIds.length;) {
+    for (uint256 i = 0; i < poolIds.length;) {
       address poolId = poolIds[i];
       PoolDetail storage _pool = _poolDetail[poolId];
       // Deactivate the pool admin in the active mapping.
@@ -153,13 +157,9 @@ abstract contract CandidateStaking is BaseStaking, ICandidateStaking, GlobalConf
   /**
    * @inheritdoc ICandidateStaking
    */
-  function stake(TConsensus consensusAddr)
-    external
-    payable
-    override
-    noEmptyValue
-    poolOfConsensusIsActive(consensusAddr)
-  {
+  function stake(
+    TConsensus consensusAddr
+  ) external payable override noEmptyValue poolOfConsensusIsActive(consensusAddr) {
     address poolId = __css2cid(consensusAddr);
     _stake(_poolDetail[poolId], msg.sender, msg.value);
   }
@@ -185,7 +185,9 @@ abstract contract CandidateStaking is BaseStaking, ICandidateStaking, GlobalConf
   /**
    * @inheritdoc ICandidateStaking
    */
-  function requestRenounce(TConsensus consensusAddr)
+  function requestRenounce(
+    TConsensus consensusAddr
+  )
     external
     override
     poolOfConsensusIsActive(consensusAddr)
@@ -199,7 +201,9 @@ abstract contract CandidateStaking is BaseStaking, ICandidateStaking, GlobalConf
   /**
    * @inheritdoc ICandidateStaking
    */
-  function requestEmergencyExit(TConsensus consensusAddr)
+  function requestEmergencyExit(
+    TConsensus consensusAddr
+  )
     external
     override
     poolOfConsensusIsActive(consensusAddr)
@@ -298,7 +302,9 @@ abstract contract CandidateStaking is BaseStaking, ICandidateStaking, GlobalConf
    * Emits the `MinValidatorStakingAmountUpdated` event.
    *
    */
-  function _setMinValidatorStakingAmount(uint256 threshold) internal {
+  function _setMinValidatorStakingAmount(
+    uint256 threshold
+  ) internal {
     _minValidatorStakingAmount = threshold;
     emit MinValidatorStakingAmountUpdated(threshold);
   }

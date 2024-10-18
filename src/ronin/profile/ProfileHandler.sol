@@ -2,16 +2,18 @@
 
 pragma solidity ^0.8.9;
 
+import { PCUVerifyBLSPublicKey } from "../../precompile-usages/PCUVerifyBLSPublicKey.sol";
 import "../../udvts/Types.sol";
 import "../../utils/RoleAccess.sol";
 import { ProfileStorage } from "./ProfileStorage.sol";
-import { PCUVerifyBLSPublicKey } from "../../precompile-usages/PCUVerifyBLSPublicKey.sol";
 
 abstract contract ProfileHandler is PCUVerifyBLSPublicKey, ProfileStorage {
   /**
    * @dev Checks each element in the new profile and reverts if there is duplication with any existing profile.
    */
-  function _requireNonDuplicatedInRegistry(CandidateProfile memory profile) internal view {
+  function _requireNonDuplicatedInRegistry(
+    CandidateProfile memory profile
+  ) internal view {
     _requireNonZeroAndNonDuplicated(RoleAccess.CONSENSUS, TConsensus.unwrap(profile.consensus));
     _requireNonZeroAndNonDuplicated(RoleAccess.CANDIDATE_ADMIN, profile.admin);
     _requireNonZeroAndNonDuplicated(RoleAccess.TREASURY, profile.treasury);
@@ -34,27 +36,37 @@ abstract contract ProfileHandler is PCUVerifyBLSPublicKey, ProfileStorage {
     }
   }
 
-  function _isRegisteredAddr(address addr) internal view returns (bool) {
+  function _isRegisteredAddr(
+    address addr
+  ) internal view returns (bool) {
     return _registry[uint256(uint160(addr))];
   }
 
-  function _requireNonDuplicatedPubkey(bytes memory pubkey) internal view {
+  function _requireNonDuplicatedPubkey(
+    bytes memory pubkey
+  ) internal view {
     if (_isRegisteredPubkey(pubkey)) {
       revert ErrDuplicatedPubkey(pubkey);
     }
   }
 
-  function _requireNonDuplicatedVRFKeyHash(bytes32 vrfKeyHash) internal view {
+  function _requireNonDuplicatedVRFKeyHash(
+    bytes32 vrfKeyHash
+  ) internal view {
     if (_isRegisteredVRFKeyHash(vrfKeyHash)) {
       revert ErrDuplicatedVRFKeyHash(vrfKeyHash);
     }
   }
 
-  function _isRegisteredPubkey(bytes memory pubkey) internal view returns (bool) {
+  function _isRegisteredPubkey(
+    bytes memory pubkey
+  ) internal view returns (bool) {
     return _registry[_hashPubkey(pubkey)];
   }
 
-  function _isRegisteredVRFKeyHash(bytes32 vrfKeyHash) internal view returns (bool) {
+  function _isRegisteredVRFKeyHash(
+    bytes32 vrfKeyHash
+  ) internal view returns (bool) {
     return _registry[uint256(vrfKeyHash)];
   }
 
@@ -66,13 +78,17 @@ abstract contract ProfileHandler is PCUVerifyBLSPublicKey, ProfileStorage {
     }
   }
 
-  function _requireCooldownPassed(CandidateProfile storage _profile) internal view {
+  function _requireCooldownPassed(
+    CandidateProfile storage _profile
+  ) internal view {
     if (block.timestamp < _profile.profileLastChange + _profileChangeCooldown) {
       revert ErrProfileChangeCooldownNotEnded();
     }
   }
 
-  function _requireCooldownPassedAndStartCooldown(CandidateProfile storage _profile) internal {
+  function _requireCooldownPassedAndStartCooldown(
+    CandidateProfile storage _profile
+  ) internal {
     _requireCooldownPassed(_profile);
     _startCooldown(_profile);
   }

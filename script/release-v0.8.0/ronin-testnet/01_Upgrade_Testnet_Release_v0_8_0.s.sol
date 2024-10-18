@@ -1,36 +1,39 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { TransparentUpgradeableProxy } from "@openzeppelin-v4/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
+import { TransparentUpgradeableProxy } from
+  "@openzeppelin-v4/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 
 import { StdStyle } from "forge-std/StdStyle.sol";
 import { console } from "forge-std/console.sol";
 
-import { RoninValidatorSetREP10Migrator } from
-  "src/ronin/validator/migrations/RoninValidatorSetREP10Migrator.sol";
 import { IRoninGovernanceAdmin } from "src/interfaces/IRoninGovernanceAdmin.sol";
-import { IRoninValidatorSet } from "src/interfaces/validator/IRoninValidatorSet.sol";
-import { ISlashIndicator } from "src/interfaces/slash-indicator/ISlashIndicator.sol";
 
-import { IRandomBeacon } from "src/interfaces/random-beacon/IRandomBeacon.sol";
+import { ISlashIndicator } from "src/interfaces/slash-indicator/ISlashIndicator.sol";
+import { IRoninValidatorSet } from "src/interfaces/validator/IRoninValidatorSet.sol";
+import { RoninValidatorSetREP10Migrator } from "src/ronin/validator/migrations/RoninValidatorSetREP10Migrator.sol";
+
+import { TransparentUpgradeableProxyV2 } from "src/extensions/TransparentUpgradeableProxyV2.sol";
 import { IFastFinalityTracking } from "src/interfaces/IFastFinalityTracking.sol";
 import { IRoninTrustedOrganization } from "src/interfaces/IRoninTrustedOrganization.sol";
 import { IRandomBeacon } from "src/interfaces/random-beacon/IRandomBeacon.sol";
-import { ICandidateManager } from "src/interfaces/validator/ICandidateManager.sol";
+import { IRandomBeacon } from "src/interfaces/random-beacon/IRandomBeacon.sol";
 import { ISlashUnavailability } from "src/interfaces/slash-indicator/ISlashUnavailability.sol";
-import { TransparentUpgradeableProxyV2 } from "src/extensions/TransparentUpgradeableProxyV2.sol";
+import { ICandidateManager } from "src/interfaces/validator/ICandidateManager.sol";
+
 import { Proposal } from "src/libraries/Proposal.sol";
 
+import { LibProxy } from "@fdk/libraries/LibProxy.sol";
+import { TContract } from "@fdk/types/Types.sol";
 import { RoninMigration } from "script/RoninMigration.s.sol";
 import { RoninRandomBeaconDeploy } from "script/contracts/RoninRandomBeaconDeploy.s.sol";
 import { RoninValidatorSetREP10MigratorLogicDeploy } from
   "script/contracts/RoninValidatorSetRep10MigratorLogicDeploy.s.sol";
 import { ISharedArgument } from "script/interfaces/ISharedArgument.sol";
-import { LibProxy } from "@fdk/libraries/LibProxy.sol";
-import { TContract } from "@fdk/types/Types.sol";
-import { Contract } from "script/utils/Contract.sol";
+
 import { LibProposal } from "script/shared/libraries/LibProposal.sol";
 import { LibWrapUpEpoch } from "script/shared/libraries/LibWrapUpEpoch.sol";
+import { Contract } from "script/utils/Contract.sol";
 
 contract Migration__01_Upgrade_Testnet_Release_V0_8_0 is RoninMigration {
   using LibProxy for *;
@@ -41,7 +44,7 @@ contract Migration__01_Upgrade_Testnet_Release_V0_8_0 is RoninMigration {
   uint256 private constant MAX_SV = 0;
 
   uint256 private constant RANDOM_BEACON_SLASH_THRESHOLD = 3;
-  uint256 private constant REP10_ACTIVATION_PERIOD = 19867; // Friday, 2024-May-24 00:00:00 UTC
+  uint256 private constant REP10_ACTIVATION_PERIOD = 19_867; // Friday, 2024-May-24 00:00:00 UTC
   uint256 private constant NEW_MAX_VALIDATOR_CANDIDATE = 64;
   uint256 private constant SLASH_RANDOM_BEACON_AMOUNT = 10_000 ether;
   uint256 private constant NEW_SLASH_UNAVAILABILITY_AMOUNT = 50_000 ether;
@@ -86,7 +89,9 @@ contract Migration__01_Upgrade_Testnet_Release_V0_8_0 is RoninMigration {
     LibProposal.executeProposal(roninGovernanceAdmin, roninTrustedOrganization, proposal);
   }
 
-  function _updateConfig(ISharedArgument.SharedParameter memory param) internal pure {
+  function _updateConfig(
+    ISharedArgument.SharedParameter memory param
+  ) internal pure {
     param.slashIndicator.slashRandomBeacon.randomBeaconSlashAmount = SLASH_RANDOM_BEACON_AMOUNT;
   }
 
@@ -234,10 +239,9 @@ contract Migration__01_Upgrade_Testnet_Release_V0_8_0 is RoninMigration {
     vm.stopBroadcast();
   }
 
-  function _buildProposalData(ISharedArgument.SharedParameter memory param)
-    internal
-    returns (address[] memory targets, uint256[] memory values, bytes[] memory callDatas)
-  {
+  function _buildProposalData(
+    ISharedArgument.SharedParameter memory param
+  ) internal returns (address[] memory targets, uint256[] memory values, bytes[] memory callDatas) {
     uint256 innerCallCount = contractTypesToUpgrade.length;
     console.log("Number contract to upgrade:", innerCallCount);
 

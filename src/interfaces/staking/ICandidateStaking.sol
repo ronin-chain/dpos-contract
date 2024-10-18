@@ -62,7 +62,9 @@ interface ICandidateStaking is IRewardPool {
    * Emits the `MinValidatorStakingAmountUpdated` event.
    *
    */
-  function setMinValidatorStakingAmount(uint256) external;
+  function setMinValidatorStakingAmount(
+    uint256
+  ) external;
 
   /**
    * @dev Sets the commission rate range that a candidate can set.
@@ -124,7 +126,9 @@ interface ICandidateStaking is IRewardPool {
    * Emits the event `Staked`.
    *
    */
-  function stake(TConsensus consensusAddr) external payable;
+  function stake(
+    TConsensus consensusAddr
+  ) external payable;
 
   /**
    * @dev Unstakes from the validator candidate `consensusAddr` for `amount`.
@@ -165,7 +169,9 @@ interface ICandidateStaking is IRewardPool {
    * - The method caller is the pool admin.
    *
    */
-  function requestRenounce(TConsensus consensusAddr) external;
+  function requestRenounce(
+    TConsensus consensusAddr
+  ) external;
 
   /**
    * @dev Renounces being a validator candidate and takes back the delegating/staking amount.
@@ -175,5 +181,7 @@ interface ICandidateStaking is IRewardPool {
    * - The method caller is the pool admin.
    *
    */
-  function requestEmergencyExit(TConsensus consensusAddr) external;
+  function requestEmergencyExit(
+    TConsensus consensusAddr
+  ) external;
 }

@@ -43,7 +43,9 @@ interface IEmergencyExit {
    * Emits the event `EmergencyExitLockedAmountUpdated`.
    *
    */
-  function setEmergencyExitLockedAmount(uint256 _emergencyExitLockedAmount) external;
+  function setEmergencyExitLockedAmount(
+    uint256 _emergencyExitLockedAmount
+  ) external;
 
   /**
    * @dev Sets the duration that an emergency request is expired and the fund will be recycled.
@@ -54,7 +56,9 @@ interface IEmergencyExit {
    * Emits the event `EmergencyExpiryDurationUpdated`.
    *
    */
-  function setEmergencyExpiryDuration(uint256 _emergencyExpiryDuration) external;
+  function setEmergencyExpiryDuration(
+    uint256 _emergencyExpiryDuration
+  ) external;
 
   /**
    * @dev Unlocks fund for emergency exit request.

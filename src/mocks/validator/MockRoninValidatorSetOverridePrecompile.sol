@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.9;
 
-import "../MockPrecompile.sol";
 import "../../ronin/validator/RoninValidatorSet.sol";
+import "../MockPrecompile.sol";
 
 contract MockRoninValidatorSetOverridePrecompile is RoninValidatorSet, MockPrecompile {
   constructor() { }
@@ -11,8 +11,8 @@ contract MockRoninValidatorSetOverridePrecompile is RoninValidatorSet, MockPreco
   function arrangeValidatorCandidates(
     address[] memory _candidates,
     uint256[] memory _trustedWeights,
-    uint _newValidatorCount,
-    uint _maxPrioritizedValidatorNumber
+    uint256 _newValidatorCount,
+    uint256 _maxPrioritizedValidatorNumber
   ) external pure returns (address[] memory) {
     _arrangeValidatorCandidates(_candidates, _trustedWeights, _newValidatorCount, _maxPrioritizedValidatorNumber);
     return _candidates;

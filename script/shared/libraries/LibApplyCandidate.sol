@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { Vm } from "forge-std/Vm.sol";
-import { LibSharedAddress } from "@fdk/libraries/LibSharedAddress.sol";
 import { LibErrorHandler } from "@fdk/libraries/LibErrorHandler.sol";
+import { LibSharedAddress } from "@fdk/libraries/LibSharedAddress.sol";
+import { Vm } from "forge-std/Vm.sol";
+
 import { ICandidateStaking } from "src/interfaces/staking/ICandidateStaking.sol";
 
 library LibApplyCandidate {
@@ -32,7 +33,7 @@ library LibApplyCandidate {
         candidateAdmin,
         consensusAddr,
         candidateAdmin,
-        15_00,
+        1500,
         bytes(string.concat("mock-pub-key", vm.toString(candidateAdmin))),
         bytes(string.concat("mock-proof-of-possession", vm.toString(candidateAdmin)))
       )
@@ -46,7 +47,7 @@ library LibApplyCandidate {
           candidateAdmin,
           consensusAddr,
           candidateAdmin,
-          15_00,
+          1500,
           bytes(string.concat("mock-pub-key", vm.toString(candidateAdmin)))
         )
       );
@@ -56,7 +57,7 @@ library LibApplyCandidate {
     if (!success) {
       (success, returnData) = staking.call{ value: value }(
         abi.encodeWithSelector(
-          ICandidateStaking.applyValidatorCandidate.selector, candidateAdmin, consensusAddr, candidateAdmin, 15_00
+          ICandidateStaking.applyValidatorCandidate.selector, candidateAdmin, consensusAddr, candidateAdmin, 1500
         )
       );
     }

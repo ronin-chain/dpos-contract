@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
+import { IGeneralConfig } from "@fdk/interfaces/IGeneralConfig.sol";
 import { IRoninTrustedOrganization } from "src/interfaces/IRoninTrustedOrganization.sol";
 import { IRandomBeacon } from "src/interfaces/random-beacon/IRandomBeacon.sol";
-import { IGeneralConfig } from "@fdk/interfaces/IGeneralConfig.sol";
 
 interface ISharedArgument is IGeneralConfig {
   struct SlashBridgeOperatorParam {

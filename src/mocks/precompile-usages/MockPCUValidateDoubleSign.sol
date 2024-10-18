@@ -7,11 +7,15 @@ import "../../precompile-usages/PCUValidateDoubleSign.sol";
 contract MockPCUValidateDoubleSign is PCUValidateDoubleSign {
   address internal _precompileValidateDoubleSignAddress;
 
-  constructor(address _precompile) {
+  constructor(
+    address _precompile
+  ) {
     setPrecompileValidateDoubleSignAddress(_precompile);
   }
 
-  function setPrecompileValidateDoubleSignAddress(address _addr) public {
+  function setPrecompileValidateDoubleSignAddress(
+    address _addr
+  ) public {
     _precompileValidateDoubleSignAddress = _addr;
   }
 

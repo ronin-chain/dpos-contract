@@ -3,9 +3,10 @@
 pragma solidity ^0.8.9;
 
 import { HasContracts } from "../../extensions/collections/HasContracts.sol";
+
+import { ISlashRandomBeacon } from "../../interfaces/slash-indicator/ISlashRandomBeacon.sol";
 import { IRoninValidatorSet } from "../../interfaces/validator/IRoninValidatorSet.sol";
 import { ITimingInfo } from "../../interfaces/validator/info-fragments/ITimingInfo.sol";
-import { ISlashRandomBeacon } from "../../interfaces/slash-indicator/ISlashRandomBeacon.sol";
 import { ContractType } from "../../utils/ContractType.sol";
 
 abstract contract SlashRandomBeacon is ISlashRandomBeacon, HasContracts {

@@ -34,8 +34,8 @@ abstract contract PCUValidateFastFinality is PrecompiledUsage {
       listOfPublicKey,
       aggregatedSignature
     );
-    uint payloadLength = payload.length;
-    uint[1] memory output;
+    uint256 payloadLength = payload.length;
+    uint256[1] memory output;
 
     assembly {
       let payloadStart := add(payload, 0x20)

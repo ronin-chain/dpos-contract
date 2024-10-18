@@ -7,11 +7,15 @@ import "../../precompile-usages/PCUValidateFastFinality.sol";
 contract MockPCUValidateFastFinality is PCUValidateFastFinality {
   address internal _precompileValidateFastFinalityAddress;
 
-  constructor(address _precompile) {
+  constructor(
+    address _precompile
+  ) {
     setPrecompileValidateFastFinalityAddress(_precompile);
   }
 
-  function setPrecompileValidateFastFinalityAddress(address _addr) public {
+  function setPrecompileValidateFastFinalityAddress(
+    address _addr
+  ) public {
     _precompileValidateFastFinalityAddress = _addr;
   }
 

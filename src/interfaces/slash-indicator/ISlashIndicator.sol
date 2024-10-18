@@ -2,10 +2,10 @@
 
 pragma solidity ^0.8.9;
 
-import { ISlashDoubleSign } from "./ISlashDoubleSign.sol";
-import { ISlashUnavailability } from "./ISlashUnavailability.sol";
 import { ICreditScore } from "./ICreditScore.sol";
+import { ISlashDoubleSign } from "./ISlashDoubleSign.sol";
 import { ISlashRandomBeacon } from "./ISlashRandomBeacon.sol";
+import { ISlashUnavailability } from "./ISlashUnavailability.sol";
 
 interface ISlashIndicator is ISlashDoubleSign, ISlashUnavailability, ICreditScore, ISlashRandomBeacon {
   function initialize(
@@ -31,9 +31,13 @@ interface ISlashIndicator is ISlashDoubleSign, ISlashUnavailability, ICreditScor
     uint256[4] calldata _creditScoreConfigs
   ) external;
 
-  function initializeV2(address roninGovernanceAdminContract) external;
+  function initializeV2(
+    address roninGovernanceAdminContract
+  ) external;
 
-  function initializeV3(address profileContract) external;
+  function initializeV3(
+    address profileContract
+  ) external;
 
   function initializeV4(
     address randomBeaconContract,

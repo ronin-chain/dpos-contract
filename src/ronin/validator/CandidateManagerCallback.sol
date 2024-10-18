@@ -2,11 +2,12 @@
 
 pragma solidity ^0.8.9;
 
-import { CandidateManager } from "./CandidateManager.sol";
 import { IProfile } from "../../interfaces/IProfile.sol";
-import { IStaking } from "../../interfaces/staking/IStaking.sol";
+
 import { IRoninTrustedOrganization } from "../../interfaces/IRoninTrustedOrganization.sol";
+import { IStaking } from "../../interfaces/staking/IStaking.sol";
 import { ICandidateManagerCallback } from "../../interfaces/validator/ICandidateManagerCallback.sol";
+import { CandidateManager } from "./CandidateManager.sol";
 
 import { TConsensus } from "../../udvts/Types.sol";
 import { ContractType } from "../../utils/ContractType.sol";
@@ -30,7 +31,7 @@ abstract contract CandidateManagerCallback is ICandidateManagerCallback, Candida
     if (_isValidatorCandidateById(cid)) revert ErrExistentCandidate();
     if (commissionRate > _MAX_PERCENTAGE) revert ErrInvalidCommissionRate();
 
-    for (uint i; i < length;) {
+    for (uint256 i; i < length;) {
       ValidatorCandidate storage existentInfo = _candidateInfo[_candidateIds[i]];
       if (candidateAdmin == existentInfo.__shadowedAdmin) revert ErrExistentCandidateAdmin(candidateAdmin);
       if (treasuryAddr == existentInfo.__shadowedTreasury) revert ErrExistentTreasury(treasuryAddr);
@@ -118,7 +119,9 @@ abstract contract CandidateManagerCallback is ICandidateManagerCallback, Candida
   /**
    * @dev Override `CandidateManager-_isTrustedOrg`.
    */
-  function _isTrustedOrg(address validatorId) internal view override returns (bool) {
+  function _isTrustedOrg(
+    address validatorId
+  ) internal view override returns (bool) {
     return IRoninTrustedOrganization(getContract(ContractType.RONIN_TRUSTED_ORGANIZATION)).getConsensusWeightById(
       validatorId
     ) > 0;

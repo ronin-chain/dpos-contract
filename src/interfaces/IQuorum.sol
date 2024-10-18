@@ -19,7 +19,9 @@ interface IQuorum {
   /**
    * @dev Checks whether the `_voteWeight` passes the threshold.
    */
-  function checkThreshold(uint256 _voteWeight) external view returns (bool);
+  function checkThreshold(
+    uint256 _voteWeight
+  ) external view returns (bool);
 
   /**
    * @dev Returns the minimum vote weight to pass the threshold.

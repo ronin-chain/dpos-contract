@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { IRoninGovernanceAdmin } from "src/interfaces/IRoninGovernanceAdmin.sol";
 import { ISharedArgument, RoninMigration } from "../RoninMigration.s.sol";
 import { Contract } from "../utils/Contract.sol";
+import { IRoninGovernanceAdmin } from "src/interfaces/IRoninGovernanceAdmin.sol";
 
 contract HardForkRoninGovernanceAdminDeploy is RoninMigration {
   function _defaultArguments() internal view override returns (bytes memory args) {

@@ -2,22 +2,25 @@
 
 pragma solidity ^0.8.9;
 
-import { Math } from "../../libraries/Math.sol";
-import { EmergencyExit } from "./EmergencyExit.sol";
-import { IProfile } from "../../interfaces/IProfile.sol";
-import { IStaking } from "../../interfaces/staking/IStaking.sol";
+import { IFastFinalityTracking } from "../../interfaces/IFastFinalityTracking.sol";
 import { IMaintenance } from "../../interfaces/IMaintenance.sol";
+import { IProfile } from "../../interfaces/IProfile.sol";
+
+import { IRoninTrustedOrganization } from "../../interfaces/IRoninTrustedOrganization.sol";
 import { IStakingVesting } from "../../interfaces/IStakingVesting.sol";
 import { IRandomBeacon } from "../../interfaces/random-beacon/IRandomBeacon.sol";
-import { IFastFinalityTracking } from "../../interfaces/IFastFinalityTracking.sol";
-import { ICoinbaseExecution } from "../../interfaces/validator/ICoinbaseExecution.sol";
 import { ISlashIndicator } from "../../interfaces/slash-indicator/ISlashIndicator.sol";
-import { IRoninTrustedOrganization } from "../../interfaces/IRoninTrustedOrganization.sol";
+import { IStaking } from "../../interfaces/staking/IStaking.sol";
+import { ICoinbaseExecution } from "../../interfaces/validator/ICoinbaseExecution.sol";
+
 import { LibArray } from "../../libraries/LibArray.sol";
-import { ContractType } from "../../utils/ContractType.sol";
+import { Math } from "../../libraries/Math.sol";
+
 import { TConsensus } from "../../udvts/Types.sol";
 import { ErrCallerMustBeCoinbase } from "../../utils/CommonErrors.sol";
+import { ContractType } from "../../utils/ContractType.sol";
 import { CoinbaseExecutionDependant } from "./CoinbaseExecutionDependant.sol";
+import { EmergencyExit } from "./EmergencyExit.sol";
 
 abstract contract CoinbaseExecution is ICoinbaseExecution, CoinbaseExecutionDependant {
   using LibArray for uint256[];
@@ -213,7 +216,7 @@ abstract contract CoinbaseExecution is ICoinbaseExecution, CoinbaseExecutionDepe
 
     (uint256 minRate, uint256 maxRate) = IStaking(getContract(ContractType.STAKING)).getCommissionRateRange();
 
-    for (uint i; i < length; ++i) {
+    for (uint256 i; i < length; ++i) {
       vId = cids[i];
       treasury = _candidateInfo[vId].__shadowedTreasury;
 
@@ -488,8 +491,8 @@ abstract contract CoinbaseExecution is ICoinbaseExecution, CoinbaseExecutionDepe
   function _calcCommissionReward(
     address vId,
     uint256 totalReward,
-    uint minCommissionRate,
-    uint maxCommissionRate
+    uint256 minCommissionRate,
+    uint256 maxCommissionRate
   ) private view returns (uint256 validatorReward, uint256 delegatorReward) {
     unchecked {
       uint256 rate = Math.max(Math.min(_candidateInfo[vId].commissionRate, maxCommissionRate), minCommissionRate);

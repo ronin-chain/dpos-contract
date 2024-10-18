@@ -2,10 +2,12 @@
 pragma solidity ^0.8.0;
 
 import { ConditionalImplementControl } from "../../../extensions/version-control/ConditionalImplementControl.sol";
-import { ITimingInfo } from "../../../interfaces/validator/info-fragments/ITimingInfo.sol";
+
 import { ICoinbaseExecution } from "../../../interfaces/validator/ICoinbaseExecution.sol";
-import { ContractType } from "../../../utils/ContractType.sol";
+import { ITimingInfo } from "../../../interfaces/validator/info-fragments/ITimingInfo.sol";
+
 import { ErrorHandler } from "../../../libraries/ErrorHandler.sol";
+import { ContractType } from "../../../utils/ContractType.sol";
 
 /**
  * @title RoninValidatorSetTimedMigrator
@@ -44,7 +46,9 @@ contract RoninValidatorSetTimedMigrator is ConditionalImplementControl {
     address newImpl
   ) ConditionalImplementControl(proxyStorage, prevImpl, newImpl) { }
 
-  function initialize(bytes[] calldata callDatas) external initializer {
+  function initialize(
+    bytes[] calldata callDatas
+  ) external initializer {
     uint256 length = callDatas.length;
     bool success;
     bytes memory returnOrRevertData;

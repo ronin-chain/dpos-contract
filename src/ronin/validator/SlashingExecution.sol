@@ -3,13 +3,15 @@
 pragma solidity ^0.8.9;
 
 import { HasContracts } from "../../extensions/collections/HasContracts.sol";
-import { ISlashingExecution } from "../../interfaces/validator/ISlashingExecution.sol";
+
 import { IStaking } from "../../interfaces/staking/IStaking.sol";
+import { ISlashingExecution } from "../../interfaces/validator/ISlashingExecution.sol";
 import { Math } from "../../libraries/Math.sol";
 import { ContractType } from "../../utils/ContractType.sol";
 import { HasSlashIndicatorDeprecated, HasStakingDeprecated } from "../../utils/DeprecatedSlots.sol";
-import { CommonStorage } from "./storage-fragments/CommonStorage.sol";
+
 import { SlashingExecutionDependant } from "./SlashingExecutionDependant.sol";
+import { CommonStorage } from "./storage-fragments/CommonStorage.sol";
 
 abstract contract SlashingExecution is ISlashingExecution, SlashingExecutionDependant {
   /**

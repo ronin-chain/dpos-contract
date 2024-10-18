@@ -2,16 +2,17 @@
 
 pragma solidity ^0.8.9;
 
-import "../../extensions/collections/HasContracts.sol";
 import "../../extensions/RONTransferHelper.sol";
+import "../../extensions/collections/HasContracts.sol";
 import {
-  HasStakingVestingDeprecated,
   HasBridgeTrackingDeprecated,
   HasMaintenanceDeprecated,
-  HasSlashIndicatorDeprecated
+  HasSlashIndicatorDeprecated,
+  HasStakingVestingDeprecated
 } from "../../utils/DeprecatedSlots.sol";
-import "./storage-fragments/CommonStorage.sol";
+
 import { EmergencyExit } from "./EmergencyExit.sol";
+import "./storage-fragments/CommonStorage.sol";
 
 abstract contract CoinbaseExecutionDependant is
   RONTransferHelper,

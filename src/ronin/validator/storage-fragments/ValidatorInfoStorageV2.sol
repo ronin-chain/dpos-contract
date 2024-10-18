@@ -2,12 +2,13 @@
 
 pragma solidity ^0.8.9;
 
-import { HasTrustedOrgDeprecated } from "../../../utils/DeprecatedSlots.sol";
 import "../../../extensions/collections/HasContracts.sol";
-import "../../../interfaces/validator/info-fragments/IValidatorInfoV2.sol";
+
 import { IProfile } from "../../../interfaces/IProfile.sol";
 import { IRandomBeacon } from "../../../interfaces/random-beacon/IRandomBeacon.sol";
+import "../../../interfaces/validator/info-fragments/IValidatorInfoV2.sol";
 import { TConsensus } from "../../../udvts/Types.sol";
+import { HasTrustedOrgDeprecated } from "../../../utils/DeprecatedSlots.sol";
 
 abstract contract ValidatorInfoStorageV2 is IValidatorInfoV2, HasContracts, HasTrustedOrgDeprecated {
   /// @dev The maximum number of validator.
@@ -45,7 +46,7 @@ abstract contract ValidatorInfoStorageV2 is IValidatorInfoV2, HasContracts, HasT
   function getValidatorIds() public view override returns (address[] memory cids) {
     cids = new address[](_validatorCount);
     address iValidator;
-    for (uint i; i < cids.length;) {
+    for (uint256 i; i < cids.length;) {
       iValidator = _validatorIds[i];
       cids[i] = iValidator;
 
@@ -68,7 +69,7 @@ abstract contract ValidatorInfoStorageV2 is IValidatorInfoV2, HasContracts, HasT
   function getBlockProducerIds() public view override returns (address[] memory cids) {
     cids = new address[](_validatorCount);
     uint256 count = 0;
-    for (uint i; i < cids.length;) {
+    for (uint256 i; i < cids.length;) {
       address validatorId = _validatorIds[i];
       if (_isBlockProducerById(validatorId)) {
         cids[count++] = validatorId;
@@ -87,15 +88,21 @@ abstract contract ValidatorInfoStorageV2 is IValidatorInfoV2, HasContracts, HasT
   /**
    * @inheritdoc IValidatorInfoV2
    */
-  function isBlockProducer(TConsensus consensusAddr) public view override returns (bool) {
+  function isBlockProducer(
+    TConsensus consensusAddr
+  ) public view override returns (bool) {
     return _isBlockProducerById(__css2cid(consensusAddr));
   }
 
-  function isBlockProducerById(address id) external view override returns (bool) {
+  function isBlockProducerById(
+    address id
+  ) external view override returns (bool) {
     return _isBlockProducerById(id);
   }
 
-  function _isBlockProducerById(address id) internal view returns (bool yes) {
+  function _isBlockProducerById(
+    address id
+  ) internal view returns (bool yes) {
     yes = _validatorMap[id];
   }
 
@@ -104,7 +111,7 @@ abstract contract ValidatorInfoStorageV2 is IValidatorInfoV2, HasContracts, HasT
    */
   function totalBlockProducer() external view returns (uint256 total) {
     unchecked {
-      for (uint i; i < _validatorCount; i++) {
+      for (uint256 i; i < _validatorCount; i++) {
         if (_isBlockProducerById(_validatorIds[i])) {
           total++;
         }
@@ -129,11 +136,17 @@ abstract contract ValidatorInfoStorageV2 is IValidatorInfoV2, HasContracts, HasT
   }
 
   /// @dev See {RoninValidatorSet-__css2cid}
-  function __css2cid(TConsensus consensusAddr) internal view virtual returns (address);
+  function __css2cid(
+    TConsensus consensusAddr
+  ) internal view virtual returns (address);
 
   /// @dev See {RoninValidatorSet-__css2cidBatch}
-  function __css2cidBatch(TConsensus[] memory consensusAddrs) internal view virtual returns (address[] memory);
+  function __css2cidBatch(
+    TConsensus[] memory consensusAddrs
+  ) internal view virtual returns (address[] memory);
 
   /// @dev See {RoninValidatorSet-__cid2cssBatch}
-  function __cid2cssBatch(address[] memory cids) internal view virtual returns (TConsensus[] memory);
+  function __cid2cssBatch(
+    address[] memory cids
+  ) internal view virtual returns (TConsensus[] memory);
 }

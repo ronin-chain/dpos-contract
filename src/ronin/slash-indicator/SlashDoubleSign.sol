@@ -2,10 +2,10 @@
 
 pragma solidity ^0.8.9;
 
+import "../../extensions/collections/HasContracts.sol";
 import "../../interfaces/slash-indicator/ISlashDoubleSign.sol";
 import "../../interfaces/validator/IRoninValidatorSet.sol";
 import "../../precompile-usages/PCUValidateDoubleSign.sol";
-import "../../extensions/collections/HasContracts.sol";
 import { HasValidatorDeprecated } from "../../utils/DeprecatedSlots.sol";
 
 abstract contract SlashDoubleSign is ISlashDoubleSign, HasContracts, HasValidatorDeprecated, PCUValidateDoubleSign {
@@ -107,5 +107,7 @@ abstract contract SlashDoubleSign is ISlashDoubleSign, HasContracts, HasValidato
    */
   function _shouldSlash(TConsensus consensus, address validatorId) internal view virtual returns (bool);
 
-  function __tryCss2cid(TConsensus consensusAddr) internal view virtual returns (bool, address);
+  function __tryCss2cid(
+    TConsensus consensusAddr
+  ) internal view virtual returns (bool, address);
 }

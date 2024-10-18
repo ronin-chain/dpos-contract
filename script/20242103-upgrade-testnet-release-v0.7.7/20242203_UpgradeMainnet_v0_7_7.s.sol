@@ -1,23 +1,24 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { IBaseStaking } from "src/interfaces/staking/IBaseStaking.sol";
-import {
-  TransparentUpgradeableProxy,
-  TransparentUpgradeableProxyV2
-} from "src/extensions/TransparentUpgradeableProxyV2.sol";
+import { LibProxy } from "@fdk/libraries/LibProxy.sol";
+import { TContract } from "@fdk/types/Types.sol";
+import { DefaultNetwork } from "@fdk/utils/DefaultNetwork.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
 import { console } from "forge-std/console.sol";
-import { TContract } from "@fdk/types/Types.sol";
-import { LibProxy } from "@fdk/libraries/LibProxy.sol";
-import { DefaultNetwork } from "@fdk/utils/DefaultNetwork.sol";
 import { IRoninTrustedOrganization, Proposal, RoninMigration } from "script/RoninMigration.s.sol";
-import { IRoninGovernanceAdmin } from "src/interfaces/IRoninGovernanceAdmin.sol";
+
+import { LibProposal } from "script/shared/libraries/LibProposal.sol";
 import { Contract } from "script/utils/Contract.sol";
+import {
+  TransparentUpgradeableProxy, TransparentUpgradeableProxyV2
+} from "src/extensions/TransparentUpgradeableProxyV2.sol";
 import { IMaintenance } from "src/interfaces/IMaintenance.sol";
+import { IRoninGovernanceAdmin } from "src/interfaces/IRoninGovernanceAdmin.sol";
+import { IBaseStaking } from "src/interfaces/staking/IBaseStaking.sol";
+
 import { IStaking } from "src/interfaces/staking/IStaking.sol";
 import "src/ronin/profile/Profile_Mainnet.sol";
-import { LibProposal } from "script/shared/libraries/LibProposal.sol";
 
 contract Migration__20242103_UpgradeReleaseV0_7_7_Mainnet is RoninMigration {
   using LibProxy for *;
@@ -210,7 +211,7 @@ contract Migration__20242103_UpgradeReleaseV0_7_7_Mainnet is RoninMigration {
     profile.getConsensus2Id(lostAddr[1]);
     profile.getConsensus2Id(lostAddr[2]);
 
-    for (uint i; i < allCss.length; i++) {
+    for (uint256 i; i < allCss.length; i++) {
       assertEq(profile.getConsensus2Id(allCss[i]), TConsensus.unwrap(allCss[i]));
     }
 
@@ -222,10 +223,10 @@ contract Migration__20242103_UpgradeReleaseV0_7_7_Mainnet is RoninMigration {
     IStaking staking = IStaking(loadContract(Contract.Staking.key()));
     staking.getRewards(address(0x1111111), lostAddr);
 
-    uint[] memory rewards = staking.getRewards(address(0x4C2699150039670c792902d302E11e82bdc7043D), lostAddr);
+    uint256[] memory rewards = staking.getRewards(address(0x4C2699150039670c792902d302E11e82bdc7043D), lostAddr);
 
     assertEq(rewards[0], 0);
     assertEq(rewards[1], 0);
-    assertEq(rewards[2], 18081215086235332);
+    assertEq(rewards[2], 18_081_215_086_235_332);
   }
 }

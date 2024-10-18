@@ -2,17 +2,19 @@
 
 pragma solidity ^0.8.9;
 
-import { Initializable } from "@openzeppelin-v4/contracts/proxy/utils/Initializable.sol";
-import { Math } from "@openzeppelin-v4/contracts/utils/math/Math.sol";
 import { HasContracts } from "../../extensions/collections/HasContracts.sol";
+
+import { IFastFinalityTracking } from "../../interfaces/IFastFinalityTracking.sol";
 import { IProfile } from "../../interfaces/IProfile.sol";
 import { IStaking } from "../../interfaces/staking/IStaking.sol";
-import { IFastFinalityTracking } from "../../interfaces/IFastFinalityTracking.sol";
 import { IRoninValidatorSet } from "../../interfaces/validator/IRoninValidatorSet.sol";
 import { LibArray } from "../../libraries/LibArray.sol";
 import { TConsensus } from "../../udvts/Types.sol";
+
+import { ErrCallerMustBeCoinbase, ErrOncePerBlock } from "../../utils/CommonErrors.sol";
 import { ContractType } from "../../utils/ContractType.sol";
-import { ErrOncePerBlock, ErrCallerMustBeCoinbase } from "../../utils/CommonErrors.sol";
+import { Initializable } from "@openzeppelin-v4/contracts/proxy/utils/Initializable.sol";
+import { Math } from "@openzeppelin-v4/contracts/utils/math/Math.sol";
 
 contract FastFinalityTracking is IFastFinalityTracking, Initializable, HasContracts {
   using LibArray for uint256[];
@@ -42,15 +44,21 @@ contract FastFinalityTracking is IFastFinalityTracking, Initializable, HasContra
     _disableInitializers();
   }
 
-  function initialize(address validatorContract) external initializer {
+  function initialize(
+    address validatorContract
+  ) external initializer {
     _setContract(ContractType.VALIDATOR, validatorContract);
   }
 
-  function initializeV2(address profileContract) external reinitializer(2) {
+  function initializeV2(
+    address profileContract
+  ) external reinitializer(2) {
     _setContract(ContractType.PROFILE, profileContract);
   }
 
-  function initializeV3(address stakingContract) external reinitializer(3) {
+  function initializeV3(
+    address stakingContract
+  ) external reinitializer(3) {
     _setContract(ContractType.STAKING, stakingContract);
   }
 
@@ -64,7 +72,9 @@ contract FastFinalityTracking is IFastFinalityTracking, Initializable, HasContra
   /**
    * @inheritdoc IFastFinalityTracking
    */
-  function getNormalizedSum(uint256 period) external view returns (uint256 normalizedSum) {
+  function getNormalizedSum(
+    uint256 period
+  ) external view returns (uint256 normalizedSum) {
     normalizedSum = _normalizedData[period].normalizedSum;
   }
 
@@ -78,7 +88,9 @@ contract FastFinalityTracking is IFastFinalityTracking, Initializable, HasContra
   /**
    * @inheritdoc IFastFinalityTracking
    */
-  function recordFinality(TConsensus[] calldata voters) external oncePerBlock onlyCoinbase {
+  function recordFinality(
+    TConsensus[] calldata voters
+  ) external oncePerBlock onlyCoinbase {
     unchecked {
       address[] memory votedCids = __css2cidBatch(voters);
 
@@ -164,7 +176,7 @@ contract FastFinalityTracking is IFastFinalityTracking, Initializable, HasContra
     uint256 length = cids.length;
 
     voteCounts = new uint256[](length);
-    for (uint i; i < length; ++i) {
+    for (uint256 i; i < length; ++i) {
       voteCounts[i] = _tracker[epoch][cids[i]].qcVoteCount;
     }
   }
@@ -196,7 +208,9 @@ contract FastFinalityTracking is IFastFinalityTracking, Initializable, HasContra
     }
   }
 
-  function __css2cidBatch(TConsensus[] memory consensusAddrs) internal view returns (address[] memory) {
+  function __css2cidBatch(
+    TConsensus[] memory consensusAddrs
+  ) internal view returns (address[] memory) {
     return IProfile(getContract(ContractType.PROFILE)).getManyConsensus2Id(consensusAddrs);
   }
 }

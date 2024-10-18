@@ -2,8 +2,9 @@
 pragma solidity ^0.8.0;
 
 import { ConditionalImplementControl } from "../../../extensions/version-control/ConditionalImplementControl.sol";
-import { ErrUnauthorizedCall } from "../../../utils/CommonErrors.sol";
+
 import { ErrorHandler } from "../../../libraries/ErrorHandler.sol";
+import { ErrUnauthorizedCall } from "../../../utils/CommonErrors.sol";
 
 contract NotifiedMigrator is ConditionalImplementControl {
   using ErrorHandler for bool;
@@ -19,7 +20,9 @@ contract NotifiedMigrator is ConditionalImplementControl {
     NOTIFIER = notifier;
   }
 
-  function initialize(bytes[] calldata callDatas) external initializer {
+  function initialize(
+    bytes[] calldata callDatas
+  ) external initializer {
     uint256 length = callDatas.length;
     bool success;
     bytes memory returnOrRevertData;

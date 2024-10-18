@@ -2,16 +2,20 @@
 
 pragma solidity ^0.8.9;
 
-import "./MockPrecompile.sol";
-import "../ronin/slash-indicator/SlashIndicator.sol";
 import "../interfaces/validator/IRoninValidatorSet.sol";
+import "../ronin/slash-indicator/SlashIndicator.sol";
+import "./MockPrecompile.sol";
 
 contract MockSlashIndicatorExtended is SlashIndicator, MockPrecompile {
-  function slashFelony(address _validatorAddr) external {
+  function slashFelony(
+    address _validatorAddr
+  ) external {
     IRoninValidatorSet(getContract(ContractType.VALIDATOR)).execSlash(_validatorAddr, 0, 0, false);
   }
 
-  function slashMisdemeanor(address _validatorAddr) external {
+  function slashMisdemeanor(
+    address _validatorAddr
+  ) external {
     IRoninValidatorSet(getContract(ContractType.VALIDATOR)).execSlash(_validatorAddr, 0, 0, false);
   }
 

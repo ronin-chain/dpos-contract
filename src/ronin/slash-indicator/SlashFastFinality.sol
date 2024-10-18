@@ -2,12 +2,12 @@
 
 pragma solidity ^0.8.9;
 
-import "../../interfaces/slash-indicator/ISlashFastFinality.sol";
-import { IRoninValidatorSet } from "../../interfaces/validator/IRoninValidatorSet.sol";
+import "../../extensions/collections/HasContracts.sol";
 import { IProfile } from "../../interfaces/IProfile.sol";
 import { IRoninTrustedOrganization } from "../../interfaces/IRoninTrustedOrganization.sol";
+import "../../interfaces/slash-indicator/ISlashFastFinality.sol";
+import { IRoninValidatorSet } from "../../interfaces/validator/IRoninValidatorSet.sol";
 import "../../precompile-usages/PCUValidateFastFinality.sol";
-import "../../extensions/collections/HasContracts.sol";
 import "../../utils/CommonErrors.sol";
 
 abstract contract SlashFastFinality is ISlashFastFinality, HasContracts, PCUValidateFastFinality {
@@ -106,9 +106,13 @@ abstract contract SlashFastFinality is ISlashFastFinality, HasContracts, PCUVali
   /**
    * @dev Get governor, i.e. governing validator's weight, of the `addr`.
    */
-  function _getGovernorWeight(address addr) internal view returns (uint256) {
+  function _getGovernorWeight(
+    address addr
+  ) internal view returns (uint256) {
     return IRoninTrustedOrganization(getContract(ContractType.RONIN_TRUSTED_ORGANIZATION)).getGovernorWeight(addr);
   }
 
-  function __css2cid(TConsensus consensusAddr) internal view virtual returns (address);
+  function __css2cid(
+    TConsensus consensusAddr
+  ) internal view virtual returns (address);
 }

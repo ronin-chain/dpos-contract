@@ -1,13 +1,13 @@
 /// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import { Initializable as InitializableV5 } from "@openzeppelin-v5/contracts/proxy/utils/Initializable.sol";
-import { StorageSlot } from "@openzeppelin-v4/contracts/utils/StorageSlot.sol";
-import { HasContracts } from "../collections/HasContracts.sol";
 import { IConditionalImplementControl } from "../../interfaces/version-control/IConditionalImplementControl.sol";
 import { ErrorHandler } from "../../libraries/ErrorHandler.sol";
 import { LibArray } from "../../libraries/LibArray.sol";
 import { ErrOnlySelfCall, IdentityGuard } from "../../utils/IdentityGuard.sol";
+import { HasContracts } from "../collections/HasContracts.sol";
+import { StorageSlot } from "@openzeppelin-v4/contracts/utils/StorageSlot.sol";
+import { Initializable as InitializableV5 } from "@openzeppelin-v5/contracts/proxy/utils/Initializable.sol";
 
 /**
  * @title ConditionalImplementControl
@@ -111,7 +111,9 @@ abstract contract ConditionalImplementControl is
     _upgradeTo(NEW_IMPL);
   }
 
-  function _upgradeTo(address newImplementation) internal {
+  function _upgradeTo(
+    address newImplementation
+  ) internal {
     StorageSlot.getAddressSlot(IMPLEMENTATION_SLOT).value = newImplementation;
     emit Upgraded(newImplementation);
   }
@@ -145,7 +147,9 @@ abstract contract ConditionalImplementControl is
    * @param impl The address of the version to call.
    * @return returnData The return data of the call.
    */
-  function _dispatchCall(address impl) internal virtual whenConditionsAreMet returns (bytes memory returnData) {
+  function _dispatchCall(
+    address impl
+  ) internal virtual whenConditionsAreMet returns (bytes memory returnData) {
     (bool success, bytes memory returnOrRevertData) = impl.delegatecall(msg.data);
     success.handleRevert(msg.sig, returnOrRevertData);
     assembly ("memory-safe") {

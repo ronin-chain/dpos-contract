@@ -4,7 +4,9 @@ pragma solidity ^0.8.13;
 import "../REP-10_Base.t.sol";
 
 contract RoninRandomBeacon_FulfillRandomSeed_Test is REP10_BaseTest {
-  function testFuzz_FilterOutNewlyJoinedGoverningValidator_execWrapUpBeaconPeriod(uint256 wrapUpEpochCount) external {
+  function testFuzz_FilterOutNewlyJoinedGoverningValidator_execWrapUpBeaconPeriod(
+    uint256 wrapUpEpochCount
+  ) external {
     address newCandidate = makeAddr("new-candidate");
     address newConsensus = makeAddr("new-consensus");
     address newGovernor = makeAddr("new-governor");
@@ -45,7 +47,9 @@ contract RoninRandomBeacon_FulfillRandomSeed_Test is REP10_BaseTest {
     }
   }
 
-  function testFuzz_FilterOutNewlyJoinedStandardValidator_execWrapUpBeaconPeriod(uint256 wrapUpEpochCount) external {
+  function testFuzz_FilterOutNewlyJoinedStandardValidator_execWrapUpBeaconPeriod(
+    uint256 wrapUpEpochCount
+  ) external {
     address newCandidate = makeAddr("new-candidate");
     address newConsensus = makeAddr("new-consensus");
     LibApplyCandidate.applyValidatorCandidate(address(staking), newCandidate, newConsensus);

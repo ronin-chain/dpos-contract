@@ -7,11 +7,15 @@ import "../../precompile-usages/PCUPickValidatorSet.sol";
 contract MockPCUPickValidatorSet is PCUPickValidatorSet {
   address internal _precompileSortValidatorAddress;
 
-  constructor(address _precompile) {
+  constructor(
+    address _precompile
+  ) {
     setPrecompileSortValidatorAddress(_precompile);
   }
 
-  function setPrecompileSortValidatorAddress(address _addr) public {
+  function setPrecompileSortValidatorAddress(
+    address _addr
+  ) public {
     _precompileSortValidatorAddress = _addr;
   }
 

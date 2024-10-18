@@ -4,10 +4,12 @@ pragma solidity ^0.8.9;
 
 import { ICandidateManager } from "./ICandidateManager.sol";
 import { ICandidateManagerCallback } from "./ICandidateManagerCallback.sol";
-import { ICommonInfo } from "./info-fragments/ICommonInfo.sol";
+
 import { ICoinbaseExecution } from "./ICoinbaseExecution.sol";
-import { ISlashingExecution } from "./ISlashingExecution.sol";
+
 import { IEmergencyExit } from "./IEmergencyExit.sol";
+import { ISlashingExecution } from "./ISlashingExecution.sol";
+import { ICommonInfo } from "./info-fragments/ICommonInfo.sol";
 
 interface IRoninValidatorSet is
   ICandidateManagerCallback,
@@ -38,6 +40,10 @@ interface IRoninValidatorSet is
   ) external;
 
   function initializeV2() external;
-  function initializeV3(address fastFinalityTrackingContract) external;
-  function initializeV4(address profileContract) external;
+  function initializeV3(
+    address fastFinalityTrackingContract
+  ) external;
+  function initializeV4(
+    address profileContract
+  ) external;
 }

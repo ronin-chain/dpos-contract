@@ -1,15 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-import "@openzeppelin-v4/contracts/proxy/utils/Initializable.sol";
-import "../../interfaces/validator/ICandidateManager.sol";
-import "../../interfaces/validator/IRoninValidatorSet.sol";
+import "../../interfaces/IProfile.sol";
 import "../../interfaces/IRoninTrustedOrganization.sol";
 import "../../interfaces/staking/IStaking.sol";
-import "../../interfaces/IProfile.sol";
-import "./ProfileXComponents.sol";
+import "../../interfaces/validator/ICandidateManager.sol";
+import "../../interfaces/validator/IRoninValidatorSet.sol";
+
 import { ErrUnauthorized, RoleAccess } from "../../utils/CommonErrors.sol";
 import { ContractType } from "../../utils/ContractType.sol";
+import "./ProfileXComponents.sol";
+import "@openzeppelin-v4/contracts/proxy/utils/Initializable.sol";
 
 contract Profile is IProfile, ProfileXComponents, Initializable {
   constructor() {
@@ -21,7 +22,9 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     _;
   }
 
-  function initialize(address validatorContract) external initializer {
+  function initialize(
+    address validatorContract
+  ) external initializer {
     _setContract(ContractType.VALIDATOR, validatorContract);
   }
 
@@ -41,7 +44,9 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     __migrationRenouncedCandidates();
   }
 
-  function initializeV3(uint256 cooldown) external reinitializer(3) {
+  function initializeV3(
+    uint256 cooldown
+  ) external reinitializer(3) {
     _setCooldownConfig(cooldown);
   }
 
@@ -69,18 +74,18 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
   /**
    * @inheritdoc IProfile
    */
-  function getId2Profile(address id) external view returns (CandidateProfile memory) {
+  function getId2Profile(
+    address id
+  ) external view returns (CandidateProfile memory) {
     return _id2Profile[id];
   }
 
   /**
    * @inheritdoc IProfile
    */
-  function getId2BeaconInfo(address id)
-    external
-    view
-    returns (bytes32 vrfKeyHash, uint256 vrfKeyHashLastChange, uint256 registeredAt)
-  {
+  function getId2BeaconInfo(
+    address id
+  ) external view returns (bytes32 vrfKeyHash, uint256 vrfKeyHashLastChange, uint256 registeredAt) {
     CandidateProfile storage $ = _getId2ProfileHelper(id);
 
     vrfKeyHash = $.vrfKeyHash;
@@ -91,11 +96,9 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
   /**
    * @inheritdoc IProfile
    */
-  function getVRFKeyHash2BeaconInfo(bytes32 vrfKeyHash)
-    external
-    view
-    returns (address id, uint256 vrfKeyHashLastChange, uint256 registeredAt)
-  {
+  function getVRFKeyHash2BeaconInfo(
+    bytes32 vrfKeyHash
+  ) external view returns (address id, uint256 vrfKeyHashLastChange, uint256 registeredAt) {
     id = _getVRFKeyHash2Id(vrfKeyHash);
     CandidateProfile storage $ = _getId2ProfileHelper(id);
 
@@ -106,80 +109,102 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
   /**
    * @inheritdoc IProfile
    */
-  function getId2Admin(address id) external view returns (address) {
+  function getId2Admin(
+    address id
+  ) external view returns (address) {
     return _id2Profile[id].admin;
   }
 
   /**
    * @inheritdoc IProfile
    */
-  function getId2Treasury(address id) external view returns (address payable) {
+  function getId2Treasury(
+    address id
+  ) external view returns (address payable) {
     return _id2Profile[id].treasury;
   }
 
   /**
    * @inheritdoc IProfile
    */
-  function getId2Pubkey(address id) external view returns (bytes memory) {
+  function getId2Pubkey(
+    address id
+  ) external view returns (bytes memory) {
     return _id2Profile[id].pubkey;
   }
 
   /**
    * @inheritdoc IProfile
    */
-  function getId2ProfileLastChange(address id) external view returns (uint256) {
+  function getId2ProfileLastChange(
+    address id
+  ) external view returns (uint256) {
     return _id2Profile[id].profileLastChange;
   }
 
   /**
    * @inheritdoc IProfile
    */
-  function getId2OldPubkey(address id) external view returns (bytes memory) {
+  function getId2OldPubkey(
+    address id
+  ) external view returns (bytes memory) {
     return _id2Profile[id].oldPubkey;
   }
 
   /**
    * @inheritdoc IProfile
    */
-  function getId2OldConsensus(address id) external view returns (TConsensus) {
+  function getId2OldConsensus(
+    address id
+  ) external view returns (TConsensus) {
     return _id2Profile[id].oldConsensus;
   }
 
   /**
    * @inheritdoc IProfile
    */
-  function getId2RegisteredAt(address id) external view returns (uint256) {
+  function getId2RegisteredAt(
+    address id
+  ) external view returns (uint256) {
     return _id2Profile[id].registeredAt;
   }
 
   /**
    * @inheritdoc IProfile
    */
-  function getId2VRFKeyHashLastChange(address id) external view returns (uint256) {
+  function getId2VRFKeyHashLastChange(
+    address id
+  ) external view returns (uint256) {
     return _id2Profile[id].vrfKeyHashLastChange;
   }
 
   /**
    * @inheritdoc IProfile
    */
-  function getId2Consensus(address id) external view returns (TConsensus) {
+  function getId2Consensus(
+    address id
+  ) external view returns (TConsensus) {
     return _id2Profile[id].consensus;
   }
 
   /**
    * @inheritdoc IProfile
    */
-  function getId2VRFKeyHash(address id) external view returns (bytes32) {
+  function getId2VRFKeyHash(
+    address id
+  ) external view returns (bytes32) {
     return _id2Profile[id].vrfKeyHash;
   }
 
   /**
    * @inheritdoc IProfile
    */
-  function getManyId2Admin(address[] calldata idList) external view returns (address[] memory adminList) {
+  function getManyId2Admin(
+    address[] calldata idList
+  ) external view returns (address[] memory adminList) {
     adminList = new address[](idList.length);
 
-    for (uint i; i < idList.length; ++i) {
+    for (uint256 i; i < idList.length; ++i) {
       adminList[i] = _id2Profile[idList[i]].admin;
     }
   }
@@ -187,9 +212,11 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
   /**
    * @inheritdoc IProfile
    */
-  function getManyId2Consensus(address[] calldata idList) external view returns (TConsensus[] memory consensusList) {
+  function getManyId2Consensus(
+    address[] calldata idList
+  ) external view returns (TConsensus[] memory consensusList) {
     consensusList = new TConsensus[](idList.length);
-    for (uint i; i < idList.length; ++i) {
+    for (uint256 i; i < idList.length; ++i) {
       consensusList[i] = _id2Profile[idList[i]].consensus;
     }
   }
@@ -197,7 +224,9 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
   /**
    * @inheritdoc IProfile
    */
-  function getManyId2RegisteredAt(address[] calldata idList) external view returns (uint256[] memory registeredAtList) {
+  function getManyId2RegisteredAt(
+    address[] calldata idList
+  ) external view returns (uint256[] memory registeredAtList) {
     uint256 length = idList.length;
     registeredAtList = new uint256[](length);
 
@@ -209,28 +238,36 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
   /**
    * @inheritdoc IProfile
    */
-  function getConsensus2Id(TConsensus consensus) external view returns (address) {
+  function getConsensus2Id(
+    TConsensus consensus
+  ) external view returns (address) {
     return _getConsensus2Id(consensus);
   }
 
   /**
    * @inheritdoc IProfile
    */
-  function getVRFKeyHash2Id(bytes32 vrfKeyHash) external view returns (address) {
+  function getVRFKeyHash2Id(
+    bytes32 vrfKeyHash
+  ) external view returns (address) {
     return _getVRFKeyHash2Id(vrfKeyHash);
   }
 
   /**
    * @inheritdoc IProfile
    */
-  function tryGetVRFKeyHash2Id(bytes32 vrfKeyHash) external view returns (bool found, address id) {
+  function tryGetVRFKeyHash2Id(
+    bytes32 vrfKeyHash
+  ) external view returns (bool found, address id) {
     return _tryGetVRFKeyHash2Id(vrfKeyHash);
   }
 
   /**
    * @dev Look up the `id` by `consensus`, revert if not found.
    */
-  function _getConsensus2Id(TConsensus consensus) internal view returns (address) {
+  function _getConsensus2Id(
+    TConsensus consensus
+  ) internal view returns (address) {
     (bool found, address id) = _tryGetConsensus2Id(consensus);
     if (!found) revert ErrLookUpIdFailed(consensus);
     return id;
@@ -239,7 +276,9 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
   /**
    * @dev Look up the `id` by `vrfKeyHash`, revert if not found.
    */
-  function _getVRFKeyHash2Id(bytes32 vrfKeyHash) internal view returns (address) {
+  function _getVRFKeyHash2Id(
+    bytes32 vrfKeyHash
+  ) internal view returns (address) {
     (bool found, address id) = _tryGetVRFKeyHash2Id(vrfKeyHash);
     if (!found) revert ErrLookUpIdFromVRFKeyFailed(vrfKeyHash);
     return id;
@@ -248,14 +287,18 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
   /**
    * @inheritdoc IProfile
    */
-  function tryGetConsensus2Id(TConsensus consensus) external view returns (bool found, address id) {
+  function tryGetConsensus2Id(
+    TConsensus consensus
+  ) external view returns (bool found, address id) {
     return _tryGetConsensus2Id(consensus);
   }
 
   /**
    * @dev Try look up the `id` by `consensus`, return a boolean indicating whether the query success.
    */
-  function _tryGetConsensus2Id(TConsensus consensus) internal view returns (bool found, address id) {
+  function _tryGetConsensus2Id(
+    TConsensus consensus
+  ) internal view returns (bool found, address id) {
     id = _consensus2Id[consensus];
     found = id != address(0);
   }
@@ -263,7 +306,9 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
   /**
    * @dev Try Look up the `id` by `vrfKeyHash`, return a boolean indicating whether the query success.
    */
-  function _tryGetVRFKeyHash2Id(bytes32 vrfKeyHash) internal view returns (bool found, address id) {
+  function _tryGetVRFKeyHash2Id(
+    bytes32 vrfKeyHash
+  ) internal view returns (bool found, address id) {
     id = _vrfKeyHash2Id[vrfKeyHash];
     found = id != address(0);
   }
@@ -271,10 +316,12 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
   /**
    * @inheritdoc IProfile
    */
-  function getManyConsensus2Id(TConsensus[] calldata consensusList) external view returns (address[] memory idList) {
+  function getManyConsensus2Id(
+    TConsensus[] calldata consensusList
+  ) external view returns (address[] memory idList) {
     idList = new address[](consensusList.length);
     unchecked {
-      for (uint i; i < consensusList.length; ++i) {
+      for (uint256 i; i < consensusList.length; ++i) {
         idList[i] = _getConsensus2Id(consensusList[i]);
       }
     }
@@ -402,14 +449,18 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     _setVRFKeyHash(_profile, vrfKeyHash);
   }
 
-  function _requireCandidateAdmin(CandidateProfile storage sProfile) internal view {
+  function _requireCandidateAdmin(
+    CandidateProfile storage sProfile
+  ) internal view {
     if (
       msg.sender != sProfile.admin
         || !IRoninValidatorSet(getContract(ContractType.VALIDATOR)).isCandidateAdminById(sProfile.id, msg.sender)
     ) revert ErrUnauthorized(msg.sig, RoleAccess.CANDIDATE_ADMIN);
   }
 
-  function _requireNotOnRenunciation(address id) internal view {
+  function _requireNotOnRenunciation(
+    address id
+  ) internal view {
     IRoninValidatorSet validatorContract = IRoninValidatorSet(getContract(ContractType.VALIDATOR));
     if (validatorContract.getCandidateInfoById(id).revokingTimestamp > 0) revert ErrValidatorOnRenunciation(id);
   }
@@ -424,7 +475,9 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
   /**
    * @inheritdoc IProfile
    */
-  function setCooldownConfig(uint256 cooldown) external onlyAdmin {
+  function setCooldownConfig(
+    uint256 cooldown
+  ) external onlyAdmin {
     _setCooldownConfig(cooldown);
   }
 }

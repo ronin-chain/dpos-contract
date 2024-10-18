@@ -1,14 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { LibProxy } from "@fdk/libraries/LibProxy.sol";
-import { RoninValidatorSetTimedMigrator } from
-  "src/ronin/validator/migrations/RoninValidatorSetTimedMigrator.sol";
-import { IRoninValidatorSet } from "src/interfaces/validator/IRoninValidatorSet.sol";
-import { RoninMigration } from "script/RoninMigration.s.sol";
-import { ProxyInterface, UpgradeInfo, LibDeploy, DeployInfo } from "@fdk/libraries/LibDeploy.sol";
 import { Contract } from "../utils/Contract.sol";
 import { FastFinalityTrackingDeploy } from "./FastFinalityTrackingDeploy.s.sol";
+import { DeployInfo, LibDeploy, ProxyInterface, UpgradeInfo } from "@fdk/libraries/LibDeploy.sol";
+import { LibProxy } from "@fdk/libraries/LibProxy.sol";
+import { RoninMigration } from "script/RoninMigration.s.sol";
+import { IRoninValidatorSet } from "src/interfaces/validator/IRoninValidatorSet.sol";
+import { RoninValidatorSetTimedMigrator } from "src/ronin/validator/migrations/RoninValidatorSetTimedMigrator.sol";
 
 contract RoninValidatorSetTimedMigratorUpgrade is RoninMigration {
   using LibProxy for address payable;

@@ -26,8 +26,8 @@ abstract contract PCUValidateDoubleSign is PrecompiledUsage {
 
     bytes memory _payload =
       abi.encodeWithSignature("validatingDoubleSignProof(address,bytes,bytes)", _consensusAddr, _header1, _header2);
-    uint _payloadLength = _payload.length;
-    uint[1] memory _output;
+    uint256 _payloadLength = _payload.length;
+    uint256[1] memory _output;
 
     assembly {
       let _payloadStart := add(_payload, 0x20)

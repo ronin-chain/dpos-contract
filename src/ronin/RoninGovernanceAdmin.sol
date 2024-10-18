@@ -1,16 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "../extensions/sequential-governance/governance-proposal/GovernanceProposal.sol";
-import "../extensions/collections/HasContracts.sol";
 import "../extensions/GovernanceAdmin.sol";
+import "../extensions/collections/HasContracts.sol";
+import "../extensions/sequential-governance/governance-proposal/GovernanceProposal.sol";
+
+import "../interfaces/IRoninGovernanceAdmin.sol";
+import "../interfaces/IRoninTrustedOrganization.sol";
+import "../interfaces/validator/IRoninValidatorSet.sol";
 import "../libraries/EmergencyExitBallot.sol";
 import { ErrorHandler } from "../libraries/ErrorHandler.sol";
 import { IsolatedGovernance } from "../libraries/IsolatedGovernance.sol";
 import { HasValidatorDeprecated } from "../utils/DeprecatedSlots.sol";
-import "../interfaces/IRoninTrustedOrganization.sol";
-import "../interfaces/validator/IRoninValidatorSet.sol";
-import "../interfaces/IRoninGovernanceAdmin.sol";
 
 contract RoninGovernanceAdmin is
   HasContracts,
@@ -214,7 +215,9 @@ contract RoninGovernanceAdmin is
   /**
    * @dev Returns weight of a govenor.
    */
-  function _getWeight(address _governor) internal view virtual override returns (uint256) {
+  function _getWeight(
+    address _governor
+  ) internal view virtual override returns (uint256) {
     bytes4 _selector = IRoninTrustedOrganization.getGovernorWeight.selector;
     (bool _success, bytes memory _returndata) = getContract(ContractType.RONIN_TRUSTED_ORGANIZATION).staticcall(
       abi.encodeWithSelector(
@@ -230,7 +233,9 @@ contract RoninGovernanceAdmin is
   /**
    * @dev Returns the total weight of a list address of governors.
    */
-  function _sumGovernorWeight(address[] memory governors) internal view virtual returns (uint256) {
+  function _sumGovernorWeight(
+    address[] memory governors
+  ) internal view virtual returns (uint256) {
     bytes4 _selector = IRoninTrustedOrganization.sumGovernorWeight.selector;
     (bool _success, bytes memory _returndata) = getContract(ContractType.RONIN_TRUSTED_ORGANIZATION).staticcall(
       abi.encodeWithSelector(

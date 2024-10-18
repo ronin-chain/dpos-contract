@@ -6,7 +6,9 @@ import { TConsensus } from "src/udvts/Types.sol";
 contract MockValidatorSet {
   uint256 _period;
 
-  function setPeriod(uint256 period) external {
+  function setPeriod(
+    uint256 period
+  ) external {
     _period = period;
   }
 

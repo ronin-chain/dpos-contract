@@ -1,13 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "../extensions/sequential-governance/CoreGovernance.sol";
 import "../extensions/collections/HasContracts.sol";
+import "../extensions/sequential-governance/CoreGovernance.sol";
 import "../interfaces/IRoninTrustedOrganization.sol";
 import { IGovernanceAdmin } from "../interfaces/extensions/IGovernanceAdmin.sol";
 import { ErrorHandler } from "../libraries/ErrorHandler.sol";
+
+import { HasBridgeDeprecated, HasGovernanceAdminDeprecated } from "../utils/DeprecatedSlots.sol";
 import { IdentityGuard } from "../utils/IdentityGuard.sol";
-import { HasGovernanceAdminDeprecated, HasBridgeDeprecated } from "../utils/DeprecatedSlots.sol";
 
 abstract contract GovernanceAdmin is
   CoreGovernance,
@@ -69,14 +70,18 @@ abstract contract GovernanceAdmin is
   /**
    * @inheritdoc IGovernanceAdmin
    */
-  function setProposalExpiryDuration(uint256 _expiryDuration) external onlySelfCall {
+  function setProposalExpiryDuration(
+    uint256 _expiryDuration
+  ) external onlySelfCall {
     _setProposalExpiryDuration(_expiryDuration);
   }
 
   /**
    * @inheritdoc IGovernanceAdmin
    */
-  function getProxyImplementation(address _proxy) external view returns (address) {
+  function getProxyImplementation(
+    address _proxy
+  ) external view returns (address) {
     // We need to manually run the static call since the getter cannot be flagged as view
     // bytes4(keccak256("implementation()")) == 0x5c60da1b
     bytes4 _selector = 0x5c60da1b;
@@ -95,7 +100,9 @@ abstract contract GovernanceAdmin is
   /**
    * @inheritdoc IGovernanceAdmin
    */
-  function getProxyAdmin(address _proxy) external view returns (address) {
+  function getProxyAdmin(
+    address _proxy
+  ) external view returns (address) {
     // We need to manually run the static call since the getter cannot be flagged as view
     // bytes4(keccak256("admin()")) == 0xf851a440
     bytes4 _selector = 0xf851a440;

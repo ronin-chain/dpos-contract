@@ -2,14 +2,15 @@
 
 pragma solidity ^0.8.9;
 
-import "@openzeppelin-v4/contracts/proxy/utils/Initializable.sol";
-import "../interfaces/IStakingVesting.sol";
+import { RONTransferHelper } from "../extensions/RONTransferHelper.sol";
 import "../extensions/collections/HasContracts.sol";
 import "../extensions/consumers/PercentageConsumer.sol";
-import { RONTransferHelper } from "../extensions/RONTransferHelper.sol";
-import { HasValidatorDeprecated } from "../utils/DeprecatedSlots.sol";
+import "../interfaces/IStakingVesting.sol";
+
 import { IRoninValidatorSet } from "../interfaces/validator/IRoninValidatorSet.sol";
 import "../utils/CommonErrors.sol";
+import { HasValidatorDeprecated } from "../utils/DeprecatedSlots.sol";
+import "@openzeppelin-v4/contracts/proxy/utils/Initializable.sol";
 
 contract StakingVesting is
   IStakingVesting,
@@ -56,7 +57,9 @@ contract StakingVesting is
     delete ______deprecatedValidator;
   }
 
-  function initializeV3(uint256 fastFinalityRewardPercent) external reinitializer(3) {
+  function initializeV3(
+    uint256 fastFinalityRewardPercent
+  ) external reinitializer(3) {
     _setFastFinalityRewardPercentage(fastFinalityRewardPercent);
   }
 
@@ -81,14 +84,18 @@ contract StakingVesting is
   /**
    * @inheritdoc IStakingVesting
    */
-  function blockProducerBlockBonus(uint256 /* _block */ ) public view override returns (uint256) {
+  function blockProducerBlockBonus(
+    uint256 /* _block */
+  ) public view override returns (uint256) {
     return _blockProducerBonusPerBlock;
   }
 
   /**
    * @inheritdoc IStakingVesting
    */
-  function bridgeOperatorBlockBonus(uint256 /* _block */ ) public view override returns (uint256) {
+  function bridgeOperatorBlockBonus(
+    uint256 /* _block */
+  ) public view override returns (uint256) {
     return _bridgeOperatorBonusPerBlock;
   }
 
@@ -157,21 +164,27 @@ contract StakingVesting is
   /**
    * @inheritdoc IStakingVesting
    */
-  function setBlockProducerBonusPerBlock(uint256 amount) external override onlyAdmin {
+  function setBlockProducerBonusPerBlock(
+    uint256 amount
+  ) external override onlyAdmin {
     _setBlockProducerBonusPerBlock(amount);
   }
 
   /**
    * @inheritdoc IStakingVesting
    */
-  function setBridgeOperatorBonusPerBlock(uint256 amount) external override onlyAdmin {
+  function setBridgeOperatorBonusPerBlock(
+    uint256 amount
+  ) external override onlyAdmin {
     _setBridgeOperatorBonusPerBlock(amount);
   }
 
   /**
    * @inheritdoc IStakingVesting
    */
-  function setFastFinalityRewardPercentage(uint256 percent) external override onlyAdmin {
+  function setFastFinalityRewardPercentage(
+    uint256 percent
+  ) external override onlyAdmin {
     if (percent > _MAX_PERCENTAGE) revert ErrInvalidArguments(msg.sig);
     _setFastFinalityRewardPercentage(percent);
   }
@@ -182,7 +195,9 @@ contract StakingVesting is
    * Emits the event `BlockProducerBonusPerBlockUpdated`.
    *
    */
-  function _setBlockProducerBonusPerBlock(uint256 amount) internal {
+  function _setBlockProducerBonusPerBlock(
+    uint256 amount
+  ) internal {
     _blockProducerBonusPerBlock = amount;
     emit BlockProducerBonusPerBlockUpdated(amount);
   }
@@ -193,7 +208,9 @@ contract StakingVesting is
    * Emits the event `BridgeOperatorBonusPerBlockUpdated`.
    *
    */
-  function _setBridgeOperatorBonusPerBlock(uint256 amount) internal {
+  function _setBridgeOperatorBonusPerBlock(
+    uint256 amount
+  ) internal {
     _bridgeOperatorBonusPerBlock = amount;
     emit BridgeOperatorBonusPerBlockUpdated(amount);
   }
@@ -204,7 +221,9 @@ contract StakingVesting is
    * Emits the event `FastFinalityRewardPercentageUpdated`.
    *
    */
-  function _setFastFinalityRewardPercentage(uint256 percent) internal {
+  function _setFastFinalityRewardPercentage(
+    uint256 percent
+  ) internal {
     _fastFinalityRewardPercentage = percent;
     emit FastFinalityRewardPercentageUpdated(percent);
   }

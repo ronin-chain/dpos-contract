@@ -55,7 +55,7 @@ contract RoninRandomBeaconXProfileTest is REP10_BaseTest {
 
     vm.prank(adminToChangeVRF);
     profile.changeVRFKeyHash(cidToChangeVRF, newKey.keyHash);
-    
+
     LibWrapUpEpoch.wrapUpEpochAndSubmitBeacons(keys);
   }
 

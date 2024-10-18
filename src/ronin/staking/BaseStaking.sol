@@ -2,16 +2,18 @@
 
 pragma solidity ^0.8.9;
 
-import "@openzeppelin-v4/contracts/security/ReentrancyGuard.sol";
 import "../../extensions/RONTransferHelper.sol";
 import "../../extensions/collections/HasContracts.sol";
+
+import "../../interfaces/IProfile.sol";
 import "../../interfaces/staking/IBaseStaking.sol";
 import "../../interfaces/validator/IRoninValidatorSet.sol";
-import "../../interfaces/IProfile.sol";
 import "../../libraries/Math.sol";
+
+import { TConsensus, TPoolId } from "../../udvts/Types.sol";
 import { HasValidatorDeprecated } from "../../utils/DeprecatedSlots.sol";
 import "./RewardCalculation.sol";
-import { TPoolId, TConsensus } from "../../udvts/Types.sol";
+import "@openzeppelin-v4/contracts/security/ReentrancyGuard.sol";
 
 abstract contract BaseStaking is
   RONTransferHelper,
@@ -52,7 +54,9 @@ abstract contract BaseStaking is
     _;
   }
 
-  modifier poolOfConsensusIsActive(TConsensus consensusAddr) {
+  modifier poolOfConsensusIsActive(
+    TConsensus consensusAddr
+  ) {
     _poolOfConsensusIsActive(consensusAddr);
     _;
   }
@@ -69,7 +73,9 @@ abstract contract BaseStaking is
     if (_pool.wasAdmin[delegator]) revert ErrPoolAdminForbidden();
   }
 
-  function _poolOfConsensusIsActive(TConsensus consensusAddr) private view {
+  function _poolOfConsensusIsActive(
+    TConsensus consensusAddr
+  ) private view {
     if (!IRoninValidatorSet(getContract(ContractType.VALIDATOR)).isValidatorCandidate(consensusAddr)) {
       revert ErrInactivePool(consensusAddr, __css2cid(consensusAddr));
     }
@@ -78,42 +84,40 @@ abstract contract BaseStaking is
   /**
    * @inheritdoc IBaseStaking
    */
-  function isAdminOfActivePool(address admin) public view override returns (bool) {
+  function isAdminOfActivePool(
+    address admin
+  ) public view override returns (bool) {
     return _adminOfActivePoolMapping[admin] != address(0);
   }
 
   /**
    * @inheritdoc IBaseStaking
    */
-  function getPoolAddressOf(address admin) external view override returns (address) {
+  function getPoolAddressOf(
+    address admin
+  ) external view override returns (address) {
     return _adminOfActivePoolMapping[admin];
   }
 
   /**
    * @inheritdoc IBaseStaking
    */
-  function getPoolDetail(TConsensus consensusAddr)
-    external
-    view
-    returns (address admin, uint256 stakingAmount, uint256 stakingTotal)
-  {
+  function getPoolDetail(
+    TConsensus consensusAddr
+  ) external view returns (address admin, uint256 stakingAmount, uint256 stakingTotal) {
     address poolId = __css2cid(consensusAddr);
     return _getPoolDetailById(poolId);
   }
 
-  function getPoolDetailById(address poolId)
-    external
-    view
-    returns (address admin, uint256 stakingAmount, uint256 stakingTotal)
-  {
+  function getPoolDetailById(
+    address poolId
+  ) external view returns (address admin, uint256 stakingAmount, uint256 stakingTotal) {
     return _getPoolDetailById(poolId);
   }
 
-  function _getPoolDetailById(address poolId)
-    internal
-    view
-    returns (address admin, uint256 stakingAmount, uint256 stakingTotal)
-  {
+  function _getPoolDetailById(
+    address poolId
+  ) internal view returns (address admin, uint256 stakingAmount, uint256 stakingTotal) {
     PoolDetail storage _pool = _poolDetail[poolId];
     return (_pool.__shadowedPoolAdmin, _pool.stakingAmount, _pool.stakingTotal);
   }
@@ -121,11 +125,9 @@ abstract contract BaseStaking is
   /**
    * @inheritdoc IBaseStaking
    */
-  function getManySelfStakings(TConsensus[] calldata consensusAddrs)
-    external
-    view
-    returns (uint256[] memory selfStakings_)
-  {
+  function getManySelfStakings(
+    TConsensus[] calldata consensusAddrs
+  ) external view returns (uint256[] memory selfStakings_) {
     address[] memory poolIds = __css2cidBatch(consensusAddrs);
     return _getManySelfStakingsById(poolIds);
   }
@@ -133,16 +135,20 @@ abstract contract BaseStaking is
   /**
    * @inheritdoc IBaseStaking
    */
-  function getManySelfStakingsById(address[] calldata poolIds) external view returns (uint256[] memory selfStakings_) {
+  function getManySelfStakingsById(
+    address[] calldata poolIds
+  ) external view returns (uint256[] memory selfStakings_) {
     return _getManySelfStakingsById(poolIds);
   }
 
   /**
    * @dev Query many self staking amount by list `poolIds`.
    */
-  function _getManySelfStakingsById(address[] memory poolIds) internal view returns (uint256[] memory selfStakings_) {
+  function _getManySelfStakingsById(
+    address[] memory poolIds
+  ) internal view returns (uint256[] memory selfStakings_) {
     selfStakings_ = new uint256[](poolIds.length);
-    for (uint i = 0; i < poolIds.length;) {
+    for (uint256 i = 0; i < poolIds.length;) {
       selfStakings_[i] = _poolDetail[poolIds[i]].stakingAmount;
 
       unchecked {
@@ -154,7 +160,9 @@ abstract contract BaseStaking is
   /**
    * @inheritdoc IRewardPool
    */
-  function getStakingTotal(TConsensus consensusAddr) external view override returns (uint256) {
+  function getStakingTotal(
+    TConsensus consensusAddr
+  ) external view override returns (uint256) {
     address poolId = __css2cid(consensusAddr);
     return _getStakingTotal(poolId);
   }
@@ -162,12 +170,9 @@ abstract contract BaseStaking is
   /**
    * @inheritdoc IRewardPool
    */
-  function getManyStakingTotals(TConsensus[] calldata consensusAddrs)
-    external
-    view
-    override
-    returns (uint256[] memory stakingAmounts_)
-  {
+  function getManyStakingTotals(
+    TConsensus[] calldata consensusAddrs
+  ) external view override returns (uint256[] memory stakingAmounts_) {
     address[] memory poolIds = __css2cidBatch(consensusAddrs);
     return _getManyStakingTotalsById(poolIds);
   }
@@ -175,18 +180,17 @@ abstract contract BaseStaking is
   /**
    * @inheritdoc IRewardPool
    */
-  function getManyStakingTotalsById(address[] calldata poolIds)
-    external
-    view
-    override
-    returns (uint256[] memory stakingAmounts_)
-  {
+  function getManyStakingTotalsById(
+    address[] calldata poolIds
+  ) external view override returns (uint256[] memory stakingAmounts_) {
     return _getManyStakingTotalsById(poolIds);
   }
 
-  function _getManyStakingTotalsById(address[] memory poolIds) internal view returns (uint256[] memory stakingAmounts_) {
+  function _getManyStakingTotalsById(
+    address[] memory poolIds
+  ) internal view returns (uint256[] memory stakingAmounts_) {
     stakingAmounts_ = new uint256[](poolIds.length);
-    for (uint i = 0; i < poolIds.length;) {
+    for (uint256 i = 0; i < poolIds.length;) {
       stakingAmounts_[i] = _getStakingTotal(poolIds[i]);
 
       unchecked {
@@ -195,7 +199,9 @@ abstract contract BaseStaking is
     }
   }
 
-  function _getStakingTotal(address poolId) internal view override returns (uint256) {
+  function _getStakingTotal(
+    address poolId
+  ) internal view override returns (uint256) {
     return _poolDetail[poolId].stakingTotal;
   }
 
@@ -231,7 +237,7 @@ abstract contract BaseStaking is
   ) internal view returns (uint256[] memory stakingAmounts) {
     if (poolIds.length != userList.length) revert ErrInvalidArrays();
     stakingAmounts = new uint256[](poolIds.length);
-    for (uint i = 0; i < stakingAmounts.length;) {
+    for (uint256 i = 0; i < stakingAmounts.length;) {
       stakingAmounts[i] = _getStakingAmount(poolIds[i], userList[i]);
 
       unchecked {
@@ -244,11 +250,15 @@ abstract contract BaseStaking is
     return _poolDetail[poolId].delegatingAmount[user];
   }
 
-  function __css2cid(TConsensus consensusAddr) internal view override returns (address) {
+  function __css2cid(
+    TConsensus consensusAddr
+  ) internal view override returns (address) {
     return IProfile(getContract(ContractType.PROFILE)).getConsensus2Id(consensusAddr);
   }
 
-  function __css2cidBatch(TConsensus[] memory consensusAddrs) internal view returns (address[] memory) {
+  function __css2cidBatch(
+    TConsensus[] memory consensusAddrs
+  ) internal view returns (address[] memory) {
     return IProfile(getContract(ContractType.PROFILE)).getManyConsensus2Id(consensusAddrs);
   }
 
@@ -269,14 +279,18 @@ abstract contract BaseStaking is
   /**
    * @inheritdoc IBaseStaking
    */
-  function setCooldownSecsToUndelegate(uint256 cooldownSecs) external override onlyAdmin {
+  function setCooldownSecsToUndelegate(
+    uint256 cooldownSecs
+  ) external override onlyAdmin {
     _setCooldownSecsToUndelegate(cooldownSecs);
   }
 
   /**
    * @inheritdoc IBaseStaking
    */
-  function setWaitingSecsToRevoke(uint256 secs) external override onlyAdmin {
+  function setWaitingSecsToRevoke(
+    uint256 secs
+  ) external override onlyAdmin {
     _setWaitingSecsToRevoke(secs);
   }
 
@@ -286,7 +300,9 @@ abstract contract BaseStaking is
    * Emits the event `CooldownSecsToUndelegateUpdated`.
    *
    */
-  function _setCooldownSecsToUndelegate(uint256 cooldownSecs) internal {
+  function _setCooldownSecsToUndelegate(
+    uint256 cooldownSecs
+  ) internal {
     _cooldownSecsToUndelegate = cooldownSecs;
     emit CooldownSecsToUndelegateUpdated(cooldownSecs);
   }
@@ -297,7 +313,9 @@ abstract contract BaseStaking is
    * Emits the event `WaitingSecsToRevokeUpdated`.
    *
    */
-  function _setWaitingSecsToRevoke(uint256 secs) internal {
+  function _setWaitingSecsToRevoke(
+    uint256 secs
+  ) internal {
     _waitingSecsToRevoke = secs;
     emit WaitingSecsToRevokeUpdated(secs);
   }

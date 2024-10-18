@@ -138,7 +138,7 @@ contract Migration__01_DeployREP10_Logics_Mainnet_Release_V0_8_0 is REP10_Config
             abi.encodeCall(
               ISlashIndicator.initializeV4,
               (address(roninRandomBeacon), SLASH_RANDOM_BEACON_AMOUNT, REP10_ACTIVATION_PERIOD)
-              )
+            )
           )
         );
       }
