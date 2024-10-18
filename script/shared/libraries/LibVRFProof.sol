@@ -29,7 +29,7 @@ library LibVRFProof {
     115792089237316195423570985008687907852837564279074904382605163141518161494337;
   uint256 private constant UINT256_MAX = 115792089237316195423570985008687907853269984665640564039457584007913129639935;
   Vm internal constant vm = Vm(LibSharedAddress.VM);
-  string internal constant CONFIG_PATH = "config/";
+  string internal constant CONFIG_PATH = "script/config/vrf";
   IGeneralConfig internal constant config = IGeneralConfig(LibSharedAddress.VME);
 
   function listenEventAndSubmitProof(VRFKey[] memory keys, VmSafe.Log[] memory logs) internal {
