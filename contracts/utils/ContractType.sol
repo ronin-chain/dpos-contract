@@ -35,5 +35,9 @@ enum ContractType {
   /* 15 */
   PROFILE,
   /* 16 */
-  RANDOM_BEACON
+  RANDOM_BEACON,
+  /* 17 */
+  ZK_FEE_PLAZA,
+  /* 18 */
+  ZK_ROLLUP_MANAGER
 }
