@@ -110,6 +110,9 @@ library LibWrapUpEpoch {
         if (logs[i].topics[0] == ICoinbaseExecution.FastFinalityRewardDistributionFailed.selector) {
           revert("PANIC: Fast finality reward distribution failed for validator");
         }
+        if (logs[i].topics[0] == ICoinbaseExecution.L2MiningRewardDistributionFailed.selector) {
+          revert("PANIC: L2 mining reward distribution failed for validator");
+        }
       }
     }
 

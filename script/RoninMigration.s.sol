@@ -55,6 +55,7 @@ contract RoninMigration is BaseMigration {
         || network() == Network.RoninDevnet.key() || network() == Network.ShadowForkMainnet.key()
     ) {
       param.initialOwner = makeAddr("initial-owner");
+      _setProfileParam(param.profile);
       _setStakingParam(param.staking);
       _setMaintenanceParam(param.maintenance);
       _setStakingVestingParam(param.stakingVesting);
@@ -71,6 +72,13 @@ contract RoninMigration is BaseMigration {
     }
 
     rawCallData = abi.encode(param);
+  }
+
+  function _setProfileParam(
+    ISharedArgument.ProfileParam memory param
+  ) internal {
+    param.cooldown = vm.envOr("COOLDOWN", uint256(1 days));
+    param.rollupManager = makeAddr("rollup-manager");
   }
 
   function _setRoninValidatorSetREP10Migrator(
@@ -191,7 +199,7 @@ contract RoninMigration is BaseMigration {
 
   function _setRoninValidatorSetParam(
     ISharedArgument.RoninValidatorSetParam memory param
-  ) internal view {
+  ) internal {
     param.maxValidatorNumber = vm.envOr("MAX_VALIDATOR_NUMBER", uint256(15));
     param.maxPrioritizedValidatorNumber = vm.envOr("MAX_PRIORITIZED_VALIDATOR_NUMBER", uint256(4));
     param.numberOfBlocksInEpoch = vm.envOr("NUMBER_OF_BLOCKS_IN_EPOCH", uint256(200));
@@ -199,6 +207,7 @@ contract RoninMigration is BaseMigration {
     param.minEffectiveDaysOnwards = vm.envOr("MIN_EFFECTIVE_DAYS_ONWARDS", uint256(7));
     param.emergencyExitLockedAmount = vm.envOr("EMERGENCY_EXIT_LOCKED_AMOUNT", uint256(500));
     param.emergencyExpiryDuration = vm.envOr("EMERGENCY_EXPIRY_DURATION", uint256(14 days));
+    param.zkFeePlaza = makeAddr("zk-fee-plaza");
   }
 
   function _setGovernanceAdminParam(
