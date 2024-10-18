@@ -37,7 +37,7 @@ contract RoninValidatorSetTimedMigratorUpgrade is RoninMigration {
       callData: abi.encodeCall(RoninValidatorSetTimedMigrator.initialize, (callDatas)),
       shouldPrompt: true,
       proxyInterface: ProxyInterface.Transparent,
-      upgradeCallback: this.upgradeCallback,
+      upgradeCallback: _upgradeCallback,
       shouldUseCallback: true
     }).upgrade();
 

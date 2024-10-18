@@ -79,6 +79,12 @@ contract RoninValidatorSetConstructor is Initializable, CoinbaseExecutionDependa
     _setContract(ContractType.PROFILE, profileContract);
   }
 
+  function initializeV5(
+    address zkFeePlazaContract
+  ) external reinitializer(5) {
+    _setContract(ContractType.ZK_FEE_PLAZA, zkFeePlazaContract);
+  }
+
   /**
    * @dev Only receives RON from staking vesting contract (for topping up bonus), and from staking contract (for transferring
    * deducting amount on slashing).

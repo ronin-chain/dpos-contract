@@ -157,7 +157,7 @@ library LibVRFProof {
 
   function logProof(
     VRF.Proof memory proof
-  ) internal view {
+  ) internal pure {
     console.log("\n==================================================================================");
 
     console.log("pk[0]", proof.pk[0]);

@@ -88,7 +88,7 @@ contract DeployDPoS is RoninMigration {
     _initStaking(param.staking);
     _initTrustedOrg(param.roninTrustedOrganization);
     _initValidatorSet(param.roninValidatorSet);
-    _initProfile();
+    _initProfile(param.profile);
     _initMaintenance(param.maintenance);
     _initSlashIndicator(param.slashIndicator);
     _initStakingVesting(param.stakingVesting);
@@ -217,10 +217,14 @@ contract DeployDPoS is RoninMigration {
     }
   }
 
-  function _initProfile() internal logFn("_initProfile") {
+  function _initProfile(
+    ISharedArgument.ProfileParam memory param
+  ) internal logFn("_initProfile") {
     vm.startBroadcast(sender());
     profile.initialize(address(validatorSet));
     profile.initializeV2(address(staking), address(trustedOrg));
+    profile.initializeV3(param.cooldown);
+    profile.initializeV4(param.rollupManager);
     vm.stopBroadcast();
   }
 
@@ -289,7 +293,7 @@ contract DeployDPoS is RoninMigration {
       shouldPrompt: true,
       callData: "",
       proxyInterface: ProxyInterface.Transparent,
-      upgradeCallback: this.upgradeCallback,
+      upgradeCallback: _upgradeCallback,
       shouldUseCallback: true
     }).upgrade();
 
@@ -315,6 +319,7 @@ contract DeployDPoS is RoninMigration {
     // validatorSet.initializeV2();
     validatorSet.initializeV3(address(fastFinalityTracking));
     validatorSet.initializeV4(address(profile));
+    validatorSet.initializeV5(param.zkFeePlaza);
     vm.stopBroadcast();
 
     UpgradeInfo({
@@ -324,7 +329,7 @@ contract DeployDPoS is RoninMigration {
       shouldPrompt: true,
       callData: abi.encodeCall(RoninValidatorSetREP10Migrator.initialize, (address(randomBeacon))),
       proxyInterface: ProxyInterface.Transparent,
-      upgradeCallback: this.upgradeCallback,
+      upgradeCallback: _upgradeCallback,
       shouldUseCallback: true
     }).upgrade();
   }

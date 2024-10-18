@@ -63,7 +63,15 @@ contract MockValidatorSet is
     address profileContract
   ) external { }
 
+  function initializeV5(
+    address zkFeePlazaContract
+  ) external { }
+
   function submitBlockReward() external payable override { }
+
+  function onL2BlockRewardSubmitted(
+    address cid
+  ) external payable override { }
 
   function getPeriodEndBlock(
     uint256 period

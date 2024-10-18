@@ -44,4 +44,7 @@ interface IRoninValidatorSet is
   function initializeV4(
     address profileContract
   ) external;
+  function initializeV5(
+    address zkFeePlazaContract
+  ) external;
 }
