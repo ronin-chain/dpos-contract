@@ -3,8 +3,8 @@
 pragma solidity ^0.8.9;
 
 import { SafeL2 } from "safe-smart-account/contracts/SafeL2.sol";
-import { MockRONTransferHelperConsumer_Berlin } from "./MockRONTransferHelperConsumer_Berlin.sol";
-import { MockRONTransferHelperConsumer_Istanbul } from "./MockRONTransferHelperConsumer_Istanbul.sol";
+import { MockRONTransferHelperConsumer_Berlin } from "test/foundry/mocks/extensions/MockRONTransferHelperConsumer_Berlin.sol";
+import { MockRONTransferHelperConsumer_Istanbul } from "test/foundry/mocks/extensions/MockRONTransferHelperConsumer_Istanbul.sol";
 
 import { Test } from "forge-std/Test.sol";
 import { console } from "forge-std/console.sol";

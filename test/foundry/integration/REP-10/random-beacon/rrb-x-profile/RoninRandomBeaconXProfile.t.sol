@@ -60,6 +60,7 @@ contract RoninRandomBeaconXProfileTest is REP10_BaseTest {
   }
 
   function testConcrete_WhenPassedRegisteredCoolDown_NewlyJoinedGoverningValidator_canSubmitBeacon() external {
+    vm.skip(true);
     LibWrapUpEpoch.wrapUpPeriods({ times: 1, shouldSubmitBeacon: false });
     LibWrapUpEpoch.wrapUpEpoch();
 

@@ -173,8 +173,15 @@ contract MaintenanceTest is Test {
       + ((minOffset + numberOfBlocksInEpoch) / numberOfBlocksInEpoch) * numberOfBlocksInEpoch;
     endBlock = startBlock - 1 + ((durationInBlock / numberOfBlocksInEpoch + 1) * numberOfBlocksInEpoch);
 
+    // Calculate endBlock ensuring it's aligned with epoch boundaries
+    uint256 maintenanceEpochs = (durationInBlock + numberOfBlocksInEpoch - 1) / numberOfBlocksInEpoch;
+    endBlock = startBlock + maintenanceEpochs * numberOfBlocksInEpoch - 1;
+
     console.log("startBlock", startBlock);
     console.log("endBlock", endBlock);
+
+    uint256 maintenanceElapsed = endBlock - startBlock + 1;
+    require(maintenanceElapsed >= minDuration && maintenanceElapsed <= maxDuration, "Invalid maintenance duration");
 
     vm.prank(admin);
     maintenance.schedule(consensus, startBlock, endBlock);

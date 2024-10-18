@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.17 <0.9.0;
 
-import { Base_Test } from "@ronin/test/Base.t.sol";
+import { Test } from "forge-std/Test.sol";
 
 import { MockProfile } from "@ronin/contracts/mocks/MockProfile.sol";
 import { MockValidatorSet } from "@ronin/test/mocks/MockValidatorSet.sol";
@@ -9,7 +9,7 @@ import { IProfile } from "@ronin/contracts/interfaces/IProfile.sol";
 import { TConsensus } from "@ronin/contracts/udvts/Types.sol";
 import { TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
 
-contract Profile_Unit_Test is Base_Test {
+contract Profile_Concrete_Unit_Test is Test {
   MockProfile internal _profile;
   MockValidatorSet internal _validatorSetContract;
   address internal immutable _stakingContract = address(0x10000);
@@ -51,7 +51,7 @@ contract Profile_Unit_Test is Base_Test {
     vm.stopPrank();
   }
 
-  function test_RevertWhen_ChangePubkey() external {
+  function testConcrete_RevertWhen_ChangePubkey() external {
     IProfile.CandidateProfile memory _validatorProfile;
 
     _profile.setVerificationFailed(true);

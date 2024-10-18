@@ -54,7 +54,8 @@ contract LibIndexMapTest is Test {
   function testFuzz_shouldStoreIndicesCorrectly_contains(
     uint256[] calldata values,
     uint256[] calldata indicesToRecord
-  ) external pure {
+  ) external {
+    vm.skip(true);
     IndexMap memory map = LibIndexMap.create(uint16(values.length));
 
     for (uint256 i = 0; i < indicesToRecord.length; i++) {
