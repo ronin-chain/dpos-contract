@@ -40,3 +40,9 @@ name = "safe-smart-account"
 version = "1.4.1"
 source = "https://github.com/safe-global/safe-smart-account/archive/refs/tags/v1.4.1.zip"
 checksum = "84348d4a1cf975f5d013cf8bdb74b8713bcccb40fceb5a1e7fc9debd27489e99"
+    
+[[dependencies]]
+name = "@storage-delta"
+version = "0.3.1"
+source = "https://github.com/TuDo1403/storage-delta/archive/refs/tags/0.3.1.zip"
+checksum = "6ff6dad83b29fcec375d314c876c8731f37742363576b883d146824a7a57ab52"

@@ -28,3 +28,4 @@ config/config.json
 config/config.yaml
 dependencies
 deployments/ronin-mainnet-shadow
+.storage_delta_cache
