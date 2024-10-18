@@ -50,6 +50,12 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     _setCooldownConfig(cooldown);
   }
 
+  function initializeV4(
+    address rollupManager
+  ) external reinitializer(4) {
+    _setContract(ContractType.ZK_ROLLUP_MANAGER, rollupManager);
+  }
+
   /**
    * @dev Add addresses of renounced candidates into registry. Only called during {initializeV2}.
    */
@@ -69,6 +75,44 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     _setAdmin(_profile, candidateAdmin);
     _setTreasury(_profile, payable(treasury));
     emit ProfileMigrated(id, candidateAdmin, treasury);
+  }
+
+  /**
+   * @inheritdoc IProfile
+   */
+  function getId2RollupId(
+    address id
+  ) public view returns (uint32) {
+    return _id2Profile[id].rollupId;
+  }
+
+  /**
+   * @inheritdoc IProfile
+   */
+  function getRollupId2Id(
+    uint32 rollupId
+  ) external view returns (address) {
+    (bool found, address id) = _tryGetRollupId2Id(rollupId);
+    if (!found) revert ErrLookUpIdFromRollupIdFailed(rollupId);
+    return id;
+  }
+
+  /**
+   * @inheritdoc IProfile
+   */
+  function getId2Aggregator(
+    address id
+  ) external view returns (address) {
+    return _id2Profile[id].aggregator;
+  }
+
+  /**
+   * @inheritdoc IProfile
+   */
+  function getId2Sequencer(
+    address id
+  ) external view returns (address) {
+    return _id2Profile[id].sequencer;
   }
 
   /**
@@ -256,6 +300,15 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
   /**
    * @inheritdoc IProfile
    */
+  function tryGetRollupId2Id(
+    uint32 rollupId
+  ) external view returns (bool found, address id) {
+    return _tryGetRollupId2Id(rollupId);
+  }
+
+  /**
+   * @inheritdoc IProfile
+   */
   function tryGetVRFKeyHash2Id(
     bytes32 vrfKeyHash
   ) external view returns (bool found, address id) {
@@ -310,6 +363,16 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     bytes32 vrfKeyHash
   ) internal view returns (bool found, address id) {
     id = _vrfKeyHash2Id[vrfKeyHash];
+    found = id != address(0);
+  }
+
+  /**
+   * @dev Try Look up the `id` by `rollupId`, return a boolean indicating whether the query success.
+   */
+  function _tryGetRollupId2Id(
+    uint32 rollupId
+  ) internal view returns (bool found, address id) {
+    id = _rollupId2Id[rollupId];
     found = id != address(0);
   }
 
@@ -449,6 +512,28 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     _setVRFKeyHash(_profile, vrfKeyHash);
   }
 
+  /**
+   * @inheritdoc IProfile
+   */
+  function changeSequencerAddr(address id, address sequencer) external onlyAdmin {
+    CandidateProfile storage _profile = _getId2ProfileHelper(id);
+
+    _requireNonZeroAndNonDuplicated(RoleAccess.SEQUENCER, sequencer);
+    _requireRollupCreated(_profile);
+    _setSequencer(_profile, sequencer);
+  }
+
+  /**
+   * @inheritdoc IProfile
+   */
+  function changeAggregatorAddr(address id, address aggregator) external onlyAdmin {
+    CandidateProfile storage _profile = _getId2ProfileHelper(id);
+
+    _requireNonZeroAndNonDuplicated(RoleAccess.AGGREGATOR, aggregator);
+    _requireRollupCreated(_profile);
+    _setAggregator(_profile, aggregator);
+  }
+
   function _requireCandidateAdmin(
     CandidateProfile storage sProfile
   ) internal view {
@@ -456,13 +541,6 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
       msg.sender != sProfile.admin
         || !IRoninValidatorSet(getContract(ContractType.VALIDATOR)).isCandidateAdminById(sProfile.id, msg.sender)
     ) revert ErrUnauthorized(msg.sig, RoleAccess.CANDIDATE_ADMIN);
-  }
-
-  function _requireNotOnRenunciation(
-    address id
-  ) internal view {
-    IRoninValidatorSet validatorContract = IRoninValidatorSet(getContract(ContractType.VALIDATOR));
-    if (validatorContract.getCandidateInfoById(id).revokingTimestamp > 0) revert ErrValidatorOnRenunciation(id);
   }
 
   /**

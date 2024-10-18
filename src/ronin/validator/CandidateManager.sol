@@ -92,6 +92,15 @@ abstract contract CandidateManager is
   }
 
   /**
+   * @dev Checks whether the candidate has created a rollup before.
+   */
+  function _isRollupOwner(
+    address cid
+  ) internal view returns (bool) {
+    return IProfile(getContract(ContractType.PROFILE)).getId2RollupId(cid) != 0;
+  }
+
+  /**
    * @inheritdoc ICandidateManager
    */
   function getCandidateInfos() external view override returns (ValidatorCandidate[] memory list) {
@@ -300,6 +309,7 @@ abstract contract CandidateManager is
   function _setRevokingTimestamp(ValidatorCandidate storage _candidate, uint256 timestamp) internal {
     address cid = __css2cid(_candidate.__shadowedConsensus);
     if (!_isValidatorCandidateById(cid)) revert ErrNonExistentCandidate();
+    if (_isRollupOwner(cid)) revert ErrRollupOwnerCannotRenounce();
     _candidate.revokingTimestamp = timestamp;
     emit CandidateRevokingTimestampUpdated(cid, timestamp);
   }

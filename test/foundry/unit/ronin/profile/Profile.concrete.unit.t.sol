@@ -43,7 +43,10 @@ contract Profile_Concrete_Unit_Test is Test {
           oldPubkey: "",
           oldConsensus: TConsensus.wrap(address(0)),
           registeredAt: 0,
-          vrfKeyHashLastChange: 0
+          vrfKeyHashLastChange: 0,
+          rollupId: 0,
+          aggregator: address(0),
+          sequencer: address(0)
         })
       )
     );

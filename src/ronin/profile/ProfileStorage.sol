@@ -29,8 +29,11 @@ abstract contract ProfileStorage is IProfile, HasContracts {
   /// @dev Mapping from vrf key hash => id address.
   mapping(bytes32 vrfKeyHash => address cid) internal _vrfKeyHash2Id;
 
+  /// @dev Mapping from rollup id => id address.
+  mapping(uint32 rollupId => address cid) internal _rollupId2Id;
+
   /// @dev Upgradeable gap.
-  bytes32[46] __gap;
+  bytes32[45] __gap;
 
   /**
    * @dev Add a profile from memory to storage.
@@ -118,6 +121,24 @@ abstract contract ProfileStorage is IProfile, HasContracts {
     _profile.vrfKeyHashLastChange = block.timestamp;
 
     emit VRFKeyHashChanged(_profile.id, vrfKeyHash);
+  }
+
+  /**
+   * @dev Change the aggregator address of the profile.
+   */
+  function _setAggregator(CandidateProfile storage _profile, address aggregator) internal {
+    _profile.aggregator = aggregator;
+
+    emit AggregatorChanged(_profile.id, aggregator);
+  }
+
+  /**
+   * @dev Change the sequencer address of the profile.
+   */
+  function _setSequencer(CandidateProfile storage _profile, address sequencer) internal {
+    _profile.sequencer = sequencer;
+
+    emit SequencerChanged(_profile.id, sequencer);
   }
 
   function _startCooldown(
