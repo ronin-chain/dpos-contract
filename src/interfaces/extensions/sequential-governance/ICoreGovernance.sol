@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import { Ballot } from "@ronin/contracts/libraries/Ballot.sol";
-import { Proposal } from "@ronin/contracts/libraries/Proposal.sol";
-import { SignatureConsumer } from "@ronin/contracts/interfaces/consumers/SignatureConsumer.sol";
-import { VoteStatusConsumer } from "@ronin/contracts/interfaces/consumers/VoteStatusConsumer.sol";
+import { Ballot } from "src/libraries/Ballot.sol";
+import { Proposal } from "src/libraries/Proposal.sol";
+import { SignatureConsumer } from "src/interfaces/consumers/SignatureConsumer.sol";
+import { VoteStatusConsumer } from "src/interfaces/consumers/VoteStatusConsumer.sol";
 
 interface ICoreGovernance is VoteStatusConsumer, SignatureConsumer {
   /**

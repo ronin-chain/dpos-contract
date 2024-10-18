@@ -1,25 +1,25 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { IRoninGovernanceAdmin } from "@ronin/contracts/interfaces/IRoninGovernanceAdmin.sol";
-import { IRoninValidatorSet } from "@ronin/contracts/interfaces/validator/IRoninValidatorSet.sol";
-import { IRoninGatewayV3 } from "@ronin/contracts/interfaces/IRoninGatewayV3.sol";
-import { IMainchainGatewayV3 } from "@ronin/contracts/interfaces/IMainchainGatewayV3.sol";
-import { IMaintenance } from "@ronin/contracts/interfaces/IMaintenance.sol";
-import { IBridgeTracking } from "@ronin/contracts/interfaces/bridge/IBridgeTracking.sol";
-import { ISlashIndicator } from "@ronin/contracts/interfaces/slash-indicator/ISlashIndicator.sol";
-import { IRoninTrustedOrganization } from "@ronin/contracts/interfaces/IRoninTrustedOrganization.sol";
-import { IStaking } from "@ronin/contracts/interfaces/staking/IStaking.sol";
-import { IStakingVesting } from "@ronin/contracts/interfaces/IStakingVesting.sol";
-import { IFastFinalityTracking } from "@ronin/contracts/interfaces/IFastFinalityTracking.sol";
-import { IBridgeTracking } from "@ronin/contracts/interfaces/bridge/IBridgeTracking.sol";
-import { IBridgeReward } from "@ronin/contracts/interfaces/bridge/IBridgeReward.sol";
-import { IBridgeSlash } from "@ronin/contracts/interfaces/bridge/IBridgeSlash.sol";
-import { IBridgeManager } from "@ronin/contracts/interfaces/bridge/IBridgeManager.sol";
-import { MockPrecompile } from "@ronin/contracts/mocks/MockPrecompile.sol";
-import { MappedTokenConsumer } from "@ronin/contracts/interfaces/consumers/MappedTokenConsumer.sol";
-import { Token } from "@ronin/contracts/libraries/Token.sol";
-import { Transfer } from "@ronin/contracts/libraries/Transfer.sol";
+import { IRoninGovernanceAdmin } from "src/interfaces/IRoninGovernanceAdmin.sol";
+import { IRoninValidatorSet } from "src/interfaces/validator/IRoninValidatorSet.sol";
+import { IRoninGatewayV3 } from "src/interfaces/IRoninGatewayV3.sol";
+import { IMainchainGatewayV3 } from "src/interfaces/IMainchainGatewayV3.sol";
+import { IMaintenance } from "src/interfaces/IMaintenance.sol";
+import { IBridgeTracking } from "src/interfaces/bridge/IBridgeTracking.sol";
+import { ISlashIndicator } from "src/interfaces/slash-indicator/ISlashIndicator.sol";
+import { IRoninTrustedOrganization } from "src/interfaces/IRoninTrustedOrganization.sol";
+import { IStaking } from "src/interfaces/staking/IStaking.sol";
+import { IStakingVesting } from "src/interfaces/IStakingVesting.sol";
+import { IFastFinalityTracking } from "src/interfaces/IFastFinalityTracking.sol";
+import { IBridgeTracking } from "src/interfaces/bridge/IBridgeTracking.sol";
+import { IBridgeReward } from "src/interfaces/bridge/IBridgeReward.sol";
+import { IBridgeSlash } from "src/interfaces/bridge/IBridgeSlash.sol";
+import { IBridgeManager } from "src/interfaces/bridge/IBridgeManager.sol";
+import { MockPrecompile } from "src/mocks/MockPrecompile.sol";
+import { MappedTokenConsumer } from "src/interfaces/consumers/MappedTokenConsumer.sol";
+import { Token } from "src/libraries/Token.sol";
+import { Transfer } from "src/libraries/Transfer.sol";
 
 import { RoninValidatorSetTimedMigratorUpgrade } from "script/contracts/RoninValidatorSetTimedMigratorUpgrade.s.sol";
 import { NotifiedMigratorUpgrade } from "script/contracts/NotifiedMigratorUpgrade.s.sol";

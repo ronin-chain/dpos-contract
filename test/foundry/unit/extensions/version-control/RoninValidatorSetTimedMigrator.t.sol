@@ -5,10 +5,10 @@ import {
   ILogicValidatorSet,
   MockLogicValidatorSetV1,
   MockLogicValidatorSetV2
-} from "@ronin/contracts/mocks/utils/version-control/MockLogicValidatorSet.sol";
-import { NotifiedMigrator } from "@ronin/contracts/ronin/validator/migrations/NotifiedMigrator.sol";
+} from "src/mocks/utils/version-control/MockLogicValidatorSet.sol";
+import { NotifiedMigrator } from "src/ronin/validator/migrations/NotifiedMigrator.sol";
 import { RoninValidatorSetTimedMigrator } from
-  "@ronin/contracts/ronin/validator/migrations/RoninValidatorSetTimedMigrator.sol";
+  "src/ronin/validator/migrations/RoninValidatorSetTimedMigrator.sol";
 import {
   MockActor,
   MockLogicV1,
@@ -18,8 +18,8 @@ import {
   ConditionalImplementControlTest,
   TransparentUpgradeableProxyV2
 } from "./ConditionalVersionControl.t.sol";
-import { IHasContracts } from "@ronin/contracts/interfaces/collections/IHasContracts.sol";
-import { ContractType } from "@ronin/contracts/utils/ContractType.sol";
+import { IHasContracts } from "src/interfaces/collections/IHasContracts.sol";
+import { ContractType } from "src/utils/ContractType.sol";
 
 contract RoninValidatorSetTimedMigratorTest is ConditionalImplementControlTest {
   event Received(string version);

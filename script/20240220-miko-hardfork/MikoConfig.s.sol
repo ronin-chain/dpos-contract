@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { TConsensus } from "@ronin/contracts/udvts/Types.sol";
+import { TConsensus } from "src/udvts/Types.sol";
 import { RoninMigration } from "script/RoninMigration.s.sol";
-import { IBridgeReward } from "@ronin/contracts/interfaces/bridge/IBridgeReward.sol";
+import { IBridgeReward } from "src/interfaces/bridge/IBridgeReward.sol";
 
 abstract contract MikoConfig is RoninMigration {
   bytes32 public constant $_IMPL_SLOT = 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc;

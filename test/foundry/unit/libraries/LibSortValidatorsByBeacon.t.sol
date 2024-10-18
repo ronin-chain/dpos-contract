@@ -4,9 +4,9 @@ pragma solidity ^0.8.0;
 import { console } from "forge-std/console.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
 import { Test } from "forge-std/Test.sol";
-import { LibSortValidatorsByBeacon } from "@ronin/contracts/libraries/LibSortValidatorsByBeacon.sol";
+import { LibSortValidatorsByBeacon } from "src/libraries/LibSortValidatorsByBeacon.sol";
 import { LibSortValidatorsByBeaconOld } from "test/foundry/mocks/libraries/LibSortValidatorsByBeaconOld.sol";
-import { LibArray } from "@ronin/contracts/libraries/LibArray.sol";
+import { LibArray } from "src/libraries/LibArray.sol";
 
 contract LibSortValidatorsByBeaconTest is Test {
   using StdStyle for *;

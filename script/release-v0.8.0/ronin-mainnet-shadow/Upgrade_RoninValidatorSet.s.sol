@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { IRoninTrustedOrganization } from "@ronin/contracts/interfaces/IRoninTrustedOrganization.sol";
-import { IProfile } from "@ronin/contracts/interfaces/IProfile.sol";
-import { TConsensus } from "@ronin/contracts/udvts/Types.sol";
+import { IRoninTrustedOrganization } from "src/interfaces/IRoninTrustedOrganization.sol";
+import { IProfile } from "src/interfaces/IProfile.sol";
+import { TConsensus } from "src/udvts/Types.sol";
 
 import { console } from "forge-std/console.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";

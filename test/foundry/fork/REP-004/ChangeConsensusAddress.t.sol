@@ -4,31 +4,31 @@ pragma solidity ^0.8.22;
 import { Test } from "forge-std/Test.sol";
 import { console2 } from "forge-std/console2.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
-import { TConsensus } from "@ronin/contracts/udvts/Types.sol";
-import { Maintenance } from "@ronin/contracts/ronin/Maintenance.sol";
-import { ContractType } from "@ronin/contracts/utils/ContractType.sol";
-import { MockPrecompile } from "@ronin/contracts/mocks/MockPrecompile.sol";
-import { IProfile, Profile } from "@ronin/contracts/ronin/profile/Profile.sol";
-import { Profile_Mainnet } from "@ronin/contracts/ronin/profile/Profile_Mainnet.sol";
-import { IBaseStaking, Staking } from "@ronin/contracts/ronin/staking/Staking.sol";
-import { HasContracts } from "@ronin/contracts/extensions/collections/HasContracts.sol";
-import { CandidateManager } from "@ronin/contracts/ronin/validator/CandidateManager.sol";
-import { EmergencyExitBallot } from "@ronin/contracts/libraries/EmergencyExitBallot.sol";
-import { SlashIndicator } from "@ronin/contracts/ronin/slash-indicator/SlashIndicator.sol";
-import { RoninValidatorSet, IRoninValidatorSet } from "@ronin/contracts/ronin/validator/RoninValidatorSet.sol";
-import { ICandidateManager } from "@ronin/contracts/interfaces/validator/ICandidateManager.sol";
-import { ICandidateManagerCallback } from "@ronin/contracts/interfaces/validator/ICandidateManagerCallback.sol";
+import { TConsensus } from "src/udvts/Types.sol";
+import { Maintenance } from "src/ronin/Maintenance.sol";
+import { ContractType } from "src/utils/ContractType.sol";
+import { MockPrecompile } from "src/mocks/MockPrecompile.sol";
+import { IProfile, Profile } from "src/ronin/profile/Profile.sol";
+import { Profile_Mainnet } from "src/ronin/profile/Profile_Mainnet.sol";
+import { IBaseStaking, Staking } from "src/ronin/staking/Staking.sol";
+import { HasContracts } from "src/extensions/collections/HasContracts.sol";
+import { CandidateManager } from "src/ronin/validator/CandidateManager.sol";
+import { EmergencyExitBallot } from "src/libraries/EmergencyExitBallot.sol";
+import { SlashIndicator } from "src/ronin/slash-indicator/SlashIndicator.sol";
+import { RoninValidatorSet, IRoninValidatorSet } from "src/ronin/validator/RoninValidatorSet.sol";
+import { ICandidateManager } from "src/interfaces/validator/ICandidateManager.sol";
+import { ICandidateManagerCallback } from "src/interfaces/validator/ICandidateManagerCallback.sol";
 import {
   TransparentUpgradeableProxy,
   TransparentUpgradeableProxyV2
-} from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
-import { IRoninGovernanceAdmin, RoninGovernanceAdmin } from "@ronin/contracts/ronin/RoninGovernanceAdmin.sol";
+} from "src/extensions/TransparentUpgradeableProxyV2.sol";
+import { IRoninGovernanceAdmin, RoninGovernanceAdmin } from "src/ronin/RoninGovernanceAdmin.sol";
 import {
   IRoninTrustedOrganization,
   RoninTrustedOrganization
-} from "@ronin/contracts/multi-chains/RoninTrustedOrganization.sol";
-import { Proposal } from "@ronin/contracts/libraries/Proposal.sol";
-import { Ballot } from "@ronin/contracts/libraries/Ballot.sol";
+} from "src/multi-chains/RoninTrustedOrganization.sol";
+import { Proposal } from "src/libraries/Proposal.sol";
+import { Ballot } from "src/libraries/Ballot.sol";
 
 contract ChangeConsensusAddressForkTest is Test {
   using StdStyle for *;

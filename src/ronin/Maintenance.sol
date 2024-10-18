@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.9;
 
-import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import "@openzeppelin-v4/contracts/proxy/utils/Initializable.sol";
+import "@openzeppelin-v4/contracts/utils/structs/EnumerableSet.sol";
 import "../interfaces/IMaintenance.sol";
 import "../interfaces/IProfile.sol";
 import "../interfaces/validator/IRoninValidatorSet.sol";

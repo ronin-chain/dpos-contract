@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.17 <0.9.0;
 
-import { IBridgeManager } from "@ronin/contracts/interfaces/bridge/IBridgeManager.sol";
+import { IBridgeManager } from "src/interfaces/bridge/IBridgeManager.sol";
 
 contract MockBridgeManager is IBridgeManager {
   function DOMAIN_SEPARATOR() external view returns (bytes32) { }

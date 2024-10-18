@@ -2,9 +2,9 @@
 // pragma solidity ^0.8.0;
 
 // import "../RoninTest.t.sol";
-// import { MockPrecompile } from "@ronin/contracts/mocks/MockPrecompile.sol";
-// import { ITimingInfo } from "@ronin/contracts/interfaces/validator/info-fragments/ITimingInfo.sol";
-// import { ICoinbaseExecution } from "@ronin/contracts/interfaces/validator/ICoinbaseExecution.sol";
+// import { MockPrecompile } from "src/mocks/MockPrecompile.sol";
+// import { ITimingInfo } from "src/interfaces/validator/info-fragments/ITimingInfo.sol";
+// import { ICoinbaseExecution } from "src/interfaces/validator/ICoinbaseExecution.sol";
 
 // contract DebugTx is RoninTest {
 //   uint256 internal _roninFork;

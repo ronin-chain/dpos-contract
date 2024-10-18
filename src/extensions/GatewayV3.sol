@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin-v4/contracts/security/Pausable.sol";
 import "../interfaces/IQuorum.sol";
 import "./collections/HasProxyAdmin.sol";
 

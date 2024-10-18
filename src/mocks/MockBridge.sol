@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.9;
 
-import "@openzeppelin/contracts/token/ERC20/presets/ERC20PresetMinterPauser.sol";
+import "@openzeppelin-v4/contracts/token/ERC20/presets/ERC20PresetMinterPauser.sol";
 import "../interfaces/IBridge.sol";
 
 contract MockBridge is IBridge {

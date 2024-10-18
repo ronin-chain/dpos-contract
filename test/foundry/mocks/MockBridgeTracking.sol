@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.17 <0.9.0;
 
-import { IBridgeTracking } from "@ronin/contracts/interfaces/bridge/IBridgeTracking.sol";
+import { IBridgeTracking } from "src/interfaces/bridge/IBridgeTracking.sol";
 
 contract MockBridgeTracking is IBridgeTracking {
   struct PeriodTracking {

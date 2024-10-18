@@ -1,18 +1,18 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { IBaseStaking } from "@ronin/contracts/interfaces/staking/IBaseStaking.sol";
+import { IBaseStaking } from "src/interfaces/staking/IBaseStaking.sol";
 import {
   TransparentUpgradeableProxy,
   TransparentUpgradeableProxyV2
-} from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
+} from "src/extensions/TransparentUpgradeableProxyV2.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
 import { console } from "forge-std/console.sol";
 import { TContract } from "@fdk/types/Types.sol";
 import { LibProxy } from "@fdk/libraries/LibProxy.sol";
 import { DefaultNetwork } from "@fdk/utils/DefaultNetwork.sol";
 import { IRoninTrustedOrganization, Proposal, RoninMigration } from "script/RoninMigration.s.sol";
-import { IRoninGovernanceAdmin } from "@ronin/contracts/interfaces/IRoninGovernanceAdmin.sol";
+import { IRoninGovernanceAdmin } from "src/interfaces/IRoninGovernanceAdmin.sol";
 import { Contract } from "script/utils/Contract.sol";
 import { LibProposal } from "script/shared/libraries/LibProposal.sol";
 

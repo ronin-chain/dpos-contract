@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import { LibArray } from "../libraries/LibArray.sol";
-import { IERC165 } from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import { IERC165 } from "@openzeppelin-v4/contracts/utils/introspection/IERC165.sol";
 import { TransparentUpgradeableProxyV2 } from "../extensions/TransparentUpgradeableProxyV2.sol";
 import {
   ErrAddressIsNotCreatedEOA,

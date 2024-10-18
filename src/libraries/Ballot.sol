@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin-v4/contracts/utils/cryptography/ECDSA.sol";
 
 library Ballot {
   using ECDSA for bytes32;

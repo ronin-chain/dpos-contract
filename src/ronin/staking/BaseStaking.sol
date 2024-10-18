@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.9;
 
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin-v4/contracts/security/ReentrancyGuard.sol";
 import "../../extensions/RONTransferHelper.sol";
 import "../../extensions/collections/HasContracts.sol";
 import "../../interfaces/staking/IBaseStaking.sol";

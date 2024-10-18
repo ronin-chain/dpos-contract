@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
-import { IProfile } from "@ronin/contracts/interfaces/IProfile.sol";
-import { IMaintenance } from "@ronin/contracts/interfaces/IMaintenance.sol";
-import { IStaking } from "@ronin/contracts/interfaces/staking/IStaking.sol";
-import { ISlashIndicator } from "@ronin/contracts/interfaces/slash-indicator/ISlashIndicator.sol";
-import { IStakingVesting } from "@ronin/contracts/interfaces/IStakingVesting.sol";
-import { IRoninValidatorSet } from "@ronin/contracts/interfaces/validator/IRoninValidatorSet.sol";
-import { IFastFinalityTracking } from "@ronin/contracts/interfaces/IFastFinalityTracking.sol";
+import { TransparentUpgradeableProxyV2 } from "src/extensions/TransparentUpgradeableProxyV2.sol";
+import { IProfile } from "src/interfaces/IProfile.sol";
+import { IMaintenance } from "src/interfaces/IMaintenance.sol";
+import { IStaking } from "src/interfaces/staking/IStaking.sol";
+import { ISlashIndicator } from "src/interfaces/slash-indicator/ISlashIndicator.sol";
+import { IStakingVesting } from "src/interfaces/IStakingVesting.sol";
+import { IRoninValidatorSet } from "src/interfaces/validator/IRoninValidatorSet.sol";
+import { IFastFinalityTracking } from "src/interfaces/IFastFinalityTracking.sol";
 import { console } from "forge-std/console.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
 import { LibProxy } from "@fdk/libraries/LibProxy.sol";
@@ -287,7 +287,7 @@ contract DeployDPoS is RoninMigration {
       shouldPrompt: true,
       callData: "",
       proxyInterface: ProxyInterface.Transparent,
-      upgradeCallback: this.upgradeCallback,
+      upgradeCallback: _upgradeCallback,
       shouldUseCallback: true
     }).upgrade();
 
@@ -322,7 +322,7 @@ contract DeployDPoS is RoninMigration {
       shouldPrompt: true,
       callData: abi.encodeCall(RoninValidatorSetREP10Migrator.initialize, (address(randomBeacon))),
       proxyInterface: ProxyInterface.Transparent,
-      upgradeCallback: this.upgradeCallback,
+      upgradeCallback: _upgradeCallback,
       shouldUseCallback: true
     }).upgrade();
   }

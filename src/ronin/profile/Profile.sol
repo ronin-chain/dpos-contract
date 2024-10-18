@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
+import "@openzeppelin-v4/contracts/proxy/utils/Initializable.sol";
 import "../../interfaces/validator/ICandidateManager.sol";
 import "../../interfaces/validator/IRoninValidatorSet.sol";
 import "../../interfaces/IRoninTrustedOrganization.sol";

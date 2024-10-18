@@ -3,11 +3,11 @@ pragma solidity >=0.8.17 <0.9.0;
 
 import { Test } from "forge-std/Test.sol";
 
-import { MockProfile } from "@ronin/contracts/mocks/MockProfile.sol";
-import { MockValidatorSet } from "@ronin/test/mocks/MockValidatorSet.sol";
-import { IProfile } from "@ronin/contracts/interfaces/IProfile.sol";
-import { TConsensus } from "@ronin/contracts/udvts/Types.sol";
-import { TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
+import { MockProfile } from "src/mocks/MockProfile.sol";
+import { MockValidatorSet } from "test/foundry/mocks/MockValidatorSet.sol";
+import { IProfile } from "src/interfaces/IProfile.sol";
+import { TConsensus } from "src/udvts/Types.sol";
+import { TransparentUpgradeableProxyV2 } from "src/extensions/TransparentUpgradeableProxyV2.sol";
 
 contract Profile_Concrete_Unit_Test is Test {
   MockProfile internal _profile;

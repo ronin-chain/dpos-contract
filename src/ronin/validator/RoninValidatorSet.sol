@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.9;
 
-import { Initializable } from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
+import { Initializable } from "@openzeppelin-v4/contracts/proxy/utils/Initializable.sol";
 import { CoinbaseExecution } from "./CoinbaseExecution.sol";
 import { SlashingExecution } from "./SlashingExecution.sol";
 import { TimingStorage } from "./storage-fragments/TimingStorage.sol";

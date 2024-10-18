@@ -9,8 +9,8 @@ import { IGeneralConfig } from "@fdk/interfaces/IGeneralConfig.sol";
 import { Contract } from "script/utils/Contract.sol";
 import { LibString } from "@solady/utils/LibString.sol";
 import { JSONParserLib } from "@solady/utils/JSONParserLib.sol";
-import { RandomRequest } from "@ronin/contracts/libraries/LibSLA.sol";
-import { IRandomBeacon } from "@ronin/contracts/interfaces/random-beacon/IRandomBeacon.sol";
+import { RandomRequest } from "src/libraries/LibSLA.sol";
+import { IRandomBeacon } from "src/interfaces/random-beacon/IRandomBeacon.sol";
 
 library LibVRFProof {
   using LibString for *;
@@ -151,7 +151,7 @@ library LibVRFProof {
     proof.zInv = vm.parseUint(data.at('"zInv"').value().decodeString());
   }
 
-  function logProof(VRF.Proof memory proof) internal view {
+  function logProof(VRF.Proof memory proof) internal pure {
     console.log("\n==================================================================================");
 
     console.log("pk[0]", proof.pk[0]);

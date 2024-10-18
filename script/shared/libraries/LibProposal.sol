@@ -6,12 +6,12 @@ import { console } from "forge-std/console.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
 import { IGeneralConfig } from "@fdk/interfaces/IGeneralConfig.sol";
 import { LibSharedAddress } from "@fdk/libraries/LibSharedAddress.sol";
-import { IRoninGovernanceAdmin } from "@ronin/contracts/interfaces/IRoninGovernanceAdmin.sol";
-import { IRoninTrustedOrganization } from "@ronin/contracts/interfaces/IRoninTrustedOrganization.sol";
-import { Proposal } from "@ronin/contracts/libraries/Proposal.sol";
-import { Ballot } from "@ronin/contracts/libraries/Ballot.sol";
+import { IRoninGovernanceAdmin } from "src/interfaces/IRoninGovernanceAdmin.sol";
+import { IRoninTrustedOrganization } from "src/interfaces/IRoninTrustedOrganization.sol";
+import { Proposal } from "src/libraries/Proposal.sol";
+import { Ballot } from "src/libraries/Ballot.sol";
 import { LibErrorHandler } from "@fdk/libraries/LibErrorHandler.sol";
-import { VoteStatusConsumer } from "@ronin/contracts/interfaces/consumers/VoteStatusConsumer.sol";
+import { VoteStatusConsumer } from "src/interfaces/consumers/VoteStatusConsumer.sol";
 
 library LibProposal {
   using StdStyle for *;

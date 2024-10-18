@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.9;
 
-import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
+import "@openzeppelin-v4/contracts/proxy/utils/Initializable.sol";
 import "../interfaces/IStakingVesting.sol";
 import "../extensions/collections/HasContracts.sol";
 import "../extensions/consumers/PercentageConsumer.sol";

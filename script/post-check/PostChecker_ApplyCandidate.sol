@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { ICandidateManager } from "@ronin/contracts/interfaces/validator/ICandidateManager.sol";
+import { ICandidateManager } from "src/interfaces/validator/ICandidateManager.sol";
 import { LibProxy } from "@fdk/libraries/LibProxy.sol";
 import { BaseMigration } from "@fdk/BaseMigration.s.sol";
 import { Contract } from "../utils/Contract.sol";

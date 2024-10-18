@@ -7,8 +7,8 @@ import { console } from "forge-std/console.sol";
 import { Contract } from "script/utils/Contract.sol";
 import { IGeneralConfig } from "@fdk/interfaces/IGeneralConfig.sol";
 import { LibSharedAddress } from "@fdk/libraries/LibSharedAddress.sol";
-import { ICoinbaseExecution } from "@ronin/contracts/interfaces/validator/ICoinbaseExecution.sol";
-import { IRoninValidatorSet } from "@ronin/contracts/interfaces/validator/IRoninValidatorSet.sol";
+import { ICoinbaseExecution } from "src/interfaces/validator/ICoinbaseExecution.sol";
+import { IRoninValidatorSet } from "src/interfaces/validator/IRoninValidatorSet.sol";
 import { VRF, LibVRFProof } from "./LibVRFProof.sol";
 
 library LibWrapUpEpoch {

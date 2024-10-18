@@ -2,9 +2,9 @@
 
 pragma solidity ^0.8.9;
 
-import { LibArray } from "@ronin/contracts/libraries/LibArray.sol";
-import { IndexMap, LibIndexMap } from "@ronin/contracts/libraries/LibIndexMap.sol";
-import { notInIndexMapFilter, nonZeroTrustedWeightFilter } from "@ronin/contracts/utils/Filters.sol";
+import { LibArray } from "src/libraries/LibArray.sol";
+import { IndexMap, LibIndexMap } from "src/libraries/LibIndexMap.sol";
+import { notInIndexMapFilter, nonZeroTrustedWeightFilter } from "src/utils/Filters.sol";
 
 library LibSortValidatorsByBeaconOld {
   using LibArray for uint256[];

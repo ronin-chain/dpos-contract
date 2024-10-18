@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.17 <0.9.0;
 
-import { IBridgeSlash } from "@ronin/contracts/interfaces/bridge/IBridgeSlash.sol";
+import { IBridgeSlash } from "src/interfaces/bridge/IBridgeSlash.sol";
 
 contract MockBridgeSlash is IBridgeSlash {
   mapping(address => uint256) internal _slashMap;
