@@ -2,11 +2,11 @@
 
 pragma solidity ^0.8.9;
 
+import { IRoninValidatorSet } from "../../interfaces/validator/IRoninValidatorSet.sol";
 import { PCUVerifyBLSPublicKey } from "../../precompile-usages/PCUVerifyBLSPublicKey.sol";
 import "../../udvts/Types.sol";
-import "../../utils/RoleAccess.sol";
-import { IRoninValidatorSet } from "../../interfaces/validator/IRoninValidatorSet.sol";
 import { ContractType } from "../../utils/ContractType.sol";
+import "../../utils/RoleAccess.sol";
 import { ProfileStorage } from "./ProfileStorage.sol";
 
 abstract contract ProfileHandler is PCUVerifyBLSPublicKey, ProfileStorage {
