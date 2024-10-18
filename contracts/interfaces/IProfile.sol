@@ -76,80 +76,120 @@ interface IProfile {
   error ErrLookUpIdFromVRFKeyFailed(bytes32 vrfKeyHash);
   error ErrValidatorOnRenunciation(address cid);
 
-  function initialize(address validatorContract) external;
+  function initialize(
+    address validatorContract
+  ) external;
 
   function initializeV2(address stakingContract, address trustedOrgContract) external;
 
-  function initializeV3(uint256 cooldown) external;
+  function initializeV3(
+    uint256 cooldown
+  ) external;
 
   /// @dev Getter to query full `profile` from `id` address.
-  function getId2Profile(address id) external view returns (CandidateProfile memory profile);
+  function getId2Profile(
+    address id
+  ) external view returns (CandidateProfile memory profile);
 
   /// @dev Getter to query required random beacon info from `vrfKeyHash`.
-  function getVRFKeyHash2BeaconInfo(bytes32 vrfKeyHash)
-    external
-    view
-    returns (address id, uint256 vrfKeyHashLastChange, uint256 registeredAt);
+  function getVRFKeyHash2BeaconInfo(
+    bytes32 vrfKeyHash
+  ) external view returns (address id, uint256 vrfKeyHashLastChange, uint256 registeredAt);
 
   /// @dev Getter to query required random beacon info from `id` address.
-  function getId2BeaconInfo(address id)
-    external
-    view
-    returns (bytes32 vrfKeyHash, uint256 vrfKeyHashLastChange, uint256 registeredAt);
+  function getId2BeaconInfo(
+    address id
+  ) external view returns (bytes32 vrfKeyHash, uint256 vrfKeyHashLastChange, uint256 registeredAt);
 
   /// @dev Getter to query `admin` from `id` address.
-  function getId2Admin(address id) external view returns (address);
+  function getId2Admin(
+    address id
+  ) external view returns (address);
 
   /// @dev Getter to query `treasury` from `id` address.
-  function getId2Treasury(address id) external view returns (address payable);
+  function getId2Treasury(
+    address id
+  ) external view returns (address payable);
 
   /// @dev Getter to query `pubkey` from `id` address.
-  function getId2Pubkey(address id) external view returns (bytes memory);
+  function getId2Pubkey(
+    address id
+  ) external view returns (bytes memory);
 
   /// @dev Getter to query `profileLastChange` from `id` address.
-  function getId2ProfileLastChange(address id) external view returns (uint256);
+  function getId2ProfileLastChange(
+    address id
+  ) external view returns (uint256);
 
   /// @dev Getter to query `oldPubkey` from `id` address.
-  function getId2OldPubkey(address id) external view returns (bytes memory);
+  function getId2OldPubkey(
+    address id
+  ) external view returns (bytes memory);
 
   /// @dev Getter to query `oldConsensus` from `id` address.
-  function getId2OldConsensus(address id) external view returns (TConsensus);
+  function getId2OldConsensus(
+    address id
+  ) external view returns (TConsensus);
 
   /// @dev Getter to query `registeredAt` from `id` address.
-  function getId2RegisteredAt(address id) external view returns (uint256);
+  function getId2RegisteredAt(
+    address id
+  ) external view returns (uint256);
 
   /// @dev Getter to query `consensus` from `id` address.
-  function getId2Consensus(address id) external view returns (TConsensus);
+  function getId2Consensus(
+    address id
+  ) external view returns (TConsensus);
 
   /// @dev Getter to query `vrfKeyHash` from `id` address.
-  function getId2VRFKeyHash(address id) external view returns (bytes32);
+  function getId2VRFKeyHash(
+    address id
+  ) external view returns (bytes32);
 
   /// @dev Getter to query `vrfKeyHashLastChange` from `id` address.
-  function getId2VRFKeyHashLastChange(address id) external view returns (uint256);
+  function getId2VRFKeyHashLastChange(
+    address id
+  ) external view returns (uint256);
 
   /// @dev Getter to batch query from `id` to `registeredAt`.
-  function getManyId2RegisteredAt(address[] calldata idList) external view returns (uint256[] memory);
+  function getManyId2RegisteredAt(
+    address[] calldata idList
+  ) external view returns (uint256[] memory);
 
   /// @dev Getter to batch query from `id` to `admin`, return address(0) if the profile not exist.
-  function getManyId2Admin(address[] calldata idList) external view returns (address[] memory);
+  function getManyId2Admin(
+    address[] calldata idList
+  ) external view returns (address[] memory);
 
   /// @dev Getter to batch query from `id` to `consensus`, return address(0) if the profile not exist.
-  function getManyId2Consensus(address[] calldata idList) external view returns (TConsensus[] memory consensusList);
+  function getManyId2Consensus(
+    address[] calldata idList
+  ) external view returns (TConsensus[] memory consensusList);
 
   /// @dev Getter to backward query from `consensus` address to `id` address, revert if not found.
-  function getConsensus2Id(TConsensus consensus) external view returns (address id);
+  function getConsensus2Id(
+    TConsensus consensus
+  ) external view returns (address id);
 
   /// @dev Getter to backward query from `vrfKeyHash` to `id` address, revert if not found.
-  function getVRFKeyHash2Id(bytes32 vrfKeyHash) external view returns (address id);
+  function getVRFKeyHash2Id(
+    bytes32 vrfKeyHash
+  ) external view returns (address id);
 
   /// @dev Getter to backward query from `consensus` address to `id` address.
-  function tryGetConsensus2Id(TConsensus consensus) external view returns (bool found, address id);
+  function tryGetConsensus2Id(
+    TConsensus consensus
+  ) external view returns (bool found, address id);
 
   /// @dev Getter to backward query from `vrfKeyHash` to `id` address.
-  function tryGetVRFKeyHash2Id(bytes32 vrfKeyHash) external view returns (bool found, address id);
+  function tryGetVRFKeyHash2Id(
+    bytes32 vrfKeyHash
+  ) external view returns (bool found, address id);
 
   /// @dev Getter to backward batch query from `consensus` address to `id` address.
-  function getManyConsensus2Id(TConsensus[] memory consensus) external view returns (address[] memory);
+  function getManyConsensus2Id(
+    TConsensus[] memory consensus
+  ) external view returns (address[] memory);
 
   /**
    * @dev Cross-contract function to add/update new profile of a validator candidate when they
@@ -216,7 +256,9 @@ interface IProfile {
    *
    * Returns whether all public keys are registered.
    */
-  function arePublicKeysRegistered(bytes[][2] calldata listOfPublicKey) external view returns (bool);
+  function arePublicKeysRegistered(
+    bytes[][2] calldata listOfPublicKey
+  ) external view returns (bool);
 
   /**
    * @dev Change the cooldown between 2 public key change
@@ -224,7 +266,9 @@ interface IProfile {
    * Requirement:
    *  - Only admin can call this method
    */
-  function setCooldownConfig(uint256 cooldown) external;
+  function setCooldownConfig(
+    uint256 cooldown
+  ) external;
 
   /**
    * @dev Returns the config of cool down on change profile info.

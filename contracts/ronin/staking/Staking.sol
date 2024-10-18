@@ -63,7 +63,9 @@ contract Staking is IStaking, StakingCallback, Initializable, AccessControlEnume
   /**
    * @dev Initializes the contract storage V3.
    */
-  function initializeV3(address __profileContract) external reinitializer(3) {
+  function initializeV3(
+    address __profileContract
+  ) external reinitializer(3) {
     _setContract(ContractType.PROFILE, __profileContract);
   }
 

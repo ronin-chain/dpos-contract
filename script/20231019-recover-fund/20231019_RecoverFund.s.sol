@@ -93,7 +93,9 @@ contract Simulation__20231019_RecoverFund is RoninMigration {
     console.log("recoveredFund", recoveredFund);
   }
 
-  function _initBalanceForUser(RoninTrustedOrganization trustedOrgContract) internal {
+  function _initBalanceForUser(
+    RoninTrustedOrganization trustedOrgContract
+  ) internal {
     address genesisUser = sender();
     bool shouldPrankOnly = vme.isPostChecking();
 

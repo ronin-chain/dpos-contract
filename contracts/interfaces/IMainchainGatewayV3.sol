@@ -59,7 +59,9 @@ interface IMainchainGatewayV3 is SignatureConsumer, MappedTokenConsumer {
     Token.Standard[] calldata _standards
   ) external payable;
 
-  function initializeV2(address bridgeManagerContract) external;
+  function initializeV2(
+    address bridgeManagerContract
+  ) external;
 
   function wrappedNativeToken() external view returns (IWETH);
 
@@ -82,22 +84,30 @@ interface IMainchainGatewayV3 is SignatureConsumer, MappedTokenConsumer {
    * Emits the `WrappedNativeTokenContractUpdated` event.
    *
    */
-  function setWrappedNativeTokenContract(IWETH _wrappedToken) external;
+  function setWrappedNativeTokenContract(
+    IWETH _wrappedToken
+  ) external;
 
   /**
    * @dev Returns whether the withdrawal is locked.
    */
-  function withdrawalLocked(uint256 withdrawalId) external view returns (bool);
+  function withdrawalLocked(
+    uint256 withdrawalId
+  ) external view returns (bool);
 
   /**
    * @dev Returns the withdrawal hash.
    */
-  function withdrawalHash(uint256 withdrawalId) external view returns (bytes32);
+  function withdrawalHash(
+    uint256 withdrawalId
+  ) external view returns (bytes32);
 
   /**
    * @dev Locks the assets and request deposit.
    */
-  function requestDepositFor(Transfer.Request calldata _request) external payable;
+  function requestDepositFor(
+    Transfer.Request calldata _request
+  ) external payable;
 
   /**
    * @dev Withdraws based on the receipt and the validator signatures.
@@ -120,7 +130,9 @@ interface IMainchainGatewayV3 is SignatureConsumer, MappedTokenConsumer {
    * Emits the `Withdrew` once the assets are released.
    *
    */
-  function unlockWithdrawal(Transfer.Receipt calldata _receipt) external;
+  function unlockWithdrawal(
+    Transfer.Receipt calldata _receipt
+  ) external;
 
   /**
    * @dev Maps mainchain tokens to Ronin network.
@@ -159,5 +171,7 @@ interface IMainchainGatewayV3 is SignatureConsumer, MappedTokenConsumer {
    * @dev Returns token address on Ronin network.
    * Note: Reverts for unsupported token.
    */
-  function getRoninToken(address _mainchainToken) external view returns (MappedToken memory _token);
+  function getRoninToken(
+    address _mainchainToken
+  ) external view returns (MappedToken memory _token);
 }

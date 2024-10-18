@@ -74,11 +74,9 @@ abstract contract CreditScore is
     emit CreditScoresUpdated(validatorIds, updatedCreditScores);
   }
 
-  function execResetCreditScores(address[] calldata validatorIds)
-    external
-    override
-    onlyContract(ContractType.VALIDATOR)
-  {
+  function execResetCreditScores(
+    address[] calldata validatorIds
+  ) external override onlyContract(ContractType.VALIDATOR) {
     uint256[] memory updatedCreditScores = new uint256[](validatorIds.length);
     for (uint i = 0; i < validatorIds.length;) {
       address _validator = validatorIds[i];
@@ -95,7 +93,9 @@ abstract contract CreditScore is
   /**
    * @inheritdoc ICreditScore
    */
-  function bailOut(TConsensus consensusAddr) external override {
+  function bailOut(
+    TConsensus consensusAddr
+  ) external override {
     address validatorId = __css2cid(consensusAddr);
     IRoninValidatorSet validatorContract = IRoninValidatorSet(getContract(ContractType.VALIDATOR));
     if (!validatorContract.isValidatorCandidate(consensusAddr)) {
@@ -161,19 +161,18 @@ abstract contract CreditScore is
   /**
    * @inheritdoc ICreditScore
    */
-  function getCreditScore(TConsensus consensusAddr) external view override returns (uint256) {
+  function getCreditScore(
+    TConsensus consensusAddr
+  ) external view override returns (uint256) {
     return _creditScore[__css2cid(consensusAddr)];
   }
 
   /**
    * @inheritdoc ICreditScore
    */
-  function getManyCreditScores(TConsensus[] calldata consensusAddrs)
-    public
-    view
-    override
-    returns (uint256[] memory resultList)
-  {
+  function getManyCreditScores(
+    TConsensus[] calldata consensusAddrs
+  ) public view override returns (uint256[] memory resultList) {
     address[] memory validatorIds = __css2cidBatch(consensusAddrs);
     resultList = new uint256[](validatorIds.length);
 
@@ -202,9 +201,13 @@ abstract contract CreditScore is
    */
   function _setUnavailabilityIndicator(address _validator, uint256 period, uint256 _indicator) internal virtual;
 
-  function __css2cid(TConsensus consensusAddr) internal view virtual returns (address);
+  function __css2cid(
+    TConsensus consensusAddr
+  ) internal view virtual returns (address);
 
-  function __css2cidBatch(TConsensus[] memory consensusAddrs) internal view virtual returns (address[] memory);
+  function __css2cidBatch(
+    TConsensus[] memory consensusAddrs
+  ) internal view virtual returns (address[] memory);
 
   /**
    * @dev See `ICreditScore-setCreditScoreConfigs`.

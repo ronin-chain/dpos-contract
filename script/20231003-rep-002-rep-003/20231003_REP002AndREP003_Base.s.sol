@@ -60,7 +60,9 @@ contract Simulation__20231003_UpgradeREP002AndREP003_Base is RoninMigration, Map
     return makeAccount("detach-operator-1").addr;
   }
 
-  function _afterDepositForOnlyOnRonin(Transfer.Receipt memory) internal virtual { }
+  function _afterDepositForOnlyOnRonin(
+    Transfer.Receipt memory
+  ) internal virtual { }
 
   function run() public virtual {
     {
@@ -83,7 +85,9 @@ contract Simulation__20231003_UpgradeREP002AndREP003_Base is RoninMigration, Map
     _depositCount = _hookSetDepositCount();
   }
 
-  function _depositForOnBothChain(string memory userName) internal {
+  function _depositForOnBothChain(
+    string memory userName
+  ) internal {
     Account memory user = makeAccount(userName);
     vm.makePersistent(user.addr);
     vm.deal(user.addr, 1000 ether);
@@ -119,7 +123,9 @@ contract Simulation__20231003_UpgradeREP002AndREP003_Base is RoninMigration, Map
     _roninGateway.depositFor(receipt);
   }
 
-  function _depositForOnlyOnRonin(string memory userName) internal {
+  function _depositForOnlyOnRonin(
+    string memory userName
+  ) internal {
     Account memory user = makeAccount(userName);
     vm.makePersistent(user.addr);
     vm.deal(user.addr, 1000 ether);

@@ -38,6 +38,10 @@ interface IRoninValidatorSet is
   ) external;
 
   function initializeV2() external;
-  function initializeV3(address fastFinalityTrackingContract) external;
-  function initializeV4(address profileContract) external;
+  function initializeV3(
+    address fastFinalityTrackingContract
+  ) external;
+  function initializeV4(
+    address profileContract
+  ) external;
 }

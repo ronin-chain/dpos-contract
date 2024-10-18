@@ -36,11 +36,15 @@ contract MockBridgeTracking is IBridgeTracking {
     }
   }
 
-  function totalVote(uint256 period) external view returns (uint256) {
+  function totalVote(
+    uint256 period
+  ) external view returns (uint256) {
     return _tracks[period].totalVote;
   }
 
-  function totalBallot(uint256 period) external view returns (uint256 total_) {
+  function totalBallot(
+    uint256 period
+  ) external view returns (uint256 total_) {
     PeriodTracking storage _sTrack = _tracks[period];
     for (uint i; i < _sTrack.operators.length; i++) {
       total_ += _sTrack.ballotMap[_sTrack.operators[i]];

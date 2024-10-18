@@ -28,7 +28,9 @@ interface IGovernanceAdmin is IGovernanceProposal, IHasContracts {
    * - This contract must be the admin of `proxy`.
    *
    */
-  function getProxyAdmin(address proxy) external view returns (address);
+  function getProxyAdmin(
+    address proxy
+  ) external view returns (address);
 
   /**
    * @dev Returns the current implementation of `_proxy`.
@@ -37,9 +39,13 @@ interface IGovernanceAdmin is IGovernanceProposal, IHasContracts {
    * - This contract must be the admin of `_proxy`.
    *
    */
-  function getProxyImplementation(address proxy) external view returns (address);
+  function getProxyImplementation(
+    address proxy
+  ) external view returns (address);
 
   function roninChainId() external view returns (uint256);
 
-  function setProposalExpiryDuration(uint256 _expiryDuration) external;
+  function setProposalExpiryDuration(
+    uint256 _expiryDuration
+  ) external;
 }

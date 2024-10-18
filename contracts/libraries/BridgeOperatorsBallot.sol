@@ -28,7 +28,9 @@ library BridgeOperatorsBallot {
    * - The operator address list is in order.
    *
    */
-  function verifyBallot(BridgeOperatorSet calldata _ballot) internal pure {
+  function verifyBallot(
+    BridgeOperatorSet calldata _ballot
+  ) internal pure {
     if (_ballot.operators.length == 0) revert ErrEmptyArray();
 
     address _addr = _ballot.operators[0];
@@ -44,7 +46,9 @@ library BridgeOperatorsBallot {
   /**
    * @dev Returns hash of the ballot.
    */
-  function hash(BridgeOperatorSet memory self) internal pure returns (bytes32 digest_) {
+  function hash(
+    BridgeOperatorSet memory self
+  ) internal pure returns (bytes32 digest_) {
     bytes32 operatorsHash;
     address[] memory operators = self.operators;
 

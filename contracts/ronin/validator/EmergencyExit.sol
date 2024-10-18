@@ -50,14 +50,18 @@ abstract contract EmergencyExit is IEmergencyExit, RONTransferHelper, CandidateM
   /**
    * @inheritdoc IEmergencyExit
    */
-  function setEmergencyExitLockedAmount(uint256 amount) external onlyAdmin {
+  function setEmergencyExitLockedAmount(
+    uint256 amount
+  ) external onlyAdmin {
     _setEmergencyExitLockedAmount(amount);
   }
 
   /**
    * @inheritdoc IEmergencyExit
    */
-  function setEmergencyExpiryDuration(uint256 duration) external onlyAdmin {
+  function setEmergencyExpiryDuration(
+    uint256 duration
+  ) external onlyAdmin {
     _setEmergencyExpiryDuration(duration);
   }
 
@@ -140,46 +144,43 @@ abstract contract EmergencyExit is IEmergencyExit, RONTransferHelper, CandidateM
   /**
    * @dev Override `CandidateManager-_emergencyExitLockedFundReleased`.
    */
-  function _emergencyExitLockedFundReleased(address cid) internal virtual override returns (bool) {
+  function _emergencyExitLockedFundReleased(
+    address cid
+  ) internal virtual override returns (bool) {
     return _lockedFundReleased[cid];
   }
 
   /**
    * @dev Override `CandidateManager-_removeCandidate`.
    */
-  function _removeCandidate(address cid) internal override {
+  function _removeCandidate(
+    address cid
+  ) internal override {
     delete _lockedFundReleased[cid];
     super._removeCandidate(cid);
   }
 
   /// @dev See {RoninValidatorSet-__css2cid}
-  function __css2cid(TConsensus consensusAddr)
-    internal
-    view
-    virtual
-    override(CandidateManager, CommonStorage)
-    returns (address);
+  function __css2cid(
+    TConsensus consensusAddr
+  ) internal view virtual override(CandidateManager, CommonStorage) returns (address);
 
   /// @dev See {RoninValidatorSet-__css2cidBatch}
-  function __css2cidBatch(TConsensus[] memory consensusAddrs)
-    internal
-    view
-    virtual
-    override(CandidateManager, CommonStorage)
-    returns (address[] memory);
+  function __css2cidBatch(
+    TConsensus[] memory consensusAddrs
+  ) internal view virtual override(CandidateManager, CommonStorage) returns (address[] memory);
 
   /// @dev See {RoninValidatorSet-__cid2cssBatch}
-  function __cid2cssBatch(address[] memory cids)
-    internal
-    view
-    virtual
-    override(CandidateManager, ValidatorInfoStorageV2)
-    returns (TConsensus[] memory);
+  function __cid2cssBatch(
+    address[] memory cids
+  ) internal view virtual override(CandidateManager, ValidatorInfoStorageV2) returns (TConsensus[] memory);
 
   /**
    * @dev See `setEmergencyExitLockedAmount.
    */
-  function _setEmergencyExitLockedAmount(uint256 amount) internal {
+  function _setEmergencyExitLockedAmount(
+    uint256 amount
+  ) internal {
     _emergencyExitLockedAmount = amount;
     emit EmergencyExitLockedAmountUpdated(amount);
   }
@@ -187,7 +188,9 @@ abstract contract EmergencyExit is IEmergencyExit, RONTransferHelper, CandidateM
   /**
    * @dev See `setEmergencyExpiryDuration`.
    */
-  function _setEmergencyExpiryDuration(uint256 duration) internal {
+  function _setEmergencyExpiryDuration(
+    uint256 duration
+  ) internal {
     _emergencyExpiryDuration = duration;
     emit EmergencyExpiryDurationUpdated(duration);
   }

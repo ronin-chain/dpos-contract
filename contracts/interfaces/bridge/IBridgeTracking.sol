@@ -39,12 +39,16 @@ interface IBridgeTracking {
   /**
    * @dev Returns the total number of votes at the specific period `_period`.
    */
-  function totalVote(uint256 _period) external view returns (uint256);
+  function totalVote(
+    uint256 _period
+  ) external view returns (uint256);
 
   /**
    * @dev Returns the total number of ballots at the specific period `_period`.
    */
-  function totalBallot(uint256 _period) external view returns (uint256);
+  function totalBallot(
+    uint256 _period
+  ) external view returns (uint256);
 
   /**
    * @dev Returns the total number of ballots of bridge operators at the specific period `_period`.

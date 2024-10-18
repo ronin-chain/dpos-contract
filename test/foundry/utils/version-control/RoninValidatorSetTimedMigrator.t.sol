@@ -64,7 +64,9 @@ contract RoninValidatorSetTimedMigratorTest is ConditionalImplementControlTest {
     TransparentUpgradeableProxyV2(payable(_roninTrustedOrgProxy)).upgradeTo(roninTrustedOrgSwitcher);
   }
 
-  function _manualUpgradeTo(address impl) internal virtual override {
+  function _manualUpgradeTo(
+    address impl
+  ) internal virtual override {
     super._manualUpgradeTo(impl);
 
     vm.startPrank(_proxyAdmin, _proxyAdmin);
@@ -155,7 +157,9 @@ contract RoninValidatorSetTimedMigratorTest is ConditionalImplementControlTest {
   /**
    * @dev Creates a new conditional implement control for testing purposes.
    */
-  function _createConditionalImplementControl(address[3] memory inputs) internal override returns (address) {
+  function _createConditionalImplementControl(
+    address[3] memory inputs
+  ) internal override returns (address) {
     return address(new RoninValidatorSetTimedMigrator(inputs[0], inputs[1], inputs[2]));
   }
 }

@@ -22,15 +22,16 @@ contract RoninValidatorSetREP10MigratorLogicDeploy is RoninMigration {
     _setDependencyDeployScript(Contract.RoninRandomBeacon.key(), new RoninRandomBeaconDeploy());
   }
 
-  function overrideActivatedAtPeriod(uint256 activatedAtPeriod)
-    public
-    returns (RoninValidatorSetREP10MigratorLogicDeploy)
-  {
+  function overrideActivatedAtPeriod(
+    uint256 activatedAtPeriod
+  ) public returns (RoninValidatorSetREP10MigratorLogicDeploy) {
     _activatedAtPeriod = activatedAtPeriod;
     return RoninValidatorSetREP10MigratorLogicDeploy(address(this));
   }
 
-  function overridePrevImpl(address prevImpl) public returns (RoninValidatorSetREP10MigratorLogicDeploy) {
+  function overridePrevImpl(
+    address prevImpl
+  ) public returns (RoninValidatorSetREP10MigratorLogicDeploy) {
     _prevImpl = prevImpl;
     return RoninValidatorSetREP10MigratorLogicDeploy(address(this));
   }

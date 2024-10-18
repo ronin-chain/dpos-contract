@@ -20,7 +20,9 @@ contract RONTransferHelperTest is Test {
     istanbulRONTransfer = new MockRONTransferHelperConsumer_Istanbul();
   }
 
-  function testFuzz_RevertIf_SendIstanbulGasStipened_ToMultisigWallet_OnBerlin(uint256 value) public {
+  function testFuzz_RevertIf_SendIstanbulGasStipened_ToMultisigWallet_OnBerlin(
+    uint256 value
+  ) public {
     vm.skip(true);
     vm.deal(address(istanbulRONTransfer), value);
 
@@ -28,7 +30,9 @@ contract RONTransferHelperTest is Test {
     istanbulRONTransfer.sendRONLimitGas(payable(multisig), value);
   }
 
-  function testFuzz_SendBerlinGasStipened_ToMultisigWallet_OnBerlin(uint256 value) public {
+  function testFuzz_SendBerlinGasStipened_ToMultisigWallet_OnBerlin(
+    uint256 value
+  ) public {
     vm.deal(address(berlinRONTransfer), value);
 
     berlinRONTransfer.sendRONLimitGas(payable(multisig), value);

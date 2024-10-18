@@ -15,7 +15,9 @@ library EnumFlags {
 
   }
 
-  function isNone(ValidatorFlag _value) internal pure returns (bool) {
+  function isNone(
+    ValidatorFlag _value
+  ) internal pure returns (bool) {
     return uint8(_value) == 0;
   }
 

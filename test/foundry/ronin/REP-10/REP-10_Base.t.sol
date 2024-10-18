@@ -91,7 +91,9 @@ contract REP10_BaseTest is Test, GlobalConfigConsumer {
    *
    * This duplicates the implementation in {RoninValidatorSet-_computePeriod} to reduce external calls.
    */
-  function _computePeriod(uint256 timestamp) internal pure returns (uint256) {
+  function _computePeriod(
+    uint256 timestamp
+  ) internal pure returns (uint256) {
     return timestamp / PERIOD_DURATION;
   }
 }

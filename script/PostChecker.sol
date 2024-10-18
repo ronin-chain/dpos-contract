@@ -77,12 +77,9 @@ contract PostChecker is
     return RoninMigration._upgradeProxy(contractType, args, argsLogicConstructor);
   }
 
-  function _deployProxy(TContract contractType)
-    internal
-    virtual
-    override(BaseMigration, RoninMigration)
-    returns (address payable)
-  {
+  function _deployProxy(
+    TContract contractType
+  ) internal virtual override(BaseMigration, RoninMigration) returns (address payable) {
     return RoninMigration._deployProxy(contractType);
   }
 

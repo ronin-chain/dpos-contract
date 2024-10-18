@@ -19,7 +19,9 @@ contract RoninRandomBeacon_Devnet is RoninRandomBeacon {
    * @dev Manual trigger request random seed for the given period.
    * This function is only used for testing purpose.
    */
-  function manualRequestRandomSeed(uint256 period) external {
+  function manualRequestRandomSeed(
+    uint256 period
+  ) external {
     _requestRandomSeed(period, _beaconPerPeriod[period - 1].value);
   }
 

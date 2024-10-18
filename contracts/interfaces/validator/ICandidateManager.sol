@@ -91,7 +91,9 @@ interface ICandidateManager {
    * Emits the `MaxValidatorCandidateUpdated` event.
    *
    */
-  function setMaxValidatorCandidate(uint256) external;
+  function setMaxValidatorCandidate(
+    uint256
+  ) external;
 
   /**
    * @dev Sets the minimum number of days to the effective date of commision rate change.
@@ -102,12 +104,16 @@ interface ICandidateManager {
    * Emits the `MinEffectiveDaysOnwardsUpdated` event.
    *
    */
-  function setMinEffectiveDaysOnwards(uint256 _numOfDays) external;
+  function setMinEffectiveDaysOnwards(
+    uint256 _numOfDays
+  ) external;
 
   /**
    * @dev Returns whether the address is a validator (candidate).
    */
-  function isValidatorCandidate(TConsensus consensus) external view returns (bool);
+  function isValidatorCandidate(
+    TConsensus consensus
+  ) external view returns (bool);
 
   /**
    * @dev Returns the list validator candidates.
@@ -127,12 +133,16 @@ interface ICandidateManager {
   /**
    * @dev Returns the info of a candidate.
    */
-  function getCandidateInfo(TConsensus consensus) external view returns (ValidatorCandidate memory);
+  function getCandidateInfo(
+    TConsensus consensus
+  ) external view returns (ValidatorCandidate memory);
 
   /**
    * @dev Returns the info of a candidate.
    */
-  function getCandidateInfoById(address cid) external view returns (ValidatorCandidate memory);
+  function getCandidateInfoById(
+    address cid
+  ) external view returns (ValidatorCandidate memory);
 
   /**
    * @dev Returns whether the address is the candidate admin.
@@ -147,5 +157,7 @@ interface ICandidateManager {
   /**
    * @dev Returns the schedule of changing commission rate of a candidate address.
    */
-  function getCommissionChangeSchedule(TConsensus consensus) external view returns (CommissionSchedule memory);
+  function getCommissionChangeSchedule(
+    TConsensus consensus
+  ) external view returns (CommissionSchedule memory);
 }

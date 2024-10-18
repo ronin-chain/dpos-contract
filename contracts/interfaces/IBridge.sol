@@ -11,7 +11,9 @@ interface IBridge {
    * Emitted the event `BridgeOperatorsReplaced`.
    *
    */
-  function replaceBridgeOperators(address[] calldata) external;
+  function replaceBridgeOperators(
+    address[] calldata
+  ) external;
 
   /**
    * @dev Returns the bridge operator list.

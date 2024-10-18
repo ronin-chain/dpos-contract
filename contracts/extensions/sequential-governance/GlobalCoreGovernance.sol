@@ -83,11 +83,9 @@ abstract contract GlobalCoreGovernance is CoreGovernance {
   /**
    * @dev Returns corresponding address of target options. Return address(0) on non-existent target.
    */
-  function resolveTargets(GlobalProposal.TargetOption[] calldata targetOptions)
-    external
-    view
-    returns (address[] memory targets)
-  {
+  function resolveTargets(
+    GlobalProposal.TargetOption[] calldata targetOptions
+  ) external view returns (address[] memory targets) {
     return _resolveTargets({ targetOptions: targetOptions, strict: false });
   }
 

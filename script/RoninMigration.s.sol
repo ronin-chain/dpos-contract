@@ -69,14 +69,15 @@ contract RoninMigration is BaseMigration {
     rawCallData = abi.encode(param);
   }
 
-  function _setRoninValidatorSetREP10Migrator(ISharedArgument.RoninValidatorSetREP10MigratorParam memory param)
-    internal
-    view
-  {
+  function _setRoninValidatorSetREP10Migrator(
+    ISharedArgument.RoninValidatorSetREP10MigratorParam memory param
+  ) internal view {
     param.activatedAtPeriod = vm.envOr("RONIN_VALIDATOR_SET_REP10_MIGRATOR_ACTIVATED_AT_PERIOD", REP10_ACTIVATED_PERIOD);
   }
 
-  function _setRoninRandomBeaconParam(ISharedArgument.RoninRandomBeaconParam memory param) internal view {
+  function _setRoninRandomBeaconParam(
+    ISharedArgument.RoninRandomBeaconParam memory param
+  ) internal view {
     param.slashThreshold = vm.envOr("RANDOM_BEACON_SLASH_THRESHOLD", uint256(3));
     param.activatedAtPeriod = vm.envOr("RANDOM_BEACON_ACTIVATED_AT_PERIOD", REP10_ACTIVATED_PERIOD);
 
@@ -92,7 +93,9 @@ contract RoninMigration is BaseMigration {
     param.thresholds[3] = vm.envOr("ALL_VALIDATOR_THRESHOLD", uint256(15));
   }
 
-  function _setMaintenanceParam(ISharedArgument.MaintenanceParam memory param) internal view {
+  function _setMaintenanceParam(
+    ISharedArgument.MaintenanceParam memory param
+  ) internal view {
     param.maxSchedules = vm.envOr("MAX_SCHEDULES", uint256(3));
     param.minOffsetToStartSchedule = vm.envOr("MIN_OFFSET_TO_START_SCHEDULE", uint256(200));
     param.cooldownSecsToMaintain = vm.envOr("COOLDOWN_SECS_TO_MAINTAIN", uint256(3 days));
@@ -101,14 +104,18 @@ contract RoninMigration is BaseMigration {
     param.maxMaintenanceDurationInBlock = vm.envOr("MAX_MAINTENANCE_DURATION_IN_BLOCK", uint256(1000));
   }
 
-  function _setStakingParam(ISharedArgument.StakingParam memory param) internal view {
+  function _setStakingParam(
+    ISharedArgument.StakingParam memory param
+  ) internal view {
     param.maxCommissionRate = vm.envOr("MAX_COMMISSION_RATE", uint256(100_00));
     param.waitingSecsToRevoke = vm.envOr("WAITING_SECS_TO_REVOKE", uint256(7 days));
     param.minValidatorStakingAmount = vm.envOr("MIN_VALIDATOR_STAKING_AMOUNT", uint256(100 ether));
     param.cooldownSecsToUndelegate = vm.envOr("COOLDOWN_SECS_TO_UNDELEGATE", uint256(3 days));
   }
 
-  function _setStakingVestingParam(ISharedArgument.StakingVestingParam memory param) internal view {
+  function _setStakingVestingParam(
+    ISharedArgument.StakingVestingParam memory param
+  ) internal view {
     param.topupAmount = vm.envOr("TOPUP_AMOUNT", uint256(100_000_000_000));
     param.fastFinalityRewardPercent = vm.envOr("FAST_FINALITY_REWARD_PERCENT", uint256(1_00)); // 1%
     param.fastFinalityRewardPercentREP10 = vm.envOr("FAST_FINALITY_REWARD_PERCENT_REP10", uint256(8_500)); // 85%
@@ -117,7 +124,9 @@ contract RoninMigration is BaseMigration {
     param.bridgeOperatorBonusPerBlock = vm.envOr("BRIDGE_OPERATOR_BONUS_PER_BLOCK", uint256(1_100));
   }
 
-  function _setSlashIndicatorParam(ISharedArgument.SlashIndicatorParam memory param) internal view {
+  function _setSlashIndicatorParam(
+    ISharedArgument.SlashIndicatorParam memory param
+  ) internal view {
     // Deprecated slash bridge operator
     param.__deprecatedSlashBridgeOperator.missingVotesRatioTier1 = vm.envOr("MISSING_VOTES_RATIO_TIER1", uint256(10_00)); // 10%
     param.__deprecatedSlashBridgeOperator.missingVotesRatioTier2 = vm.envOr("MISSING_VOTES_RATIO_TIER2", uint256(20_00)); // 20%
@@ -157,7 +166,9 @@ contract RoninMigration is BaseMigration {
     param.creditScore.cutOffPercentageAfterBailout = vm.envOr("CUT_OFF_PERCENTAGE_AFTER_BAILOUT", uint256(50_00)); // 50%
   }
 
-  function _setTrustedOrganizationParam(ISharedArgument.RoninTrustedOrganizationParam memory param) internal {
+  function _setTrustedOrganizationParam(
+    ISharedArgument.RoninTrustedOrganizationParam memory param
+  ) internal {
     param.trustedOrganizations = new IRoninTrustedOrganization.TrustedOrganization[](4);
     uint256 governorPk;
     uint256 consensusPk;
@@ -174,7 +185,9 @@ contract RoninMigration is BaseMigration {
     param.denominator = vm.envOr("TRUSTED_ORGANIZATION_DENOMINATOR", uint256(1));
   }
 
-  function _setRoninValidatorSetParam(ISharedArgument.RoninValidatorSetParam memory param) internal view {
+  function _setRoninValidatorSetParam(
+    ISharedArgument.RoninValidatorSetParam memory param
+  ) internal view {
     param.maxValidatorNumber = vm.envOr("MAX_VALIDATOR_NUMBER", uint256(15));
     param.maxPrioritizedValidatorNumber = vm.envOr("MAX_PRIORITIZED_VALIDATOR_NUMBER", uint256(4));
     param.numberOfBlocksInEpoch = vm.envOr("NUMBER_OF_BLOCKS_IN_EPOCH", uint256(200));
@@ -184,11 +197,15 @@ contract RoninMigration is BaseMigration {
     param.emergencyExpiryDuration = vm.envOr("EMERGENCY_EXPIRY_DURATION", uint256(14 days));
   }
 
-  function _setGovernanceAdminParam(ISharedArgument.RoninGovernanceAdminParam memory param) internal view {
+  function _setGovernanceAdminParam(
+    ISharedArgument.RoninGovernanceAdminParam memory param
+  ) internal view {
     param.proposalExpiryDuration = vm.envOr("PROPOSAL_EXPIRY_DURATION", uint256(14 days));
   }
 
-  function _deployProxy(TContract contractType)
+  function _deployProxy(
+    TContract contractType
+  )
     internal
     virtual
     override

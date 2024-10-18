@@ -41,14 +41,18 @@ abstract contract RoninTest is Base_Test, ITransparentUpgradeableProxyDeployer {
     delete _params;
   }
 
-  modifier onWhichFork(uint256 forkId) virtual {
+  modifier onWhichFork(
+    uint256 forkId
+  ) virtual {
     uint256 currentFork = vm.activeFork();
     vm.selectFork(forkId);
     _;
     vm.selectFork(currentFork);
   }
 
-  modifier fromWho(address who) virtual {
+  modifier fromWho(
+    address who
+  ) virtual {
     vm.startPrank(who, who);
     _;
     vm.stopPrank();
@@ -115,7 +119,9 @@ abstract contract RoninTest is Base_Test, ITransparentUpgradeableProxyDeployer {
     bytecode = params.length != 0 ? abi.encodePacked(creationCode, params) : creationCode;
   }
 
-  function _computeSalt(string memory contractName) internal pure returns (bytes32 salt) {
+  function _computeSalt(
+    string memory contractName
+  ) internal pure returns (bytes32 salt) {
     salt = keccak256(bytes(contractName));
   }
 
@@ -181,19 +187,27 @@ abstract contract RoninTest is Base_Test, ITransparentUpgradeableProxyDeployer {
     return computeCreate2Address(salt, initcodeHash, address(this));
   }
 
-  function _getLogicLabel(string memory contractName) internal pure returns (string memory) {
+  function _getLogicLabel(
+    string memory contractName
+  ) internal pure returns (string memory) {
     return _join(LOGIC_PREFIX, contractName);
   }
 
-  function _getProxyLabel(string memory contractName) internal pure returns (string memory) {
+  function _getProxyLabel(
+    string memory contractName
+  ) internal pure returns (string memory) {
     return _join(PROXY_PREFIX, contractName);
   }
 
-  function _getProxyAdmin(TransparentUpgradeableProxyV2 proxy) internal view returns (address) {
+  function _getProxyAdmin(
+    TransparentUpgradeableProxyV2 proxy
+  ) internal view returns (address) {
     return address(uint160(uint256(vm.load(address(proxy), ADMIN_SLOT))));
   }
 
-  function _getProxyImplementation(TransparentUpgradeableProxyV2 proxy) internal view returns (address) {
+  function _getProxyImplementation(
+    TransparentUpgradeableProxyV2 proxy
+  ) internal view returns (address) {
     return address(uint160(uint256(vm.load(address(proxy), IMPLEMENTATION_SLOT))));
   }
 

@@ -59,25 +59,33 @@ abstract contract CandidateManager is
   /**
    * @inheritdoc ICandidateManager
    */
-  function setMaxValidatorCandidate(uint256 _number) external override onlyAdmin {
+  function setMaxValidatorCandidate(
+    uint256 _number
+  ) external override onlyAdmin {
     _setMaxValidatorCandidate(_number);
   }
 
   /**
    * @inheritdoc ICandidateManager
    */
-  function setMinEffectiveDaysOnwards(uint256 _numOfDays) external override onlyAdmin {
+  function setMinEffectiveDaysOnwards(
+    uint256 _numOfDays
+  ) external override onlyAdmin {
     _setMinEffectiveDaysOnwards(_numOfDays);
   }
 
   /**
    * @inheritdoc ICandidateManager
    */
-  function isValidatorCandidate(TConsensus consensus) external view override returns (bool) {
+  function isValidatorCandidate(
+    TConsensus consensus
+  ) external view override returns (bool) {
     return _isValidatorCandidateById(__css2cid(consensus));
   }
 
-  function _isValidatorCandidateById(address cid) internal view returns (bool) {
+  function _isValidatorCandidateById(
+    address cid
+  ) internal view returns (bool) {
     return _candidateIndex[cid] != 0;
   }
 
@@ -98,7 +106,9 @@ abstract contract CandidateManager is
   /**
    * @inheritdoc ICandidateManager
    */
-  function getCandidateInfo(TConsensus consensus) external view override returns (ValidatorCandidate memory) {
+  function getCandidateInfo(
+    TConsensus consensus
+  ) external view override returns (ValidatorCandidate memory) {
     address validatorId = __css2cid(consensus);
     return getCandidateInfoById(validatorId);
   }
@@ -106,7 +116,9 @@ abstract contract CandidateManager is
   /**
    * @inheritdoc ICandidateManager
    */
-  function getCandidateInfoById(address cid) public view override returns (ValidatorCandidate memory) {
+  function getCandidateInfoById(
+    address cid
+  ) public view override returns (ValidatorCandidate memory) {
     if (!_isValidatorCandidateById(cid)) revert ErrNonExistentCandidate();
     return _candidateInfo[cid];
   }
@@ -128,7 +140,9 @@ abstract contract CandidateManager is
   /**
    * @inheritdoc ICandidateManager
    */
-  function getCommissionChangeSchedule(TConsensus consensus) external view override returns (CommissionSchedule memory) {
+  function getCommissionChangeSchedule(
+    TConsensus consensus
+  ) external view override returns (CommissionSchedule memory) {
     return _candidateCommissionChangeSchedule[__css2cid(consensus)];
   }
 
@@ -139,7 +153,9 @@ abstract contract CandidateManager is
    * Emits the event `CandidatesRevoked` when a candidate is revoked.
    *
    */
-  function _syncCandidateSet(uint256 _nextPeriod) internal returns (address[] memory _unsatisfiedCandidates) {
+  function _syncCandidateSet(
+    uint256 _nextPeriod
+  ) internal returns (address[] memory _unsatisfiedCandidates) {
     IStaking _staking = IStaking(getContract(ContractType.STAKING));
     uint256 _waitingSecsToRevoke = _staking.waitingSecsToRevoke();
     uint256 _minStakingAmount = _staking.minValidatorStakingAmount();
@@ -231,7 +247,9 @@ abstract contract CandidateManager is
    * Emits the `MaxValidatorCandidateUpdated` event.
    *
    */
-  function _setMaxValidatorCandidate(uint256 _threshold) internal {
+  function _setMaxValidatorCandidate(
+    uint256 _threshold
+  ) internal {
     _maxValidatorCandidate = _threshold;
     emit MaxValidatorCandidateUpdated(_threshold);
   }
@@ -242,7 +260,9 @@ abstract contract CandidateManager is
    * Emits the `MinEffectiveDaysOnwardsUpdated` event.
    *
    */
-  function _setMinEffectiveDaysOnwards(uint256 _numOfDays) internal {
+  function _setMinEffectiveDaysOnwards(
+    uint256 _numOfDays
+  ) internal {
     if (_numOfDays < 1) revert ErrInvalidMinEffectiveDaysOnwards();
     _minEffectiveDaysOnwards = _numOfDays;
     emit MinEffectiveDaysOnwardsUpdated(_numOfDays);
@@ -251,7 +271,9 @@ abstract contract CandidateManager is
   /**
    * @dev Removes the candidate.
    */
-  function _removeCandidate(address _addr) internal virtual {
+  function _removeCandidate(
+    address _addr
+  ) internal virtual {
     uint256 idx = _candidateIndex[_addr];
     if (idx == 0) {
       return;
@@ -283,19 +305,29 @@ abstract contract CandidateManager is
   /**
    * @dev Returns a flag indicating whether the fund is unlocked.
    */
-  function _emergencyExitLockedFundReleased(address _consensusAddr) internal virtual returns (bool);
+  function _emergencyExitLockedFundReleased(
+    address _consensusAddr
+  ) internal virtual returns (bool);
 
   /**
    * @dev Returns whether the validator id is a trusted org or not.
    */
-  function _isTrustedOrg(address validatorId) internal virtual returns (bool);
+  function _isTrustedOrg(
+    address validatorId
+  ) internal virtual returns (bool);
 
   /// @dev See {RoninValidatorSet-__css2cid}
-  function __css2cid(TConsensus consensusAddr) internal view virtual returns (address);
+  function __css2cid(
+    TConsensus consensusAddr
+  ) internal view virtual returns (address);
 
   /// @dev See {RoninValidatorSet-__css2cidBatch}
-  function __css2cidBatch(TConsensus[] memory consensusAddrs) internal view virtual returns (address[] memory);
+  function __css2cidBatch(
+    TConsensus[] memory consensusAddrs
+  ) internal view virtual returns (address[] memory);
 
   /// @dev See {RoninValidatorSet-__cid2cssBatch}
-  function __cid2cssBatch(address[] memory cids) internal view virtual returns (TConsensus[] memory);
+  function __cid2cssBatch(
+    address[] memory cids
+  ) internal view virtual returns (TConsensus[] memory);
 }

@@ -56,7 +56,9 @@ abstract contract SlashUnavailability is ISlashUnavailability, HasContracts, Has
   /**
    * @inheritdoc ISlashUnavailability
    */
-  function slashUnavailability(TConsensus consensusAddr) external override oncePerBlock {
+  function slashUnavailability(
+    TConsensus consensusAddr
+  ) external override oncePerBlock {
     if (msg.sender != block.coinbase) revert ErrUnauthorized(msg.sig, RoleAccess.COINBASE);
 
     address validatorId = __css2cid(consensusAddr);
@@ -131,7 +133,9 @@ abstract contract SlashUnavailability is ISlashUnavailability, HasContracts, Has
   /**
    * @inheritdoc ISlashUnavailability
    */
-  function currentUnavailabilityIndicator(TConsensus consensus) external view override returns (uint256) {
+  function currentUnavailabilityIndicator(
+    TConsensus consensus
+  ) external view override returns (uint256) {
     return _getUnavailabilityIndicatorById(
       __css2cid(consensus), IRoninValidatorSet(getContract(ContractType.VALIDATOR)).currentPeriod()
     );
@@ -186,5 +190,7 @@ abstract contract SlashUnavailability is ISlashUnavailability, HasContracts, Has
    */
   function _checkBailedOutAtPeriodById(address validatorId, uint256 period) internal view virtual returns (bool);
 
-  function __css2cid(TConsensus consensusAddr) internal view virtual returns (address);
+  function __css2cid(
+    TConsensus consensusAddr
+  ) internal view virtual returns (address);
 }

@@ -4,7 +4,9 @@ pragma solidity ^0.8.13;
 import "../../REP-10_Base.t.sol";
 
 contract RoninRandomBeaconXRoninValidatorSetTest is REP10_BaseTest {
-  function testFuzz_getBlockProducers_And_getValidators_MustBeTheSame(uint16 wrapUpEpochCount) external {
+  function testFuzz_getBlockProducers_And_getValidators_MustBeTheSame(
+    uint16 wrapUpEpochCount
+  ) external {
     vm.deal(address(roninValidatorSet), 10_000_000 ether);
     vm.deal(address(stakingVesting), 100_000_000 ether);
     vm.assume(wrapUpEpochCount > 0 && wrapUpEpochCount < 400);
@@ -102,7 +104,9 @@ contract RoninRandomBeaconXRoninValidatorSetTest is REP10_BaseTest {
     );
   }
 
-  function testFuzz_NotIncludeRevokedCandidates_execWrapUpBeaconPeriod(uint256 revokeCount) public {
+  function testFuzz_NotIncludeRevokedCandidates_execWrapUpBeaconPeriod(
+    uint256 revokeCount
+  ) public {
     vm.deal(address(roninValidatorSet), 10_000_000 ether);
     vm.deal(address(stakingVesting), 100_000_000 ether);
 

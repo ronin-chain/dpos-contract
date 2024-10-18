@@ -18,11 +18,17 @@ interface IFastFinalityTracking {
     mapping(address cid => uint256 normalizedStake) normalizedStake;
   }
 
-  function initialize(address validatorContract) external;
+  function initialize(
+    address validatorContract
+  ) external;
 
-  function initializeV2(address profileContract) external;
+  function initializeV2(
+    address profileContract
+  ) external;
 
-  function initializeV3(address stakingContract) external;
+  function initializeV3(
+    address stakingContract
+  ) external;
 
   /**
    * @dev Submit list of `voters` who vote for fast finality in the current block.
@@ -31,7 +37,9 @@ interface IFastFinalityTracking {
    * - Only called once per block
    * - Only coinbase can call this method
    */
-  function recordFinality(TConsensus[] calldata voters) external;
+  function recordFinality(
+    TConsensus[] calldata voters
+  ) external;
 
   /**
    * @dev Returns vote count of `addrs` in the `epoch`.
@@ -44,7 +52,9 @@ interface IFastFinalityTracking {
   /**
    * @dev Returns normalized data for given period.
    */
-  function getNormalizedSum(uint256 period) external view returns (uint256 normalizedSum);
+  function getNormalizedSum(
+    uint256 period
+  ) external view returns (uint256 normalizedSum);
 
   /**
    * @dev Returns normalized stake of `cid` in the `period`.

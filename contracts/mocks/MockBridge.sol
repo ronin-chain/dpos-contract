@@ -11,7 +11,9 @@ contract MockBridge is IBridge {
   /// @dev Bridge operators array
   address[] public bridgeOperators;
 
-  function replaceBridgeOperators(address[] calldata _list) external {
+  function replaceBridgeOperators(
+    address[] calldata _list
+  ) external {
     address _addr;
     for (uint256 _i = 0; _i < _list.length; _i++) {
       _addr = _list[_i];

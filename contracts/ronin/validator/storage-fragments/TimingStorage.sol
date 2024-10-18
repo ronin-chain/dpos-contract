@@ -31,7 +31,9 @@ abstract contract TimingStorage is ITimingInfo, GlobalConfigConsumer {
   /**
    * @inheritdoc ITimingInfo
    */
-  function getPeriodEndBlock(uint256 period) external view returns (uint256 endedAtBlock) {
+  function getPeriodEndBlock(
+    uint256 period
+  ) external view returns (uint256 endedAtBlock) {
     if (period > _lastUpdatedPeriod) revert ErrPeriodNotEndedYet(period);
     uint256 firstTrackedPeriodEnd = _firstTrackedPeriodEnd;
     if (period < firstTrackedPeriodEnd) revert ErrPeriodEndingBlockNotTracked(period, firstTrackedPeriodEnd);
@@ -49,14 +51,18 @@ abstract contract TimingStorage is ITimingInfo, GlobalConfigConsumer {
   /**
    * @inheritdoc ITimingInfo
    */
-  function epochOf(uint256 _block) public view virtual override returns (uint256) {
+  function epochOf(
+    uint256 _block
+  ) public view virtual override returns (uint256) {
     return _block / _numberOfBlocksInEpoch + 1;
   }
 
   /**
    * @inheritdoc ITimingInfo
    */
-  function tryGetPeriodOfEpoch(uint256 _epoch) external view returns (bool _filled, uint256 _periodNumber) {
+  function tryGetPeriodOfEpoch(
+    uint256 _epoch
+  ) external view returns (bool _filled, uint256 _periodNumber) {
     return (_epoch <= epochOf(block.number) || _periodOf[_epoch] > 0, _periodOf[_epoch]);
   }
 
@@ -70,7 +76,9 @@ abstract contract TimingStorage is ITimingInfo, GlobalConfigConsumer {
   /**
    * @inheritdoc ITimingInfo
    */
-  function epochEndingAt(uint256 _block) public view virtual override returns (bool) {
+  function epochEndingAt(
+    uint256 _block
+  ) public view virtual override returns (bool) {
     return _block % _numberOfBlocksInEpoch == _numberOfBlocksInEpoch - 1;
   }
 
@@ -98,14 +106,18 @@ abstract contract TimingStorage is ITimingInfo, GlobalConfigConsumer {
   /**
    * @dev See `ITimingInfo-isPeriodEnding`
    */
-  function _isPeriodEnding(uint256 _newPeriod) internal view virtual returns (bool) {
+  function _isPeriodEnding(
+    uint256 _newPeriod
+  ) internal view virtual returns (bool) {
     return _newPeriod > _lastUpdatedPeriod;
   }
 
   /**
    * @dev Returns the calculated period.
    */
-  function _computePeriod(uint256 _timestamp) internal pure returns (uint256) {
+  function _computePeriod(
+    uint256 _timestamp
+  ) internal pure returns (uint256) {
     return _timestamp / PERIOD_DURATION;
   }
 }

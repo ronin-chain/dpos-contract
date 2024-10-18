@@ -9,35 +9,51 @@ contract MockTUint256Slot {
 
   uint256 private _primitiveUint256;
 
-  function subPrimitive(uint256 val) external view returns (uint256 res) {
+  function subPrimitive(
+    uint256 val
+  ) external view returns (uint256 res) {
     res = _primitiveUint256 - val;
   }
 
-  function subCustomSlot(uint256 val) external view returns (uint256 res) {
+  function subCustomSlot(
+    uint256 val
+  ) external view returns (uint256 res) {
     res = CUSTOM_SLOT_UINT256.sub(val);
   }
 
-  function divCustomSlot(uint256 val) external view returns (uint256 res) {
+  function divCustomSlot(
+    uint256 val
+  ) external view returns (uint256 res) {
     res = CUSTOM_SLOT_UINT256.div(val);
   }
 
-  function divPrimitive(uint256 val) external view returns (uint256 res) {
+  function divPrimitive(
+    uint256 val
+  ) external view returns (uint256 res) {
     res = _primitiveUint256 / val;
   }
 
-  function mulCustomSlot(uint256 val) external view returns (uint256 res) {
+  function mulCustomSlot(
+    uint256 val
+  ) external view returns (uint256 res) {
     res = CUSTOM_SLOT_UINT256.mul(val);
   }
 
-  function mulPrimitive(uint256 val) external view returns (uint256 res) {
+  function mulPrimitive(
+    uint256 val
+  ) external view returns (uint256 res) {
     res = _primitiveUint256 * val;
   }
 
-  function addPrimitive(uint256 val) external view returns (uint256 res) {
+  function addPrimitive(
+    uint256 val
+  ) external view returns (uint256 res) {
     res = _primitiveUint256 + val;
   }
 
-  function addCustomSlot(uint256 val) external view returns (uint256 res) {
+  function addCustomSlot(
+    uint256 val
+  ) external view returns (uint256 res) {
     res = CUSTOM_SLOT_UINT256.add(val);
   }
 
@@ -73,29 +89,41 @@ contract MockTUint256Slot {
     res = CUSTOM_SLOT_UINT256.postDecrement();
   }
 
-  function setCustomSlot(uint256 val) external returns (uint256 stored) {
+  function setCustomSlot(
+    uint256 val
+  ) external returns (uint256 stored) {
     CUSTOM_SLOT_UINT256.store(val);
     stored = CUSTOM_SLOT_UINT256.load();
   }
 
-  function setPrimitive(uint256 val) external returns (uint256 stored) {
+  function setPrimitive(
+    uint256 val
+  ) external returns (uint256 stored) {
     _primitiveUint256 = val;
     stored = _primitiveUint256;
   }
 
-  function subAssignCustomSlot(uint256 val) external returns (uint256 stored) {
+  function subAssignCustomSlot(
+    uint256 val
+  ) external returns (uint256 stored) {
     stored = CUSTOM_SLOT_UINT256.subAssign(val);
   }
 
-  function subAssignPrimitive(uint256 val) external returns (uint256 stored) {
+  function subAssignPrimitive(
+    uint256 val
+  ) external returns (uint256 stored) {
     stored = _primitiveUint256 -= val;
   }
 
-  function addAssignCustomSlot(uint256 val) external returns (uint256 stored) {
+  function addAssignCustomSlot(
+    uint256 val
+  ) external returns (uint256 stored) {
     stored = CUSTOM_SLOT_UINT256.addAssign(val);
   }
 
-  function addAssignPrimitive(uint256 val) external returns (uint256 stored) {
+  function addAssignPrimitive(
+    uint256 val
+  ) external returns (uint256 stored) {
     stored = _primitiveUint256 += val;
   }
 

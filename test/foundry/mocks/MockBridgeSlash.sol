@@ -42,13 +42,17 @@ contract MockBridgeSlash is IBridgeSlash {
     uint256 period
   ) external { }
 
-  function getAddedPeriodOf(address[] calldata bridgeOperators) external view returns (uint256[] memory addedPeriods) { }
+  function getAddedPeriodOf(
+    address[] calldata bridgeOperators
+  ) external view returns (uint256[] memory addedPeriods) { }
 
   function getPenaltyDurations() external pure returns (uint256[] memory penaltyDurations) { }
 
   function getSlashTier(uint256 ballot, uint256 totalVote) external pure returns (Tier tier) { }
 
-  function getSlashUntilPeriodOf(address[] calldata operators) external view returns (uint256[] memory untilPeriods) {
+  function getSlashUntilPeriodOf(
+    address[] calldata operators
+  ) external view returns (uint256[] memory untilPeriods) {
     untilPeriods = new uint256[](operators.length);
     for (uint i; i < operators.length; i++) {
       untilPeriods[i] = _slashMap[operators[i]];

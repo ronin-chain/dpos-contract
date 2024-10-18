@@ -106,9 +106,13 @@ abstract contract SlashFastFinality is ISlashFastFinality, HasContracts, PCUVali
   /**
    * @dev Get governor, i.e. governing validator's weight, of the `addr`.
    */
-  function _getGovernorWeight(address addr) internal view returns (uint256) {
+  function _getGovernorWeight(
+    address addr
+  ) internal view returns (uint256) {
     return IRoninTrustedOrganization(getContract(ContractType.RONIN_TRUSTED_ORGANIZATION)).getGovernorWeight(addr);
   }
 
-  function __css2cid(TConsensus consensusAddr) internal view virtual returns (address);
+  function __css2cid(
+    TConsensus consensusAddr
+  ) internal view virtual returns (address);
 }

@@ -31,9 +31,13 @@ interface ISlashIndicator is ISlashDoubleSign, ISlashUnavailability, ICreditScor
     uint256[4] calldata _creditScoreConfigs
   ) external;
 
-  function initializeV2(address roninGovernanceAdminContract) external;
+  function initializeV2(
+    address roninGovernanceAdminContract
+  ) external;
 
-  function initializeV3(address profileContract) external;
+  function initializeV3(
+    address profileContract
+  ) external;
 
   function initializeV4(
     address randomBeaconContract,

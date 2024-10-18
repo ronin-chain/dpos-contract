@@ -8,7 +8,9 @@ contract MockActor {
 
   address private _target;
 
-  constructor(address target) {
+  constructor(
+    address target
+  ) {
     _target = target;
   }
 

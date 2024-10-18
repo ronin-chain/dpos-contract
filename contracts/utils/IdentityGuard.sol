@@ -35,7 +35,9 @@ abstract contract IdentityGuard {
    * Requirements:
    * - The elements in the `arr` array must not contain any duplicates.
    */
-  modifier nonDuplicate(address[] memory arr) virtual {
+  modifier nonDuplicate(
+    address[] memory arr
+  ) virtual {
     _requireNonDuplicate(arr);
     _;
   }
@@ -53,7 +55,9 @@ abstract contract IdentityGuard {
    * @param addr The address of the contract to check.
    * @dev Throws an error if the contract address has no code.
    */
-  function _requireHasCode(address addr) internal view {
+  function _requireHasCode(
+    address addr
+  ) internal view {
     if (addr.code.length == 0) revert ErrZeroCodeContract(addr);
   }
 
@@ -61,7 +65,9 @@ abstract contract IdentityGuard {
    * @dev Checks if an address is zero and reverts if it is.
    * @param addr The address to check.
    */
-  function _requireNonZeroAddress(address addr) internal pure {
+  function _requireNonZeroAddress(
+    address addr
+  ) internal pure {
     if (addr == address(0)) revert ErrZeroAddress(msg.sig);
   }
 
@@ -70,7 +76,9 @@ abstract contract IdentityGuard {
    * Checks if an array contains any duplicate addresses and reverts if duplicates are found.
    * @param arr The array of addresses to check.
    */
-  function _requireNonDuplicate(address[] memory arr) internal pure {
+  function _requireNonDuplicate(
+    address[] memory arr
+  ) internal pure {
     if (arr.hasDuplicate()) revert LibArray.ErrDuplicated(msg.sig);
   }
 
@@ -80,7 +88,9 @@ abstract contract IdentityGuard {
    * It checks the codehash of the address against a predefined constant to confirm that the address is a created EOA.
    * @notice This method only works with non-state EOA accounts
    */
-  function _requireCreatedEOA(address addr) internal view {
+  function _requireCreatedEOA(
+    address addr
+  ) internal view {
     _requireNonZeroAddress(addr);
     bytes32 codehash = addr.codehash;
     if (codehash != CREATED_ACCOUNT_HASH) revert ErrAddressIsNotCreatedEOA(addr, codehash);

@@ -14,7 +14,9 @@ contract TransparentUpgradeableProxyV2 is TransparentUpgradeableProxy, ITranspar
   /**
    * @inheritdoc ITransparentUpgradeableProxyV2
    */
-  function functionDelegateCall(bytes memory _data) public payable ifAdmin {
+  function functionDelegateCall(
+    bytes memory _data
+  ) public payable ifAdmin {
     address _addr = _implementation();
     assembly {
       let _result := delegatecall(gas(), _addr, add(_data, 32), mload(_data), 0, 0)

@@ -35,11 +35,15 @@ contract MockForwarderTarget is RONTransferHelper {
     data = _data;
   }
 
-  function foo(uint256 _data) external onlyOwner {
+  function foo(
+    uint256 _data
+  ) external onlyOwner {
     data = _data;
   }
 
-  function fooPayable(uint256 _data) external payable onlyOwner {
+  function fooPayable(
+    uint256 _data
+  ) external payable onlyOwner {
     data = _data;
   }
 

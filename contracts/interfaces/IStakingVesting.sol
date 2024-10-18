@@ -39,7 +39,9 @@ interface IStakingVesting {
 
   function initializeV2() external;
 
-  function initializeV3(uint256 fastFinalityRewardPercent) external;
+  function initializeV3(
+    uint256 fastFinalityRewardPercent
+  ) external;
 
   function initializeV4(uint256 activatedAtPeriod, uint256 fastFinalityRewardPercentREP10) external;
 
@@ -51,12 +53,16 @@ interface IStakingVesting {
   /**
    * @dev Returns the bonus amount for the block producer at `blockNum`.
    */
-  function blockProducerBlockBonus(uint256 blockNum) external view returns (uint256);
+  function blockProducerBlockBonus(
+    uint256 blockNum
+  ) external view returns (uint256);
 
   /**
    * @dev Returns the bonus amount for the bridge validator at `blockNum`.
    */
-  function bridgeOperatorBlockBonus(uint256 blockNum) external view returns (uint256);
+  function bridgeOperatorBlockBonus(
+    uint256 blockNum
+  ) external view returns (uint256);
 
   /**
    * @dev Returns the percentage of fast finality reward.
@@ -116,7 +122,9 @@ interface IStakingVesting {
    * - The method caller is admin.
    *
    */
-  function setBlockProducerBonusPerBlock(uint256 amount) external;
+  function setBlockProducerBonusPerBlock(
+    uint256 amount
+  ) external;
 
   /**
    * @dev Sets the bonus amount per block for bridge operator.
@@ -127,7 +135,9 @@ interface IStakingVesting {
    * - The method caller is admin.
    *
    */
-  function setBridgeOperatorBonusPerBlock(uint256 _amount) external;
+  function setBridgeOperatorBonusPerBlock(
+    uint256 _amount
+  ) external;
 
   /**
    * @dev Sets the percent of fast finality reward.
@@ -138,5 +148,7 @@ interface IStakingVesting {
    * - The method caller is admin.
    *
    */
-  function setFastFinalityRewardPercentage(uint256 _percent) external;
+  function setFastFinalityRewardPercentage(
+    uint256 _percent
+  ) external;
 }

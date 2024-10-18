@@ -12,9 +12,13 @@ contract MockBridgeManager is IBridgeManager {
     address[] calldata bridgeOperators
   ) external returns (bool[] memory addeds) { }
 
-  function getBridgeOperatorOf(address[] calldata gorvernors) external view returns (address[] memory bridgeOperators_) { }
+  function getBridgeOperatorOf(
+    address[] calldata gorvernors
+  ) external view returns (address[] memory bridgeOperators_) { }
 
-  function getBridgeOperatorWeight(address bridgeOperator) external view returns (uint96 weight) { }
+  function getBridgeOperatorWeight(
+    address bridgeOperator
+  ) external view returns (uint96 weight) { }
 
   function getBridgeOperators() external view returns (address[] memory) { }
 
@@ -24,23 +28,37 @@ contract MockBridgeManager is IBridgeManager {
     returns (address[] memory governors, address[] memory bridgeOperators, uint96[] memory weights)
   { }
 
-  function getGovernorWeight(address governor) external view returns (uint96) { }
+  function getGovernorWeight(
+    address governor
+  ) external view returns (uint96) { }
 
-  function getGovernorWeights(address[] calldata governors) external view returns (uint96[] memory weights) { }
+  function getGovernorWeights(
+    address[] calldata governors
+  ) external view returns (uint96[] memory weights) { }
 
   function getGovernors() external view returns (address[] memory) { }
 
-  function getGovernorsOf(address[] calldata bridgeOperators) external view returns (address[] memory governors) { }
+  function getGovernorsOf(
+    address[] calldata bridgeOperators
+  ) external view returns (address[] memory governors) { }
 
   function getTotalWeight() external view returns (uint256) { }
 
-  function isBridgeOperator(address addr) external view returns (bool) { }
+  function isBridgeOperator(
+    address addr
+  ) external view returns (bool) { }
 
-  function removeBridgeOperators(address[] calldata bridgeOperators) external returns (bool[] memory removeds) { }
+  function removeBridgeOperators(
+    address[] calldata bridgeOperators
+  ) external returns (bool[] memory removeds) { }
 
-  function sumGovernorsWeight(address[] calldata governors) external view returns (uint256 sum) { }
+  function sumGovernorsWeight(
+    address[] calldata governors
+  ) external view returns (uint256 sum) { }
 
   function totalBridgeOperator() external view returns (uint256) { }
 
-  function updateBridgeOperator(address bridgeOperator) external { }
+  function updateBridgeOperator(
+    address bridgeOperator
+  ) external { }
 }

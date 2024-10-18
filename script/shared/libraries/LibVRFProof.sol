@@ -55,7 +55,9 @@ library LibVRFProof {
     }
   }
 
-  function genVRFKeys(uint256 count) internal returns (VRFKey[] memory keys) {
+  function genVRFKeys(
+    uint256 count
+  ) internal returns (VRFKey[] memory keys) {
     string[] memory cmdInput = new string[](1);
     cmdInput[0] = "./script/misc/genkey.sh";
     keys = new VRFKey[](count);
@@ -127,7 +129,9 @@ library LibVRFProof {
     }
   }
 
-  function parseProof(string memory proofPath) internal view returns (VRF.Proof memory proof) {
+  function parseProof(
+    string memory proofPath
+  ) internal view returns (VRF.Proof memory proof) {
     string memory raw = vm.readFile(proofPath);
     JSONParserLib.Item memory data = raw.parse();
 
@@ -151,7 +155,9 @@ library LibVRFProof {
     proof.zInv = vm.parseUint(data.at('"zInv"').value().decodeString());
   }
 
-  function logProof(VRF.Proof memory proof) internal view {
+  function logProof(
+    VRF.Proof memory proof
+  ) internal view {
     console.log("\n==================================================================================");
 
     console.log("pk[0]", proof.pk[0]);
@@ -176,13 +182,17 @@ library LibVRFProof {
     console.log("====================================================================================\n");
   }
 
-  function makeAddrAndKey(string memory name) private returns (address addr, uint256 privateKey) {
+  function makeAddrAndKey(
+    string memory name
+  ) private returns (address addr, uint256 privateKey) {
     privateKey = boundPrivateKey(uint256(keccak256(abi.encodePacked(name))));
     addr = vm.addr(privateKey);
     vm.label(addr, name);
   }
 
-  function boundPrivateKey(uint256 privateKey) internal pure returns (uint256 result) {
+  function boundPrivateKey(
+    uint256 privateKey
+  ) internal pure returns (uint256 result) {
     result = _bound(privateKey, 1, SECP256K1_ORDER - 1);
   }
 

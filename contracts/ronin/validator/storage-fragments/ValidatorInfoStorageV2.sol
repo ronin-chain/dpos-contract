@@ -87,15 +87,21 @@ abstract contract ValidatorInfoStorageV2 is IValidatorInfoV2, HasContracts, HasT
   /**
    * @inheritdoc IValidatorInfoV2
    */
-  function isBlockProducer(TConsensus consensusAddr) public view override returns (bool) {
+  function isBlockProducer(
+    TConsensus consensusAddr
+  ) public view override returns (bool) {
     return _isBlockProducerById(__css2cid(consensusAddr));
   }
 
-  function isBlockProducerById(address id) external view override returns (bool) {
+  function isBlockProducerById(
+    address id
+  ) external view override returns (bool) {
     return _isBlockProducerById(id);
   }
 
-  function _isBlockProducerById(address id) internal view returns (bool yes) {
+  function _isBlockProducerById(
+    address id
+  ) internal view returns (bool yes) {
     yes = _validatorMap[id];
   }
 
@@ -129,11 +135,17 @@ abstract contract ValidatorInfoStorageV2 is IValidatorInfoV2, HasContracts, HasT
   }
 
   /// @dev See {RoninValidatorSet-__css2cid}
-  function __css2cid(TConsensus consensusAddr) internal view virtual returns (address);
+  function __css2cid(
+    TConsensus consensusAddr
+  ) internal view virtual returns (address);
 
   /// @dev See {RoninValidatorSet-__css2cidBatch}
-  function __css2cidBatch(TConsensus[] memory consensusAddrs) internal view virtual returns (address[] memory);
+  function __css2cidBatch(
+    TConsensus[] memory consensusAddrs
+  ) internal view virtual returns (address[] memory);
 
   /// @dev See {RoninValidatorSet-__cid2cssBatch}
-  function __cid2cssBatch(address[] memory cids) internal view virtual returns (TConsensus[] memory);
+  function __cid2cssBatch(
+    address[] memory cids
+  ) internal view virtual returns (TConsensus[] memory);
 }

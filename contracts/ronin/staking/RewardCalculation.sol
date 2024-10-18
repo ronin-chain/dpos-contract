@@ -47,7 +47,9 @@ abstract contract RewardCalculation is IRewardPool {
   /**
    * @dev See {IRewardPool-getStakingTotal}
    */
-  function _getStakingTotal(address poolId) internal view virtual returns (uint256);
+  function _getStakingTotal(
+    address poolId
+  ) internal view virtual returns (uint256);
 
   /**
    * @dev Returns the reward amount that user claimable.
@@ -234,5 +236,7 @@ abstract contract RewardCalculation is IRewardPool {
    */
   function _currentPeriod() internal view virtual returns (uint256);
 
-  function __css2cid(TConsensus consensusAddr) internal view virtual returns (address);
+  function __css2cid(
+    TConsensus consensusAddr
+  ) internal view virtual returns (address);
 }

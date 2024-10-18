@@ -86,7 +86,9 @@ contract Migration__01_Upgrade_Testnet_Release_V0_8_0 is RoninMigration {
     LibProposal.executeProposal(roninGovernanceAdmin, roninTrustedOrganization, proposal);
   }
 
-  function _updateConfig(ISharedArgument.SharedParameter memory param) internal pure {
+  function _updateConfig(
+    ISharedArgument.SharedParameter memory param
+  ) internal pure {
     param.slashIndicator.slashRandomBeacon.randomBeaconSlashAmount = SLASH_RANDOM_BEACON_AMOUNT;
   }
 
@@ -234,10 +236,9 @@ contract Migration__01_Upgrade_Testnet_Release_V0_8_0 is RoninMigration {
     vm.stopBroadcast();
   }
 
-  function _buildProposalData(ISharedArgument.SharedParameter memory param)
-    internal
-    returns (address[] memory targets, uint256[] memory values, bytes[] memory callDatas)
-  {
+  function _buildProposalData(
+    ISharedArgument.SharedParameter memory param
+  ) internal returns (address[] memory targets, uint256[] memory values, bytes[] memory callDatas) {
     uint256 innerCallCount = contractTypesToUpgrade.length;
     console.log("Number contract to upgrade:", innerCallCount);
 

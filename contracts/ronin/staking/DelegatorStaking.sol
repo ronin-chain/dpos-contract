@@ -15,7 +15,9 @@ abstract contract DelegatorStaking is BaseStaking, IDelegatorStaking {
   /**
    * @inheritdoc IDelegatorStaking
    */
-  function delegate(TConsensus consensusAddr) external payable noEmptyValue poolOfConsensusIsActive(consensusAddr) {
+  function delegate(
+    TConsensus consensusAddr
+  ) external payable noEmptyValue poolOfConsensusIsActive(consensusAddr) {
     if (isAdminOfActivePool(msg.sender)) revert ErrAdminOfAnyActivePoolForbidden(msg.sender);
     _delegate(_poolDetail[__css2cid(consensusAddr)], msg.sender, msg.value);
   }
@@ -67,12 +69,9 @@ abstract contract DelegatorStaking is BaseStaking, IDelegatorStaking {
   /**
    * @inheritdoc IDelegatorStaking
    */
-  function claimRewards(TConsensus[] calldata consensusAddrList)
-    external
-    override
-    nonReentrant
-    returns (uint256 amount)
-  {
+  function claimRewards(
+    TConsensus[] calldata consensusAddrList
+  ) external override nonReentrant returns (uint256 amount) {
     amount = _claimRewards(msg.sender, __css2cidBatch(consensusAddrList));
     _transferRON(payable(msg.sender), amount);
   }

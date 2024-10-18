@@ -54,7 +54,9 @@ library Token {
   /**
    * @dev Returns token info struct hash.
    */
-  function hash(Info memory _info) internal pure returns (bytes32 digest) {
+  function hash(
+    Info memory _info
+  ) internal pure returns (bytes32 digest) {
     // keccak256(abi.encode(INFO_TYPE_HASH, _info.erc, _info.id, _info.quantity))
     assembly {
       let ptr := mload(0x40)
@@ -69,7 +71,9 @@ library Token {
   /**
    * @dev Validates the token info.
    */
-  function validate(Info memory _info) internal pure {
+  function validate(
+    Info memory _info
+  ) internal pure {
     if (
       !(
         (_info.erc == Standard.ERC20 && _info.quantity > 0 && _info.id == 0)
@@ -185,7 +189,9 @@ library Token {
   /**
    * @dev Returns ownership struct hash.
    */
-  function hash(Owner memory _owner) internal pure returns (bytes32 digest) {
+  function hash(
+    Owner memory _owner
+  ) internal pure returns (bytes32 digest) {
     // keccak256(abi.encode(OWNER_TYPE_HASH, _owner.addr, _owner.tokenAddr, _owner.chainId))
     assembly {
       let ptr := mload(0x40)

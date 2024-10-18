@@ -47,7 +47,9 @@ contract RoninTrustedOrganization is IRoninTrustedOrganization, HasProxyAdmin, H
     _setThreshold(num, denom);
   }
 
-  function initializeV2(address profileContract) external reinitializer(2) {
+  function initializeV2(
+    address profileContract
+  ) external reinitializer(2) {
     _setContract(ContractType.PROFILE, profileContract);
     for (uint i; i < __deprecatedBridgeVoterList.length; ++i) {
       delete __deprecatedBridgeVoterWeight[__deprecatedBridgeVoterList[i]];
@@ -65,7 +67,9 @@ contract RoninTrustedOrganization is IRoninTrustedOrganization, HasProxyAdmin, H
   /**
    * @inheritdoc IQuorum
    */
-  function checkThreshold(uint256 _voteWeight) external view virtual returns (bool) {
+  function checkThreshold(
+    uint256 _voteWeight
+  ) external view virtual returns (bool) {
     return _voteWeight * _denom >= _num * _totalWeight;
   }
 
@@ -89,14 +93,18 @@ contract RoninTrustedOrganization is IRoninTrustedOrganization, HasProxyAdmin, H
   /**
    * @inheritdoc IRoninTrustedOrganization
    */
-  function addTrustedOrganizations(TrustedOrganization[] calldata _list) external override onlyAdmin {
+  function addTrustedOrganizations(
+    TrustedOrganization[] calldata _list
+  ) external override onlyAdmin {
     _addTrustedOrganizations(_list);
   }
 
   /**
    * @inheritdoc IRoninTrustedOrganization
    */
-  function updateTrustedOrganizations(TrustedOrganization[] calldata _list) external override onlyAdmin {
+  function updateTrustedOrganizations(
+    TrustedOrganization[] calldata _list
+  ) external override onlyAdmin {
     if (_list.length == 0) revert ErrEmptyArray();
     for (uint256 _i; _i < _list.length;) {
       _updateTrustedOrganization(_list[_i]);
@@ -111,7 +119,9 @@ contract RoninTrustedOrganization is IRoninTrustedOrganization, HasProxyAdmin, H
   /**
    * @inheritdoc IRoninTrustedOrganization
    */
-  function removeTrustedOrganizations(TConsensus[] calldata list) external override onlyAdmin {
+  function removeTrustedOrganizations(
+    TConsensus[] calldata list
+  ) external override onlyAdmin {
     if (list.length == 0) revert ErrEmptyArray();
 
     for (uint _i = 0; _i < list.length;) {
@@ -138,44 +148,58 @@ contract RoninTrustedOrganization is IRoninTrustedOrganization, HasProxyAdmin, H
   /**
    * @inheritdoc IRoninTrustedOrganization
    */
-  function getConsensusWeight(TConsensus consensusAddr) external view returns (uint256) {
+  function getConsensusWeight(
+    TConsensus consensusAddr
+  ) external view returns (uint256) {
     return _getConsensusWeightByConsensus(consensusAddr);
   }
 
   /**
    * @inheritdoc IRoninTrustedOrganization
    */
-  function getConsensusWeightById(address cid) external view returns (uint256) {
+  function getConsensusWeightById(
+    address cid
+  ) external view returns (uint256) {
     return _getConsensusWeightByConsensus(__cid2css(cid));
   }
 
-  function _getConsensusWeightByConsensus(TConsensus consensusAddr) internal view returns (uint256) {
+  function _getConsensusWeightByConsensus(
+    TConsensus consensusAddr
+  ) internal view returns (uint256) {
     return _consensusWeight[consensusAddr];
   }
 
   /**
    * @inheritdoc IRoninTrustedOrganization
    */
-  function getGovernorWeight(address _governor) external view returns (uint256) {
+  function getGovernorWeight(
+    address _governor
+  ) external view returns (uint256) {
     return _governorWeight[_governor];
   }
 
   /**
    * @inheritdoc IRoninTrustedOrganization
    */
-  function getConsensusWeights(TConsensus[] calldata list) external view returns (uint256[] memory) {
+  function getConsensusWeights(
+    TConsensus[] calldata list
+  ) external view returns (uint256[] memory) {
     return _getManyConsensusWeightsByConsensus(list);
   }
 
   /**
    * @inheritdoc IRoninTrustedOrganization
    */
-  function getConsensusWeightsById(address[] calldata cids) external view returns (uint256[] memory) {
+  function getConsensusWeightsById(
+    address[] calldata cids
+  ) external view returns (uint256[] memory) {
     TConsensus[] memory consensusList = __cid2cssBatch(cids);
     return _getManyConsensusWeightsByConsensus(consensusList);
   }
 
-  function _getManyConsensusWeightsByConsensus(TConsensus[] memory list) internal view returns (uint256[] memory res) {
+  function _getManyConsensusWeightsByConsensus(
+    TConsensus[] memory list
+  ) internal view returns (uint256[] memory res) {
     res = new uint256[](list.length);
     for (uint i = 0; i < res.length; ++i) {
       res[i] = _getConsensusWeightByConsensus(list[i]);
@@ -185,7 +209,9 @@ contract RoninTrustedOrganization is IRoninTrustedOrganization, HasProxyAdmin, H
   /**
    * @inheritdoc IRoninTrustedOrganization
    */
-  function getGovernorWeights(address[] calldata _list) external view returns (uint256[] memory _res) {
+  function getGovernorWeights(
+    address[] calldata _list
+  ) external view returns (uint256[] memory _res) {
     _res = new uint256[](_list.length);
     for (uint _i = 0; _i < _res.length;) {
       _res[_i] = _governorWeight[_list[_i]];
@@ -199,7 +225,9 @@ contract RoninTrustedOrganization is IRoninTrustedOrganization, HasProxyAdmin, H
   /**
    * @inheritdoc IRoninTrustedOrganization
    */
-  function sumConsensusWeight(TConsensus[] calldata _list) external view returns (uint256 _res) {
+  function sumConsensusWeight(
+    TConsensus[] calldata _list
+  ) external view returns (uint256 _res) {
     for (uint _i = 0; _i < _list.length;) {
       _res += _consensusWeight[_list[_i]];
 
@@ -212,7 +240,9 @@ contract RoninTrustedOrganization is IRoninTrustedOrganization, HasProxyAdmin, H
   /**
    * @inheritdoc IRoninTrustedOrganization
    */
-  function sumGovernorWeight(address[] calldata _list) external view returns (uint256 _res) {
+  function sumGovernorWeight(
+    address[] calldata _list
+  ) external view returns (uint256 _res) {
     for (uint _i = 0; _i < _list.length;) {
       _res += _governorWeight[_list[_i]];
 
@@ -222,7 +252,9 @@ contract RoninTrustedOrganization is IRoninTrustedOrganization, HasProxyAdmin, H
     }
   }
 
-  function sumGovernorWeights(address[] calldata _list) external view returns (uint256 _res) {
+  function sumGovernorWeights(
+    address[] calldata _list
+  ) external view returns (uint256 _res) {
     return this.sumGovernorWeight(_list);
   }
 
@@ -255,7 +287,9 @@ contract RoninTrustedOrganization is IRoninTrustedOrganization, HasProxyAdmin, H
   /**
    * @inheritdoc IRoninTrustedOrganization
    */
-  function getTrustedOrganization(TConsensus _consensusAddr) external view returns (TrustedOrganization memory res) {
+  function getTrustedOrganization(
+    TConsensus _consensusAddr
+  ) external view returns (TrustedOrganization memory res) {
     for (uint i = 0; i < _consensusList.length; ++i) {
       if (_consensusList[i] == _consensusAddr) {
         res = getTrustedOrganizationAt(i);
@@ -266,7 +300,9 @@ contract RoninTrustedOrganization is IRoninTrustedOrganization, HasProxyAdmin, H
   /**
    * @inheritdoc IRoninTrustedOrganization
    */
-  function getTrustedOrganizationAt(uint256 _idx) public view override returns (TrustedOrganization memory) {
+  function getTrustedOrganizationAt(
+    uint256 _idx
+  ) public view override returns (TrustedOrganization memory) {
     TConsensus consensus = _consensusList[_idx];
     return TrustedOrganization(
       consensus, _governorList[_idx], address(0), _consensusWeight[consensus], _addedBlock[consensus]
@@ -295,7 +331,9 @@ contract RoninTrustedOrganization is IRoninTrustedOrganization, HasProxyAdmin, H
   /**
    * @dev Adds a list of trusted organizations.
    */
-  function _addTrustedOrganizations(TrustedOrganization[] calldata _list) internal virtual {
+  function _addTrustedOrganizations(
+    TrustedOrganization[] calldata _list
+  ) internal virtual {
     for (uint256 _i; _i < _list.length;) {
       _addTrustedOrganization(_list[_i]);
 
@@ -316,7 +354,9 @@ contract RoninTrustedOrganization is IRoninTrustedOrganization, HasProxyAdmin, H
    * - The bridge voter address is not added.
    *
    */
-  function _addTrustedOrganization(TrustedOrganization memory _v) internal virtual {
+  function _addTrustedOrganization(
+    TrustedOrganization memory _v
+  ) internal virtual {
     if (_v.addedBlock != 0) revert ErrInvalidRequest();
     _sanityCheckTrustedOrganizationData(_v);
 
@@ -344,7 +384,9 @@ contract RoninTrustedOrganization is IRoninTrustedOrganization, HasProxyAdmin, H
    * - The consensus address is already added.
    *
    */
-  function _updateTrustedOrganization(TrustedOrganization memory _v) internal virtual {
+  function _updateTrustedOrganization(
+    TrustedOrganization memory _v
+  ) internal virtual {
     _sanityCheckTrustedOrganizationData(_v);
 
     uint256 _weight = _consensusWeight[_v.consensusAddr];
@@ -383,7 +425,9 @@ contract RoninTrustedOrganization is IRoninTrustedOrganization, HasProxyAdmin, H
    * - The consensus address is added.
    *
    */
-  function _removeTrustedOrganization(TConsensus addr) internal virtual {
+  function _removeTrustedOrganization(
+    TConsensus addr
+  ) internal virtual {
     uint256 weight = _consensusWeight[addr];
     if (weight == 0) revert ErrConsensusAddressIsNotAdded(addr);
 
@@ -401,7 +445,9 @@ contract RoninTrustedOrganization is IRoninTrustedOrganization, HasProxyAdmin, H
     _governorList.pop();
   }
 
-  function _findTrustedOrgIndexByConsensus(TConsensus addr) private view returns (bool found, uint256 index) {
+  function _findTrustedOrgIndexByConsensus(
+    TConsensus addr
+  ) private view returns (bool found, uint256 index) {
     uint256 count = _consensusList.length;
     for (uint256 i = 0; i < count; i++) {
       if (_consensusList[i] == addr) {
@@ -410,7 +456,9 @@ contract RoninTrustedOrganization is IRoninTrustedOrganization, HasProxyAdmin, H
     }
   }
 
-  function _deleteConsensusInMappings(TConsensus addr) private {
+  function _deleteConsensusInMappings(
+    TConsensus addr
+  ) private {
     delete _addedBlock[addr];
     delete _consensusWeight[addr];
   }
@@ -443,7 +491,9 @@ contract RoninTrustedOrganization is IRoninTrustedOrganization, HasProxyAdmin, H
    * - The weight must be larger than 0.
    * - The consensus address, governor address, and bridge voter address are different.
    */
-  function _sanityCheckTrustedOrganizationData(TrustedOrganization memory _v) private pure {
+  function _sanityCheckTrustedOrganizationData(
+    TrustedOrganization memory _v
+  ) private pure {
     if (_v.weight == 0) revert ErrInvalidVoteWeight(msg.sig);
 
     address[] memory _addresses = new address[](3);
@@ -454,11 +504,15 @@ contract RoninTrustedOrganization is IRoninTrustedOrganization, HasProxyAdmin, H
     if (LibArray.hasDuplicate(_addresses)) revert LibArray.ErrDuplicated(msg.sig);
   }
 
-  function __cid2css(address cid) internal view returns (TConsensus) {
+  function __cid2css(
+    address cid
+  ) internal view returns (TConsensus) {
     return (IProfile(getContract(ContractType.PROFILE)).getId2Profile(cid)).consensus;
   }
 
-  function __cid2cssBatch(address[] memory cids) internal view returns (TConsensus[] memory) {
+  function __cid2cssBatch(
+    address[] memory cids
+  ) internal view returns (TConsensus[] memory) {
     return IProfile(getContract(ContractType.PROFILE)).getManyId2Consensus(cids);
   }
 }

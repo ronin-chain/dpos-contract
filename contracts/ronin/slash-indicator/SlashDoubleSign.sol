@@ -107,5 +107,7 @@ abstract contract SlashDoubleSign is ISlashDoubleSign, HasContracts, HasValidato
    */
   function _shouldSlash(TConsensus consensus, address validatorId) internal view virtual returns (bool);
 
-  function __tryCss2cid(TConsensus consensusAddr) internal view virtual returns (bool, address);
+  function __tryCss2cid(
+    TConsensus consensusAddr
+  ) internal view virtual returns (bool, address);
 }

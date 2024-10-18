@@ -159,7 +159,9 @@ abstract contract PostChecker_GovernanceAdmin is BaseMigration, PostChecker_Help
     vme.setAddress(network(), Contract.RoninGovernanceAdmin.key(), address(__newGovernanceAdmin));
   }
 
-  function getProxyAdmin(address payable proxy) external view returns (address payable proxyAdmin) {
+  function getProxyAdmin(
+    address payable proxy
+  ) external view returns (address payable proxyAdmin) {
     return proxy.getProxyAdmin();
   }
 }

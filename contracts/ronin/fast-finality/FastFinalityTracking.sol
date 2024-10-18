@@ -42,15 +42,21 @@ contract FastFinalityTracking is IFastFinalityTracking, Initializable, HasContra
     _disableInitializers();
   }
 
-  function initialize(address validatorContract) external initializer {
+  function initialize(
+    address validatorContract
+  ) external initializer {
     _setContract(ContractType.VALIDATOR, validatorContract);
   }
 
-  function initializeV2(address profileContract) external reinitializer(2) {
+  function initializeV2(
+    address profileContract
+  ) external reinitializer(2) {
     _setContract(ContractType.PROFILE, profileContract);
   }
 
-  function initializeV3(address stakingContract) external reinitializer(3) {
+  function initializeV3(
+    address stakingContract
+  ) external reinitializer(3) {
     _setContract(ContractType.STAKING, stakingContract);
   }
 
@@ -64,7 +70,9 @@ contract FastFinalityTracking is IFastFinalityTracking, Initializable, HasContra
   /**
    * @inheritdoc IFastFinalityTracking
    */
-  function getNormalizedSum(uint256 period) external view returns (uint256 normalizedSum) {
+  function getNormalizedSum(
+    uint256 period
+  ) external view returns (uint256 normalizedSum) {
     normalizedSum = _normalizedData[period].normalizedSum;
   }
 
@@ -78,7 +86,9 @@ contract FastFinalityTracking is IFastFinalityTracking, Initializable, HasContra
   /**
    * @inheritdoc IFastFinalityTracking
    */
-  function recordFinality(TConsensus[] calldata voters) external oncePerBlock onlyCoinbase {
+  function recordFinality(
+    TConsensus[] calldata voters
+  ) external oncePerBlock onlyCoinbase {
     unchecked {
       address[] memory votedCids = __css2cidBatch(voters);
 
@@ -196,7 +206,9 @@ contract FastFinalityTracking is IFastFinalityTracking, Initializable, HasContra
     }
   }
 
-  function __css2cidBatch(TConsensus[] memory consensusAddrs) internal view returns (address[] memory) {
+  function __css2cidBatch(
+    TConsensus[] memory consensusAddrs
+  ) internal view returns (address[] memory) {
     return IProfile(getContract(ContractType.PROFILE)).getManyConsensus2Id(consensusAddrs);
   }
 }

@@ -62,7 +62,9 @@ contract GeneralConfig is BaseGeneralConfig {
     }
   }
 
-  function _mapContractName(Contract contractEnum) internal {
+  function _mapContractName(
+    Contract contractEnum
+  ) internal {
     _contractNameMap[contractEnum.key()] = contractEnum.name();
   }
 }

@@ -33,7 +33,9 @@ abstract contract CoreGovernance is ICoreGovernance, ChainTypeConsumer {
 
   uint256 internal _proposalExpiryDuration;
 
-  constructor(uint256 _expiryDuration) {
+  constructor(
+    uint256 _expiryDuration
+  ) {
     _setProposalExpiryDuration(_expiryDuration);
   }
 
@@ -42,7 +44,9 @@ abstract contract CoreGovernance is ICoreGovernance, ChainTypeConsumer {
    * Increases the `_round` number if the previous one is not expired. Delete the previous proposal
    * if it is expired and not increase the `_round`.
    */
-  function _createVotingRound(uint256 _chainId) internal returns (uint256 _round) {
+  function _createVotingRound(
+    uint256 _chainId
+  ) internal returns (uint256 _round) {
     _round = round[_chainId];
     // Skip checking for the first ever round
     if (_round == 0) {
@@ -194,7 +198,9 @@ abstract contract CoreGovernance is ICoreGovernance, ChainTypeConsumer {
    * Note: This function assumes the vote `_proposalVote` is already created, consider verifying the vote's existence
    * before or it will emit an unexpected event of `ProposalExpired`.
    */
-  function _tryDeleteExpiredVotingRound(ProposalVote storage proposalVote) internal returns (bool isExpired) {
+  function _tryDeleteExpiredVotingRound(
+    ProposalVote storage proposalVote
+  ) internal returns (bool isExpired) {
     isExpired = _getChainType() == ChainType.RoninChain && proposalVote.status == VoteStatus.Pending
       && proposalVote.expiryTimestamp <= block.timestamp;
 
@@ -241,7 +247,9 @@ abstract contract CoreGovernance is ICoreGovernance, ChainTypeConsumer {
   /**
    * @dev Sets the expiry duration for a new proposal.
    */
-  function _setProposalExpiryDuration(uint256 expiryDuration) internal {
+  function _setProposalExpiryDuration(
+    uint256 expiryDuration
+  ) internal {
     _proposalExpiryDuration = expiryDuration;
     emit ProposalExpiryDurationChanged(expiryDuration);
   }
