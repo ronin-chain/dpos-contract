@@ -1,0 +1,57 @@
+name: Slither Analyze
+
+on:
+  push:
+    branches:
+      - mainnet
+      - testnet
+      - "feature/*"
+      - "features/*"
+      - "feat/*"
+      - "feats/*"
+  pull_request:
+    branches:
+      - mainnet
+      - testnet
+      - "feature/*"
+      - "features/*"
+      - "feat/*"
+      - "feats/*"
+      - "release/*"
+
+env:
+  FOUNDRY_PROFILE: ci
+
+jobs:
+  check:
+    strategy:
+      fail-fast: true
+
+    name: Foundry project
+    runs-on: ubuntu-latest
+
+    env:
+      ETHERSCAN_API_KEY: ${{ secrets.ETHERSCAN_API_KEY }}
+      INFURA_API_KEY: ${{ secrets.INFURA_API_KEY }}
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Setup repo
+        run: |
+          chmod +x ./install.sh
+          ./install.sh
+        id: setup-repo
+
+      - name: Install Slither for security analysis
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip
+          python3 -m pip install slither-analyzer
+
+      - name: Run Slither analysis
+        run: |
+          slither ./ --exclude-optimization --exclude-low --exclude-medium --exclude-informational --exclude-dependencies --filter-paths "dependencies/|script/|test/foundry/"
+        id: slither
