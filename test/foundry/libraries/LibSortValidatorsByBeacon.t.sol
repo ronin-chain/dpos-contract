@@ -166,7 +166,9 @@ contract LibSortValidatorsByBeaconTest is Test {
     }
   }
 
-  function testConcrete_shouldReplaceHoldSet_whenRequestAgain(uint256 r) external {
+  function testConcrete_shouldReplaceHoldSet_whenRequestAgain(
+    uint256 r
+  ) external {
     uint256 numGovernanceValidator = 2;
     uint256 numStandardValidator = 2;
     uint256 numRotatingValidator = 1;

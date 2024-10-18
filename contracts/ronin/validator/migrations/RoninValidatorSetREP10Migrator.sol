@@ -65,7 +65,9 @@ contract RoninValidatorSetREP10Migrator is ConditionalImplementControl {
    * This function is called while deploying middle layer migrator and {_initialized} slot is customized.
    * @param randomBeacon The address of the RandomBeacon contract.
    */
-  function initialize(address randomBeacon) external initializer {
+  function initialize(
+    address randomBeacon
+  ) external initializer {
     _setContract(ContractType.RANDOM_BEACON, randomBeacon);
   }
 

@@ -5,7 +5,9 @@ import { Test } from "forge-std/Test.sol";
 import { IndexMap, LibIndexMap } from "@ronin/contracts/libraries/LibIndexMap.sol";
 
 contract LibIndexMapTest is Test {
-  function testFuzz_CreateIndexMap(uint16 length) external pure {
+  function testFuzz_CreateIndexMap(
+    uint16 length
+  ) external pure {
     IndexMap memory map = LibIndexMap.create(length);
     assertTrue(map._inner.length != 0, "map.length == 0");
   }

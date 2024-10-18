@@ -101,7 +101,9 @@ contract ChangeConsensusAddressForkTest is Test {
     vm.label(address(_slashIndicator), "SlashIndicator");
   }
 
-  function _toSingletonArrayConsensuses(address consensus) private pure returns (TConsensus[] memory arr) {
+  function _toSingletonArrayConsensuses(
+    address consensus
+  ) private pure returns (TConsensus[] memory arr) {
     arr = new TConsensus[](1);
     arr[0] = TConsensus.wrap(consensus);
   }
@@ -929,7 +931,9 @@ contract ChangeConsensusAddressForkTest is Test {
     _maintenance.schedule(consensus, startAtBlock, endedAtBlock);
   }
 
-  function _bulkWrapUpEpoch(uint256 times) internal {
+  function _bulkWrapUpEpoch(
+    uint256 times
+  ) internal {
     for (uint256 i; i < times; ++i) {
       _fastForwardToNextDay();
       _wrapUpEpoch();
@@ -945,7 +949,9 @@ contract ChangeConsensusAddressForkTest is Test {
     vm.stopPrank();
   }
 
-  function _bulkSubmitBlockReward(uint256 times) internal {
+  function _bulkSubmitBlockReward(
+    uint256 times
+  ) internal {
     for (uint256 i; i < times; ++i) {
       vm.roll(block.number + 1);
       vm.deal(block.coinbase, 1000 ether);
@@ -1027,7 +1033,9 @@ contract ChangeConsensusAddressForkTest is Test {
     );
   }
 
-  function _getProxyAdmin(address proxy) internal view returns (address payable proxyAdmin) {
+  function _getProxyAdmin(
+    address proxy
+  ) internal view returns (address payable proxyAdmin) {
     return payable(address(uint160(uint256(vm.load(address(proxy), ADMIN_SLOT)))));
   }
 
@@ -1050,10 +1058,9 @@ contract ChangeConsensusAddressForkTest is Test {
     vm.roll(epochEndingBlockNumber);
   }
 
-  function _addTrustedOrg(IRoninTrustedOrganization.TrustedOrganization memory trustedOrg)
-    internal
-    returns (IRoninTrustedOrganization.TrustedOrganization[] memory trustedOrgs)
-  {
+  function _addTrustedOrg(
+    IRoninTrustedOrganization.TrustedOrganization memory trustedOrg
+  ) internal returns (IRoninTrustedOrganization.TrustedOrganization[] memory trustedOrgs) {
     trustedOrgs = new IRoninTrustedOrganization.TrustedOrganization[](1);
     trustedOrgs[0] = trustedOrg;
     vm.prank(_getProxyAdmin(address(_roninTO)));

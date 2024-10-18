@@ -83,10 +83,9 @@ contract Migration_01_Upgrade_ShadowForkTestnet_Release_V0_8_0 is RoninMigration
     LibProposal.executeProposal(governanceAdmin, trustedOrg, proposal);
   }
 
-  function _buildProposalData(ISharedArgument.SharedParameter memory param)
-    internal
-    returns (address[] memory targets, uint256[] memory values, bytes[] memory callDatas)
-  {
+  function _buildProposalData(
+    ISharedArgument.SharedParameter memory param
+  ) internal returns (address[] memory targets, uint256[] memory values, bytes[] memory callDatas) {
     uint256 innerCallCount = contractTypesToUpgrade.length;
     console.log("Number contract to upgrade:", innerCallCount);
 

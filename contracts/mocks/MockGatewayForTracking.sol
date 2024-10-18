@@ -7,7 +7,9 @@ import "../extensions/collections/HasContracts.sol";
 import { HasBridgeTrackingDeprecated } from "../utils/DeprecatedSlots.sol";
 
 contract MockGatewayForTracking is HasContracts, HasBridgeTrackingDeprecated {
-  constructor(address bridgeTrackingContract) {
+  constructor(
+    address bridgeTrackingContract
+  ) {
     _setContract(ContractType.BRIDGE_TRACKING, bridgeTrackingContract);
   }
 

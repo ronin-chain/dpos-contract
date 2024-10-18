@@ -28,7 +28,9 @@ abstract contract JailingStorage is IJailingInfo {
   /**
    * @inheritdoc IJailingInfo
    */
-  function checkJailed(TConsensus consensus) external view override returns (bool) {
+  function checkJailed(
+    TConsensus consensus
+  ) external view override returns (bool) {
     address candidateId = __css2cid(consensus);
     return _isJailedAtBlockById(candidateId, block.number);
   }
@@ -44,12 +46,9 @@ abstract contract JailingStorage is IJailingInfo {
   /**
    * @inheritdoc IJailingInfo
    */
-  function getJailedTimeLeft(TConsensus consensus)
-    external
-    view
-    override
-    returns (bool isJailed_, uint256 blockLeft_, uint256 epochLeft_)
-  {
+  function getJailedTimeLeft(
+    TConsensus consensus
+  ) external view override returns (bool isJailed_, uint256 blockLeft_, uint256 epochLeft_) {
     return _getJailedTimeLeftAtBlockById(__css2cid(consensus), block.number);
   }
 
@@ -80,15 +79,21 @@ abstract contract JailingStorage is IJailingInfo {
   /**
    * @inheritdoc IJailingInfo
    */
-  function checkManyJailed(TConsensus[] calldata consensusList) external view override returns (bool[] memory) {
+  function checkManyJailed(
+    TConsensus[] calldata consensusList
+  ) external view override returns (bool[] memory) {
     return _checkManyJailedById(__css2cidBatch(consensusList));
   }
 
-  function checkManyJailedById(address[] calldata candidateIds) external view override returns (bool[] memory) {
+  function checkManyJailedById(
+    address[] calldata candidateIds
+  ) external view override returns (bool[] memory) {
     return _checkManyJailedById(candidateIds);
   }
 
-  function _checkManyJailedById(address[] memory candidateIds) internal view returns (bool[] memory result) {
+  function _checkManyJailedById(
+    address[] memory candidateIds
+  ) internal view returns (bool[] memory result) {
     result = new bool[](candidateIds.length);
     for (uint256 i; i < candidateIds.length;) {
       result[i] = _isJailedById(candidateIds[i]);
@@ -102,7 +107,9 @@ abstract contract JailingStorage is IJailingInfo {
   /**
    * @inheritdoc IJailingInfo
    */
-  function checkMiningRewardDeprecated(TConsensus consensus) external view override returns (bool) {
+  function checkMiningRewardDeprecated(
+    TConsensus consensus
+  ) external view override returns (bool) {
     uint256 period = currentPeriod();
     return _miningRewardDeprecatedById(__css2cid(consensus), period);
   }
@@ -120,7 +127,9 @@ abstract contract JailingStorage is IJailingInfo {
   /**
    * @dev See `ITimingInfo-epochOf`
    */
-  function epochOf(uint256 _block) public view virtual returns (uint256);
+  function epochOf(
+    uint256 _block
+  ) public view virtual returns (uint256);
 
   /**
    * @dev See `ITimingInfo-currentPeriod`
@@ -130,7 +139,9 @@ abstract contract JailingStorage is IJailingInfo {
   /**
    * @dev Returns whether the reward of the validator is put in jail (cannot join the set of validators) during the current period.
    */
-  function _isJailedById(address validatorId) internal view returns (bool) {
+  function _isJailedById(
+    address validatorId
+  ) internal view returns (bool) {
     return _isJailedAtBlockById(validatorId, block.number);
   }
 
@@ -149,8 +160,12 @@ abstract contract JailingStorage is IJailingInfo {
   }
 
   /// @dev See {RoninValidatorSet-__css2cid}
-  function __css2cid(TConsensus consensusAddr) internal view virtual returns (address);
+  function __css2cid(
+    TConsensus consensusAddr
+  ) internal view virtual returns (address);
 
   /// @dev See {RoninValidatorSet-__css2cidBatch}
-  function __css2cidBatch(TConsensus[] memory consensusAddrs) internal view virtual returns (address[] memory);
+  function __css2cidBatch(
+    TConsensus[] memory consensusAddrs
+  ) internal view virtual returns (address[] memory);
 }

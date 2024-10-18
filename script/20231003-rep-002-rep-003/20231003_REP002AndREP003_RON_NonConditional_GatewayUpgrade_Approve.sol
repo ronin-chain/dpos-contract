@@ -18,7 +18,9 @@ contract Simulation_20231003_REP002AndREP003_RON_NonConditional_GatewayUpgrade_A
     // return 0x32015E8B982c61bc8a593816FdBf03A603EEC823;
   }
 
-  function _afterDepositForOnlyOnRonin(Transfer.Receipt memory receipt) internal override {
+  function _afterDepositForOnlyOnRonin(
+    Transfer.Receipt memory receipt
+  ) internal override {
     address[21] memory operators = [
       // 0x4b3844A29CFA5824F53e2137Edb6dc2b54501BeA,
       0x4a4217d8751a027D853785824eF40522c512A3Fe,

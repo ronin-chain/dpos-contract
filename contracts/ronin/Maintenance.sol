@@ -71,7 +71,9 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
     delete ______deprecatedValidator;
   }
 
-  function initializeV3(address profileContract_) external reinitializer(3) {
+  function initializeV3(
+    address profileContract_
+  ) external reinitializer(3) {
     _setContract(ContractType.PROFILE, profileContract_);
   }
 
@@ -189,7 +191,9 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
   /**
    * @inheritdoc IMaintenance
    */
-  function cancelSchedule(TConsensus consensusAddr) external override syncSchedule {
+  function cancelSchedule(
+    TConsensus consensusAddr
+  ) external override syncSchedule {
     address candidateId = __css2cid(consensusAddr);
 
     _requireCandidateAdmin(candidateId);
@@ -209,7 +213,9 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
   /**
    * @inheritdoc IMaintenance
    */
-  function exitMaintenance(TConsensus consensusAddr) external syncSchedule {
+  function exitMaintenance(
+    TConsensus consensusAddr
+  ) external syncSchedule {
     address candidateId = __css2cid(consensusAddr);
     uint256 currentBlock = block.number;
 
@@ -228,7 +234,9 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
   /**
    * @inheritdoc IMaintenance
    */
-  function getSchedule(TConsensus consensusAddr) external view override returns (Schedule memory) {
+  function getSchedule(
+    TConsensus consensusAddr
+  ) external view override returns (Schedule memory) {
     return _schedule[__css2cid(consensusAddr)];
   }
 
@@ -367,22 +375,30 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
   /**
    * @inheritdoc IMaintenance
    */
-  function checkScheduled(TConsensus consensusAddr) external view override returns (bool) {
+  function checkScheduled(
+    TConsensus consensusAddr
+  ) external view override returns (bool) {
     return _checkScheduledById(__css2cid(consensusAddr));
   }
 
-  function _checkScheduledById(address candidateId) internal view returns (bool) {
+  function _checkScheduledById(
+    address candidateId
+  ) internal view returns (bool) {
     return block.number <= _schedule[candidateId].to;
   }
 
   /**
    * @inheritdoc IMaintenance
    */
-  function checkCooldownEnded(TConsensus consensusAddr) external view override returns (bool) {
+  function checkCooldownEnded(
+    TConsensus consensusAddr
+  ) external view override returns (bool) {
     return _checkCooldownEndedById(__css2cid(consensusAddr));
   }
 
-  function _checkCooldownEndedById(address candidateId) internal view returns (bool) {
+  function _checkCooldownEndedById(
+    address candidateId
+  ) internal view returns (bool) {
     unchecked {
       return block.timestamp > _schedule[candidateId].requestTimestamp + _cooldownSecsToMaintain;
     }
@@ -441,17 +457,23 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
   /**
    * @dev Checks if the caller is a candidate admin for the given candidate ID.
    */
-  function _requireCandidateAdmin(address candidateId) internal view {
+  function _requireCandidateAdmin(
+    address candidateId
+  ) internal view {
     if (!IRoninValidatorSet(getContract(ContractType.VALIDATOR)).isCandidateAdminById(candidateId, msg.sender)) {
       revert ErrUnauthorized(msg.sig, RoleAccess.CANDIDATE_ADMIN);
     }
   }
 
-  function __css2cid(TConsensus consensusAddr) internal view returns (address) {
+  function __css2cid(
+    TConsensus consensusAddr
+  ) internal view returns (address) {
     return IProfile(getContract(ContractType.PROFILE)).getConsensus2Id(consensusAddr);
   }
 
-  function __css2cidBatch(TConsensus[] memory consensusAddrs) internal view returns (address[] memory) {
+  function __css2cidBatch(
+    TConsensus[] memory consensusAddrs
+  ) internal view returns (address[] memory) {
     return IProfile(getContract(ContractType.PROFILE)).getManyConsensus2Id(consensusAddrs);
   }
 }

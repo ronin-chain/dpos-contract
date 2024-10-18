@@ -59,7 +59,9 @@ interface IRoninGatewayV3 is MappedTokenConsumer {
 
   function initializeV2() external;
 
-  function initializeV3(address bridgeAdmin) external;
+  function initializeV3(
+    address bridgeAdmin
+  ) external;
 
   /**
    * @dev Returns withdrawal count.
@@ -85,7 +87,9 @@ interface IRoninGatewayV3 is MappedTokenConsumer {
    * @notice The assets will be transferred whenever the valid call passes the quorum threshold.
    *
    */
-  function depositFor(Transfer.Receipt calldata _receipt) external;
+  function depositFor(
+    Transfer.Receipt calldata _receipt
+  ) external;
 
   /**
    * @dev Marks the withdrawals are done on mainchain and returns the boolean array indicating whether the withdrawal
@@ -100,7 +104,9 @@ interface IRoninGatewayV3 is MappedTokenConsumer {
    * same time.
    *
    */
-  function tryBulkAcknowledgeMainchainWithdrew(uint256[] calldata _withdrawalIds) external returns (bool[] memory);
+  function tryBulkAcknowledgeMainchainWithdrew(
+    uint256[] calldata _withdrawalIds
+  ) external returns (bool[] memory);
 
   /**
    * @dev Tries bulk deposits based on the receipts and returns the boolean array indicating whether the deposit vote
@@ -115,7 +121,9 @@ interface IRoninGatewayV3 is MappedTokenConsumer {
    * reverting to avoid unnecessary failed transactions because the validators can send transactions at the same time.
    *
    */
-  function tryBulkDepositFor(Transfer.Receipt[] calldata _receipts) external returns (bool[] memory);
+  function tryBulkDepositFor(
+    Transfer.Receipt[] calldata _receipts
+  ) external returns (bool[] memory);
 
   /**
    * @dev Locks the assets and request withdrawal.
@@ -139,7 +147,9 @@ interface IRoninGatewayV3 is MappedTokenConsumer {
    * Emits the `WithdrawalSignaturesRequested` event.
    *
    */
-  function requestWithdrawalSignatures(uint256 _withdrawalId) external;
+  function requestWithdrawalSignatures(
+    uint256 _withdrawalId
+  ) external;
 
   /**
    * @dev Submits withdrawal signatures.
@@ -180,7 +190,9 @@ interface IRoninGatewayV3 is MappedTokenConsumer {
   /**
    * @dev Returns whether the withdrawal is done on mainchain.
    */
-  function mainchainWithdrew(uint256 _withdrawalId) external view returns (bool);
+  function mainchainWithdrew(
+    uint256 _withdrawalId
+  ) external view returns (bool);
 
   /**
    * @dev Returns mainchain token address.

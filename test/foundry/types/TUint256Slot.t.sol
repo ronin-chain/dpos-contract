@@ -13,14 +13,18 @@ contract TUint256SlotTest is Test {
     _label();
   }
 
-  function test_Store(uint256 val) external {
+  function test_Store(
+    uint256 val
+  ) external {
     uint256 a = mock.setCustomSlot(val);
     uint256 b = mock.setPrimitive(val);
 
     assertEq(a, b);
   }
 
-  function test_Load(uint256 val) external {
+  function test_Load(
+    uint256 val
+  ) external {
     mock.setCustomSlot(val);
     mock.setPrimitive(val);
 
@@ -105,7 +109,9 @@ contract TUint256SlotTest is Test {
     actual = mock.mulCustomSlot(a);
   }
 
-  function test_Fail_DivideByZero_Div(uint256 initVal) external {
+  function test_Fail_DivideByZero_Div(
+    uint256 initVal
+  ) external {
     mock.setCustomSlot(initVal);
     vm.expectRevert(stdError.divisionError);
     mock.divCustomSlot(0);
@@ -141,7 +147,9 @@ contract TUint256SlotTest is Test {
     assertEq(mock.getPrimitive(), expected);
   }
 
-  function test_PostIncrement(uint128 initVal) external {
+  function test_PostIncrement(
+    uint128 initVal
+  ) external {
     mock.setCustomSlot(initVal);
     mock.setPrimitive(initVal);
 
@@ -151,7 +159,9 @@ contract TUint256SlotTest is Test {
     assertEq(expected, actual);
   }
 
-  function test_PreIncrement(uint128 initVal) external {
+  function test_PreIncrement(
+    uint128 initVal
+  ) external {
     mock.setCustomSlot(initVal);
     mock.setPrimitive(initVal);
 
@@ -161,7 +171,9 @@ contract TUint256SlotTest is Test {
     assertEq(expected, actual);
   }
 
-  function test_PostDecrement(uint128 initVal) external {
+  function test_PostDecrement(
+    uint128 initVal
+  ) external {
     vm.assume(initVal != 0);
     mock.setCustomSlot(initVal);
     mock.setPrimitive(initVal);
@@ -172,7 +184,9 @@ contract TUint256SlotTest is Test {
     assertEq(expected, actual);
   }
 
-  function test_PreDecrement(uint128 initVal) external {
+  function test_PreDecrement(
+    uint128 initVal
+  ) external {
     vm.assume(initVal != 0);
     mock.setCustomSlot(initVal);
     mock.setPrimitive(initVal);
@@ -183,7 +197,9 @@ contract TUint256SlotTest is Test {
     assertEq(expected, actual);
   }
 
-  function test_Fail_Overflow_Add(uint256 val) external {
+  function test_Fail_Overflow_Add(
+    uint256 val
+  ) external {
     vm.assume(val != 0);
     mock.setCustomSlot(type(uint256).max);
     vm.expectRevert(stdError.arithmeticError);
@@ -191,7 +207,9 @@ contract TUint256SlotTest is Test {
     console.log(actual);
   }
 
-  function test_Fail_Underflow_Sub(uint256 val) external {
+  function test_Fail_Underflow_Sub(
+    uint256 val
+  ) external {
     vm.assume(val != 0);
     vm.expectRevert(stdError.arithmeticError);
     uint256 actual = mock.subCustomSlot(val);

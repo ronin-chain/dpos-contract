@@ -35,7 +35,9 @@ library LibIndexMap {
    * @param inner The array of uint256 values to wrap.
    * @return The wrapped IndexMap struct.
    */
-  function wrap(uint256[] memory inner) internal pure returns (IndexMap memory) {
+  function wrap(
+    uint256[] memory inner
+  ) internal pure returns (IndexMap memory) {
     return IndexMap(inner);
   }
 
@@ -44,7 +46,9 @@ library LibIndexMap {
    * @param numElement The number of elements to create the indexmap for.
    * @return indexmap The created indexmap array.
    */
-  function create(uint16 numElement) internal pure returns (IndexMap memory indexmap) {
+  function create(
+    uint16 numElement
+  ) internal pure returns (IndexMap memory indexmap) {
     unchecked {
       indexmap._inner = new uint256[](1 + uint256(numElement) / MAX_BIT);
     }

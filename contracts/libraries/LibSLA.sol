@@ -23,7 +23,9 @@ library LibSLA {
   /**
    * @dev Hashes the random request.
    */
-  function hash(RandomRequest memory req) internal pure returns (bytes32) {
+  function hash(
+    RandomRequest memory req
+  ) internal pure returns (bytes32) {
     return keccak256(abi.encode(req.period, req.prevBeacon, req.chainId, req.verifyingContract));
   }
 
@@ -37,7 +39,9 @@ library LibSLA {
   /**
    * @dev Calculates the key hash from public keys.
    */
-  function calcKeyHash(uint256[2] memory publicKeys) internal pure returns (bytes32) {
+  function calcKeyHash(
+    uint256[2] memory publicKeys
+  ) internal pure returns (bytes32) {
     return keccak256(abi.encode(publicKeys));
   }
 }

@@ -79,7 +79,9 @@ library Transfer {
   /**
    * @dev Returns token info struct hash.
    */
-  function hash(Receipt memory _receipt) internal pure returns (bytes32 digest) {
+  function hash(
+    Receipt memory _receipt
+  ) internal pure returns (bytes32 digest) {
     bytes32 hashedReceiptMainchain = Token.hash(_receipt.mainchain);
     bytes32 hashedReceiptRonin = Token.hash(_receipt.ronin);
     bytes32 hashedReceiptInfo = Token.hash(_receipt.info);

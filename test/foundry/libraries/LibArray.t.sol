@@ -144,7 +144,9 @@ contract LibArrayTest is Test {
     );
   }
 
-  function testFuzz_ShouldSortCorrectly_QuickSortDescending(uint256[] memory values) public pure {
+  function testFuzz_ShouldSortCorrectly_QuickSortDescending(
+    uint256[] memory values
+  ) public pure {
     vm.assume(values.length > 0);
 
     uint256[] memory self = new uint256[](values.length);
@@ -168,7 +170,9 @@ contract LibArrayTest is Test {
     assertTrue(sumSelfBefore == sumSelfAfter, "sumSelfBefore == sumSelfAfter");
   }
 
-  function testFuzz_ShouldSumCorrectly_sum(uint128[] memory narrowingCastedV) public pure {
+  function testFuzz_ShouldSumCorrectly_sum(
+    uint128[] memory narrowingCastedV
+  ) public pure {
     uint256[] memory v;
     assembly {
       v := narrowingCastedV
@@ -181,7 +185,9 @@ contract LibArrayTest is Test {
     assertEq(LibArray.sum(v), expectedSum, "sum(v) == expectedSum");
   }
 
-  function testFuzz_ShouldCastCorrectly_toUint256s(address[] memory addrs) public pure {
+  function testFuzz_ShouldCastCorrectly_toUint256s(
+    address[] memory addrs
+  ) public pure {
     uint256[] memory expected = new uint256[](addrs.length);
     for (uint256 i; i < addrs.length; ++i) {
       expected[i] = uint256(uint160(addrs[i]));
@@ -194,14 +200,18 @@ contract LibArrayTest is Test {
     }
   }
 
-  function testFuzz_ShouldHashCorrectly_hashAddressArray(address[] memory v) public pure {
+  function testFuzz_ShouldHashCorrectly_hashAddressArray(
+    address[] memory v
+  ) public pure {
     bytes32 expectedHash = keccak256(abi.encodePacked(v));
     bytes32 actualHash = LibArray.hash(v);
 
     assertEq(actualHash, expectedHash, "hash(v) == keccak256(abi.encodePacked(v))");
   }
 
-  function testFuzz_ShouldHashCorrectly_hashUint256Array(uint256[] memory v) public pure {
+  function testFuzz_ShouldHashCorrectly_hashUint256Array(
+    uint256[] memory v
+  ) public pure {
     bytes32 expectedHash = keccak256(abi.encodePacked(v));
     bytes32 actualHash = LibArray.hash(v);
 

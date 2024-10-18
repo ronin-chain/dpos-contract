@@ -18,7 +18,9 @@ abstract contract HasContracts is HasProxyAdmin, IHasContracts, IdentityGuard {
    * @dev Modifier to restrict access to functions only to contracts with a specific role.
    * @param contractType The contract type that allowed to call
    */
-  modifier onlyContract(ContractType contractType) virtual {
+  modifier onlyContract(
+    ContractType contractType
+  ) virtual {
     _requireContract(contractType);
     _;
   }
@@ -34,7 +36,9 @@ abstract contract HasContracts is HasProxyAdmin, IHasContracts, IdentityGuard {
   /**
    * @inheritdoc IHasContracts
    */
-  function getContract(ContractType contractType) public view returns (address payable contract_) {
+  function getContract(
+    ContractType contractType
+  ) public view returns (address payable contract_) {
     contract_ = payable(_getContractMap()[uint8(contractType)]);
     if (contract_ == address(0)) revert ErrContractTypeNotFound(contractType);
   }
@@ -64,7 +68,9 @@ abstract contract HasContracts is HasProxyAdmin, IHasContracts, IdentityGuard {
    * @param contractType The contract type that the calling contract must have.
    * @dev Throws an error if the calling contract does not have the specified role.
    */
-  function _requireContract(ContractType contractType) private view {
+  function _requireContract(
+    ContractType contractType
+  ) private view {
     if (msg.sender != getContract(contractType)) {
       revert ErrUnexpectedInternalCall(msg.sig, contractType, msg.sender);
     }

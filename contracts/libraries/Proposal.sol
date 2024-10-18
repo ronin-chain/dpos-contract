@@ -52,7 +52,9 @@ library Proposal {
   /**
    * @dev Returns struct hash of the proposal.
    */
-  function hash(ProposalDetail memory _proposal) internal pure returns (bytes32 digest_) {
+  function hash(
+    ProposalDetail memory _proposal
+  ) internal pure returns (bytes32 digest_) {
     uint256[] memory _values = _proposal.values;
     address[] memory _targets = _proposal.targets;
     bytes32[] memory _calldataHashList = new bytes32[](_proposal.calldatas.length);
@@ -105,17 +107,18 @@ library Proposal {
    * @notice Does not check whether the call result is successful or not. Please use `execute` instead.
    *
    */
-  function executable(ProposalDetail memory _proposal) internal view returns (bool _result) {
+  function executable(
+    ProposalDetail memory _proposal
+  ) internal view returns (bool _result) {
     return _proposal.chainId == 0 || _proposal.chainId == block.chainid;
   }
 
   /**
    * @dev Executes the proposal.
    */
-  function execute(ProposalDetail memory _proposal)
-    internal
-    returns (bool[] memory _successCalls, bytes[] memory _returnDatas)
-  {
+  function execute(
+    ProposalDetail memory _proposal
+  ) internal returns (bool[] memory _successCalls, bytes[] memory _returnDatas) {
     if (!executable(_proposal)) revert ErrInvalidChainId(msg.sig, _proposal.chainId, block.chainid);
 
     _successCalls = new bool[](_proposal.targets.length);

@@ -10,7 +10,9 @@ interface IBridgeAdminProposal {
   /**
    * @dev Returns the last voted block of the bridge voter.
    */
-  function lastVotedBlock(address bridgeVoter) external view returns (uint256);
+  function lastVotedBlock(
+    address bridgeVoter
+  ) external view returns (uint256);
 
   /**
    * @dev Returns the synced bridge operator set info.

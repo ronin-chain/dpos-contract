@@ -21,12 +21,16 @@ interface ITimingInfo {
   /**
    * @dev Returns the epoch index from the block number.
    */
-  function epochOf(uint256 _block) external view returns (uint256);
+  function epochOf(
+    uint256 _block
+  ) external view returns (uint256);
 
   /**
    * @dev Returns whether the epoch ending is at the block number `_block`.
    */
-  function epochEndingAt(uint256 _block) external view returns (bool);
+  function epochEndingAt(
+    uint256 _block
+  ) external view returns (bool);
 
   /**
    * @dev Returns the block number that `period` ending at.
@@ -36,12 +40,16 @@ interface ITimingInfo {
    *
    * @param period The period index.
    */
-  function getPeriodEndBlock(uint256 period) external view returns (uint256 blockNumber);
+  function getPeriodEndBlock(
+    uint256 period
+  ) external view returns (uint256 blockNumber);
 
   /**
    * @dev Tries to get the period index from the epoch number.
    */
-  function tryGetPeriodOfEpoch(uint256 _epoch) external view returns (bool _filled, uint256 _periodNumber);
+  function tryGetPeriodOfEpoch(
+    uint256 _epoch
+  ) external view returns (bool _filled, uint256 _periodNumber);
 
   /**
    * @dev Returns whether the period ending at the current block number.

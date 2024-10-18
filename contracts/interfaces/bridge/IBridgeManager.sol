@@ -24,7 +24,9 @@ interface IBridgeManager is IBridgeManagerEvents {
    * @param addr The address to check.
    * @return A boolean indicating whether the address is a bridge operator.
    */
-  function isBridgeOperator(address addr) external view returns (bool);
+  function isBridgeOperator(
+    address addr
+  ) external view returns (bool);
 
   /**
    * @dev Retrieves the full information of all registered bridge operators.
@@ -59,7 +61,9 @@ interface IBridgeManager is IBridgeManagerEvents {
   /**
    * @dev Returns total weights of the governor list.
    */
-  function sumGovernorsWeight(address[] calldata governors) external view returns (uint256 sum);
+  function sumGovernorsWeight(
+    address[] calldata governors
+  ) external view returns (uint256 sum);
 
   /**
    * @dev Returns total weights.
@@ -76,7 +80,9 @@ interface IBridgeManager is IBridgeManagerEvents {
    * @dev Returns an array of bridge operators correspoding to governor addresses.
    * @return bridgeOperators_ An array containing the addresses of all bridge operators.
    */
-  function getBridgeOperatorOf(address[] calldata gorvernors) external view returns (address[] memory bridgeOperators_);
+  function getBridgeOperatorOf(
+    address[] calldata gorvernors
+  ) external view returns (address[] memory bridgeOperators_);
 
   /**
    * @dev Retrieves the governors corresponding to a given array of bridge operators.
@@ -85,26 +91,34 @@ interface IBridgeManager is IBridgeManagerEvents {
    * @param bridgeOperators An array of bridge operator addresses for which governors are to be retrieved.
    * @return governors An array of addresses representing the governors corresponding to the provided bridge operators.
    */
-  function getGovernorsOf(address[] calldata bridgeOperators) external view returns (address[] memory governors);
+  function getGovernorsOf(
+    address[] calldata bridgeOperators
+  ) external view returns (address[] memory governors);
 
   /**
    * @dev External function to retrieve the vote weight of a specific governor.
    * @param governor The address of the governor to get the vote weight for.
    * @return voteWeight The vote weight of the specified governor.
    */
-  function getGovernorWeight(address governor) external view returns (uint96);
+  function getGovernorWeight(
+    address governor
+  ) external view returns (uint96);
 
   /**
    * @dev External function to retrieve the vote weight of a specific bridge operator.
    * @param bridgeOperator The address of the bridge operator to get the vote weight for.
    * @return weight The vote weight of the specified bridge operator.
    */
-  function getBridgeOperatorWeight(address bridgeOperator) external view returns (uint96 weight);
+  function getBridgeOperatorWeight(
+    address bridgeOperator
+  ) external view returns (uint96 weight);
 
   /**
    * @dev Returns the weights of a list of governor addresses.
    */
-  function getGovernorWeights(address[] calldata governors) external view returns (uint96[] memory weights);
+  function getGovernorWeights(
+    address[] calldata governors
+  ) external view returns (uint96[] memory weights);
 
   /**
    * @dev Returns an array of all governors.
@@ -165,7 +179,9 @@ interface IBridgeManager is IBridgeManagerEvents {
    * // ... (Process or use the information as required) ...
    * ```
    */
-  function removeBridgeOperators(address[] calldata bridgeOperators) external returns (bool[] memory removeds);
+  function removeBridgeOperators(
+    address[] calldata bridgeOperators
+  ) external returns (bool[] memory removeds);
 
   /**
    * @dev Governor updates their corresponding governor and/or operator address.
@@ -173,5 +189,7 @@ interface IBridgeManager is IBridgeManagerEvents {
    * - The caller must the governor of the operator that is requested changes.
    * @param bridgeOperator The address of the bridge operator to update.
    */
-  function updateBridgeOperator(address bridgeOperator) external;
+  function updateBridgeOperator(
+    address bridgeOperator
+  ) external;
 }

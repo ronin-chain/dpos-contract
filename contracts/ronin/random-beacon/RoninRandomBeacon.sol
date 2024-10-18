@@ -43,7 +43,9 @@ abstract contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalC
   /// @dev The maximum pick threshold for validator type.
   mapping(ValidatorType validatorType => uint256 threshold) internal _validatorThreshold;
 
-  modifier onlyActivated(uint256 period) {
+  modifier onlyActivated(
+    uint256 period
+  ) {
     if (period < _activatedAtPeriod) return;
     _;
   }
@@ -90,7 +92,9 @@ abstract contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalC
   /**
    * @inheritdoc IRandomBeacon
    */
-  function setUnavailabilitySlashThreshold(uint256 threshold) external onlyAdmin {
+  function setUnavailabilitySlashThreshold(
+    uint256 threshold
+  ) external onlyAdmin {
     _setUnavailabilitySlashThreshold(threshold);
   }
 
@@ -195,7 +199,9 @@ abstract contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalC
   /**
    * @inheritdoc IRandomBeacon
    */
-  function pickValidatorSetForCurrentPeriod(uint256 epoch) external view returns (address[] memory pickedCids) {
+  function pickValidatorSetForCurrentPeriod(
+    uint256 epoch
+  ) external view returns (address[] memory pickedCids) {
     pickedCids = getSelectedValidatorSet({ period: _computePeriod(block.timestamp), epoch: epoch });
   }
 
@@ -212,11 +218,9 @@ abstract contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalC
   /**
    * @inheritdoc IRandomBeacon
    */
-  function getSavedValidatorSet(uint256 period)
-    external
-    view
-    returns (LibSortValidatorsByBeacon.ValidatorStorage memory)
-  {
+  function getSavedValidatorSet(
+    uint256 period
+  ) external view returns (LibSortValidatorsByBeacon.ValidatorStorage memory) {
     Beacon storage $beacon = _beaconPerPeriod[period];
     if (!$beacon.finalized) revert ErrNotFinalizedBeacon(period);
 
@@ -240,7 +244,9 @@ abstract contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalC
   /**
    * @inheritdoc IRandomBeacon
    */
-  function getRequestHash(uint256 period) external view returns (bytes32 reqHash) {
+  function getRequestHash(
+    uint256 period
+  ) external view returns (bytes32 reqHash) {
     reqHash = _beaconPerPeriod[period].reqHash;
   }
 
@@ -270,7 +276,9 @@ abstract contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalC
   /**
    * @inheritdoc IRandomBeacon
    */
-  function getBeaconData(uint256 period) external view returns (uint256 value, bool finalized, uint256 submissionCount) {
+  function getBeaconData(
+    uint256 period
+  ) external view returns (uint256 value, bool finalized, uint256 submissionCount) {
     Beacon storage $beacon = _beaconPerPeriod[period];
     value = $beacon.value;
     finalized = $beacon.finalized;
@@ -287,21 +295,27 @@ abstract contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalC
   /**
    * @inheritdoc IRandomBeacon
    */
-  function getUnavailabilityCount(TConsensus consensus) external view returns (uint256 count) {
+  function getUnavailabilityCount(
+    TConsensus consensus
+  ) external view returns (uint256 count) {
     count = getUnavailabilityCountById({ cid: _convertToCid(consensus) });
   }
 
   /**
    * @inheritdoc IRandomBeacon
    */
-  function getUnavailabilityCountById(address cid) public view returns (uint256 count) {
+  function getUnavailabilityCountById(
+    address cid
+  ) public view returns (uint256 count) {
     count = _unavailableCount[cid];
   }
 
   /**
    * @inheritdoc IRandomBeacon
    */
-  function getValidatorThreshold(ValidatorType validatorType) external view returns (uint256 threshold) {
+  function getValidatorThreshold(
+    ValidatorType validatorType
+  ) external view returns (uint256 threshold) {
     threshold = _validatorThreshold[validatorType];
   }
 
@@ -315,7 +329,9 @@ abstract contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalC
   /**
    * @inheritdoc IRandomBeacon
    */
-  function calcKeyHash(uint256[2] memory publicKeys) external pure returns (bytes32 keyHash) {
+  function calcKeyHash(
+    uint256[2] memory publicKeys
+  ) external pure returns (bytes32 keyHash) {
     keyHash = LibSLA.calcKeyHash(publicKeys);
   }
 
@@ -353,7 +369,9 @@ abstract contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalC
   /**
    * @dev Sets the unavailability slash threshold.
    */
-  function _setUnavailabilitySlashThreshold(uint256 threshold) internal {
+  function _setUnavailabilitySlashThreshold(
+    uint256 threshold
+  ) internal {
     _unavailabilitySlashThreshold = threshold;
 
     emit SlashUnavailabilityThresholdUpdated(threshold);
@@ -534,7 +552,9 @@ abstract contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalC
   /**
    * @dev Converts the consensus address to cid from `Profile` contract.
    */
-  function _convertToCid(TConsensus consensus) internal view returns (address) {
+  function _convertToCid(
+    TConsensus consensus
+  ) internal view returns (address) {
     return IProfile(getContract(ContractType.PROFILE)).getConsensus2Id({ consensus: consensus });
   }
 
@@ -543,7 +563,9 @@ abstract contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalC
    *
    * This duplicates the implementation in {RoninValidatorSet-_computePeriod} to reduce external calls.
    */
-  function _computePeriod(uint256 timestamp) internal pure returns (uint256) {
+  function _computePeriod(
+    uint256 timestamp
+  ) internal pure returns (uint256) {
     return timestamp / PERIOD_DURATION;
   }
 }

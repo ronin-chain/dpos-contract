@@ -41,7 +41,9 @@ abstract contract CandidateStaking is BaseStaking, ICandidateStaking, GlobalConf
   /**
    * @inheritdoc ICandidateStaking
    */
-  function setMinValidatorStakingAmount(uint256 threshold) external override onlyAdmin {
+  function setMinValidatorStakingAmount(
+    uint256 threshold
+  ) external override onlyAdmin {
     _setMinValidatorStakingAmount(threshold);
   }
 
@@ -153,13 +155,9 @@ abstract contract CandidateStaking is BaseStaking, ICandidateStaking, GlobalConf
   /**
    * @inheritdoc ICandidateStaking
    */
-  function stake(TConsensus consensusAddr)
-    external
-    payable
-    override
-    noEmptyValue
-    poolOfConsensusIsActive(consensusAddr)
-  {
+  function stake(
+    TConsensus consensusAddr
+  ) external payable override noEmptyValue poolOfConsensusIsActive(consensusAddr) {
     address poolId = __css2cid(consensusAddr);
     _stake(_poolDetail[poolId], msg.sender, msg.value);
   }
@@ -185,7 +183,9 @@ abstract contract CandidateStaking is BaseStaking, ICandidateStaking, GlobalConf
   /**
    * @inheritdoc ICandidateStaking
    */
-  function requestRenounce(TConsensus consensusAddr)
+  function requestRenounce(
+    TConsensus consensusAddr
+  )
     external
     override
     poolOfConsensusIsActive(consensusAddr)
@@ -199,7 +199,9 @@ abstract contract CandidateStaking is BaseStaking, ICandidateStaking, GlobalConf
   /**
    * @inheritdoc ICandidateStaking
    */
-  function requestEmergencyExit(TConsensus consensusAddr)
+  function requestEmergencyExit(
+    TConsensus consensusAddr
+  )
     external
     override
     poolOfConsensusIsActive(consensusAddr)
@@ -298,7 +300,9 @@ abstract contract CandidateStaking is BaseStaking, ICandidateStaking, GlobalConf
    * Emits the `MinValidatorStakingAmountUpdated` event.
    *
    */
-  function _setMinValidatorStakingAmount(uint256 threshold) internal {
+  function _setMinValidatorStakingAmount(
+    uint256 threshold
+  ) internal {
     _minValidatorStakingAmount = threshold;
     emit MinValidatorStakingAmountUpdated(threshold);
   }

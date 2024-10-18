@@ -90,7 +90,9 @@ contract ConditionalImplementControlTest is Test {
   /**
    * @notice Tests invalid inputs with null addresses.
    */
-  function testFail_NullInputs(uint8 nullIdx) external virtual {
+  function testFail_NullInputs(
+    uint8 nullIdx
+  ) external virtual {
     nullIdx %= 3;
     address[3] memory inputs = _getTestAddresses();
     delete inputs[nullIdx];
@@ -174,7 +176,9 @@ contract ConditionalImplementControlTest is Test {
   /**
    * @notice Tests unauthorized EOA calls to the method `selfUpgrade`.
    */
-  function testFail_CallSelfUpgrade_Unauthorized_EOA(address user) external virtual {
+  function testFail_CallSelfUpgrade_Unauthorized_EOA(
+    address user
+  ) external virtual {
     vm.assume(user != _proxyAdmin);
     _manualUpgradeTo(_switcher);
     vm.prank(user);
@@ -203,7 +207,9 @@ contract ConditionalImplementControlTest is Test {
   /**
    * @notice Tests unauthorized EOA calls to the non-view methods.
    */
-  function testFail_CallToContractSwitcher_NonViewMethod_FromEOA(address user) external virtual {
+  function testFail_CallToContractSwitcher_NonViewMethod_FromEOA(
+    address user
+  ) external virtual {
     vm.assume(user != _proxyAdmin);
     vm.expectRevert(abi.encodePacked(IConditionalImplementControl.ErrDelegateFromUnknownOrigin.selector, _switcher));
     vm.prank(user);
@@ -222,7 +228,9 @@ contract ConditionalImplementControlTest is Test {
   /**
    * @notice Tests unauthorized EOA calls to the view methods.
    */
-  function testFail_CallToContractSwitcher_ViewMethod_FromEOA(address user) external virtual {
+  function testFail_CallToContractSwitcher_ViewMethod_FromEOA(
+    address user
+  ) external virtual {
     vm.assume(user != _proxyAdmin);
     vm.expectRevert(abi.encodePacked(IConditionalImplementControl.ErrDelegateFromUnknownOrigin.selector, _switcher));
     vm.prank(user);
@@ -241,7 +249,9 @@ contract ConditionalImplementControlTest is Test {
   /**
    * @dev Upgrades the proxy to address `impl`.
    */
-  function _manualUpgradeTo(address impl) internal virtual {
+  function _manualUpgradeTo(
+    address impl
+  ) internal virtual {
     vm.prank(_proxyAdmin);
     TransparentUpgradeableProxyV2(_proxy).upgradeTo(impl);
   }
@@ -256,7 +266,9 @@ contract ConditionalImplementControlTest is Test {
   /**
    * @dev Creates a new conditional implement control for testing purposes.
    */
-  function _createConditionalImplementControl(address[3] memory inputs) internal virtual returns (address) {
+  function _createConditionalImplementControl(
+    address[3] memory inputs
+  ) internal virtual returns (address) {
     return address(new MockConditionalImplementControl(inputs[0], inputs[1], inputs[2], _upgradedAtBlock));
   }
 }

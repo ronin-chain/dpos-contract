@@ -111,7 +111,9 @@ abstract contract ConditionalImplementControl is
     _upgradeTo(NEW_IMPL);
   }
 
-  function _upgradeTo(address newImplementation) internal {
+  function _upgradeTo(
+    address newImplementation
+  ) internal {
     StorageSlot.getAddressSlot(IMPLEMENTATION_SLOT).value = newImplementation;
     emit Upgraded(newImplementation);
   }
@@ -145,7 +147,9 @@ abstract contract ConditionalImplementControl is
    * @param impl The address of the version to call.
    * @return returnData The return data of the call.
    */
-  function _dispatchCall(address impl) internal virtual whenConditionsAreMet returns (bytes memory returnData) {
+  function _dispatchCall(
+    address impl
+  ) internal virtual whenConditionsAreMet returns (bytes memory returnData) {
     (bool success, bytes memory returnOrRevertData) = impl.delegatecall(msg.data);
     success.handleRevert(msg.sig, returnOrRevertData);
     assembly ("memory-safe") {

@@ -23,7 +23,9 @@ abstract contract GatewayV3 is HasProxyAdmin, Pausable, IQuorum {
   /**
    * @dev Grant emergency pauser role for `_addr`.
    */
-  function setEmergencyPauser(address _addr) external onlyAdmin {
+  function setEmergencyPauser(
+    address _addr
+  ) external onlyAdmin {
     emergencyPauser = _addr;
   }
 
@@ -37,7 +39,9 @@ abstract contract GatewayV3 is HasProxyAdmin, Pausable, IQuorum {
   /**
    * @inheritdoc IQuorum
    */
-  function checkThreshold(uint256 _voteWeight) external view virtual returns (bool) {
+  function checkThreshold(
+    uint256 _voteWeight
+  ) external view virtual returns (bool) {
     return _voteWeight * _denom >= _num * _getTotalWeight();
   }
 
@@ -94,7 +98,9 @@ abstract contract GatewayV3 is HasProxyAdmin, Pausable, IQuorum {
   /**
    * @dev Returns minimum vote weight.
    */
-  function _minimumVoteWeight(uint256 _totalWeight) internal view virtual returns (uint256) {
+  function _minimumVoteWeight(
+    uint256 _totalWeight
+  ) internal view virtual returns (uint256) {
     return (_num * _totalWeight + _denom - 1) / _denom;
   }
 

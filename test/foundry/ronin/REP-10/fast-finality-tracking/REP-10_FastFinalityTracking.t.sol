@@ -324,7 +324,9 @@ contract REP_10_FastFinalityTrackingTest is REP10_BaseTest {
     console.log("Total Reward:", vm.toString(sumValidatorReward + sumDelegatorReward).green());
   }
 
-  function testREP10Fuzz_recordVoters_ScoresNeverZero(uint256 numPick) external {
+  function testREP10Fuzz_recordVoters_ScoresNeverZero(
+    uint256 numPick
+  ) external {
     TConsensus[] memory allConsensuses = roninValidatorSet.getValidatorCandidates();
     numPick = bound(numPick, 1, allConsensuses.length);
 
@@ -355,7 +357,9 @@ contract REP_10_FastFinalityTrackingTest is REP10_BaseTest {
     }
   }
 
-  function testREP10Fuzz_recordVoters_CountsNeverZero(uint256 numPick) external {
+  function testREP10Fuzz_recordVoters_CountsNeverZero(
+    uint256 numPick
+  ) external {
     TConsensus[] memory allConsensuses = roninValidatorSet.getValidatorCandidates();
     numPick = bound(numPick, 1, allConsensuses.length);
 

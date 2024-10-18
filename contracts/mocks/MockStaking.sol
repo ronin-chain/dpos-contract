@@ -17,7 +17,9 @@ contract MockStaking is RewardCalculation, GlobalConfigConsumer {
   uint256 public pendingReward;
   address public poolAddr;
 
-  constructor(address _poolAddr) {
+  constructor(
+    address _poolAddr
+  ) {
     poolAddr = _poolAddr;
   }
 
@@ -57,11 +59,15 @@ contract MockStaking is RewardCalculation, GlobalConfigConsumer {
     _stakingTotal -= _amount;
   }
 
-  function increaseReward(uint256 _amount) external {
+  function increaseReward(
+    uint256 _amount
+  ) external {
     pendingReward += _amount;
   }
 
-  function decreaseReward(uint256 _amount) external {
+  function decreaseReward(
+    uint256 _amount
+  ) external {
     pendingReward -= _amount;
   }
 
@@ -73,7 +79,9 @@ contract MockStaking is RewardCalculation, GlobalConfigConsumer {
     return _currentPeriod();
   }
 
-  function claimReward(address _user) external returns (uint256 _amount) {
+  function claimReward(
+    address _user
+  ) external returns (uint256 _amount) {
     _amount = _claimReward(poolAddr, _user, getPeriod());
   }
 
@@ -95,11 +103,15 @@ contract MockStaking is RewardCalculation, GlobalConfigConsumer {
     return _stakingAmount[_user];
   }
 
-  function getStakingTotal(TConsensus addr) external view virtual override returns (uint256) {
+  function getStakingTotal(
+    TConsensus addr
+  ) external view virtual override returns (uint256) {
     return _getStakingTotal(TConsensus.unwrap(addr));
   }
 
-  function _getStakingTotal(address poolId) internal view virtual override returns (uint256) {
+  function _getStakingTotal(
+    address poolId
+  ) internal view virtual override returns (uint256) {
     return poolId == poolAddr ? _stakingTotal : 0;
   }
 
@@ -107,13 +119,15 @@ contract MockStaking is RewardCalculation, GlobalConfigConsumer {
     return lastUpdatedPeriod;
   }
 
-  function getManyStakingTotals(TConsensus[] calldata _poolAddr) external view override returns (uint256[] memory) { }
+  function getManyStakingTotals(
+    TConsensus[] calldata _poolAddr
+  ) external view override returns (uint256[] memory) { }
 
-  function getManyStakingTotalsById(address[] calldata poolIds)
-    external
-    view
-    returns (uint256[] memory stakingAmounts_)
-  { }
+  function getManyStakingTotalsById(
+    address[] calldata poolIds
+  ) external view returns (uint256[] memory stakingAmounts_) { }
 
-  function __css2cid(TConsensus consensusAddr) internal view virtual override returns (address) { }
+  function __css2cid(
+    TConsensus consensusAddr
+  ) internal view virtual override returns (address) { }
 }

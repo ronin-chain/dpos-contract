@@ -38,7 +38,9 @@ library GlobalProposal {
   /**
    * @dev Returns struct hash of the proposal.
    */
-  function hash(GlobalProposalDetail memory self) internal pure returns (bytes32 digest_) {
+  function hash(
+    GlobalProposalDetail memory self
+  ) internal pure returns (bytes32 digest_) {
     uint256[] memory values = self.values;
     TargetOption[] memory targets = self.targetOptions;
     bytes32[] memory calldataHashList = new bytes32[](self.calldatas.length);

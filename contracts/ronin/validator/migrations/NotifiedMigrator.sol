@@ -19,7 +19,9 @@ contract NotifiedMigrator is ConditionalImplementControl {
     NOTIFIER = notifier;
   }
 
-  function initialize(bytes[] calldata callDatas) external initializer {
+  function initialize(
+    bytes[] calldata callDatas
+  ) external initializer {
     uint256 length = callDatas.length;
     bool success;
     bytes memory returnOrRevertData;

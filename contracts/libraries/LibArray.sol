@@ -65,7 +65,9 @@ library LibArray {
    * @param data The array of uint256 values for which the sum is calculated.
    * @return result The sum of the provided array.
    */
-  function sum(uint256[] memory data) internal pure returns (uint256 result) {
+  function sum(
+    uint256[] memory data
+  ) internal pure returns (uint256 result) {
     assembly ("memory-safe") {
       // Load the length (first 32 bytes)
       let len := mload(data)
@@ -83,7 +85,9 @@ library LibArray {
    * @param A Array to search
    * @return Returns true if duplicate, false otherwise
    */
-  function hasDuplicate(address[] memory A) internal pure returns (bool) {
+  function hasDuplicate(
+    address[] memory A
+  ) internal pure returns (bool) {
     uint256 length = A.length;
     if (length == 0) return false;
 
@@ -225,13 +229,17 @@ library LibArray {
    * @param self The array of uint256
    * @return digest The hash result of the array
    */
-  function hash(uint256[] memory self) internal pure returns (bytes32 digest) {
+  function hash(
+    uint256[] memory self
+  ) internal pure returns (bytes32 digest) {
     assembly ("memory-safe") {
       digest := keccak256(add(self, 0x20), mul(mload(self), 0x20))
     }
   }
 
-  function hash(address[] memory self) internal pure returns (bytes32 digest) {
+  function hash(
+    address[] memory self
+  ) internal pure returns (bytes32 digest) {
     return hash(toUint256s(self));
   }
 
@@ -272,7 +280,9 @@ library LibArray {
   /**
    * @dev Converts an array of address to an array of uint256.
    */
-  function toUint256s(address[] memory self) internal pure returns (uint256[] memory uint256s) {
+  function toUint256s(
+    address[] memory self
+  ) internal pure returns (uint256[] memory uint256s) {
     assembly ("memory-safe") {
       uint256s := self
     }
@@ -281,7 +291,9 @@ library LibArray {
   /**
    * @dev Converts an array of uint256 to an array of uint96.
    */
-  function unsafeToUint96s(uint256[] memory self) internal pure returns (uint96[] memory uint96s) {
+  function unsafeToUint96s(
+    uint256[] memory self
+  ) internal pure returns (uint96[] memory uint96s) {
     assembly ("memory-safe") {
       uint96s := self
     }
@@ -290,7 +302,9 @@ library LibArray {
   /**
    * @dev Converts an array of uint256 to an array of address.
    */
-  function unsafeToAddresses(uint256[] memory self) internal pure returns (address[] memory addresses) {
+  function unsafeToAddresses(
+    uint256[] memory self
+  ) internal pure returns (address[] memory addresses) {
     assembly ("memory-safe") {
       addresses := self
     }
@@ -301,7 +315,9 @@ library LibArray {
    * @param length The array size
    * @return data an array of indices
    */
-  function arange(uint256 length) internal pure returns (uint256[] memory data) {
+  function arange(
+    uint256 length
+  ) internal pure returns (uint256[] memory data) {
     unchecked {
       data = new uint256[](length);
       for (uint256 i; i < length; ++i) {
@@ -405,7 +421,9 @@ library LibArray {
    *
    * WARNING This function DOES modifies the original `values`.
    */
-  function inplaceDescSort(uint256[] memory values) internal pure returns (uint256[] memory sorted) {
+  function inplaceDescSort(
+    uint256[] memory values
+  ) internal pure returns (uint256[] memory sorted) {
     return inplaceDescQuickSort(values);
   }
 
@@ -416,7 +434,9 @@ library LibArray {
    *
    * WARNING This function modify `values`
    */
-  function inplaceDescQuickSort(uint256[] memory values) internal pure returns (uint256[] memory sorted) {
+  function inplaceDescQuickSort(
+    uint256[] memory values
+  ) internal pure returns (uint256[] memory sorted) {
     uint256 length = values.length;
     unchecked {
       if (length > 1) _inplaceDescQuickSort(values, 0, int256(length - 1));

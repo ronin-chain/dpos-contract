@@ -60,11 +60,9 @@ abstract contract GlobalGovernanceProposal is GlobalCoreGovernance, CommonGovern
   /**
    * @dev See {CommonGovernanceProposal-_getProposalSignatures}
    */
-  function getGlobalProposalSignatures(uint256 round_)
-    external
-    view
-    returns (address[] memory voters, Ballot.VoteType[] memory supports_, Signature[] memory signatures)
-  {
+  function getGlobalProposalSignatures(
+    uint256 round_
+  ) external view returns (address[] memory voters, Ballot.VoteType[] memory supports_, Signature[] memory signatures) {
     return _getProposalSignatures(0, round_);
   }
 

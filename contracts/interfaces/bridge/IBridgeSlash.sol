@@ -36,14 +36,18 @@ interface IBridgeSlash is IBridgeSlashEvents {
    * @param bridgeOperators The addresses of the bridge operators.
    * @return untilPeriods The penalized periods for the bridge operators.
    */
-  function getSlashUntilPeriodOf(address[] calldata bridgeOperators) external returns (uint256[] memory untilPeriods);
+  function getSlashUntilPeriodOf(
+    address[] calldata bridgeOperators
+  ) external returns (uint256[] memory untilPeriods);
 
   /**
    * @dev Retrieves the added periods of the specified bridge operators.
    * @param bridgeOperators An array of bridge operator addresses.
    * @return addedPeriods An array of uint256 values representing the added periods for each bridge operator.
    */
-  function getAddedPeriodOf(address[] calldata bridgeOperators) external view returns (uint256[] memory addedPeriods);
+  function getAddedPeriodOf(
+    address[] calldata bridgeOperators
+  ) external view returns (uint256[] memory addedPeriods);
 
   /**
    * @dev Gets the slash tier based on the given ballot and total ballots.

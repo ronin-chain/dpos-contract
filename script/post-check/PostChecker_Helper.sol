@@ -17,7 +17,9 @@ abstract contract PostChecker_Helper is BaseMigration {
 
   using LibErrorHandler for bool;
 
-  modifier logPostCheck(string memory task) {
+  modifier logPostCheck(
+    string memory task
+  ) {
     innerLogLevel++;
     if (innerLogLevel == 1) {
       console.log(string.concat("[>] Post-checking: ", task, "..."));

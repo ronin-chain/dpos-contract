@@ -18,7 +18,9 @@ library Sorting {
   //                                   VALUE SORTING                                   //
   ///////////////////////////////////////////////////////////////////////////////////////
 
-  function sort(uint[] memory data) internal pure returns (uint[] memory) {
+  function sort(
+    uint[] memory data
+  ) internal pure returns (uint[] memory) {
     return _quickSort(data, int(0), int(data.length - 1));
   }
 
@@ -84,7 +86,9 @@ library Sorting {
     return keys;
   }
 
-  function sortNodes(Node[] memory nodes) internal pure returns (Node[] memory) {
+  function sortNodes(
+    Node[] memory nodes
+  ) internal pure returns (Node[] memory) {
     return _quickSortNodes(nodes, int(0), int(nodes.length - 1));
   }
 
@@ -108,7 +112,9 @@ library Sorting {
     return nodes;
   }
 
-  function _bubbleSortNodes(Node[] memory nodes) private pure returns (Node[] memory) {
+  function _bubbleSortNodes(
+    Node[] memory nodes
+  ) private pure returns (Node[] memory) {
     uint length = nodes.length;
     for (uint i = 0; i < length - 1; i++) {
       for (uint j = i + 1; j < length; j++) {
@@ -153,7 +159,9 @@ library Sorting {
     return (_keys, _otherKeys);
   }
 
-  function sortNode3s(Node3[] memory nodes) internal pure returns (Node3[] memory) {
+  function sortNode3s(
+    Node3[] memory nodes
+  ) internal pure returns (Node3[] memory) {
     return _quickSortNode3s(nodes, int(0), int(nodes.length - 1));
   }
 
@@ -177,7 +185,9 @@ library Sorting {
     return nodes;
   }
 
-  function _bubbleSortNode3s(Node3[] memory nodes) private pure returns (Node3[] memory) {
+  function _bubbleSortNode3s(
+    Node3[] memory nodes
+  ) private pure returns (Node3[] memory) {
     uint length = nodes.length;
     for (uint i = 0; i < length - 1; i++) {
       for (uint j = i + 1; j < length; j++) {

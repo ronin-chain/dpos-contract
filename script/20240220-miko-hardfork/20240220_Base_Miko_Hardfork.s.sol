@@ -85,11 +85,9 @@ contract Proposal__Base_20240220_MikoHardfork is MikoConfig {
     allDPoSContracts.push(payable(address(validatorContract)));
   }
 
-  function _sys__parseMigrateData(string memory path)
-    internal
-    view
-    returns (address[] memory poolIds, address[] memory admins, bool[] memory flags)
-  {
+  function _sys__parseMigrateData(
+    string memory path
+  ) internal view returns (address[] memory poolIds, address[] memory admins, bool[] memory flags) {
     string memory raw = vm.readFile(path);
     JSONParserLib.Item memory data = raw.parse();
     uint256 size = data.size();

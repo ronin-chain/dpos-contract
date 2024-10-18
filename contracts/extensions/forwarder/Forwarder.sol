@@ -37,7 +37,9 @@ contract Forwarder is AccessControlEnumerable {
     _setupRole(MODERATOR_ROLE, moderator);
   }
 
-  modifier validTarget(address target) {
+  modifier validTarget(
+    address target
+  ) {
     _checkRole(TARGET_ROLE, target);
     _;
   }

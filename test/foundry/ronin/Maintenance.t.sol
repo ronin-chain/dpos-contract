@@ -35,7 +35,6 @@ contract MaintenanceTest is Test {
     LibPrecompile.deployPrecompile();
     dposDeployHelper.cheatSetUpValidators();
 
-
     profile = Profile(config.getAddressFromCurrentNetwork(Contract.Profile.key()));
     staking = Staking(config.getAddressFromCurrentNetwork(Contract.Staking.key()));
     maintenance = Maintenance(config.getAddressFromCurrentNetwork(Contract.Maintenance.key()));
@@ -51,7 +50,9 @@ contract MaintenanceTest is Test {
     _schedule(validatorId, durationInBlock);
   }
 
-  function testFuzz_cancelSchedule(uint256 index) external {
+  function testFuzz_cancelSchedule(
+    uint256 index
+  ) external {
     address[] memory validatorIds = validatorSet.getValidatorIds();
     address validatorId = validatorIds[index % validatorIds.length];
 
@@ -183,7 +184,9 @@ contract MaintenanceTest is Test {
     assertEq(maintenance.totalSchedule(), totalSchedule + 1);
   }
 
-  function testFuzz_exitMaintenance(uint256 index) external {
+  function testFuzz_exitMaintenance(
+    uint256 index
+  ) external {
     address[] memory validatorIds = validatorSet.getValidatorIds();
     console.log("validatorIds.length", validatorIds.length);
     address validatorId = validatorIds[index == 0 ? 0 : index % validatorIds.length];
@@ -273,7 +276,9 @@ contract MaintenanceTest is Test {
     _wrapUpEpoch();
   }
 
-  function _wrapUpEpochs(uint256 times) internal {
+  function _wrapUpEpochs(
+    uint256 times
+  ) internal {
     for (uint256 i; i < times; ++i) {
       _fastForwardToNextDay();
       _wrapUpEpoch();
@@ -284,7 +289,9 @@ contract MaintenanceTest is Test {
     _wrapUpEpoch(block.coinbase);
   }
 
-  function _wrapUpEpoch(address caller) internal {
+  function _wrapUpEpoch(
+    address caller
+  ) internal {
     vm.startPrank(caller);
     try validatorSet.wrapUpEpoch() { } catch { }
     vm.stopPrank();

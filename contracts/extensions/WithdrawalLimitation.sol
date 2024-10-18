@@ -74,7 +74,9 @@ abstract contract WithdrawalLimitation is GatewayV3 {
   /**
    * @dev Checks whether the `_voteWeight` passes the high-tier vote weight threshold.
    */
-  function checkHighTierVoteWeightThreshold(uint256 _voteWeight) external view virtual returns (bool) {
+  function checkHighTierVoteWeightThreshold(
+    uint256 _voteWeight
+  ) external view virtual returns (bool) {
     return _voteWeight * _highTierVWDenom >= _highTierVWNum * _getTotalWeight();
   }
 
@@ -329,7 +331,9 @@ abstract contract WithdrawalLimitation is GatewayV3 {
   /**
    * @dev Returns high-tier vote weight.
    */
-  function _highTierVoteWeight(uint256 _totalWeight) internal view virtual returns (uint256) {
+  function _highTierVoteWeight(
+    uint256 _totalWeight
+  ) internal view virtual returns (uint256) {
     return (_highTierVWNum * _totalWeight + _highTierVWDenom - 1) / _highTierVWDenom;
   }
 

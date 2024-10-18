@@ -120,5 +120,7 @@ abstract contract CommonGovernanceProposal is CoreGovernance {
   /**
    * @dev Returns the weight of a governor.
    */
-  function _getWeight(address _governor) internal view virtual returns (uint256);
+  function _getWeight(
+    address _governor
+  ) internal view virtual returns (uint256);
 }

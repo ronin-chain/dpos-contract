@@ -214,7 +214,9 @@ contract RoninGovernanceAdmin is
   /**
    * @dev Returns weight of a govenor.
    */
-  function _getWeight(address _governor) internal view virtual override returns (uint256) {
+  function _getWeight(
+    address _governor
+  ) internal view virtual override returns (uint256) {
     bytes4 _selector = IRoninTrustedOrganization.getGovernorWeight.selector;
     (bool _success, bytes memory _returndata) = getContract(ContractType.RONIN_TRUSTED_ORGANIZATION).staticcall(
       abi.encodeWithSelector(
@@ -230,7 +232,9 @@ contract RoninGovernanceAdmin is
   /**
    * @dev Returns the total weight of a list address of governors.
    */
-  function _sumGovernorWeight(address[] memory governors) internal view virtual returns (uint256) {
+  function _sumGovernorWeight(
+    address[] memory governors
+  ) internal view virtual returns (uint256) {
     bytes4 _selector = IRoninTrustedOrganization.sumGovernorWeight.selector;
     (bool _success, bytes memory _returndata) = getContract(ContractType.RONIN_TRUSTED_ORGANIZATION).staticcall(
       abi.encodeWithSelector(

@@ -13,5 +13,7 @@ interface ITransparentUpgradeableProxyV2 {
    * reviewing the encoded data `_data` and the method which is called before using this.
    *
    */
-  function functionDelegateCall(bytes memory _data) external payable;
+  function functionDelegateCall(
+    bytes memory _data
+  ) external payable;
 }

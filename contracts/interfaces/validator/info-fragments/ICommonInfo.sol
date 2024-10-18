@@ -31,5 +31,7 @@ interface ICommonInfo is ITimingInfo, IJailingInfo, IValidatorInfoV2 {
   /**
    * @dev Returns the emergency exit request.
    */
-  function getEmergencyExitInfo(TConsensus consensus) external view returns (EmergencyExitInfo memory);
+  function getEmergencyExitInfo(
+    TConsensus consensus
+  ) external view returns (EmergencyExitInfo memory);
 }

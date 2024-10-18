@@ -34,7 +34,9 @@ interface IStaking is IRewardPool, IBaseStaking, ICandidateStaking, IDelegatorSt
   /**
    * @dev Initializes the contract storage V3.
    */
-  function initializeV3(address __profileContract) external;
+  function initializeV3(
+    address __profileContract
+  ) external;
 
   function initializeV4(address admin, address migrator) external;
 

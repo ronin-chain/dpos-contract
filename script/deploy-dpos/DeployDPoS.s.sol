@@ -171,10 +171,9 @@ contract DeployDPoS is RoninMigration {
     }
   }
 
-  function _initRoninRandomBeacon(ISharedArgument.RoninRandomBeaconParam memory param)
-    internal
-    logFn("_initRoninRandomBeacon")
-  {
+  function _initRoninRandomBeacon(
+    ISharedArgument.RoninRandomBeaconParam memory param
+  ) internal logFn("_initRoninRandomBeacon") {
     vm.startBroadcast(sender());
     vm.recordLogs();
     randomBeacon.initialize({
@@ -225,7 +224,9 @@ contract DeployDPoS is RoninMigration {
     vm.stopBroadcast();
   }
 
-  function _initSlashIndicator(ISharedArgument.SlashIndicatorParam memory param) internal logFn("_initSlashIndicator") {
+  function _initSlashIndicator(
+    ISharedArgument.SlashIndicatorParam memory param
+  ) internal logFn("_initSlashIndicator") {
     uint256[4] memory bridgeOperatorSlashingConfig;
     uint256[2] memory bridgeVotingSlashingConfig;
     uint256[3] memory doubleSignSlashingConfig;
@@ -267,17 +268,18 @@ contract DeployDPoS is RoninMigration {
     vm.stopBroadcast();
   }
 
-  function _initTrustedOrg(ISharedArgument.RoninTrustedOrganizationParam memory param)
-    internal
-    logFn("_initTrustedOrg")
-  {
+  function _initTrustedOrg(
+    ISharedArgument.RoninTrustedOrganizationParam memory param
+  ) internal logFn("_initTrustedOrg") {
     vm.startBroadcast(sender());
     trustedOrg.initialize(param.trustedOrganizations, param.numerator, param.denominator);
     trustedOrg.initializeV2(address(profile));
     vm.stopBroadcast();
   }
 
-  function _initValidatorSet(ISharedArgument.RoninValidatorSetParam memory param) internal logFn("_initValidatorSet") {
+  function _initValidatorSet(
+    ISharedArgument.RoninValidatorSetParam memory param
+  ) internal logFn("_initValidatorSet") {
     address migrator = new RoninValidatorSetREP10MigratorLogicDeploy().run();
 
     UpgradeInfo({
@@ -327,7 +329,9 @@ contract DeployDPoS is RoninMigration {
     }).upgrade();
   }
 
-  function _initStaking(ISharedArgument.StakingParam memory param) internal logFn("_initStaking") {
+  function _initStaking(
+    ISharedArgument.StakingParam memory param
+  ) internal logFn("_initStaking") {
     vm.startBroadcast(sender());
     staking.initialize(
       address(validatorSet),
@@ -341,7 +345,9 @@ contract DeployDPoS is RoninMigration {
     vm.stopBroadcast();
   }
 
-  function _initStakingVesting(ISharedArgument.StakingVestingParam memory param) internal logFn("_initStakingVesting") {
+  function _initStakingVesting(
+    ISharedArgument.StakingVestingParam memory param
+  ) internal logFn("_initStakingVesting") {
     vm.startBroadcast(sender());
     stakingVesting.initialize(
       address(validatorSet), param.blockProducerBonusPerBlock, param.bridgeOperatorBonusPerBlock
@@ -352,7 +358,9 @@ contract DeployDPoS is RoninMigration {
     vm.stopBroadcast();
   }
 
-  function _initMaintenance(ISharedArgument.MaintenanceParam memory param) internal logFn("_initMaintenance") {
+  function _initMaintenance(
+    ISharedArgument.MaintenanceParam memory param
+  ) internal logFn("_initMaintenance") {
     vm.startBroadcast(sender());
     maintenance.initialize(
       address(validatorSet),

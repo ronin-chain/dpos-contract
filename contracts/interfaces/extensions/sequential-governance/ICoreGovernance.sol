@@ -39,7 +39,9 @@ interface ICoreGovernance is VoteStatusConsumer, SignatureConsumer {
 
   /// @dev Mapping from chain id => vote round
   /// @notice chain id = 0 for global proposal
-  function round(uint256) external view returns (uint256);
+  function round(
+    uint256
+  ) external view returns (uint256);
 
   /// @dev Mapping from chain id => vote round => proposal vote
   function vote(

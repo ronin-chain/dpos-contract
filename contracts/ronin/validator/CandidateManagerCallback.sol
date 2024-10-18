@@ -118,7 +118,9 @@ abstract contract CandidateManagerCallback is ICandidateManagerCallback, Candida
   /**
    * @dev Override `CandidateManager-_isTrustedOrg`.
    */
-  function _isTrustedOrg(address validatorId) internal view override returns (bool) {
+  function _isTrustedOrg(
+    address validatorId
+  ) internal view override returns (bool) {
     return IRoninTrustedOrganization(getContract(ContractType.RONIN_TRUSTED_ORGANIZATION)).getConsensusWeightById(
       validatorId
     ) > 0;

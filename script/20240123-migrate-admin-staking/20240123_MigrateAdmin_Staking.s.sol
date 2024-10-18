@@ -25,11 +25,9 @@ contract Migration__20240123_MigrateAdmin_Staking is RoninMigration {
     staking.migrateWasAdmin{ gas: 20_000_000 }(poolIds, admins, flags);
   }
 
-  function _parseMigrateData(string memory path)
-    private
-    view
-    returns (address[] memory poolIds, address[] memory admins, bool[] memory flags)
-  {
+  function _parseMigrateData(
+    string memory path
+  ) private view returns (address[] memory poolIds, address[] memory admins, bool[] memory flags) {
     string memory raw = vm.readFile(path);
     JSONParserLib.Item memory data = raw.parse();
     uint256 size = data.size();

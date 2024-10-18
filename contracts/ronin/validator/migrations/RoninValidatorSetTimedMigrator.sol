@@ -44,7 +44,9 @@ contract RoninValidatorSetTimedMigrator is ConditionalImplementControl {
     address newImpl
   ) ConditionalImplementControl(proxyStorage, prevImpl, newImpl) { }
 
-  function initialize(bytes[] calldata callDatas) external initializer {
+  function initialize(
+    bytes[] calldata callDatas
+  ) external initializer {
     uint256 length = callDatas.length;
     bool success;
     bytes memory returnOrRevertData;

@@ -21,7 +21,9 @@ library LibWrapUpEpoch {
     logs = wrapUpPeriods({ times: 1 })[0];
   }
 
-  function wrapUpPeriods(uint256 times) internal returns (VmSafe.Log[][] memory logs) {
+  function wrapUpPeriods(
+    uint256 times
+  ) internal returns (VmSafe.Log[][] memory logs) {
     logs = wrapUpPeriods({ times: times, shouldSubmitBeacon: false });
   }
 
@@ -73,7 +75,9 @@ library LibWrapUpEpoch {
     logs = _wrapUpEpoch();
   }
 
-  function wrapUpEpochAndSubmitBeacons(LibVRFProof.VRFKey[] memory keys) internal returns (VmSafe.Log[] memory logs) {
+  function wrapUpEpochAndSubmitBeacons(
+    LibVRFProof.VRFKey[] memory keys
+  ) internal returns (VmSafe.Log[] memory logs) {
     fastForwardToNextEpoch();
     logs = _wrapUpEpochAndSubmitBeacons(keys);
   }
@@ -126,7 +130,9 @@ library LibWrapUpEpoch {
     );
   }
 
-  function _wrapUpEpochAndSubmitBeacons(LibVRFProof.VRFKey[] memory keys) private returns (VmSafe.Log[] memory logs) {
+  function _wrapUpEpochAndSubmitBeacons(
+    LibVRFProof.VRFKey[] memory keys
+  ) private returns (VmSafe.Log[] memory logs) {
     logs = _wrapUpEpoch();
     LibVRFProof.listenEventAndSubmitProof(keys, logs);
   }
