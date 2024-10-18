@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { IBridgeReward } from "@ronin/contracts/interfaces/bridge/IBridgeReward.sol";
+import { IBridgeReward } from "src/interfaces/bridge/IBridgeReward.sol";
 import { RoninMigration } from "script/RoninMigration.s.sol";
 import { Contract } from "../utils/Contract.sol";
 

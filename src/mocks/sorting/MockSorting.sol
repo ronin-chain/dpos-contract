@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.9;
 
-import "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
+import "@openzeppelin-v4/contracts/proxy/transparent/ProxyAdmin.sol";
 import "../libraries/Sorting.sol";
 
 contract MockSorting {

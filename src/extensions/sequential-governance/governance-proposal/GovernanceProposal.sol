@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import { ECDSA } from "@openzeppelin-v4/contracts/utils/cryptography/ECDSA.sol";
 import { CoreGovernance } from "../CoreGovernance.sol";
 import { CommonGovernanceProposal } from "./CommonGovernanceProposal.sol";
 import { IGovernanceProposal } from "../../../interfaces/extensions/sequential-governance/IGovernanceProposal.sol";

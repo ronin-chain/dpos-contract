@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { IStaking } from "@ronin/contracts/interfaces/staking/IStaking.sol";
+import { IStaking } from "src/interfaces/staking/IStaking.sol";
 import { Contract } from "script/utils/Contract.sol";
 import { RoninMigration } from "script/RoninMigration.s.sol";
 

@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import { IndexMap } from "./LibIndexMap.sol";
-import { Math } from "@openzeppelin/contracts/utils/math/Math.sol";
+import { Math } from "@openzeppelin-v4/contracts/utils/math/Math.sol";
 
 /**
  * @title LibArray

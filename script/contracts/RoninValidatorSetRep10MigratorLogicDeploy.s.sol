@@ -3,7 +3,7 @@ pragma solidity ^0.8.19;
 
 import { ISharedArgument } from "script/interfaces/ISharedArgument.sol";
 import { RoninValidatorSetREP10Migrator } from
-  "@ronin/contracts/ronin/validator/migrations/RoninValidatorSetREP10Migrator.sol";
+  "src/ronin/validator/migrations/RoninValidatorSetREP10Migrator.sol";
 import { Contract } from "script/utils/Contract.sol";
 import { RoninMigration } from "script/RoninMigration.s.sol";
 import { LibProxy } from "@fdk/libraries/LibProxy.sol";

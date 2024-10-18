@@ -1,42 +1,48 @@
-
 [[dependencies]]
-name = "@fdk"
-version = "0.3.0-beta"
-source = "https://github.com/axieinfinity/foundry-deployment-kit/archive/refs/tags/v0.3.0-beta.zip"
-checksum = "aabeda6cc1fe02227d26f3edd86d4af6c91e2167e8b9f1971cc1ea7ce33d34f9"
-
-[[dependencies]]
-name = "@prb-test"
-version = "0.6.4"
-source = "https://soldeer-revisions.s3.amazonaws.com/@prb-test/0_6_4_22-01-2024_13:22:10_test.zip"
-checksum = "35fc7fd91e79985c87869e00a9bdb863643c76e2c1d777c161486e4b0086107a"
-
-[[dependencies]]
-name = "@openzeppelin"
-version = "4.7.3"
-source = "https://github.com/OpenZeppelin/openzeppelin-contracts/archive/refs/tags/v4.7.3.zip"
-checksum = "e25b51f352864703de7b35e5030d63b38cbe4e8d61d7858f9ff9f77e18e370dd"
-
-[[dependencies]]
-name = "@openzeppelin-v5"
-version = "5.0.2"
-source = "https://github.com/OpenZeppelin/openzeppelin-contracts/archive/refs/tags/v5.0.2.zip"
-checksum = "ca49e0776066328da0087977864dfaef0d5e54a0ea9859236a7cd9ad02abb9e5"
-
-[[dependencies]]
-name = "@chainlink-contracts"
-version = "0.4.1"
-source = "https://soldeer-revisions.s3.amazonaws.com/@chainlink-contracts/0_4_1_19-08-2024_05:20:08_contracts.zip"
-checksum = "912d509a74086ae9adecee89186dca8efb46e0ed271be50b3fd9184842498cf3"
-
-[[dependencies]]
-name = "@chainlink"
+name = "chainlink"
 version = "1.6.0"
-source = "https://github.com/smartcontractkit/chainlink/archive/refs/tags/v1.6.0.zip"
+url = "https://github.com/smartcontractkit/chainlink/archive/refs/tags/v1.6.0.zip"
 checksum = "4b7055e4c006e36a5853e24cb2a96e336ee0966721db412b5bb2d989703c4da7"
+integrity = "025f329f2886ae61cd5b4a3942d73dbdb60e8cd68e68abddacfeb109fb8f363f"
+
+[[dependencies]]
+name = "fdk"
+version = "0.3.5-beta"
+url = "https://github.com/axieinfinity/foundry-deployment-kit/archive/refs/tags/v0.3.5-beta.zip"
+checksum = "cd9e25e2554380489e6f6bbc70808270401997756e80e477d6c2b4a8f6fd4ffb"
+integrity = "402b27e7d023ae03bd4d32db476ad1dc4e67ab75386d42f6d0790c3407aa57f7"
+
+[[dependencies]]
+name = "openzeppelin-v4"
+version = "4.7.3"
+url = "https://github.com/OpenZeppelin/openzeppelin-contracts/archive/refs/tags/v4.7.3.zip"
+checksum = "e25b51f352864703de7b35e5030d63b38cbe4e8d61d7858f9ff9f77e18e370dd"
+integrity = "22307e72fcd0d9ba18b894af6b2efdcdb4b4b51c1e7822cb2f0983ef348048d4"
+
+[[dependencies]]
+name = "openzeppelin-v5"
+version = "5.0.2"
+url = "https://github.com/OpenZeppelin/openzeppelin-contracts/archive/refs/tags/v5.0.2.zip"
+checksum = "ca49e0776066328da0087977864dfaef0d5e54a0ea9859236a7cd9ad02abb9e5"
+integrity = "6f8fc028520b958667ef1e96460c64140f42fef60ff02bc63110780c557b7c7e"
+
+[[dependencies]]
+name = "prb-math"
+version = "4.0.1"
+url = "https://github.com/PaulRBerg/prb-math/archive/refs/tags/v4.0.1.zip"
+checksum = "00dcafda9210bc4c4964748dc300e99b2a39fcbc92bf46d33785ed4a27182cc1"
+integrity = "ff5836b118be6e4933fabb547f2618c0a3b089c784a0c994f1d145a0c580698c"
+
+[[dependencies]]
+name = "prb-test"
+version = "0.6.4"
+url = "https://github.com/PaulRBerg/prb-test/archive/refs/tags/v0.6.4.zip"
+checksum = "1458dc3760d4fa5ad2ecd778d04d61143785d0a10c1674aed29a69210ac4e072"
+integrity = "e61d2d4974d6461b650445295fa55b8065a802878c80672214762630339e2bac"
 
 [[dependencies]]
 name = "safe-smart-account"
 version = "1.4.1"
-source = "https://github.com/safe-global/safe-smart-account/archive/refs/tags/v1.4.1.zip"
+url = "https://github.com/safe-global/safe-smart-account/archive/refs/tags/v1.4.1.zip"
 checksum = "84348d4a1cf975f5d013cf8bdb74b8713bcccb40fceb5a1e7fc9debd27489e99"
+integrity = "65ed08a525b96c6b4d8316f827fcd799ff831e1a3b4e56bc55fbf200d27c372d"

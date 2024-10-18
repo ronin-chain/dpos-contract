@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.9;
 
-import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
+import "@openzeppelin-v4/contracts/proxy/utils/Initializable.sol";
+import "@openzeppelin-v4/contracts/access/AccessControlEnumerable.sol";
 import "../../libraries/Math.sol";
 import "../../interfaces/staking/IStaking.sol";
 import "../../interfaces/validator/IRoninValidatorSet.sol";

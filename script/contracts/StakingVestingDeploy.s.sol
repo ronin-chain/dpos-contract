@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { IStakingVesting } from "@ronin/contracts/interfaces/IStakingVesting.sol";
+import { IStakingVesting } from "src/interfaces/IStakingVesting.sol";
 import { Contract } from "script/utils/Contract.sol";
 import { RoninMigration } from "script/RoninMigration.s.sol";
 

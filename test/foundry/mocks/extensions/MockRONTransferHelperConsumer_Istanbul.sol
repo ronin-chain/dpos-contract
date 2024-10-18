@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.9;
 
-import { RONTransferHelper } from "@ronin/contracts/extensions/RONTransferHelper.sol";
+import { RONTransferHelper } from "src/extensions/RONTransferHelper.sol";
 
 contract MockRONTransferHelperConsumer_Istanbul is RONTransferHelper {
   uint256 public constant DEFAULT_ADDITION_GAS = 1200;

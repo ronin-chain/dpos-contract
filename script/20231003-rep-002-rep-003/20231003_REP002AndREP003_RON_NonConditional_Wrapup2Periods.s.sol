@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { TConsensus } from "@ronin/contracts/udvts/Types.sol";
+import { TConsensus } from "src/udvts/Types.sol";
 import "./20231003_REP002AndREP003_RON_NonConditional.s.sol";
 
 contract Simulation__20231003_UpgradeREP002AndREP003_RON_NonConditional_Wrapup2Periods is

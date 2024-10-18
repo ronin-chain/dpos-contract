@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/utils/StorageSlot.sol";
+import "@openzeppelin-v4/contracts/utils/StorageSlot.sol";
 import "../../utils/CommonErrors.sol";
 
 abstract contract HasProxyAdmin {

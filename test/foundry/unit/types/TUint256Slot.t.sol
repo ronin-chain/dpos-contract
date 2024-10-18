@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import { stdError, Test } from "forge-std/Test.sol";
 import { console } from "forge-std/console.sol";
-import { MockTUint256Slot } from "@ronin/contracts/mocks/types/MockTUint256Slot.sol";
+import { MockTUint256Slot } from "src/mocks/types/MockTUint256Slot.sol";
 
 contract TUint256SlotTest is Test {
   MockTUint256Slot internal mock;

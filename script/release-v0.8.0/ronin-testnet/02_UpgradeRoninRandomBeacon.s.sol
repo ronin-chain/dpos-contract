@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { IRoninTrustedOrganization } from "@ronin/contracts/interfaces/IRoninTrustedOrganization.sol";
-import { TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
-import { IProfile } from "@ronin/contracts/interfaces/IProfile.sol";
-import { IRoninGovernanceAdmin } from "@ronin/contracts/interfaces/IRoninGovernanceAdmin.sol";
+import { IRoninTrustedOrganization } from "src/interfaces/IRoninTrustedOrganization.sol";
+import { TransparentUpgradeableProxyV2 } from "src/extensions/TransparentUpgradeableProxyV2.sol";
+import { IProfile } from "src/interfaces/IProfile.sol";
+import { IRoninGovernanceAdmin } from "src/interfaces/IRoninGovernanceAdmin.sol";
 
-import { Proposal } from "@ronin/contracts/libraries/Proposal.sol";
+import { Proposal } from "src/libraries/Proposal.sol";
 
 import { StdStyle } from "forge-std/StdStyle.sol";
 import { RoninMigration } from "script/RoninMigration.s.sol";
@@ -14,7 +14,7 @@ import { Contract } from "script/utils/Contract.sol";
 
 import { LibProposal } from "script/shared/libraries/LibProposal.sol";
 import { LibVRFProof } from "script/shared/libraries/LibVRFProof.sol";
-import { IRandomBeacon } from "@ronin/contracts/interfaces/random-beacon/IRandomBeacon.sol";
+import { IRandomBeacon } from "src/interfaces/random-beacon/IRandomBeacon.sol";
 
 contract Migration_Testnet_Upgrade_RoninRandomBeacon is RoninMigration {
   using LibVRFProof for *;

@@ -2,11 +2,11 @@
 pragma solidity ^0.8.0;
 
 import { Test } from "forge-std/Test.sol";
-import { LibArray } from "@ronin/contracts/libraries/LibArray.sol";
+import { LibArray } from "src/libraries/LibArray.sol";
 import { console } from "forge-std/console.sol";
 
 contract LibArrayTest is Test {
-  function testConcrete_findNormalizedPivotAndSum() public view {
+  function testConcrete_findNormalizedPivotAndSum() public pure {
     address[] memory cids = new address[](13);
     for (uint256 i; i < cids.length; ++i) {
       cids[i] = address(uint160(i));

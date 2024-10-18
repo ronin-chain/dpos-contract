@@ -5,8 +5,8 @@ import { RoninMigration } from "script/RoninMigration.s.sol";
 
 import { Contract } from "../utils/Contract.sol";
 import { BridgeSlashDeploy } from "./BridgeSlashDeploy.s.sol";
-import { IBridgeManager } from "@ronin/contracts/interfaces/bridge/IBridgeManager.sol";
-import { GlobalProposal } from "@ronin/contracts/libraries/GlobalProposal.sol";
+import { IBridgeManager } from "src/interfaces/bridge/IBridgeManager.sol";
+import { GlobalProposal } from "src/libraries/GlobalProposal.sol";
 
 contract RoninBridgeManagerDeploy is RoninMigration {
   function _injectDependencies() internal override {

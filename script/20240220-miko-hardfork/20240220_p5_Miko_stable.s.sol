@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { IStaking } from "@ronin/contracts/interfaces/staking/IStaking.sol";
-import { IProfile } from "@ronin/contracts/interfaces/IProfile.sol";
-import { IAccessControl } from "@openzeppelin/contracts/access/IAccessControl.sol";
+import { IStaking } from "src/interfaces/staking/IStaking.sol";
+import { IProfile } from "src/interfaces/IProfile.sol";
+import { IAccessControl } from "@openzeppelin-v4/contracts/access/IAccessControl.sol";
 
 import { Proposal__Base_20240220_MikoHardfork } from "./20240220_Base_Miko_Hardfork.s.sol";
 import { DefaultNetwork } from "@fdk/utils/DefaultNetwork.sol";

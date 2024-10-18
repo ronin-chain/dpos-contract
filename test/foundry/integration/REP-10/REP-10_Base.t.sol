@@ -10,28 +10,28 @@ import { ISharedArgument } from "script/interfaces/ISharedArgument.sol";
 import { Contract } from "script/utils/Contract.sol";
 import { loadContract } from "@fdk/utils/Helpers.sol";
 import { LibWrapUpEpoch } from "script/shared/libraries/LibWrapUpEpoch.sol";
-import { ICoinbaseExecution } from "@ronin/contracts/interfaces/validator/ICoinbaseExecution.sol";
-import { IRoninGovernanceAdmin } from "@ronin/contracts/interfaces/IRoninGovernanceAdmin.sol";
-import { IRandomBeacon } from "@ronin/contracts/interfaces/random-beacon/IRandomBeacon.sol";
-import { ICandidateManager } from "@ronin/contracts/interfaces/validator/ICandidateManager.sol";
-import { IRoninValidatorSet } from "@ronin/contracts/interfaces/validator/IRoninValidatorSet.sol";
-import { GlobalConfigConsumer } from "@ronin/contracts/extensions/consumers/GlobalConfigConsumer.sol";
+import { ICoinbaseExecution } from "src/interfaces/validator/ICoinbaseExecution.sol";
+import { IRoninGovernanceAdmin } from "src/interfaces/IRoninGovernanceAdmin.sol";
+import { IRandomBeacon } from "src/interfaces/random-beacon/IRandomBeacon.sol";
+import { ICandidateManager } from "src/interfaces/validator/ICandidateManager.sol";
+import { IRoninValidatorSet } from "src/interfaces/validator/IRoninValidatorSet.sol";
+import { GlobalConfigConsumer } from "src/extensions/consumers/GlobalConfigConsumer.sol";
 import { LibPrecompile } from "script/shared/libraries/LibPrecompile.sol";
-import { IProfile } from "@ronin/contracts/interfaces/IProfile.sol";
-import { LibArray } from "@ronin/contracts/libraries/LibArray.sol";
-import { LibSortValidatorsByBeacon } from "@ronin/contracts/libraries/LibSortValidatorsByBeacon.sol";
-import { IRoninTrustedOrganization } from "@ronin/contracts/interfaces/IRoninTrustedOrganization.sol";
-import { ISlashRandomBeacon } from "@ronin/contracts/interfaces/slash-indicator/ISlashRandomBeacon.sol";
-import { ISlashIndicator } from "@ronin/contracts/interfaces/slash-indicator/ISlashIndicator.sol";
+import { IProfile } from "src/interfaces/IProfile.sol";
+import { LibArray } from "src/libraries/LibArray.sol";
+import { LibSortValidatorsByBeacon } from "src/libraries/LibSortValidatorsByBeacon.sol";
+import { IRoninTrustedOrganization } from "src/interfaces/IRoninTrustedOrganization.sol";
+import { ISlashRandomBeacon } from "src/interfaces/slash-indicator/ISlashRandomBeacon.sol";
+import { ISlashIndicator } from "src/interfaces/slash-indicator/ISlashIndicator.sol";
 import { LibVRFProof } from "script/shared/libraries/LibVRFProof.sol";
-import { IBaseSlash } from "@ronin/contracts/interfaces/slash-indicator/IBaseSlash.sol";
-import { RandomRequest } from "@ronin/contracts/libraries/LibSLA.sol";
+import { IBaseSlash } from "src/interfaces/slash-indicator/IBaseSlash.sol";
+import { RandomRequest } from "src/libraries/LibSLA.sol";
 import { LibApplyCandidate } from "script/shared/libraries/LibApplyCandidate.sol";
-import { IStaking } from "@ronin/contracts/interfaces/staking/IStaking.sol";
-import { IStakingVesting } from "@ronin/contracts/interfaces/IStakingVesting.sol";
-import { IFastFinalityTracking } from "@ronin/contracts/interfaces/IFastFinalityTracking.sol";
-import { TConsensus } from "@ronin/contracts/udvts/Types.sol";
-import { TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
+import { IStaking } from "src/interfaces/staking/IStaking.sol";
+import { IStakingVesting } from "src/interfaces/IStakingVesting.sol";
+import { IFastFinalityTracking } from "src/interfaces/IFastFinalityTracking.sol";
+import { TConsensus } from "src/udvts/Types.sol";
+import { TransparentUpgradeableProxyV2 } from "src/extensions/TransparentUpgradeableProxyV2.sol";
 
 contract REP10_BaseTest is Test, GlobalConfigConsumer {
   DeployDPoS dposDeployHelper;
@@ -67,15 +67,15 @@ contract REP10_BaseTest is Test, GlobalConfigConsumer {
   }
 
   function _loadContracts() internal virtual {
-    profile = IProfile(loadContract(Contract.Profile.key()));
-    staking = IStaking(loadContract(Contract.Staking.key()));
-    stakingVesting = IStakingVesting(loadContract(Contract.StakingVesting.key()));
-    slashIndicator = ISlashIndicator(loadContract(Contract.SlashIndicator.key()));
-    roninRandomBeacon = IRandomBeacon(loadContract(Contract.RoninRandomBeacon.key()));
-    roninValidatorSet = IRoninValidatorSet(loadContract(Contract.RoninValidatorSet.key()));
-    governanceAdmin = IRoninGovernanceAdmin(loadContract(Contract.RoninGovernanceAdmin.key()));
-    fastFinalityTracking = IFastFinalityTracking(loadContract(Contract.FastFinalityTracking.key()));
-    roninTrustedOrganization = IRoninTrustedOrganization(loadContract(Contract.RoninTrustedOrganization.key()));
+    profile = IProfile(loadContract(Contract.Profile.key(), true));
+    staking = IStaking(loadContract(Contract.Staking.key(), true));
+    stakingVesting = IStakingVesting(loadContract(Contract.StakingVesting.key(), true));
+    slashIndicator = ISlashIndicator(loadContract(Contract.SlashIndicator.key(), true));
+    roninRandomBeacon = IRandomBeacon(loadContract(Contract.RoninRandomBeacon.key(), true));
+    roninValidatorSet = IRoninValidatorSet(loadContract(Contract.RoninValidatorSet.key(), true));
+    governanceAdmin = IRoninGovernanceAdmin(loadContract(Contract.RoninGovernanceAdmin.key(), true));
+    fastFinalityTracking = IFastFinalityTracking(loadContract(Contract.FastFinalityTracking.key(), true));
+    roninTrustedOrganization = IRoninTrustedOrganization(loadContract(Contract.RoninTrustedOrganization.key(), true));
   }
 
   function _setUpDPoSDeployHelper() internal virtual {

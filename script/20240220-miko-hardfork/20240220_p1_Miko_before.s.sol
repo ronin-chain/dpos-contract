@@ -6,7 +6,7 @@ import { LibProxy } from "@fdk/libraries/LibProxy.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
 import { Proposal__Base_20240220_MikoHardfork } from "./20240220_Base_Miko_Hardfork.s.sol";
 import { DefaultNetwork } from "@fdk/utils/DefaultNetwork.sol";
-import { TransparentUpgradeableProxy } from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
+import { TransparentUpgradeableProxy } from "@openzeppelin-v4/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 
 contract Proposal__20240220_MikoHardfork_Before is Proposal__Base_20240220_MikoHardfork {
   using LibProxy for *;

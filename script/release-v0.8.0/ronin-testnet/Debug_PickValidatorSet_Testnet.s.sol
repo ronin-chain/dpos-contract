@@ -3,13 +3,13 @@ pragma solidity ^0.8.19;
 
 import { console } from "forge-std/console.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
-import { IStaking } from "@ronin/contracts/interfaces/staking/IStaking.sol";
-import { IRoninValidatorSet } from "@ronin/contracts/interfaces/validator/IRoninValidatorSet.sol";
-import { IRandomBeacon } from "@ronin/contracts/interfaces/random-beacon/IRandomBeacon.sol";
+import { IStaking } from "src/interfaces/staking/IStaking.sol";
+import { IRoninValidatorSet } from "src/interfaces/validator/IRoninValidatorSet.sol";
+import { IRandomBeacon } from "src/interfaces/random-beacon/IRandomBeacon.sol";
 
-import { IRoninTrustedOrganization } from "@ronin/contracts/interfaces/IRoninTrustedOrganization.sol";
-import { IProfile } from "@ronin/contracts/interfaces/IProfile.sol";
-import { TConsensus } from "@ronin/contracts/udvts/Types.sol";
+import { IRoninTrustedOrganization } from "src/interfaces/IRoninTrustedOrganization.sol";
+import { IProfile } from "src/interfaces/IProfile.sol";
+import { TConsensus } from "src/udvts/Types.sol";
 
 import { console } from "forge-std/console.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";

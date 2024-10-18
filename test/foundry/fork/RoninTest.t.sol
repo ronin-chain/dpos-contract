@@ -3,16 +3,16 @@
 
 // import { console } from "forge-std/console.sol";
 
-// import { Base_Test } from "@ronin/test/Base.t.sol";
+// import { Base_Test } from "test/foundry/Base.t.sol";
 
 // import {
 //   ITransparentUpgradeableProxyDeployer,
 //   TransparentUpgradeableProxyV3
 // } from "./extensions/TransparentUpgradeableProxyV3.sol";
-// import { TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
+// import { TransparentUpgradeableProxyV2 } from "src/extensions/TransparentUpgradeableProxyV2.sol";
 
-// import { IRoninGovernanceAdmin } from "@ronin/contracts/interfaces/IRoninGovernanceAdmin.sol";
-// import { IRoninValidatorSet } from "@ronin/contracts/interfaces/validator/IRoninValidatorSet.sol";
+// import { IRoninGovernanceAdmin } from "src/interfaces/IRoninGovernanceAdmin.sol";
+// import { IRoninValidatorSet } from "src/interfaces/validator/IRoninValidatorSet.sol";
 
 // import "./utils/Consts.sol";
 

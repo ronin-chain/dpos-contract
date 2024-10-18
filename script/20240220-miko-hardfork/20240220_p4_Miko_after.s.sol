@@ -6,9 +6,9 @@ import { BridgeTrackingRecoveryLogic } from "../20231019-recover-fund/contracts/
 import { Proposal__Base_20240220_MikoHardfork } from "./20240220_Base_Miko_Hardfork.s.sol";
 import { DefaultNetwork } from "@fdk/utils/DefaultNetwork.sol";
 import { console } from "forge-std/console.sol";
-import { TransparentUpgradeableProxy } from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
+import { TransparentUpgradeableProxy } from "@openzeppelin-v4/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 import { ITransparentUpgradeableProxyV2 } from
-  "@ronin/contracts/interfaces/extensions/ITransparentUpgradeableProxyV2.sol";
+  "src/interfaces/extensions/ITransparentUpgradeableProxyV2.sol";
 
 contract Proposal__20240220_MikoHardfork_After is Proposal__Base_20240220_MikoHardfork {
   using StdStyle for *;

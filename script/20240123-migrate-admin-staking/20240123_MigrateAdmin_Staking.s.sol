@@ -6,8 +6,8 @@ import { console } from "forge-std/console.sol";
 import { JSONParserLib } from "@solady/utils/JSONParserLib.sol";
 import { RoninMigration } from "script/RoninMigration.s.sol";
 import { Contract } from "script/utils/Contract.sol";
-import { IStaking } from "@ronin/contracts/interfaces/staking/IStaking.sol";
-import { IAccessControlEnumerable } from "@openzeppelin/contracts/access/IAccessControlEnumerable.sol";
+import { IStaking } from "src/interfaces/staking/IStaking.sol";
+import { IAccessControlEnumerable } from "@openzeppelin-v4/contracts/access/IAccessControlEnumerable.sol";
 
 contract Migration__20240123_MigrateAdmin_Staking is RoninMigration {
   using StdStyle for *;

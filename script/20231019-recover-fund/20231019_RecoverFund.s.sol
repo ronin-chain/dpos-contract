@@ -5,18 +5,18 @@ import { console } from "forge-std/console.sol";
 import { RoninMigration } from "script/RoninMigration.s.sol";
 import { Contract } from "script/utils/Contract.sol";
 import { DefaultNetwork } from "@fdk/utils/DefaultNetwork.sol";
-import { IRoninGovernanceAdmin } from "@ronin/contracts/interfaces/IRoninGovernanceAdmin.sol";
-import { IGovernanceAdmin } from "@ronin/contracts/interfaces/extensions/IGovernanceAdmin.sol";
+import { IRoninGovernanceAdmin } from "src/interfaces/IRoninGovernanceAdmin.sol";
+import { IGovernanceAdmin } from "src/interfaces/extensions/IGovernanceAdmin.sol";
 import { BridgeTrackingRecoveryLogic } from "./contracts/BridgeTrackingRecoveryLogic.sol";
-import { IRoninTrustedOrganization } from "@ronin/contracts/interfaces/IRoninTrustedOrganization.sol";
-import { IBridgeReward } from "@ronin/contracts/interfaces/bridge/IBridgeReward.sol";
-import { TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
-import { Proposal } from "@ronin/contracts/libraries/Proposal.sol";
+import { IRoninTrustedOrganization } from "src/interfaces/IRoninTrustedOrganization.sol";
+import { IBridgeReward } from "src/interfaces/bridge/IBridgeReward.sol";
+import { TransparentUpgradeableProxyV2 } from "src/extensions/TransparentUpgradeableProxyV2.sol";
+import { Proposal } from "src/libraries/Proposal.sol";
 
 import {
   IRoninTrustedOrganization,
   RoninTrustedOrganization
-} from "@ronin/contracts/multi-chains/RoninTrustedOrganization.sol";
+} from "src/multi-chains/RoninTrustedOrganization.sol";
 import { LibProposal } from "script/shared/libraries/LibProposal.sol";
 
 contract Simulation__20231019_RecoverFund is RoninMigration {

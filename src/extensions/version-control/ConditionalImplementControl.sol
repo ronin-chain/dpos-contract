@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import { Initializable as InitializableV5 } from "@openzeppelin-v5/contracts/proxy/utils/Initializable.sol";
-import { StorageSlot } from "@openzeppelin/contracts/utils/StorageSlot.sol";
+import { StorageSlot } from "@openzeppelin-v4/contracts/utils/StorageSlot.sol";
 import { HasContracts } from "../collections/HasContracts.sol";
 import { IConditionalImplementControl } from "../../interfaces/version-control/IConditionalImplementControl.sol";
 import { ErrorHandler } from "../../libraries/ErrorHandler.sol";

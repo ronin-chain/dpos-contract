@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { ICandidateStaking } from "@ronin/contracts/interfaces/staking/ICandidateStaking.sol";
-import { IProfile } from "@ronin/contracts/interfaces/IProfile.sol";
-import { IRoninValidatorSet } from "@ronin/contracts/interfaces/validator/IRoninValidatorSet.sol";
-import { IStakingVesting } from "@ronin/contracts/interfaces/IStakingVesting.sol";
-import { IRandomBeacon } from "@ronin/contracts/interfaces/random-beacon/IRandomBeacon.sol";
-import { IRoninTrustedOrganization } from "@ronin/contracts/interfaces/IRoninTrustedOrganization.sol";
-import { TConsensus } from "@ronin/contracts/udvts/Types.sol";
-import { ContractType } from "contracts/utils/ContractType.sol";
+import { ICandidateStaking } from "src/interfaces/staking/ICandidateStaking.sol";
+import { IProfile } from "src/interfaces/IProfile.sol";
+import { IRoninValidatorSet } from "src/interfaces/validator/IRoninValidatorSet.sol";
+import { IStakingVesting } from "src/interfaces/IStakingVesting.sol";
+import { IRandomBeacon } from "src/interfaces/random-beacon/IRandomBeacon.sol";
+import { IRoninTrustedOrganization } from "src/interfaces/IRoninTrustedOrganization.sol";
+import { TConsensus } from "src/udvts/Types.sol";
+import { ContractType } from "src/utils/ContractType.sol";
 import { ITransparentUpgradeableProxyV2 } from
-  "@ronin/contracts/interfaces/extensions/ITransparentUpgradeableProxyV2.sol";
+  "src/interfaces/extensions/ITransparentUpgradeableProxyV2.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
 import { console } from "forge-std/console.sol";
 import { VmSafe } from "forge-std/Vm.sol";
@@ -59,14 +59,14 @@ contract PostChecker is
     return payable(RoninMigration._getProxyAdminFromCurrentNetwork());
   }
 
-  function upgradeCallback(
+  function _upgradeCallback(
     address proxy,
     address logic,
     uint256 callValue,
     bytes memory callData,
     ProxyInterface proxyInterface
-  ) public virtual override(BaseMigration, RoninMigration) {
-    super.upgradeCallback(proxy, logic, callValue, callData, proxyInterface);
+  ) internal virtual override(BaseMigration, RoninMigration) {
+    super._upgradeCallback(proxy, logic, callValue, callData, proxyInterface);
   }
 
   function _upgradeProxy(

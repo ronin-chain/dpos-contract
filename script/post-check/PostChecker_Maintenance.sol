@@ -6,10 +6,10 @@ import { LibProxy } from "@fdk/libraries/LibProxy.sol";
 import { BaseMigration } from "@fdk/BaseMigration.s.sol";
 import { Contract } from "../utils/Contract.sol";
 
-import { ICandidateManager } from "@ronin/contracts/interfaces/validator/ICandidateManager.sol";
-import { IValidatorInfoV2 } from "@ronin/contracts/interfaces/validator/info-fragments/IValidatorInfoV2.sol";
-import { IRoninValidatorSet } from "@ronin/contracts/interfaces/validator/IRoninValidatorSet.sol";
-import { IMaintenance } from "@ronin/contracts/interfaces/IMaintenance.sol";
+import { ICandidateManager } from "src/interfaces/validator/ICandidateManager.sol";
+import { IValidatorInfoV2 } from "src/interfaces/validator/info-fragments/IValidatorInfoV2.sol";
+import { IRoninValidatorSet } from "src/interfaces/validator/IRoninValidatorSet.sol";
+import { IMaintenance } from "src/interfaces/IMaintenance.sol";
 
 import "./PostChecker_Helper.sol";
 

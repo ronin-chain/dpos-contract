@@ -3,11 +3,11 @@
 pragma solidity ^0.8.9;
 
 import { Test, console } from "forge-std/Test.sol";
-import { IStaking, Staking } from "@ronin/contracts/ronin/staking/Staking.sol";
-import { Maintenance } from "@ronin/contracts/ronin/Maintenance.sol";
-import { TConsensus, Profile, IProfile } from "@ronin/contracts/ronin/profile/Profile.sol";
-import { IRoninValidatorSet } from "@ronin/contracts/interfaces/validator/IRoninValidatorSet.sol";
-import { TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
+import { IStaking, Staking } from "src/ronin/staking/Staking.sol";
+import { Maintenance } from "src/ronin/Maintenance.sol";
+import { TConsensus, Profile, IProfile } from "src/ronin/profile/Profile.sol";
+import { IRoninValidatorSet } from "src/interfaces/validator/IRoninValidatorSet.sol";
+import { TransparentUpgradeableProxyV2 } from "src/extensions/TransparentUpgradeableProxyV2.sol";
 import { LibSharedAddress } from "@fdk/libraries/LibSharedAddress.sol";
 import { ISharedArgument } from "script/interfaces/ISharedArgument.sol";
 import { DeployDPoS } from "script/deploy-dpos/DeployDPoS.s.sol";

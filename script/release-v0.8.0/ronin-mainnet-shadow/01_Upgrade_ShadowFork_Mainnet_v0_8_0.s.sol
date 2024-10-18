@@ -1,30 +1,30 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { TransparentUpgradeableProxy } from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
+import { TransparentUpgradeableProxy } from "@openzeppelin-v4/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 
 import { StdStyle } from "forge-std/StdStyle.sol";
 import { console } from "forge-std/console.sol";
 
-import { IStaking } from "@ronin/contracts/interfaces/staking/IStaking.sol";
+import { IStaking } from "src/interfaces/staking/IStaking.sol";
 import { RoninValidatorSetREP10Migrator } from
-  "@ronin/contracts/ronin/validator/migrations/RoninValidatorSetREP10Migrator.sol";
-import { IRoninGovernanceAdmin } from "@ronin/contracts/interfaces/IRoninGovernanceAdmin.sol";
-import { IRoninValidatorSet } from "@ronin/contracts/interfaces/validator/IRoninValidatorSet.sol";
-import { ISlashIndicator } from "@ronin/contracts/interfaces/slash-indicator/ISlashIndicator.sol";
+  "src/ronin/validator/migrations/RoninValidatorSetREP10Migrator.sol";
+import { IRoninGovernanceAdmin } from "src/interfaces/IRoninGovernanceAdmin.sol";
+import { IRoninValidatorSet } from "src/interfaces/validator/IRoninValidatorSet.sol";
+import { ISlashIndicator } from "src/interfaces/slash-indicator/ISlashIndicator.sol";
 
-import { IRandomBeacon } from "@ronin/contracts/interfaces/random-beacon/IRandomBeacon.sol";
-import { IFastFinalityTracking } from "@ronin/contracts/interfaces/IFastFinalityTracking.sol";
+import { IRandomBeacon } from "src/interfaces/random-beacon/IRandomBeacon.sol";
+import { IFastFinalityTracking } from "src/interfaces/IFastFinalityTracking.sol";
 
-import { IRoninTrustedOrganization } from "@ronin/contracts/interfaces/IRoninTrustedOrganization.sol";
-import { IBaseStaking } from "@ronin/contracts/interfaces/staking/IBaseStaking.sol";
-import { IRandomBeacon } from "@ronin/contracts/interfaces/random-beacon/IRandomBeacon.sol";
-import { ICandidateManager } from "@ronin/contracts/interfaces/validator/ICandidateManager.sol";
-import { ISlashUnavailability } from "@ronin/contracts/interfaces/slash-indicator/ISlashUnavailability.sol";
-import { TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
-import { Proposal } from "@ronin/contracts/libraries/Proposal.sol";
-import { ContractType } from "@ronin/contracts/utils/ContractType.sol";
-import { TConsensus } from "@ronin/contracts/udvts/Types.sol";
+import { IRoninTrustedOrganization } from "src/interfaces/IRoninTrustedOrganization.sol";
+import { IBaseStaking } from "src/interfaces/staking/IBaseStaking.sol";
+import { IRandomBeacon } from "src/interfaces/random-beacon/IRandomBeacon.sol";
+import { ICandidateManager } from "src/interfaces/validator/ICandidateManager.sol";
+import { ISlashUnavailability } from "src/interfaces/slash-indicator/ISlashUnavailability.sol";
+import { TransparentUpgradeableProxyV2 } from "src/extensions/TransparentUpgradeableProxyV2.sol";
+import { Proposal } from "src/libraries/Proposal.sol";
+import { ContractType } from "src/utils/ContractType.sol";
+import { TConsensus } from "src/udvts/Types.sol";
 
 import { RoninMigration } from "script/RoninMigration.s.sol";
 import { RoninRandomBeaconDeploy } from "script/contracts/RoninRandomBeaconDeploy.s.sol";

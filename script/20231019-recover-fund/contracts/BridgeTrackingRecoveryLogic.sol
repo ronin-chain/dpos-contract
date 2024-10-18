@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { IBridgeReward } from "@ronin/contracts/interfaces/bridge/IBridgeReward.sol";
-import { ContractType } from "@ronin/contracts/utils/ContractType.sol";
+import { IBridgeReward } from "src/interfaces/bridge/IBridgeReward.sol";
+import { ContractType } from "src/utils/ContractType.sol";
 
 contract BridgeTrackingRecoveryLogic {
   event TotalInternalTxCount(uint indexed count);

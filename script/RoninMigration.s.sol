@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { ProxyAdmin } from "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
-import { IRoninGovernanceAdmin } from "@ronin/contracts/interfaces/IRoninGovernanceAdmin.sol";
-import { TransparentUpgradeableProxy } from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
-import { IRoninTrustedOrganization } from "@ronin/contracts/interfaces/IRoninTrustedOrganization.sol";
-import { IRandomBeacon } from "@ronin/contracts/interfaces/random-beacon/IRandomBeacon.sol";
-import { TConsensus } from "@ronin/contracts/udvts/Types.sol";
-import { Proposal } from "@ronin/contracts/libraries/Proposal.sol";
+import { ProxyAdmin } from "@openzeppelin-v4/contracts/proxy/transparent/ProxyAdmin.sol";
+import { IRoninGovernanceAdmin } from "src/interfaces/IRoninGovernanceAdmin.sol";
+import { TransparentUpgradeableProxy } from "@openzeppelin-v4/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
+import { IRoninTrustedOrganization } from "src/interfaces/IRoninTrustedOrganization.sol";
+import { IRandomBeacon } from "src/interfaces/random-beacon/IRandomBeacon.sol";
+import { TConsensus } from "src/udvts/Types.sol";
+import { Proposal } from "src/libraries/Proposal.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
 import { console } from "forge-std/console.sol";
 import { LibProxy } from "@fdk/libraries/LibProxy.sol";
@@ -201,7 +201,7 @@ contract RoninMigration is BaseMigration {
     address proxyAdmin = _getProxyAdmin();
     assertTrue(proxyAdmin != address(0x0), "BaseMigration: Null ProxyAdmin");
 
-    deployed = LibDeploy.deployTransparentProxyV2({
+    deployed = LibDeploy.deployTransparentProxy({
       implInfo: DeployInfo({
         callValue: 0,
         by: sender(),
@@ -253,18 +253,18 @@ contract RoninMigration is BaseMigration {
       callData: args,
       proxyInterface: ProxyInterface.Transparent,
       shouldPrompt: false,
-      upgradeCallback: this.upgradeCallback,
+      upgradeCallback: _upgradeCallback,
       shouldUseCallback: true
     }).upgrade();
   }
 
-  function upgradeCallback(
+  function _upgradeCallback(
     address proxy,
     address logic,
     uint256, /* callValue */
     bytes memory callData,
     ProxyInterface /* proxyInterface */
-  ) public virtual override {
+  ) internal virtual override {
     address proxyAdmin = proxy.getProxyAdmin();
     assertTrue(proxyAdmin != address(0x0), "RoninMigration: Invalid {proxyAdmin} or {proxy} is not a Proxy contract");
     address governanceAdmin = _getProxyAdminFromCurrentNetwork();

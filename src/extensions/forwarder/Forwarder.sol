@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
+import "@openzeppelin-v4/contracts/access/AccessControlEnumerable.sol";
 import { ErrorHandler } from "../../libraries/ErrorHandler.sol";
 
 contract Forwarder is AccessControlEnumerable {

@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.9;
 
-import { SafeL2 } from "safe-smart-account/contracts/SafeL2.sol";
+import { SafeL2 } from "@safe/contracts/SafeL2.sol";
 import { MockRONTransferHelperConsumer_Berlin } from "test/foundry/mocks/extensions/MockRONTransferHelperConsumer_Berlin.sol";
 import { MockRONTransferHelperConsumer_Istanbul } from "test/foundry/mocks/extensions/MockRONTransferHelperConsumer_Istanbul.sol";
 

@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin-v4/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin-v4/contracts/token/ERC20/IERC20.sol";
 import "./Token.sol";
 
 library Transfer {

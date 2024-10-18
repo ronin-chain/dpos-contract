@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.9;
 
-import { Initializable } from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
-import { Math } from "@openzeppelin/contracts/utils/math/Math.sol";
+import { Initializable } from "@openzeppelin-v4/contracts/proxy/utils/Initializable.sol";
+import { Math } from "@openzeppelin-v4/contracts/utils/math/Math.sol";
 import { HasContracts } from "../../extensions/collections/HasContracts.sol";
 import { IProfile } from "../../interfaces/IProfile.sol";
 import { IStaking } from "../../interfaces/staking/IStaking.sol";
