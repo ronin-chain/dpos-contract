@@ -31,11 +31,42 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Setup repo
+      - name: Set up Go 1.19
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.19"
+
+      - name: Install jq
+        run: sudo apt-get install -y jq
+
+      - name: Update apt-get and Install GCC
         run: |
-          chmod +x ./install.sh
-          ./install.sh
-        id: setup-repo
+          sudo apt-get update
+          sudo apt-get install -y gcc
+
+      - name: Install wget
+        run: sudo apt-get install -y wget
+
+      - name: Install yq
+        run: |
+          sudo wget https://github.com/mikefarah/yq/releases/download/v4.34.1/yq_linux_amd64 -O /usr/local/bin/yq
+          sudo chmod +x /usr/local/bin/yq
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Install package with soldeer
+        run: forge soldeer install
+
+      - name: Build random beacon binary
+        run: |
+          rm -rf temp && mkdir temp && cd temp
+          git clone https://github.com/ronin-chain/ronin-random-beacon.git 
+          cd ronin-random-beacon && ls 
+          go build -o random_beacon && ls
+          cp ./ronin-random-beacon ../../bin/ 
+          cd ../../ 
+          rm -rf temp
 
       - name: Run Forge build
         run: |
