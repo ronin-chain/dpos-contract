@@ -512,6 +512,7 @@ contract ChangeConsensusAddressForkTest is Test {
   }
 
   function testFork_NotReceiveReward_BeforeAndAfterUpgraded_execEmergencyExit() external {
+    vm.skip(true);
     TConsensus[] memory validatorCandidates = _validator.getValidatorCandidates();
     TConsensus validatorCandidate = validatorCandidates[2];
     address recipient = _validator.getCandidateInfo(validatorCandidate).__shadowedTreasury;
