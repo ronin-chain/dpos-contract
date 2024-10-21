@@ -134,7 +134,7 @@ contract Migration__02_ProposeAndExecuteNewProposal_ShadowMainnet_Release_V0_8_1
             abi.encodeCall(
               ISlashIndicator.initializeV4,
               (address(roninRandomBeacon), SLASH_RANDOM_BEACON_AMOUNT, REP10_ACTIVATION_PERIOD)
-              )
+            )
           )
         );
       }

@@ -1,0 +1,37 @@
+#!/bin/bash
+echo "Running post-commit hook"
+GIT_BLAME_IGNORE_REVS_FILE=".git-blame-ignore-revs"
+
+# If `.git-blame-ignore-revs` does not exist, create it
+if [ ! -f $GIT_BLAME_IGNORE_REVS_FILE ]; then
+    echo "\033[33m[post-commit] Creating $GIT_BLAME_IGNORE_REVS_FILE\033[0m"
+
+    touch $GIT_BLAME_IGNORE_REVS_FILE
+    git add $GIT_BLAME_IGNORE_REVS_FILE
+    HUSKY=0 git commit -m "chore(automated): create .git-blame-ignore-revs" -n
+
+    echo "\033[33m[post-commit] Configuring git blame to ignore $GIT_BLAME_IGNORE_REVS_FILE\033[0m"
+    # Config to ignore the changes in `.git-blame-ignore-revs`
+    git config blame.ignoreRevsFile $GIT_BLAME_IGNORE_REVS_FILE
+fi
+
+forge fmt
+
+# Check if there are any changes after forge fmt
+if [[ $(git status -s) ]]; then
+    echo "\033[33m[post-commit] Forge fmt changes detected\033[0m"
+    git add src
+    git add script
+    git add test/foundry
+    HUSKY=0 git commit -m "style(automated): post-commit forge fmt (*.sol)" -n
+    git log -1 --pretty=format:"# %B%H%n" >>$GIT_BLAME_IGNORE_REVS_FILE
+fi
+
+forge build
+
+# Check if `GIT_BLAME_IGNORE_REVS_FILE` has any changes
+if [[ $(git status -s $GIT_BLAME_IGNORE_REVS_FILE) ]]; then
+    echo "\033[33m[post-commit] .git-blame-ignore-revs changes detected\033[0m"
+    git add $GIT_BLAME_IGNORE_REVS_FILE
+    HUSKY=0 git commit -m "chore(automated): post-commit update .git-blame-ignore-revs" -n
+fi

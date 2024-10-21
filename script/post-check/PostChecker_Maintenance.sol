@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
+import { Contract } from "../utils/Contract.sol";
+import { BaseMigration } from "@fdk/BaseMigration.s.sol";
 import { LibErrorHandler } from "@fdk/libraries/LibErrorHandler.sol";
 import { LibProxy } from "@fdk/libraries/LibProxy.sol";
-import { BaseMigration } from "@fdk/BaseMigration.s.sol";
-import { Contract } from "../utils/Contract.sol";
 
-import { ICandidateManager } from "@ronin/contracts/interfaces/validator/ICandidateManager.sol";
-import { IValidatorInfoV2 } from "@ronin/contracts/interfaces/validator/info-fragments/IValidatorInfoV2.sol";
-import { IRoninValidatorSet } from "@ronin/contracts/interfaces/validator/IRoninValidatorSet.sol";
-import { IMaintenance } from "@ronin/contracts/interfaces/IMaintenance.sol";
+import { IMaintenance } from "src/interfaces/IMaintenance.sol";
+import { ICandidateManager } from "src/interfaces/validator/ICandidateManager.sol";
+import { IRoninValidatorSet } from "src/interfaces/validator/IRoninValidatorSet.sol";
+import { IValidatorInfoV2 } from "src/interfaces/validator/info-fragments/IValidatorInfoV2.sol";
 
 import "./PostChecker_Helper.sol";
 
@@ -56,9 +56,9 @@ abstract contract PostChecker_Maintenance is BaseMigration, PostChecker_Helper {
     uint256 numberOfBlocksInEpoch = IRoninValidatorSet(_validatorSet).numberOfBlocksInEpoch();
     uint256 minDuration = IMaintenance(_maintenance).minMaintenanceDurationInBlock();
 
-    uint startBlock = latestEpochBlock + numberOfBlocksInEpoch + 1
+    uint256 startBlock = latestEpochBlock + numberOfBlocksInEpoch + 1
       + ((minOffset + numberOfBlocksInEpoch) / numberOfBlocksInEpoch) * numberOfBlocksInEpoch;
-    uint endBlock = startBlock - 1 + numberOfBlocksInEpoch * (minDuration / numberOfBlocksInEpoch + 1);
+    uint256 endBlock = startBlock - 1 + numberOfBlocksInEpoch * (minDuration / numberOfBlocksInEpoch + 1);
     (bool success,) =
       _maintenance.call(abi.encodeWithSelector(IMaintenance.schedule.selector, _consensusAddr, startBlock, endBlock));
     assertEq(success, true, "schedule failed");

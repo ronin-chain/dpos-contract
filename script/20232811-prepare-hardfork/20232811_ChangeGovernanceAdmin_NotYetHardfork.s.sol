@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { Contract } from "script/utils/Contract.sol";
 import { Migration__20232811_ChangeGovernanceAdmin_Common } from "./20232811_ChangeGovernanceAdmin_Common.s.sol";
+import { Contract } from "script/utils/Contract.sol";
 
 contract Migration__20232811_ChangeGovernanceAdmin_NotYetHardfork is Migration__20232811_ChangeGovernanceAdmin_Common {
   bytes32 constant $_IMPL_SLOT = 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc;

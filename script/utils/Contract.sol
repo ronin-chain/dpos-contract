@@ -35,11 +35,15 @@ enum Contract {
 
 using { key, name } for Contract global;
 
-function key(Contract contractEnum) pure returns (TContract) {
+function key(
+  Contract contractEnum
+) pure returns (TContract) {
   return TContract.wrap(LibString.packOne(name(contractEnum)));
 }
 
-function name(Contract contractEnum) pure returns (string memory) {
+function name(
+  Contract contractEnum
+) pure returns (string memory) {
   if (contractEnum == Contract.Profile) return "Profile";
   if (contractEnum == Contract.Profile_Mainnet) return "Profile_Mainnet";
   if (contractEnum == Contract.Staking) return "Staking";

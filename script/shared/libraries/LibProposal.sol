@@ -1,17 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
+import { IGeneralConfig } from "@fdk/interfaces/IGeneralConfig.sol";
+
+import { LibErrorHandler } from "@fdk/libraries/LibErrorHandler.sol";
+import { LibSharedAddress } from "@fdk/libraries/LibSharedAddress.sol";
+import { StdStyle } from "forge-std/StdStyle.sol";
 import { Vm } from "forge-std/Vm.sol";
 import { console } from "forge-std/console.sol";
-import { StdStyle } from "forge-std/StdStyle.sol";
-import { IGeneralConfig } from "@fdk/interfaces/IGeneralConfig.sol";
-import { LibSharedAddress } from "@fdk/libraries/LibSharedAddress.sol";
-import { IRoninGovernanceAdmin } from "@ronin/contracts/interfaces/IRoninGovernanceAdmin.sol";
-import { IRoninTrustedOrganization } from "@ronin/contracts/interfaces/IRoninTrustedOrganization.sol";
-import { Proposal } from "@ronin/contracts/libraries/Proposal.sol";
-import { Ballot } from "@ronin/contracts/libraries/Ballot.sol";
-import { LibErrorHandler } from "@fdk/libraries/LibErrorHandler.sol";
-import { VoteStatusConsumer } from "@ronin/contracts/interfaces/consumers/VoteStatusConsumer.sol";
+
+import { IRoninGovernanceAdmin } from "src/interfaces/IRoninGovernanceAdmin.sol";
+import { IRoninTrustedOrganization } from "src/interfaces/IRoninTrustedOrganization.sol";
+import { VoteStatusConsumer } from "src/interfaces/consumers/VoteStatusConsumer.sol";
+import { Ballot } from "src/libraries/Ballot.sol";
+import { Proposal } from "src/libraries/Proposal.sol";
 
 library LibProposal {
   using StdStyle for *;
@@ -62,10 +64,10 @@ library LibProposal {
     for (uint256 i; i < proposal.gasAmounts.length; ++i) {
       totalGas += proposal.gasAmounts[i];
     }
-    totalGas += (totalGas * 20_00) / 100_00;
+    totalGas += (totalGas * 2000) / 10_000;
 
     if (totalGas < DEFAULT_PROPOSAL_GAS) {
-      totalGas = (DEFAULT_PROPOSAL_GAS * 120_00) / 100_00;
+      totalGas = (DEFAULT_PROPOSAL_GAS * 12_000) / 10_000;
     }
 
     for (uint256 i = 0; i < allTrustedOrgs.length; ++i) {
@@ -150,7 +152,7 @@ library LibProposal {
         gas -= gasleft();
         success.handleRevert(msg.sig, returnOrRevertData);
         // add 50% extra gas amount
-        gasAmounts[i] = gas < DEFAULT_PROPOSAL_GAS / 2 ? DEFAULT_PROPOSAL_GAS : (gas * 200_00) / 100_00;
+        gasAmounts[i] = gas < DEFAULT_PROPOSAL_GAS / 2 ? DEFAULT_PROPOSAL_GAS : (gas * 20_000) / 10_000;
       }
     }
     vm.stopPrank();

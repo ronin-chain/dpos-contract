@@ -4,20 +4,24 @@ pragma solidity ^0.8.19;
 import { StdStyle } from "forge-std/StdStyle.sol";
 import { console } from "forge-std/console.sol";
 
+import { Contract } from "../utils/Contract.sol";
+import { BaseMigration } from "@fdk/BaseMigration.s.sol";
 import { LibErrorHandler } from "@fdk/libraries/LibErrorHandler.sol";
 import { LibProxy } from "@fdk/libraries/LibProxy.sol";
-import { BaseMigration } from "@fdk/BaseMigration.s.sol";
-import { Contract } from "../utils/Contract.sol";
-import { TransparentUpgradeableProxy } from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
-import { IAccessControl } from "@openzeppelin/contracts/access/IAccessControl.sol";
+
 import { TContract } from "@fdk/types/TContract.sol";
-import { ICandidateManager } from "@ronin/contracts/interfaces/validator/ICandidateManager.sol";
-import { ICandidateStaking } from "@ronin/contracts/interfaces/staking/ICandidateStaking.sol";
-import { IStaking } from "@ronin/contracts/interfaces/staking/IStaking.sol";
-import { IRoninTrustedOrganization } from "@ronin/contracts/interfaces/IRoninTrustedOrganization.sol";
-import { IRoninValidatorSet } from "@ronin/contracts/interfaces/validator/IRoninValidatorSet.sol";
-import { Proposal } from "@ronin/contracts/libraries/Proposal.sol";
-import { RoninGovernanceAdmin } from "@ronin/contracts/ronin/RoninGovernanceAdmin.sol";
+import { IAccessControl } from "@openzeppelin-v4/contracts/access/IAccessControl.sol";
+import { TransparentUpgradeableProxy } from
+  "@openzeppelin-v4/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
+
+import { IRoninTrustedOrganization } from "src/interfaces/IRoninTrustedOrganization.sol";
+import { ICandidateStaking } from "src/interfaces/staking/ICandidateStaking.sol";
+import { IStaking } from "src/interfaces/staking/IStaking.sol";
+import { ICandidateManager } from "src/interfaces/validator/ICandidateManager.sol";
+
+import { IRoninValidatorSet } from "src/interfaces/validator/IRoninValidatorSet.sol";
+import { Proposal } from "src/libraries/Proposal.sol";
+import { RoninGovernanceAdmin } from "src/ronin/RoninGovernanceAdmin.sol";
 
 import "./PostChecker_Helper.sol";
 import { vme } from "@fdk/utils/Constants.sol";
@@ -134,8 +138,8 @@ abstract contract PostChecker_GovernanceAdmin is BaseMigration, PostChecker_Help
           abi.encodeWithSelector(TransparentUpgradeableProxy.changeAdmin.selector, address(__newGovernanceAdmin));
       }
 
-      for (uint i; i < _proxyACTargets.length; ++i) {
-        uint j = _proxyTargets.length + i;
+      for (uint256 i; i < _proxyACTargets.length; ++i) {
+        uint256 j = _proxyTargets.length + i;
         targets[j] = _proxyACTargets[i];
         callDatas[j] = abi.encodeCall(IAccessControl.grantRole, (DEFAULT_ADMIN_ROLE, address(__newGovernanceAdmin)));
 
@@ -159,7 +163,9 @@ abstract contract PostChecker_GovernanceAdmin is BaseMigration, PostChecker_Help
     vme.setAddress(network(), Contract.RoninGovernanceAdmin.key(), address(__newGovernanceAdmin));
   }
 
-  function getProxyAdmin(address payable proxy) external view returns (address payable proxyAdmin) {
+  function getProxyAdmin(
+    address payable proxy
+  ) external view returns (address payable proxyAdmin) {
     return proxy.getProxyAdmin();
   }
 }

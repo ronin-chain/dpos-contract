@@ -1,45 +1,49 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { TransparentUpgradeableProxy } from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
+import { TransparentUpgradeableProxy } from
+  "@openzeppelin-v4/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 
 import { StdStyle } from "forge-std/StdStyle.sol";
 import { console } from "forge-std/console.sol";
 
-import { IStaking } from "@ronin/contracts/interfaces/staking/IStaking.sol";
-import { RoninValidatorSetREP10Migrator } from
-  "@ronin/contracts/ronin/validator/migrations/RoninValidatorSetREP10Migrator.sol";
-import { IRoninGovernanceAdmin } from "@ronin/contracts/interfaces/IRoninGovernanceAdmin.sol";
-import { IRoninValidatorSet } from "@ronin/contracts/interfaces/validator/IRoninValidatorSet.sol";
-import { ISlashIndicator } from "@ronin/contracts/interfaces/slash-indicator/ISlashIndicator.sol";
+import { IRoninGovernanceAdmin } from "src/interfaces/IRoninGovernanceAdmin.sol";
 
-import { IRandomBeacon } from "@ronin/contracts/interfaces/random-beacon/IRandomBeacon.sol";
-import { IFastFinalityTracking } from "@ronin/contracts/interfaces/IFastFinalityTracking.sol";
-import { IStakingVesting } from "@ronin/contracts/interfaces/IStakingVesting.sol";
+import { ISlashIndicator } from "src/interfaces/slash-indicator/ISlashIndicator.sol";
+import { IStaking } from "src/interfaces/staking/IStaking.sol";
+import { IRoninValidatorSet } from "src/interfaces/validator/IRoninValidatorSet.sol";
+import { RoninValidatorSetREP10Migrator } from "src/ronin/validator/migrations/RoninValidatorSetREP10Migrator.sol";
 
-import { IRoninTrustedOrganization } from "@ronin/contracts/interfaces/IRoninTrustedOrganization.sol";
-import { IBaseStaking } from "@ronin/contracts/interfaces/staking/IBaseStaking.sol";
-import { IRandomBeacon } from "@ronin/contracts/interfaces/random-beacon/IRandomBeacon.sol";
-import { ICandidateManager } from "@ronin/contracts/interfaces/validator/ICandidateManager.sol";
-import { ISlashUnavailability } from "@ronin/contracts/interfaces/slash-indicator/ISlashUnavailability.sol";
-import { TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
-import { Proposal } from "@ronin/contracts/libraries/Proposal.sol";
-import { ContractType } from "@ronin/contracts/utils/ContractType.sol";
-import { TConsensus } from "@ronin/contracts/udvts/Types.sol";
+import { IFastFinalityTracking } from "src/interfaces/IFastFinalityTracking.sol";
+import { IStakingVesting } from "src/interfaces/IStakingVesting.sol";
+import { IRandomBeacon } from "src/interfaces/random-beacon/IRandomBeacon.sol";
 
+import { TransparentUpgradeableProxyV2 } from "src/extensions/TransparentUpgradeableProxyV2.sol";
+import { IRoninTrustedOrganization } from "src/interfaces/IRoninTrustedOrganization.sol";
+import { IRandomBeacon } from "src/interfaces/random-beacon/IRandomBeacon.sol";
+import { ISlashUnavailability } from "src/interfaces/slash-indicator/ISlashUnavailability.sol";
+import { IBaseStaking } from "src/interfaces/staking/IBaseStaking.sol";
+import { ICandidateManager } from "src/interfaces/validator/ICandidateManager.sol";
+
+import { Proposal } from "src/libraries/Proposal.sol";
+
+import { TConsensus } from "src/udvts/Types.sol";
+import { ContractType } from "src/utils/ContractType.sol";
+
+import { LibProxy } from "@fdk/libraries/LibProxy.sol";
+import { TContract } from "@fdk/types/Types.sol";
+import { DefaultNetwork } from "@fdk/utils/DefaultNetwork.sol";
 import { RoninMigration } from "script/RoninMigration.s.sol";
 import { RoninRandomBeaconDeploy } from "script/contracts/RoninRandomBeaconDeploy.s.sol";
 import { RoninValidatorSetREP10MigratorLogicDeploy } from
   "script/contracts/RoninValidatorSetRep10MigratorLogicDeploy.s.sol";
 import { ISharedArgument } from "script/interfaces/ISharedArgument.sol";
-import { LibProxy } from "@fdk/libraries/LibProxy.sol";
-import { TContract } from "@fdk/types/Types.sol";
-import { DefaultNetwork } from "@fdk/utils/DefaultNetwork.sol";
-import { Network } from "script/utils/Network.sol";
-import { Contract } from "script/utils/Contract.sol";
+
 import { LibProposal } from "script/shared/libraries/LibProposal.sol";
 import { LibVRFProof } from "script/shared/libraries/LibVRFProof.sol";
 import { LibWrapUpEpoch } from "script/shared/libraries/LibWrapUpEpoch.sol";
+import { Contract } from "script/utils/Contract.sol";
+import { Network } from "script/utils/Network.sol";
 
 abstract contract REP10_Config_Mainnet_Base is RoninMigration {
   using LibProxy for *;
@@ -50,8 +54,8 @@ abstract contract REP10_Config_Mainnet_Base is RoninMigration {
   uint256 internal constant MAX_SV = 0; // Max Standard Validator Pick Threshold
 
   uint256 internal constant RANDOM_BEACON_SLASH_THRESHOLD = 3; // Random Beacon Slash Threshold
-  uint256 internal constant REP10_ACTIVATION_PERIOD = 19908; // Wed, 2024-Jul-4 00:00:00 UTC
-  uint256 internal constant SLASH_RANDOM_BEACON_AMOUNT = 1_000 ether; // Random Beacon Slash Amount
+  uint256 internal constant REP10_ACTIVATION_PERIOD = 19_908; // Wed, 2024-Jul-4 00:00:00 UTC
+  uint256 internal constant SLASH_RANDOM_BEACON_AMOUNT = 1000 ether; // Random Beacon Slash Amount
   uint256 internal constant NEW_MAX_VALIDATOR_CANDIDATE = 64; // New Max Validator Candidate
 
   address internal constant BAKSON_WALLET = 0xe880802580a1fbdeF67ACe39D1B21c5b2C74f059;

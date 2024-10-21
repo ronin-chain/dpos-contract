@@ -13,11 +13,13 @@ abstract contract PostChecker_Helper is BaseMigration {
   uint256 NORMAL_BLOCK_NUMBER = 100_000_000;
 
   LibVRFProof.VRFKey[] internal _vrfKeys;
-  uint private innerLogLevel = 0;
+  uint256 private innerLogLevel = 0;
 
   using LibErrorHandler for bool;
 
-  modifier logPostCheck(string memory task) {
+  modifier logPostCheck(
+    string memory task
+  ) {
     innerLogLevel++;
     if (innerLogLevel == 1) {
       console.log(string.concat("[>] Post-checking: ", task, "..."));

@@ -10,7 +10,7 @@ contract Migration__02_ProposeProposal_REP10_Mainnet_v0_8_0 is REP10_Config_Main
 
   function run() public virtual override onlyOn(DefaultNetwork.RoninMainnet.key()) {
     super.run();
-    
+
     roninRandomBeacon = IRandomBeacon(loadContract(Contract.RoninRandomBeacon.key()));
     // Verify: https://app.roninchain.com/address/0x1c327065568622bec442272c6d8c822575208ddc
     roninValidatorSetREP10LogicMigrator = 0x1C327065568622BEc442272C6D8c822575208Ddc;
