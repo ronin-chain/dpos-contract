@@ -63,7 +63,7 @@ jobs:
           rm -rf temp && mkdir temp && cd temp
           git clone https://github.com/ronin-chain/ronin-random-beacon.git 
           cd ronin-random-beacon && ls 
-          go build -o random_beacon && ls
+          go build -o ronin-random-beacon && ls
           cp ./ronin-random-beacon ../../bin/ 
           cd ../../ 
           rm -rf temp
