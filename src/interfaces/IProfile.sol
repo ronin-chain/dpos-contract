@@ -37,6 +37,13 @@ interface IProfile {
     bytes32 vrfKeyHash;
     /// @dev Timestamp of last change of VRF key hash. Only used in the logic of Beacon. Not used for checking for cooldown of updating the profile.
     uint256 vrfKeyHashLastChange;
+    /////////////////// ZkEVM Related Variables //////////////////////
+    /// @dev The rollup id of the candidate.
+    uint32 rollupId;
+    /// @dev The trusted aggregator to verify the zk proof.
+    address aggregator;
+    /// @dev The trusted sequencer to sequence batch of L2 transactions.
+    address sequencer;
   }
 
   /// @dev Event emitted when a profile with `id` is added.
@@ -53,6 +60,12 @@ interface IProfile {
   event VRFKeyHashChanged(address indexed id, bytes32 vrfKeyHash);
   /// @dev Event emitted when the pubkey is verified successfully.
   event PubkeyVerified(bytes pubkey, bytes proofOfPossession);
+  /// @dev Event emitted when the validator create new rollup contract.
+  event RollupCreated(address indexed id, uint32 indexed rollupId);
+  /// @dev Event emitted when the validator change the trusted aggregator.
+  event AggregatorChanged(address indexed id, address indexed aggregator);
+  /// @dev Event emitted when the validator change the trusted sequencer.
+  event SequencerChanged(address indexed id, address indexed sequencer);
 
   /// @dev Error of already existed profile.
   error ErrExistentProfile();
@@ -74,7 +87,10 @@ interface IProfile {
   error ErrInvalidProofOfPossession(bytes pubkey, bytes proofOfPossession);
   error ErrLookUpIdFailed(TConsensus consensus);
   error ErrLookUpIdFromVRFKeyFailed(bytes32 vrfKeyHash);
+  error ErrLookUpIdFromRollupIdFailed(uint32 rollupId);
   error ErrValidatorOnRenunciation(address cid);
+  error ErrExistentRollup(address cid, uint32 createdRollupId);
+  error ErrZeroRollupId(address cid);
 
   function initialize(
     address validatorContract
@@ -85,6 +101,43 @@ interface IProfile {
   function initializeV3(
     uint256 cooldown
   ) external;
+
+  function initializeV4(
+    address rollupManager
+  ) external;
+
+  /// @dev Getter to query `id` from `rollupId`.
+  function getRollupId2Id(
+    uint32 rollupId
+  ) external view returns (address id);
+
+  /// @dev Getter to query `rollupId` from `id` address.
+  function getId2RollupId(
+    address id
+  ) external view returns (uint32);
+
+  /// @dev Getter to query `aggregator` from `id` address.
+  function getId2Aggregator(
+    address id
+  ) external view returns (address);
+
+  /// @dev Getter to query `sequencer` from `id` address.
+  function getId2Sequencer(
+    address id
+  ) external view returns (address);
+
+  /*
+  * @dev Cross-contract function to add new rollup contract of a candidate.
+  *
+  * Requirements:
+  * - Only `rollupManager` can call this method.
+  * - On renounce, the candidate cannot create a new rollup contract.
+  * - `id` must be a valid candidate.
+  * - `rollupId` must be unique.
+  * - `rollupId` must be greater than 0.
+  * - Candidate must not have any rollup id before.
+  */
+  function execCreateRollup(address id, uint32 rollupId) external;
 
   /// @dev Getter to query full `profile` from `id` address.
   function getId2Profile(
@@ -186,6 +239,11 @@ interface IProfile {
     bytes32 vrfKeyHash
   ) external view returns (bool found, address id);
 
+  /// @dev Getter to backward query from `rollupId` to `id` address.
+  function tryGetRollupId2Id(
+    uint32 rollupId
+  ) external view returns (bool found, address id);
+
   /// @dev Getter to backward batch query from `consensus` address to `id` address.
   function getManyConsensus2Id(
     TConsensus[] memory consensus
@@ -205,6 +263,26 @@ interface IProfile {
     bytes calldata pubkey,
     bytes calldata proofOfPossession
   ) external;
+
+  /**
+   * @dev Updated the `sequencer` address of candidate id `id` immediately without waiting time.
+   * Requirements:
+   * - Only admin can call this method.
+   * - The profile must be existed.
+   * - The new sequencer address must not be duplicated or zero.
+   * - Must have created rollup contract before.
+   */
+  function changeSequencerAddr(address id, address newSequencer) external;
+
+  /**
+   * @dev Updated the `aggregator` address of candidate id `id` immediately without waiting time.
+   * Requirements:
+   * - Only admin can call this method.
+   * - The profile must be existed.
+   * - The new aggregator address must not be duplicated or zero.
+   * - Must have created rollup contract before.
+   */
+  function changeAggregatorAddr(address id, address newAggregator) external;
 
   /**
    * @dev Updated the treasury address of candidate id `id` immediately without waiting time.

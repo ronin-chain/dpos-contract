@@ -99,6 +99,20 @@ abstract contract CoinbaseExecution is ICoinbaseExecution, CoinbaseExecutionDepe
   /**
    * @inheritdoc ICoinbaseExecution
    */
+  function onL2BlockRewardSubmitted(
+    address cid
+  ) external payable onlyContract(ContractType.ZK_FEE_PLAZA) {
+    (uint256 validatorL2Fee, uint256 delegatorL2Fee) = _calcCommissionReward(cid, msg.value);
+
+    _validatorL2MiningReward[cid] += validatorL2Fee;
+    _delegatorL2MiningReward[cid] += delegatorL2Fee;
+
+    emit L2BlockRewardSubmitted(cid, msg.value);
+  }
+
+  /**
+   * @inheritdoc ICoinbaseExecution
+   */
   function wrapUpEpoch() external payable virtual override onlyCoinbase whenEpochEnding oncePerEpoch {
     unchecked {
       uint256 newPeriod = _computePeriod(block.timestamp);
@@ -123,10 +137,13 @@ abstract contract CoinbaseExecution is ICoinbaseExecution, CoinbaseExecutionDepe
         randomBeacon.execRecordAndSlashUnavailability(lastPeriod, newPeriod, address(slashIndicatorContract), allCids);
         slashIndicatorContract.execUpdateCreditScores(allCids, lastPeriod);
 
-        (uint256[] memory delegatorBlockMiningRewards, uint256[] memory delegatorFastFinalityRewards) =
-          _distributeRewardToTreasuriesAndCalculateTotalDelegatorsReward(lastPeriod, allCids);
+        (
+          uint256[] memory delegatorBlockMiningRewards,
+          uint256[] memory delegatorL2BlockMiningRewards,
+          uint256[] memory delegatorFastFinalityRewards
+        ) = _distributeRewardToTreasuriesAndCalculateTotalDelegatorsReward(lastPeriod, allCids);
         _settleAndTransferDelegatingRewards(
-          lastPeriod, allCids, delegatorBlockMiningRewards, delegatorFastFinalityRewards
+          lastPeriod, allCids, delegatorBlockMiningRewards, delegatorL2BlockMiningRewards, delegatorFastFinalityRewards
         );
         _tryRecycleLockedFundsFromEmergencyExits();
         _recycleDeprecatedRewards();
@@ -206,12 +223,20 @@ abstract contract CoinbaseExecution is ICoinbaseExecution, CoinbaseExecutionDepe
   function _distributeRewardToTreasuriesAndCalculateTotalDelegatorsReward(
     uint256 lastPeriod,
     address[] memory cids
-  ) private returns (uint256[] memory delegatorBlockMiningRewards, uint256[] memory delegatorFastFinalityRewards) {
+  )
+    private
+    returns (
+      uint256[] memory delegatorBlockMiningRewards,
+      uint256[] memory delegatorL2BlockMiningRewards,
+      uint256[] memory delegatorFastFinalityRewards
+    )
+  {
     address vId; // validator id
     address payable treasury;
 
     uint256 length = cids.length;
     delegatorBlockMiningRewards = new uint256[](length);
+    delegatorL2BlockMiningRewards = new uint256[](length);
     delegatorFastFinalityRewards = new uint256[](length);
 
     (uint256 minRate, uint256 maxRate) = IStaking(getContract(ContractType.STAKING)).getCommissionRateRange();
@@ -219,6 +244,10 @@ abstract contract CoinbaseExecution is ICoinbaseExecution, CoinbaseExecutionDepe
     for (uint256 i; i < length; ++i) {
       vId = cids[i];
       treasury = _candidateInfo[vId].__shadowedTreasury;
+
+      // Distribute the L2 mining reward to the treasury address of the validator regardless of the jail status.
+      delegatorL2BlockMiningRewards[i] = _delegatorL2MiningReward[vId];
+      _distributeL2MiningReward(vId, treasury);
 
       if (!_isJailedById(vId) && !_miningRewardDeprecatedById(vId, lastPeriod)) {
         (uint256 validatorFFReward, uint256 delegatorFFReward) = _calcCommissionReward({
@@ -240,6 +269,28 @@ abstract contract CoinbaseExecution is ICoinbaseExecution, CoinbaseExecutionDepe
       delete _delegatorMiningReward[vId];
       delete _validatorMiningReward[vId];
       delete _fastFinalityReward[vId];
+      delete _delegatorL2MiningReward[vId];
+      delete _validatorL2MiningReward[vId];
+    }
+  }
+
+  /**
+   * @dev Distributes the L2 mining reward to the validator's treasury address.
+   *
+   * Emits the `MiningRewardL2Distributed` once the reward is distributed successfully.
+   * Emits the `MiningRewardL2DistributionFailed` once the contract fails to distribute reward.
+   *
+   * Note: This method should be called once in the end of each period.
+   */
+  function _distributeL2MiningReward(address cid, address payable treasury) private {
+    uint256 amount = _validatorL2MiningReward[cid];
+    if (amount > 0) {
+      if (_unsafeSendRONLimitGas(treasury, amount, DEFAULT_ADDITION_GAS)) {
+        emit L2MiningRewardDistributed(cid, treasury, amount);
+        return;
+      }
+
+      emit L2MiningRewardDistributionFailed(cid, treasury, amount, address(this).balance);
     }
   }
 
@@ -298,10 +349,12 @@ abstract contract CoinbaseExecution is ICoinbaseExecution, CoinbaseExecutionDepe
     uint256 period,
     address[] memory cids,
     uint256[] memory delegatorMiningRewards,
+    uint256[] memory delegatorL2MiningRewards,
     uint256[] memory delegatorFFRewards
   ) private {
     IStaking staking = IStaking(getContract(ContractType.STAKING));
-    (uint256[] memory totalRewards, uint256 sumReward) = LibArray.addAndSum(delegatorMiningRewards, delegatorFFRewards);
+    (uint256[] memory totalRewards, uint256 sumReward) =
+      LibArray.addAndSum(delegatorMiningRewards, delegatorL2MiningRewards, delegatorFFRewards);
 
     if (sumReward != 0) {
       if (_unsafeSendRON(payable(address(staking)), sumReward)) {
@@ -309,6 +362,7 @@ abstract contract CoinbaseExecution is ICoinbaseExecution, CoinbaseExecutionDepe
 
         emit FastFinalityRewardDelegatorsDistributed(cids, delegatorFFRewards);
         emit MiningRewardDelegatorsDistributed(cids, delegatorMiningRewards);
+        emit L2MiningRewardDelegatorsDistributed(cids, delegatorL2MiningRewards);
 
         return;
       }
@@ -316,6 +370,7 @@ abstract contract CoinbaseExecution is ICoinbaseExecution, CoinbaseExecutionDepe
       uint256 selfBalance = address(this).balance;
       emit FastFinalityRewardDelegatorsDistributionFailed(cids, delegatorFFRewards, selfBalance);
       emit MiningRewardDelegatorsDistributionFailed(cids, delegatorMiningRewards, selfBalance);
+      emit L2MiningRewardDelegatorsDistributionFailed(cids, delegatorL2MiningRewards, selfBalance);
     }
   }
 
@@ -440,7 +495,6 @@ abstract contract CoinbaseExecution is ICoinbaseExecution, CoinbaseExecutionDepe
    * - This method is called at the end of each epoch
    *
    * Emits the `BlockProducerSetUpdated` event.
-   * Emits the `BridgeOperatorSetUpdated` event.
    *
    */
   function _updateApplicableValidatorToBlockProducerSet(
