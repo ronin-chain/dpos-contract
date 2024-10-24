@@ -1,5 +1,14 @@
 #!/bin/bash
 echo "Running post-commit hook"
+
+HAS_PENDING_CHANGES=false
+# If there are any changes in the working directory, stash them
+if [[ $(git status -s) ]]; then
+    HAS_PENDING_CHANGES=true
+    echo "\033[33m[post-commit] Stashing pending changes\033[0m"
+    git stash push -m "post-commit: Stash changes"
+fi
+
 GIT_BLAME_IGNORE_REVS_FILE=".git-blame-ignore-revs"
 
 # If `.git-blame-ignore-revs` does not exist, create it
@@ -34,4 +43,10 @@ if [[ $(git status -s $GIT_BLAME_IGNORE_REVS_FILE) ]]; then
     echo "\033[33m[post-commit] .git-blame-ignore-revs changes detected\033[0m"
     git add $GIT_BLAME_IGNORE_REVS_FILE
     HUSKY=0 git commit -m "chore(automated): post-commit update .git-blame-ignore-revs" -n
+fi
+
+# If there were any pending changes, unstash them
+if [ "$HAS_PENDING_CHANGES" = true ]; then
+    echo "\033[33m[post-commit] Unstashing pending changes\033[0m"
+    git stash pop
 fi

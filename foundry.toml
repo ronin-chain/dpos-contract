@@ -43,9 +43,10 @@ ronin-mainnet-shadow = "${RONIN_MAINNET_SHADOW}"
 "openzeppelin-v4" = { version = "4.7.3", url = "https://github.com/OpenZeppelin/openzeppelin-contracts/archive/refs/tags/v4.7.3.zip" }
 "openzeppelin-v5" = { version = "5.0.2", url = "https://github.com/OpenZeppelin/openzeppelin-contracts/archive/refs/tags/v5.0.2.zip" }
 "chainlink" = { version = "1.6.0", url = "https://github.com/smartcontractkit/chainlink/archive/refs/tags/v1.6.0.zip" }
-"safe-smart-account" = { version = "1.4.1", url = "https://github.com/safe-global/safe-smart-account/archive/refs/tags/v1.4.1.zip" }
+"safe" = { version = "1.4.1", url = "https://github.com/safe-global/safe-smart-account/archive/refs/tags/v1.4.1.zip" }
 "prb-test" = { version = "0.6.4", url = "https://github.com/PaulRBerg/prb-test/archive/refs/tags/v0.6.4.zip" }
 "prb-math" = { version = "4.0.1", url = "https://github.com/PaulRBerg/prb-math/archive/refs/tags/v4.0.1.zip" }
+storage-delta = { version = "0.3.2", url = "https://github.com/TuDo1403/storage-delta/archive/refs/tags/0.3.2.zip" }
 
 [soldeer]
 # whether soldeer manages remappings

@@ -1,14 +1,6 @@
 name: Slither Analyze
 
 on:
-  push:
-    branches:
-      - mainnet
-      - testnet
-      - "feature/*"
-      - "features/*"
-      - "feat/*"
-      - "feats/*"
   pull_request:
     branches:
       - mainnet
@@ -23,11 +15,11 @@ env:
   FOUNDRY_PROFILE: ci
 
 jobs:
-  check:
+  check-slither:
     strategy:
       fail-fast: true
 
-    name: Foundry project
+    name: Slither Analyze
     runs-on: [self-hosted, dockerize]
 
     env:
@@ -39,30 +31,28 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Set up Go 1.19
-        uses: actions/setup-go@v4
-        with:
-          go-version: "1.19"
-
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
 
       - name: Install package with soldeer
         run: forge soldeer install
 
-      - name: Setup repo
-        run: |
-          chmod +x ./install.sh
-          ./install.sh
-        id: setup-repo
-
-      - name: Install Slither for security analysis
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y python3-pip
-          python3 -m pip install slither-analyzer
-
-      - name: Run Slither analysis
-        run: |
-          slither ./ --exclude-optimization --exclude-low --exclude-medium --exclude-informational --exclude-dependencies --filter-paths "dependencies/|script/|test/foundry/"
+      - name: Run Slither
+        uses: crytic/slither-action@v0.4.0
         id: slither
+        with:
+          node-version: 18
+          fail-on: none
+          slither-args: --exclude-optimization --exclude-low --exclude-medium --exclude-informational --exclude-dependencies --filter-paths "dependencies/|script/|test/foundry/" --checklist --markdown-root ${{ github.server_url }}/${{ github.repository }}/blob/${{ github.sha }}/
+
+      - name: Create/update checklist as PR comment
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request'
+        env:
+          REPORT: ${{ steps.slither.outputs.stdout }}
+        with:
+          script: |
+            const script = require('.github/scripts/comment')
+            const header = '# Slither report'
+            const body = process.env.REPORT
+            await script({ github, context, header, body })

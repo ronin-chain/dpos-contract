@@ -41,8 +41,15 @@ checksum = "1458dc3760d4fa5ad2ecd778d04d61143785d0a10c1674aed29a69210ac4e072"
 integrity = "e61d2d4974d6461b650445295fa55b8065a802878c80672214762630339e2bac"
 
 [[dependencies]]
-name = "safe-smart-account"
+name = "safe"
 version = "1.4.1"
 url = "https://github.com/safe-global/safe-smart-account/archive/refs/tags/v1.4.1.zip"
 checksum = "84348d4a1cf975f5d013cf8bdb74b8713bcccb40fceb5a1e7fc9debd27489e99"
 integrity = "65ed08a525b96c6b4d8316f827fcd799ff831e1a3b4e56bc55fbf200d27c372d"
+
+[[dependencies]]
+name = "storage-delta"
+version = "0.3.2"
+url = "https://github.com/TuDo1403/storage-delta/archive/refs/tags/0.3.2.zip"
+checksum = "bd0183461714b86b32c5a99e086a4f6459533963cdd3cda40e3aa46e01df35aa"
+integrity = "d03f887cb1960d7ccc1d67fbc573b15bf032a42e055bbc1d824c4cf6a4547969"

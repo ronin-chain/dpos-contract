@@ -1,0 +1,116 @@
+name: Check Storage Layout Changes
+
+on:
+  pull_request:
+    branches:
+      - mainnet
+      - testnet
+      - "release/*"
+      - "feature/*"
+      - "features/*"
+
+env:
+  FOUNDRY_PROFILE: ci
+
+jobs:
+  check-storage-layout:
+    strategy:
+      fail-fast: true
+
+    name: Check storage layout changes
+    runs-on: [self-hosted, dockerize]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+
+      - name: "Setup Node"
+        uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 #v3.4.1
+        with:
+          node-version: v16.16.0
+
+      - name: Install package with soldeer
+        run: |
+          forge soldeer install
+
+      - name: Run Forge build
+        run: |
+          forge --version
+          forge build
+        id: build
+
+      - name: Install Dependencies
+        id: install-deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget
+          sudo apt-get install bc
+          sudo wget https://github.com/mikefarah/yq/releases/download/v4.44.3/yq_linux_amd64 -O /usr/bin/yq
+          sudo chmod +x /usr/bin/yq
+
+      - name: Run Storage Layout Check
+        id: storage-layout-check
+        run: |
+          git fetch --unshallow || git fetch --all
+
+          dependencies/storage-delta-0.3.2/run.sh \
+            --omit new \
+            --dst-commit ${{ github.event.pull_request.base.sha }} \
+            --src-commit ${{ github.event.pull_request.head.sha }} \
+            --github-root ${{ github.server_url }}/${{ github.repository }}/blob/
+
+      - name: Check for storage_delta folder
+        id: check-folder
+        run: |
+          if [ -d "storage_delta" ]; then
+              # Query all the subdirectories in the storage_delta folder to check any `.diff` files
+              # Echo the contents of the `.diff` files to the output with wrapped ```diff {content} ```
+              find storage_delta -type f -name "*.diff"
+              for file in $(find storage_delta -type f -name "*.diff"); do
+                  clean_path=$(echo "$file" | sed -e 's|storage_delta/diffs/||' -e 's|https:/|https://|' -e 's|\.diff$||')
+                  echo "## Layout Changes for [$(basename "${clean_path%.*}")]($clean_path)" >>storage_delta_report.md
+                  echo '```diff' >>storage_delta_report.md    
+                  # Remove \ No newline at end of file from the diff file
+                  grep -v '\\ No newline at end of file' $file >>storage_delta_report.md
+                  echo '```' >>storage_delta_report.md
+              done
+              # Check if .removed files exist, if yes, add header `Removed Storage Layouts` and append the contents of the file to storage_delta_report.md
+              if [ -f "storage_delta/.removed" ]; then
+                  echo "## Removed Components" >>storage_delta_report.md
+                  cat storage_delta/.removed >>storage_delta_report.md
+              fi
+
+              # Check if the storage_delta_report.md file exists
+              if [ -f "storage_delta_report.md" ]; then
+                  # Output the contents of the storage_delta_report.md file to the output
+                  cat storage_delta_report.md 
+                  echo "storage_delta_exists=true" >>$GITHUB_OUTPUT
+              else
+                  echo "No storage layout changes detected."
+              fi
+          fi
+        env:
+          GITHUB_OUTPUT: ${{ steps.check-folder.outputs.storage_delta_exists }}
+        shell: bash
+
+      - name: Set storage delta report output
+        if: ${{ steps.check-folder.outputs.storage_delta_exists == 'true' }}
+        id: set-report
+        run: |
+          REPORT=$(cat storage_delta_report.md)
+          echo "REPORT<<EOF" >> $GITHUB_ENV
+          echo "$REPORT" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Create/update checklist as PR comment
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request' && steps.check-folder.outputs.storage_delta_exists == 'true'
+        with:
+          script: |
+            const script = require('.github/scripts/comment');
+            const header = '# Storage Layout Change Report';
+            const body = process.env.REPORT;
+            await script({ github, context, header, body });

@@ -4,4 +4,4 @@ forge-std/=dependencies/fdk-0.3.5-beta/dependencies/forge-std-1.9.3/src/
 @solady/=dependencies/fdk-0.3.5-beta/dependencies/solady-0.0.228/src/
 @fdk/=dependencies/fdk-0.3.5-beta/script/
 @chainlink/contracts/=dependencies/chainlink-1.6.0/contracts/
-@safe/contracts/=dependencies/safe-smart-account-1.4.1/contracts/
+@safe/contracts/=dependencies/safe-1.4.1/contracts/
