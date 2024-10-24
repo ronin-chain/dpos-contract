@@ -1,21 +1,21 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { IBaseStaking } from "@ronin/contracts/interfaces/staking/IBaseStaking.sol";
-import {
-  TransparentUpgradeableProxy,
-  TransparentUpgradeableProxyV2
-} from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
+import { LibProxy } from "@fdk/libraries/LibProxy.sol";
+import { TContract } from "@fdk/types/Types.sol";
+import { DefaultNetwork } from "@fdk/utils/DefaultNetwork.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
 import { console } from "forge-std/console.sol";
-import { TContract } from "@fdk/types/Types.sol";
-import { LibProxy } from "@fdk/libraries/LibProxy.sol";
-import { DefaultNetwork } from "@fdk/utils/DefaultNetwork.sol";
 import { IRoninTrustedOrganization, Proposal, RoninMigration } from "script/RoninMigration.s.sol";
-import { IRoninGovernanceAdmin } from "@ronin/contracts/interfaces/IRoninGovernanceAdmin.sol";
-import { Contract } from "script/utils/Contract.sol";
-import { IFastFinalityTracking } from "@ronin/contracts/interfaces/IFastFinalityTracking.sol";
+
 import { LibProposal } from "script/shared/libraries/LibProposal.sol";
+import { Contract } from "script/utils/Contract.sol";
+import {
+  TransparentUpgradeableProxy, TransparentUpgradeableProxyV2
+} from "src/extensions/TransparentUpgradeableProxyV2.sol";
+import { IFastFinalityTracking } from "src/interfaces/IFastFinalityTracking.sol";
+import { IRoninGovernanceAdmin } from "src/interfaces/IRoninGovernanceAdmin.sol";
+import { IBaseStaking } from "src/interfaces/staking/IBaseStaking.sol";
 
 contract Migration__20240301_UpgradeReleaseV0_7_6_Testnet is RoninMigration {
   using LibProxy for *;

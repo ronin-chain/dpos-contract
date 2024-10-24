@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { Vm, VmSafe } from "forge-std/Vm.sol";
-import { StdStyle } from "forge-std/StdStyle.sol";
-import { console } from "forge-std/console.sol";
-import { Contract } from "script/utils/Contract.sol";
+import { LibVRFProof, VRF } from "./LibVRFProof.sol";
 import { IGeneralConfig } from "@fdk/interfaces/IGeneralConfig.sol";
 import { LibSharedAddress } from "@fdk/libraries/LibSharedAddress.sol";
-import { ICoinbaseExecution } from "@ronin/contracts/interfaces/validator/ICoinbaseExecution.sol";
-import { IRoninValidatorSet } from "@ronin/contracts/interfaces/validator/IRoninValidatorSet.sol";
-import { VRF, LibVRFProof } from "./LibVRFProof.sol";
+import { StdStyle } from "forge-std/StdStyle.sol";
+import { Vm, VmSafe } from "forge-std/Vm.sol";
+import { console } from "forge-std/console.sol";
+import { Contract } from "script/utils/Contract.sol";
+import { ICoinbaseExecution } from "src/interfaces/validator/ICoinbaseExecution.sol";
+import { IRoninValidatorSet } from "src/interfaces/validator/IRoninValidatorSet.sol";
 
 library LibWrapUpEpoch {
   using StdStyle for *;
@@ -21,7 +21,9 @@ library LibWrapUpEpoch {
     logs = wrapUpPeriods({ times: 1 })[0];
   }
 
-  function wrapUpPeriods(uint256 times) internal returns (VmSafe.Log[][] memory logs) {
+  function wrapUpPeriods(
+    uint256 times
+  ) internal returns (VmSafe.Log[][] memory logs) {
     logs = wrapUpPeriods({ times: times, shouldSubmitBeacon: false });
   }
 
@@ -73,7 +75,9 @@ library LibWrapUpEpoch {
     logs = _wrapUpEpoch();
   }
 
-  function wrapUpEpochAndSubmitBeacons(LibVRFProof.VRFKey[] memory keys) internal returns (VmSafe.Log[] memory logs) {
+  function wrapUpEpochAndSubmitBeacons(
+    LibVRFProof.VRFKey[] memory keys
+  ) internal returns (VmSafe.Log[] memory logs) {
     fastForwardToNextEpoch();
     logs = _wrapUpEpochAndSubmitBeacons(keys);
   }
@@ -126,7 +130,9 @@ library LibWrapUpEpoch {
     );
   }
 
-  function _wrapUpEpochAndSubmitBeacons(LibVRFProof.VRFKey[] memory keys) private returns (VmSafe.Log[] memory logs) {
+  function _wrapUpEpochAndSubmitBeacons(
+    LibVRFProof.VRFKey[] memory keys
+  ) private returns (VmSafe.Log[] memory logs) {
     logs = _wrapUpEpoch();
     LibVRFProof.listenEventAndSubmitProof(keys, logs);
   }

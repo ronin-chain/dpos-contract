@@ -1,65 +1,69 @@
 [profile.default]
-src = 'contracts'
-test = 'test/foundry/'
+src = 'src'
+test = 'test/foundry'
 script = 'script'
 out = 'out'
 optimizer = true
 optimizer_runs = 1_000
 ffi = true
 
-libs = ['lib', 'node_modules/@openzeppelin', 'node_modules/hardhat']
+libs = ['dependencies']
 
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config
 
-solc = '0.8.25'
+solc = '0.8.27'
 use_literal_content = true
 extra_output = ["devdoc", "userdoc", "storagelayout"]
-evm_version = 'istanbul'
+evm_version = 'london'
 cache_path = 'cache_foundry'
 fs_permissions = [{ access = "read-write", path = "./" }]
+gas_limit = "18446744073709551615"
 
 [fmt]
 line_length = 120
 tab_width = 2
-multiline_func_header = 'params_first'
 bracket_spacing = true
-int_types = 'preserve'
+multiline_func_header = 'params_first'
+single_line_statement_blocks = 'preserve'
+sort_imports = true
+number_underscore = "thousands"
 
-[profile.ci]
-verbosity = 4
-
-[profile.default.fuzz]
-runs = 256
-
-[profile.intense.fuzz]
-runs = 5_000
-
-[profile.via-ir.fuzz]
-runs = 1_000
-
-[profile.min-solc]
-solc_version = "0.8.4"
-
-[profile.min-solc.fuzz]
-runs = 1_000
-
-[profile.min-solc-via-ir.fuzz]
-runs = 1_000
 
 [rpc_endpoints]
 ethereum = "https://eth.llamarpc.com"
 goerli = "https://goerli.infura.io/v3/${INFURA_API_KEY}"
 ronin-mainnet = "https://api-archived.roninchain.com/rpc"
 ronin-testnet = "https://saigon-archive.roninchain.com/rpc"
-ronin-devnet = "https://hcm-rpc.skymavis.one/rpc"
 localhost = "http://localhost:8545"
-ronin-testnet-shadow = "http://34.27.172.168:8545"
-ronin-mainnet-shadow = "http://35.192.217.237:8545"
+ronin-testnet-shadow = "${RONIN_TESTNET_SHADOW}"
+ronin-mainnet-shadow = "${RONIN_MAINNET_SHADOW}"
 
 [dependencies]
-"@fdk" = { version = "0.3.0-beta", url = "https://github.com/axieinfinity/foundry-deployment-kit/archive/refs/tags/v0.3.0-beta.zip" }
-"@prb-test" = { version = "0.6.4" }
-"@openzeppelin" = { version = "4.7.3", url = "https://github.com/OpenZeppelin/openzeppelin-contracts/archive/refs/tags/v4.7.3.zip" }
-"@openzeppelin-v5" = { version = "5.0.2", url = "https://github.com/OpenZeppelin/openzeppelin-contracts/archive/refs/tags/v5.0.2.zip" }
-"@chainlink" = { version = "1.6.0", url = "https://github.com/smartcontractkit/chainlink/archive/refs/tags/v1.6.0.zip" }
-safe-smart-account = { version = "1.4.1", url = "https://github.com/safe-global/safe-smart-account/archive/refs/tags/v1.4.1.zip" }
+"fdk" = { version = "0.3.5-beta", url = "https://github.com/axieinfinity/foundry-deployment-kit/archive/refs/tags/v0.3.5-beta.zip" }
+"openzeppelin-v4" = { version = "4.7.3", url = "https://github.com/OpenZeppelin/openzeppelin-contracts/archive/refs/tags/v4.7.3.zip" }
+"openzeppelin-v5" = { version = "5.0.2", url = "https://github.com/OpenZeppelin/openzeppelin-contracts/archive/refs/tags/v5.0.2.zip" }
+"chainlink" = { version = "1.6.0", url = "https://github.com/smartcontractkit/chainlink/archive/refs/tags/v1.6.0.zip" }
+"safe" = { version = "1.4.1", url = "https://github.com/safe-global/safe-smart-account/archive/refs/tags/v1.4.1.zip" }
+"prb-test" = { version = "0.6.4", url = "https://github.com/PaulRBerg/prb-test/archive/refs/tags/v0.6.4.zip" }
+"prb-math" = { version = "4.0.1", url = "https://github.com/PaulRBerg/prb-math/archive/refs/tags/v4.0.1.zip" }
+storage-delta = { version = "0.3.2", url = "https://github.com/TuDo1403/storage-delta/archive/refs/tags/0.3.2.zip" }
+
+[soldeer]
+# whether soldeer manages remappings
+remappings_generate = false
+
+# whether soldeer re-generates all remappings when installing, updating or uninstalling deps
+remappings_regenerate = false
+
+# whether to suffix the remapping with the version: `name-a.b.c`
+remappings_version = true
+
+# a prefix to add to the remappings ("@" would give `@name`)
+remappings_prefix = "@"
+
+# where to store the remappings ("txt" for `remappings.txt` or "config" for `foundry.toml`)
+# ignored when `soldeer.toml` is used as config (uses `remappings.txt`)
+remappings_location = "txt"
+
+# whether to install sub-dependencies or not. If true this wil install the dependencies of dependencies 1 level down.
+recursive_deps = true

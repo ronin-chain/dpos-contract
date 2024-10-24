@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
+import { IAccessControlEnumerable } from "@openzeppelin-v4/contracts/access/IAccessControlEnumerable.sol";
+import { JSONParserLib } from "@solady/utils/JSONParserLib.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
 import { console } from "forge-std/console.sol";
-import { JSONParserLib } from "@solady/utils/JSONParserLib.sol";
 import { RoninMigration } from "script/RoninMigration.s.sol";
 import { Contract } from "script/utils/Contract.sol";
-import { IStaking } from "@ronin/contracts/interfaces/staking/IStaking.sol";
-import { IAccessControlEnumerable } from "@openzeppelin/contracts/access/IAccessControlEnumerable.sol";
+import { IStaking } from "src/interfaces/staking/IStaking.sol";
 
 contract Migration__20240123_MigrateAdmin_Staking is RoninMigration {
   using StdStyle for *;
@@ -25,11 +25,9 @@ contract Migration__20240123_MigrateAdmin_Staking is RoninMigration {
     staking.migrateWasAdmin{ gas: 20_000_000 }(poolIds, admins, flags);
   }
 
-  function _parseMigrateData(string memory path)
-    private
-    view
-    returns (address[] memory poolIds, address[] memory admins, bool[] memory flags)
-  {
+  function _parseMigrateData(
+    string memory path
+  ) private view returns (address[] memory poolIds, address[] memory admins, bool[] memory flags) {
     string memory raw = vm.readFile(path);
     JSONParserLib.Item memory data = raw.parse();
     uint256 size = data.size();

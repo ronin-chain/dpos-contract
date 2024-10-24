@@ -3,13 +3,14 @@ pragma solidity ^0.8.19;
 
 import { console } from "forge-std/console.sol";
 import { RoninMigration } from "script/RoninMigration.s.sol";
+
+import { LibPrecompile } from "script/shared/libraries/LibPrecompile.sol";
 import { LibProposal } from "script/shared/libraries/LibProposal.sol";
 import { LibWrapUpEpoch } from "script/shared/libraries/LibWrapUpEpoch.sol";
-import { Proposal } from "@ronin/contracts/libraries/Proposal.sol";
-import { IRoninGovernanceAdmin } from "@ronin/contracts/interfaces/IRoninGovernanceAdmin.sol";
-import { IRoninTrustedOrganization } from "@ronin/contracts/interfaces/IRoninTrustedOrganization.sol";
-import { LibPrecompile } from "script/shared/libraries/LibPrecompile.sol";
 import { Contract } from "script/utils/Contract.sol";
+import { IRoninGovernanceAdmin } from "src/interfaces/IRoninGovernanceAdmin.sol";
+import { IRoninTrustedOrganization } from "src/interfaces/IRoninTrustedOrganization.sol";
+import { Proposal } from "src/libraries/Proposal.sol";
 
 contract Migration__01_RejectOnGoingProposal_ShadowMainnet is RoninMigration {
   address[] _targets;

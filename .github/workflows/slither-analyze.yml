@@ -1,0 +1,58 @@
+name: Slither Analyze
+
+on:
+  pull_request:
+    branches:
+      - mainnet
+      - testnet
+      - "feature/*"
+      - "features/*"
+      - "feat/*"
+      - "feats/*"
+      - "release/*"
+
+env:
+  FOUNDRY_PROFILE: ci
+
+jobs:
+  check-slither:
+    strategy:
+      fail-fast: true
+
+    name: Slither Analyze
+    runs-on: [self-hosted, dockerize]
+
+    env:
+      ETHERSCAN_API_KEY: ${{ secrets.ETHERSCAN_API_KEY }}
+      INFURA_API_KEY: ${{ secrets.INFURA_API_KEY }}
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Install package with soldeer
+        run: forge soldeer install
+
+      - name: Run Slither
+        uses: crytic/slither-action@v0.4.0
+        id: slither
+        with:
+          node-version: 18
+          fail-on: none
+          slither-args: --exclude-optimization --exclude-low --exclude-medium --exclude-informational --exclude-dependencies --filter-paths "dependencies/|script/|test/foundry/" --checklist --markdown-root ${{ github.server_url }}/${{ github.repository }}/blob/${{ github.sha }}/
+
+      - name: Create/update checklist as PR comment
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request'
+        env:
+          REPORT: ${{ steps.slither.outputs.stdout }}
+        with:
+          script: |
+            const script = require('.github/scripts/comment')
+            const header = '# Slither report'
+            const body = process.env.REPORT
+            await script({ github, context, header, body })
