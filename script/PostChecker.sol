@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
+import { IHasContracts } from "src/interfaces/collections/IHasContracts.sol";
 import { RoninMigration } from "./RoninMigration.s.sol";
 import { ISharedArgument } from "./interfaces/ISharedArgument.sol";
 import { PostChecker_ApplyCandidate } from "./post-check/PostChecker_ApplyCandidate.sol";

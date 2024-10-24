@@ -128,6 +128,7 @@ abstract contract ProfileStorage is IProfile, HasContracts {
    */
   function _setAggregator(CandidateProfile storage _profile, address aggregator) internal {
     _profile.aggregator = aggregator;
+    _registry[uint256(uint160(address(aggregator)))] = true;
 
     emit AggregatorChanged(_profile.id, aggregator);
   }
@@ -137,6 +138,7 @@ abstract contract ProfileStorage is IProfile, HasContracts {
    */
   function _setSequencer(CandidateProfile storage _profile, address sequencer) internal {
     _profile.sequencer = sequencer;
+    _registry[uint256(uint160(address(sequencer)))] = true;
 
     emit SequencerChanged(_profile.id, sequencer);
   }
