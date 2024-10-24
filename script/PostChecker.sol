@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { IHasContracts } from "src/interfaces/collections/IHasContracts.sol";
 import { RoninMigration } from "./RoninMigration.s.sol";
 import { ISharedArgument } from "./interfaces/ISharedArgument.sol";
 import { PostChecker_ApplyCandidate } from "./post-check/PostChecker_ApplyCandidate.sol";
@@ -14,6 +13,7 @@ import { PostChecker_Staking } from "./post-check/PostChecker_Staking.sol";
 import { Contract } from "./utils/Contract.sol";
 import { BaseMigration } from "@fdk/BaseMigration.s.sol";
 import { ScriptExtended } from "@fdk/extensions/ScriptExtended.s.sol";
+import { IHasContracts } from "src/interfaces/collections/IHasContracts.sol";
 
 import { ProxyInterface } from "@fdk/libraries/LibDeploy.sol";
 import { LibErrorHandler } from "@fdk/libraries/LibErrorHandler.sol";
