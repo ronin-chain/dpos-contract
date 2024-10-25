@@ -13,12 +13,12 @@ contract Profile_Concrete_Unit_Test is Profile_Base_Unit_Test {
     vm.warp(block.timestamp + 11);
 
     vm.expectRevert(abi.encodeWithSelector(IProfile.ErrInvalidProofOfPossession.selector, "0xaa", ""));
-    _profile.changePubkey(address(0x20000), "0xaa", "");
+    _profile.changePubkey(_id, "0xaa", "");
 
     _profile.setVerificationFailed(false);
 
-    _profile.changePubkey(address(0x20000), "0xbb", "");
-    _validatorProfile = _profile.getId2Profile(address(0x20000));
+    _profile.changePubkey(_id, "0xbb", "");
+    _validatorProfile = _profile.getId2Profile(_id);
     assertEq(_validatorProfile.pubkey, "0xbb");
 
     vm.stopPrank();
@@ -53,15 +53,15 @@ contract Profile_Concrete_Unit_Test is Profile_Base_Unit_Test {
     vm.startPrank(_validatorAdmin);
     vm.warp(block.timestamp + 11);
 
-    _profile.changePubkey(address(0x20000), "0xaa", "");
+    _profile.changePubkey(_id, "0xaa", "");
 
     vm.expectRevert(IProfile.ErrProfileChangeCooldownNotEnded.selector);
-    _profile.changePubkey(address(0x20000), "0xbb", "");
+    _profile.changePubkey(_id, "0xbb", "");
 
     vm.warp(block.timestamp + 11);
-    _profile.changePubkey(address(0x20000), "0xbb", "");
+    _profile.changePubkey(_id, "0xbb", "");
 
-    IProfile.CandidateProfile memory _validatorProfile = _profile.getId2Profile(address(0x20000));
+    IProfile.CandidateProfile memory _validatorProfile = _profile.getId2Profile(_id);
     assertEq(_validatorProfile.oldPubkey, "0xaa");
     assertEq(_validatorProfile.pubkey, "0xbb");
 
