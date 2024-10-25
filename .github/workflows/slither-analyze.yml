@@ -10,6 +10,7 @@ on:
       - "feat/*"
       - "feats/*"
       - "release/*"
+      - "implement-feature/*"
 
 env:
   FOUNDRY_PROFILE: ci

@@ -8,6 +8,7 @@ on:
       - "release/*"
       - "feature/*"
       - "features/*"
+      - "implement-feature/*"
 
 env:
   FOUNDRY_PROFILE: ci
