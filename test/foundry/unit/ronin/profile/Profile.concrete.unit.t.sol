@@ -1,56 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.17 <0.9.0;
 
-import { Test } from "forge-std/Test.sol";
+import "./Profile.base.unit.t.sol";
 
-import { TransparentUpgradeableProxyV2 } from "src/extensions/TransparentUpgradeableProxyV2.sol";
-import { IProfile } from "src/interfaces/IProfile.sol";
-import { MockProfile } from "src/mocks/MockProfile.sol";
-import { TConsensus } from "src/udvts/Types.sol";
-import { MockValidatorSet } from "test/foundry/mocks/MockValidatorSet.sol";
-
-contract Profile_Concrete_Unit_Test is Test {
-  MockProfile internal _profile;
-  MockValidatorSet internal _validatorSetContract;
-  address internal immutable _stakingContract = address(0x10000);
-  address internal immutable _validatorAdmin = address(0x20001);
-  bytes32 constant ADMIN_SLOT = 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103;
-
-  function setUp() public virtual {
-    _validatorSetContract = new MockValidatorSet();
-
-    MockProfile _profileLogic = new MockProfile();
-    _profile = MockProfile(address(new TransparentUpgradeableProxyV2(address(_profileLogic), address(1), "")));
-    _profile.initialize(address(_validatorSetContract));
-    _profile.initializeV2(_stakingContract, address(0));
-    _profile.initializeV3(10);
-
-    vm.startPrank(address(1));
-
-    TransparentUpgradeableProxyV2 _proxy = TransparentUpgradeableProxyV2(payable(address(_profile)));
-    _proxy.functionDelegateCall(
-      abi.encodeWithSelector(
-        MockProfile.addNewProfile.selector,
-        IProfile.CandidateProfile({
-          id: address(0x20000),
-          consensus: TConsensus.wrap(address(0x20000)),
-          admin: _validatorAdmin,
-          treasury: payable(address(0x20000)),
-          __reservedGovernor: address(0),
-          vrfKeyHash: 0x0,
-          pubkey: "",
-          profileLastChange: 0,
-          oldPubkey: "",
-          oldConsensus: TConsensus.wrap(address(0)),
-          registeredAt: 0,
-          vrfKeyHashLastChange: 0
-        })
-      )
-    );
-
-    vm.stopPrank();
-  }
-
+contract Profile_Concrete_Unit_Test is Profile_Base_Unit_Test {
   function testConcrete_RevertWhen_ChangePubkey() external {
     IProfile.CandidateProfile memory _validatorProfile;
 
@@ -71,10 +24,10 @@ contract Profile_Concrete_Unit_Test is Test {
     vm.stopPrank();
   }
 
-  function test_RevertWhen_ApplyValidatorCandidate() external {
+  function testConcrete_RevertWhen_ApplyValidatorCandidate() external {
     _profile.setVerificationFailed(true);
 
-    vm.startPrank(_stakingContract);
+    vm.startPrank(_staking);
     vm.expectRevert(abi.encodeWithSelector(IProfile.ErrInvalidProofOfPossession.selector, "0xcc", ""));
     _profile.execApplyValidatorCandidate({
       admin: address(0x30000),
@@ -96,7 +49,7 @@ contract Profile_Concrete_Unit_Test is Test {
     vm.stopPrank();
   }
 
-  function test_RevertWhen_ChangePubkeyCooldownNotEnded() external {
+  function testConcrete_RevertWhen_ChangePubkeyCooldownNotEnded() external {
     vm.startPrank(_validatorAdmin);
     vm.warp(block.timestamp + 11);
 
@@ -115,8 +68,8 @@ contract Profile_Concrete_Unit_Test is Test {
     vm.stopPrank();
   }
 
-  function test_ArePublicKeysRegistered() external {
-    vm.startPrank(_stakingContract);
+  function testConcrete_ArePublicKeysRegistered() external {
+    vm.startPrank(_staking);
 
     _profile.setVerificationFailed(false);
     _profile.execApplyValidatorCandidate({
