@@ -86,20 +86,26 @@ contract LibArrayTest is Test {
     assertEq(normSum, 196_128_750_000_000_000_000_000, "incorrect expected normSum");
   }
 
-  function testFuzz_AddAndSum(uint256[1000] memory arr1_, uint256[1000] memory arr2_) public pure {
+  function testFuzz_AddAndSum(
+    uint256[1000] memory arr1_,
+    uint256[1000] memory arr2_,
+    uint256[1000] memory arr3_
+  ) public pure {
     uint256[] memory arr1 = new uint256[](arr1_.length);
     uint256[] memory arr2 = new uint256[](arr2_.length);
+    uint256[] memory arr3 = new uint256[](arr3_.length);
     for (uint256 i; i < arr1.length; ++i) {
       arr1[i] = bound(arr1_[i], 0, type(uint128).max);
       arr2[i] = bound(arr2_[i], 0, type(uint128).max);
+      arr3[i] = bound(arr3_[i], 0, type(uint128).max);
     }
 
     uint256[] memory expected = new uint256[](arr1.length);
     for (uint256 i; i < arr1.length; ++i) {
-      expected[i] = arr1[i] + arr2[i];
+      expected[i] = arr1[i] + arr2[i] + arr3[i];
     }
 
-    (uint256[] memory actual, uint256 totalActual) = LibArray.addAndSum(arr1, arr2);
+    (uint256[] memory actual, uint256 totalActual) = LibArray.addAndSum(arr1, arr2, arr3);
 
     for (uint256 i; i < arr1.length; ++i) {
       assertEq(actual[i], expected[i], "actual[i] == expected[i]");

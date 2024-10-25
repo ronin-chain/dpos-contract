@@ -29,14 +29,16 @@ library LibArray {
    */
   function addAndSum(
     uint256[] memory arr1,
-    uint256[] memory arr2
+    uint256[] memory arr2,
+    uint256[] memory arr3
   ) internal pure returns (uint256[] memory res, uint256 total) {
     uint256 length = arr1.length;
     if (length != arr2.length) revert ErrLengthMismatch();
+    if (length != arr3.length) revert ErrLengthMismatch();
 
     res = new uint256[](length);
     for (uint256 i; i < length; ++i) {
-      res[i] = arr1[i] + arr2[i];
+      res[i] = arr1[i] + arr2[i] + arr3[i];
       total += res[i];
     }
   }

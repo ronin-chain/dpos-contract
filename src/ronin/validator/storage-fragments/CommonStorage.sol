@@ -8,15 +8,15 @@ import "./TimingStorage.sol";
 import "./ValidatorInfoStorageV2.sol";
 
 abstract contract CommonStorage is ICommonInfo, TimingStorage, JailingStorage, ValidatorInfoStorageV2 {
-  /// @dev Mapping from consensus address => pending reward from producing block
-  mapping(address consensus => uint256 miningReward) internal _validatorMiningReward;
-  /// @dev Mapping from consensus address => pending reward from producing block for delegator
-  mapping(address consensus => uint256 miningReward) internal _delegatorMiningReward;
+  /// @dev Mapping from cid address => pending reward from producing block
+  mapping(address cid => uint256 miningReward) internal _validatorMiningReward;
+  /// @dev Mapping from cid address => pending reward from producing block for delegator
+  mapping(address cid => uint256 miningReward) internal _delegatorMiningReward;
 
   /// @dev The total reward for fast finality
   uint256 internal _totalFastFinalityReward;
   /// @dev Mapping from consensus address => pending reward for fast finality
-  mapping(address => uint256) internal _fastFinalityReward;
+  mapping(address cid => uint256) internal _fastFinalityReward;
 
   /// @dev The deprecated reward that has not been withdrawn by admin
   uint256 internal _totalDeprecatedReward;
@@ -27,16 +27,21 @@ abstract contract CommonStorage is ICommonInfo, TimingStorage, JailingStorage, V
   uint256 internal _emergencyExpiryDuration;
   /// @dev The address list of consensus addresses that being locked fund.
   address[] internal _lockedConsensusList;
-  /// @dev Mapping from consensus => request exist info
-  mapping(address => EmergencyExitInfo) internal _exitInfo;
-  /// @dev Mapping from consensus => flag indicating whether the locked fund is released
-  mapping(address => bool) internal _lockedFundReleased;
+  /// @dev Mapping from cid => request exist info
+  mapping(address cid => EmergencyExitInfo) internal _exitInfo;
+  /// @dev Mapping from cid => flag indicating whether the locked fund is released
+  mapping(address cid => bool) internal _lockedFundReleased;
+
+  /// @dev Mapping from candidate id => L2 tx fee for validator
+  mapping(address cid => uint256 l2TxFee) internal _validatorL2MiningReward;
+  /// @dev Mapping from candidate id => L2 tx fee for delegator
+  mapping(address cid => uint256 l2TxFee) internal _delegatorL2MiningReward;
 
   /**
    * @dev This empty reserved space is put in place to allow future versions to add new
    * variables without shifting down storage in the inheritance chain.
    */
-  uint256[44] private ______gap;
+  uint256[42] private ______gap;
 
   /**
    * @inheritdoc ICommonInfo
