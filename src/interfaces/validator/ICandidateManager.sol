@@ -71,6 +71,8 @@ interface ICandidateManager {
   error ErrInvalidCommissionRate();
   /// @dev Error of invalid min effective days onwards.
   error ErrInvalidMinEffectiveDaysOnwards();
+  /// @dev Error of validator who is rollup owner cannot renounce.
+  error ErrRollupOwnerCannotRenounce();
 
   /**
    * @dev Returns the maximum number of validator candidate.
