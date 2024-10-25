@@ -20,7 +20,6 @@ abstract contract ProfileXComponents is IProfile, ProfileHandler {
     if (_registry[rollupId]) revert ErrRollupIdAlreadyRegistered(rollupId);
     if (rollupId == 0) revert ErrZeroRollupId(id);
     if (_profile.id == address(0)) revert ErrNonExistentProfile();
-    if (_profile.rollupId != 0) revert ErrExistentRollup(id, _profile.rollupId);
 
     _profile.rollupId = rollupId;
     _registry[rollupId] = true;
