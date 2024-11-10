@@ -2,8 +2,10 @@
 
 pragma solidity ^0.8.9;
 
+import { IRoninValidatorSet } from "../../interfaces/validator/IRoninValidatorSet.sol";
 import { PCUVerifyBLSPublicKey } from "../../precompile-usages/PCUVerifyBLSPublicKey.sol";
 import "../../udvts/Types.sol";
+import { ContractType } from "../../utils/ContractType.sol";
 import "../../utils/RoleAccess.sol";
 import { ProfileStorage } from "./ProfileStorage.sol";
 
@@ -23,6 +25,13 @@ abstract contract ProfileHandler is PCUVerifyBLSPublicKey, ProfileStorage {
     // _requireNonDuplicated(RoleAccess.GOVERNOR, profile.__reservedGovernor);
 
     _requireNonDuplicatedPubkey(profile.pubkey);
+  }
+
+  function _requireNotOnRenunciation(
+    address id
+  ) internal view {
+    IRoninValidatorSet validatorContract = IRoninValidatorSet(getContract(ContractType.VALIDATOR));
+    if (validatorContract.getCandidateInfoById(id).revokingTimestamp > 0) revert ErrValidatorOnRenunciation(id);
   }
 
   function _requireNonZeroAndNonDuplicated(RoleAccess addressType, address addr) internal view {
@@ -84,6 +93,15 @@ abstract contract ProfileHandler is PCUVerifyBLSPublicKey, ProfileStorage {
     if (block.timestamp < _profile.profileLastChange + _profileChangeCooldown) {
       revert ErrProfileChangeCooldownNotEnded();
     }
+  }
+
+  /**
+   * @dev Checks if the candidate has a rollup contract created and reverts if not.
+   */
+  function _requireRollupCreated(
+    CandidateProfile storage _profile
+  ) internal view {
+    if (_profile.rollupId == 0) revert ErrZeroRollupId(_profile.id);
   }
 
   function _requireCooldownPassedAndStartCooldown(

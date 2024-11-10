@@ -12,7 +12,7 @@ contract Migration__04_ProposeAndExecuteProposalPatch_ShadowMainnet_Release_V0_8
 
   Proposal.ProposalDetail internal _proposal;
 
-  function run() public virtual override onlyOn(Network.ShadowForkMainnet.key()) {
+  function run() public virtual override onlyOn(Network.RoninMainnetShadow.key()) {
     super.run();
     roninRandomBeacon = IRandomBeacon(loadContract(Contract.RoninRandomBeacon.key()));
     vm.chainId(2020);

@@ -12,6 +12,28 @@ abstract contract ProfileXComponents is IProfile, ProfileHandler {
   /**
    * @inheritdoc IProfile
    */
+  function execCreateRollup(address id, uint32 rollupId) external onlyContract(ContractType.ZK_ROLLUP_MANAGER) {
+    CandidateProfile storage _profile = _getId2ProfileHelper(id);
+
+    _requireNotOnRenunciation(id);
+
+    if (_registry[rollupId]) revert ErrRollupIdAlreadyRegistered(rollupId);
+    if (rollupId == 0) revert ErrZeroRollupId(id);
+    if (_profile.id == address(0)) revert ErrNonExistentProfile();
+
+    _profile.rollupId = rollupId;
+    _registry[rollupId] = true;
+
+    // By default, the aggregator and sequencer are the same as the profile id.
+    _setAggregator(_profile, id);
+    _setSequencer(_profile, id);
+
+    emit RollupCreated(id, rollupId);
+  }
+
+  /**
+   * @inheritdoc IProfile
+   */
   function execApplyValidatorCandidate(
     address admin,
     address id,
@@ -36,7 +58,10 @@ abstract contract ProfileXComponents is IProfile, ProfileHandler {
       oldConsensus: TConsensus.wrap(address(0)),
       registeredAt: block.timestamp,
       vrfKeyHash: 0x0,
-      vrfKeyHashLastChange: 0
+      vrfKeyHashLastChange: 0,
+      rollupId: 0,
+      aggregator: address(0),
+      sequencer: address(0)
     });
 
     _requireNonDuplicatedInRegistry(profile);

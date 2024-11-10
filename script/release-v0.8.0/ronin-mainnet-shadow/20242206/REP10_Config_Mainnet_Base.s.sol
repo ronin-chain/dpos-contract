@@ -77,7 +77,7 @@ abstract contract REP10_Config_Mainnet_Base is RoninMigration {
   IRoninGovernanceAdmin internal roninGovernanceAdmin;
   IRoninTrustedOrganization internal roninTrustedOrganization;
 
-  function run() public virtual onlyOn(Network.ShadowForkMainnet.key()) {
+  function run() public virtual onlyOn(Network.RoninMainnetShadow.key()) {
     staking = IStaking(loadContract(Contract.Staking.key()));
     stakingVesting = IStakingVesting(loadContract(Contract.StakingVesting.key()));
     slashIndicator = ISlashIndicator(loadContract(Contract.SlashIndicator.key()));

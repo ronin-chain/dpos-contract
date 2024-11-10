@@ -10,9 +10,9 @@ import "./MockPrecompile.sol";
 contract MockProfile is Profile {
   bool internal _verificationFailed;
 
-  function addNewProfile(
+  function exposed_addNewProfile(
     CandidateProfile memory profile
-  ) external onlyAdmin {
+  ) external {
     CandidateProfile storage _profile = _id2Profile[profile.id];
     if (_profile.id != address(0)) revert ErrExistentProfile();
     _addNewProfile(_profile, profile);

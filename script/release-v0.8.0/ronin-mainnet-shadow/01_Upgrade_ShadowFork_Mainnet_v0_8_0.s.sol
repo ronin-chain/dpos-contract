@@ -73,7 +73,7 @@ contract Migration__01_Upgrade_ShadowForkMainnet_Release_V0_8_0 is RoninMigratio
   IRoninGovernanceAdmin private roninGovernanceAdmin;
   IRoninTrustedOrganization private roninTrustedOrganization;
 
-  function run() public onlyOn(Network.ShadowForkMainnet.key()) {
+  function run() public onlyOn(Network.RoninMainnetShadow.key()) {
     staking = IStaking(loadContract(Contract.Staking.key()));
     slashIndicator = ISlashIndicator(loadContract(Contract.SlashIndicator.key()));
     roninValidatorSet = IRoninValidatorSet(loadContract(Contract.RoninValidatorSet.key()));
