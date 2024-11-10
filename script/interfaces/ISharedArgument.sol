@@ -76,6 +76,7 @@ interface ISharedArgument is IGeneralConfig {
     uint256 minEffectiveDaysOnwards;
     uint256 emergencyExitLockedAmount;
     uint256 emergencyExpiryDuration;
+    address zkFeePlaza;
   }
 
   struct RoninGovernanceAdminParam {
@@ -90,6 +91,7 @@ interface ISharedArgument is IGeneralConfig {
 
   struct ProfileParam {
     uint256 cooldown;
+    address rollupManager;
   }
 
   struct RoninRandomBeaconParam {

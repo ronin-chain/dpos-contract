@@ -9,7 +9,7 @@ contract Migration__02_ProposeAndExecuteNewProposal_ShadowMainnet_Release_V0_8_1
 
   Proposal.ProposalDetail internal _proposal;
 
-  function run() public virtual override onlyOn(Network.ShadowForkMainnet.key()) {
+  function run() public virtual override onlyOn(Network.RoninMainnetShadow.key()) {
     super.run();
     vm.chainId(2020);
     address payable[] memory allContracts = config.getAllAddresses(network());

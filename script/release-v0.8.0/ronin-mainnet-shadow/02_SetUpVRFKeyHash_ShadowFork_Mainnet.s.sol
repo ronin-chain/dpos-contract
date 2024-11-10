@@ -25,7 +25,7 @@ contract Migration_02_SetupVRFKeyHash_ShadowFork_Mainnet is RoninMigration {
   IRoninTrustedOrganization private trustedOrg;
   LibVRFProof.VRFKey[] private keys;
 
-  function run() public onlyOn(Network.ShadowForkMainnet.key()) {
+  function run() public onlyOn(Network.RoninMainnetShadow.key()) {
     profile = IProfile(loadContract(Contract.Profile.key()));
     trustedOrg = IRoninTrustedOrganization(loadContract(Contract.RoninTrustedOrganization.key()));
 

@@ -13,6 +13,7 @@ import { PostChecker_Staking } from "./post-check/PostChecker_Staking.sol";
 import { Contract } from "./utils/Contract.sol";
 import { BaseMigration } from "@fdk/BaseMigration.s.sol";
 import { ScriptExtended } from "@fdk/extensions/ScriptExtended.s.sol";
+import { IHasContracts } from "src/interfaces/collections/IHasContracts.sol";
 
 import { ProxyInterface } from "@fdk/libraries/LibDeploy.sol";
 import { LibErrorHandler } from "@fdk/libraries/LibErrorHandler.sol";
@@ -187,6 +188,7 @@ contract PostChecker is
 
       console.log("Submitting block reward at next block number after REP10 activated...".yellow());
       VmSafe.Log[] memory logs = _randomlySubmitBlockReward({ validatorSet: validatorSet, txFee: 0.2 ether });
+      _randomlySubmitL2BlockReward({ validatorSet: validatorSet, txFee: 0.3 ether });
       console.log("FF Percentage after REP-10".yellow(), stakingVesting.fastFinalityRewardPercentage());
 
       bool emitted;
@@ -215,16 +217,37 @@ contract PostChecker is
       assertEq(stakingVesting.fastFinalityRewardPercentage(), newPercentage, "REP10 percentage not match");
 
       _randomlySubmitBlockReward({ validatorSet: validatorSet, txFee: 0.3 ether });
+      _randomlySubmitL2BlockReward({ validatorSet: validatorSet, txFee: 0.4 ether });
     }
 
     console.log(StdStyle.green("Cheat fast forward to 1 epoch ...\n"));
     LibWrapUpEpoch.wrapUpEpoch();
   }
 
+  function _randomlySubmitL2BlockReward(
+    IRoninValidatorSet validatorSet,
+    uint256 txFee
+  ) internal returns (VmSafe.Log[] memory logs) {
+    console.log(
+      "Submitting L2 block reward at: - Period:", validatorSet.currentPeriod(), " - Block:", vm.getBlockNumber() + 1
+    );
+    address feePlaza = IHasContracts(address(validatorSet)).getContract(ContractType.ZK_FEE_PLAZA);
+    uint256 currUnixTimestamp = vm.unixTime();
+    address[] memory allCids = validatorSet.getValidatorCandidateIds();
+    address randomCid = allCids[currUnixTimestamp % allCids.length];
+
+    vm.deal(feePlaza, txFee);
+    vme.rollUpTo(vm.getBlockNumber() + 1);
+    vm.prank(feePlaza);
+    vm.recordLogs();
+    validatorSet.onL2BlockRewardSubmitted{ value: txFee }(randomCid);
+    logs = vm.getRecordedLogs();
+  }
+
   function _randomlySubmitBlockReward(
     IRoninValidatorSet validatorSet,
     uint256 txFee
-  ) private returns (VmSafe.Log[] memory logs) {
+  ) internal returns (VmSafe.Log[] memory logs) {
     console.log(
       "Submitting block reward at: - Period:", validatorSet.currentPeriod(), " - Block:", vm.getBlockNumber() + 1
     );

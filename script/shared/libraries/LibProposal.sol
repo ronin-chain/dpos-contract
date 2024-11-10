@@ -57,6 +57,9 @@ library LibProposal {
     Ballot.VoteType support
   ) internal {
     IRoninTrustedOrganization.TrustedOrganization[] memory allTrustedOrgs = roninTrustedOrg.getAllTrustedOrganizations();
+    for (uint256 i; i < allTrustedOrgs.length; ++i) {
+      console.log("Governor[%s]: %s", i, vm.toString(allTrustedOrgs[i].governor));
+    }
 
     bool shouldPrankOnly = config.isPostChecking();
 
@@ -82,6 +85,7 @@ library LibProposal {
         break;
       }
 
+      console.log("%s is voting for the proposal", vm.toString(iTrustedOrg));
       if (shouldPrankOnly) {
         vm.prank(iTrustedOrg);
       } else {
