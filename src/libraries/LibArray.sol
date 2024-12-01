@@ -238,6 +238,18 @@ library LibArray {
   }
 
   function hash(
+    uint96[] memory self
+  ) internal pure returns (bytes32 digest) {
+    return hash(toUint256s(self));
+  }
+
+  function hash(
+    bytes32[] memory self
+  ) internal pure returns (bytes32 digest) {
+    return hash(toUint256s(self));
+  }
+
+  function hash(
     address[] memory self
   ) internal pure returns (bytes32 digest) {
     return hash(toUint256s(self));
@@ -282,6 +294,28 @@ library LibArray {
    */
   function toUint256s(
     address[] memory self
+  ) internal pure returns (uint256[] memory uint256s) {
+    assembly ("memory-safe") {
+      uint256s := self
+    }
+  }
+
+  /**
+   * @dev Converts an array of uint96 to an array of uint256.
+   */
+  function toUint256s(
+    uint96[] memory self
+  ) internal pure returns (uint256[] memory uint256s) {
+    assembly ("memory-safe") {
+      uint256s := self
+    }
+  }
+
+  /**
+   * @dev Converts an array of bytes32 to an array of uint256.
+   */
+  function toUint256s(
+    bytes32[] memory self
   ) internal pure returns (uint256[] memory uint256s) {
     assembly ("memory-safe") {
       uint256s := self
