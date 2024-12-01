@@ -1,16 +1,20 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { console } from "forge-std/console.sol";
 import { VRF } from "@chainlink/contracts/src/v0.8/VRF.sol";
-import { Vm, VmSafe } from "forge-std/Vm.sol";
-import { LibSharedAddress } from "@fdk/libraries/LibSharedAddress.sol";
+
 import { IGeneralConfig } from "@fdk/interfaces/IGeneralConfig.sol";
-import { Contract } from "script/utils/Contract.sol";
-import { LibString } from "@solady/utils/LibString.sol";
+import { LibSharedAddress } from "@fdk/libraries/LibSharedAddress.sol";
+
 import { JSONParserLib } from "@solady/utils/JSONParserLib.sol";
-import { RandomRequest } from "@ronin/contracts/libraries/LibSLA.sol";
-import { IRandomBeacon } from "@ronin/contracts/interfaces/random-beacon/IRandomBeacon.sol";
+import { LibString } from "@solady/utils/LibString.sol";
+import { Vm, VmSafe } from "forge-std/Vm.sol";
+import { console } from "forge-std/console.sol";
+
+import { Contract } from "script/utils/Contract.sol";
+
+import { IRandomBeacon } from "src/interfaces/random-beacon/IRandomBeacon.sol";
+import { RandomRequest } from "src/libraries/LibSLA.sol";
 
 library LibVRFProof {
   using LibString for *;
@@ -26,10 +30,11 @@ library LibVRFProof {
   event RoninRandomBeaconNotYetDeployed();
 
   uint256 private constant SECP256K1_ORDER =
-    115792089237316195423570985008687907852837564279074904382605163141518161494337;
-  uint256 private constant UINT256_MAX = 115792089237316195423570985008687907853269984665640564039457584007913129639935;
+    115_792_089_237_316_195_423_570_985_008_687_907_852_837_564_279_074_904_382_605_163_141_518_161_494_337;
+  uint256 private constant UINT256_MAX =
+    115_792_089_237_316_195_423_570_985_008_687_907_853_269_984_665_640_564_039_457_584_007_913_129_639_935;
   Vm internal constant vm = Vm(LibSharedAddress.VM);
-  string internal constant CONFIG_PATH = "config/";
+  string internal constant CONFIG_PATH = "script/config/vrf";
   IGeneralConfig internal constant config = IGeneralConfig(LibSharedAddress.VME);
 
   function listenEventAndSubmitProof(VRFKey[] memory keys, VmSafe.Log[] memory logs) internal {
@@ -55,7 +60,9 @@ library LibVRFProof {
     }
   }
 
-  function genVRFKeys(uint256 count) internal returns (VRFKey[] memory keys) {
+  function genVRFKeys(
+    uint256 count
+  ) internal returns (VRFKey[] memory keys) {
     string[] memory cmdInput = new string[](1);
     cmdInput[0] = "./script/misc/genkey.sh";
     keys = new VRFKey[](count);
@@ -127,7 +134,9 @@ library LibVRFProof {
     }
   }
 
-  function parseProof(string memory proofPath) internal view returns (VRF.Proof memory proof) {
+  function parseProof(
+    string memory proofPath
+  ) internal view returns (VRF.Proof memory proof) {
     string memory raw = vm.readFile(proofPath);
     JSONParserLib.Item memory data = raw.parse();
 
@@ -151,7 +160,9 @@ library LibVRFProof {
     proof.zInv = vm.parseUint(data.at('"zInv"').value().decodeString());
   }
 
-  function logProof(VRF.Proof memory proof) internal view {
+  function logProof(
+    VRF.Proof memory proof
+  ) internal pure {
     console.log("\n==================================================================================");
 
     console.log("pk[0]", proof.pk[0]);
@@ -176,13 +187,17 @@ library LibVRFProof {
     console.log("====================================================================================\n");
   }
 
-  function makeAddrAndKey(string memory name) private returns (address addr, uint256 privateKey) {
+  function makeAddrAndKey(
+    string memory name
+  ) private returns (address addr, uint256 privateKey) {
     privateKey = boundPrivateKey(uint256(keccak256(abi.encodePacked(name))));
     addr = vm.addr(privateKey);
     vm.label(addr, name);
   }
 
-  function boundPrivateKey(uint256 privateKey) internal pure returns (uint256 result) {
+  function boundPrivateKey(
+    uint256 privateKey
+  ) internal pure returns (uint256 result) {
     result = _bound(privateKey, 1, SECP256K1_ORDER - 1);
   }
 

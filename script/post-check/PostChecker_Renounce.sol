@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
+import { Contract } from "../utils/Contract.sol";
+import { BaseMigration } from "@fdk/BaseMigration.s.sol";
 import { LibErrorHandler } from "@fdk/libraries/LibErrorHandler.sol";
 import { LibProxy } from "@fdk/libraries/LibProxy.sol";
-import { BaseMigration } from "@fdk/BaseMigration.s.sol";
-import { Contract } from "../utils/Contract.sol";
 
-import { ICandidateManager } from "@ronin/contracts/interfaces/validator/ICandidateManager.sol";
-import { ICandidateStaking } from "@ronin/contracts/interfaces/staking/ICandidateStaking.sol";
-import { IStaking } from "@ronin/contracts/interfaces/staking/IStaking.sol";
-import { LibWrapUpEpoch } from "script/shared/libraries/LibWrapUpEpoch.sol";
-import { LibApplyCandidate } from "script/shared/libraries/LibApplyCandidate.sol";
 import "./PostChecker_Helper.sol";
+import { LibApplyCandidate } from "script/shared/libraries/LibApplyCandidate.sol";
+import { LibWrapUpEpoch } from "script/shared/libraries/LibWrapUpEpoch.sol";
+import { ICandidateStaking } from "src/interfaces/staking/ICandidateStaking.sol";
+import { IStaking } from "src/interfaces/staking/IStaking.sol";
+import { ICandidateManager } from "src/interfaces/validator/ICandidateManager.sol";
 
 abstract contract PostChecker_Renounce is BaseMigration, PostChecker_Helper {
   using LibProxy for *;

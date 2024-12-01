@@ -1,20 +1,22 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { TransparentUpgradeableProxy } from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
-import { TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
+import { LibProxy } from "@fdk/libraries/LibProxy.sol";
+import { TContract } from "@fdk/types/Types.sol";
+import { DefaultNetwork } from "@fdk/utils/DefaultNetwork.sol";
+import { TransparentUpgradeableProxy } from
+  "@openzeppelin-v4/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
 import { console } from "forge-std/console.sol";
-import { TContract } from "@fdk/types/Types.sol";
-import { LibProxy } from "@fdk/libraries/LibProxy.sol";
-import { DefaultNetwork } from "@fdk/utils/DefaultNetwork.sol";
 import { RoninMigration } from "script/RoninMigration.s.sol";
-import { Contract } from "script/utils/Contract.sol";
-import { IProfile } from "@ronin/contracts/interfaces/IProfile.sol";
-import { IRoninGovernanceAdmin } from "@ronin/contracts/interfaces/IRoninGovernanceAdmin.sol";
-import { IRoninTrustedOrganization } from "@ronin/contracts/interfaces/IRoninTrustedOrganization.sol";
-import { Proposal } from "@ronin/contracts/libraries/Proposal.sol";
+
 import { LibProposal } from "script/shared/libraries/LibProposal.sol";
+import { Contract } from "script/utils/Contract.sol";
+import { TransparentUpgradeableProxyV2 } from "src/extensions/TransparentUpgradeableProxyV2.sol";
+import { IProfile } from "src/interfaces/IProfile.sol";
+import { IRoninGovernanceAdmin } from "src/interfaces/IRoninGovernanceAdmin.sol";
+import { IRoninTrustedOrganization } from "src/interfaces/IRoninTrustedOrganization.sol";
+import { Proposal } from "src/libraries/Proposal.sol";
 
 abstract contract Migration__20232811_ChangeGovernanceAdmin_Common is RoninMigration {
   using LibProxy for address payable;
@@ -57,7 +59,7 @@ abstract contract Migration__20232811_ChangeGovernanceAdmin_Common is RoninMigra
     {
       console.log("=============== Begin upgrade ===============");
 
-      uint cooldownTimeChangePubkey = 1 days;
+      uint256 cooldownTimeChangePubkey = 1 days;
 
       if (block.chainid == DefaultNetwork.RoninTestnet.chainId()) {
         _proposalDuration = 1 days;

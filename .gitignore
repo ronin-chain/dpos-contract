@@ -27,4 +27,8 @@ deployments/**/exported_address
 config/config.json
 config/config.yaml
 dependencies
-deployments/ronin-mainnet-shadow
+deployments/*-shadow
+bin/ronin-random-beacon
+broadcast/**/6063/*
+broadcast/**/31337/*
+script/**/command
