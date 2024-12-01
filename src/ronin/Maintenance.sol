@@ -2,16 +2,19 @@
 
 pragma solidity ^0.8.9;
 
-import "../extensions/collections/HasContracts.sol";
-import "../interfaces/IMaintenance.sol";
-import "../interfaces/IProfile.sol";
-import "../interfaces/validator/IRoninValidatorSet.sol";
-import "../libraries/Math.sol";
+import { Initializable } from "@openzeppelin-v4/contracts/proxy/utils/Initializable.sol";
+import { EnumerableSet } from "@openzeppelin-v4/contracts/utils/structs/EnumerableSet.sol";
 
-import { ErrUnauthorized, RoleAccess } from "../utils/CommonErrors.sol";
-import { HasValidatorDeprecated } from "../utils/DeprecatedSlots.sol";
-import "@openzeppelin-v4/contracts/proxy/utils/Initializable.sol";
-import "@openzeppelin-v4/contracts/utils/structs/EnumerableSet.sol";
+import { HasContracts } from "src/extensions/collections/HasContracts.sol";
+import { IMaintenance } from "src/interfaces/IMaintenance.sol";
+import { IProfile } from "src/interfaces/IProfile.sol";
+import { IRoninValidatorSet } from "src/interfaces/validator/IRoninValidatorSet.sol";
+import { Math } from "src/libraries/Math.sol";
+import { TConsensus } from "src/udvts/Types.sol";
+
+import { ErrUnauthorized, RoleAccess } from "src/utils/CommonErrors.sol";
+import { ContractType } from "src/utils/ContractType.sol";
+import { HasValidatorDeprecated } from "src/utils/DeprecatedSlots.sol";
 
 contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Initializable {
   using Math for uint256;
@@ -161,7 +164,6 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
     IRoninValidatorSet validatorContract = IRoninValidatorSet(getContract(ContractType.VALIDATOR));
     address candidateId = __css2cid(consensusAddr);
 
-    if (!validatorContract.isBlockProducerById(candidateId)) revert ErrUnauthorized(msg.sig, RoleAccess.BLOCK_PRODUCER);
     _requireCandidateAdmin(candidateId);
     if (_checkScheduledById(candidateId)) revert ErrAlreadyScheduled();
     if (!_checkCooldownEndedById(candidateId)) revert ErrCooldownTimeNotYetEnded();
@@ -230,6 +232,30 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
     _scheduledCandidates.remove(candidateId);
 
     emit MaintenanceExited(candidateId);
+  }
+
+  /**
+   * @inheritdoc IMaintenance
+   */
+  function getActiveSchedules() external view returns (address[] memory activeCids) {
+    address[] memory allScheduledCids = _scheduledCandidates.values();
+    uint256 length = allScheduledCids.length;
+    uint256 count;
+
+    // Create a new array to store active candidates
+    activeCids = new address[](length);
+
+    for (uint256 i; i < length; ++i) {
+      if (_checkScheduledById(allScheduledCids[i])) {
+        activeCids[count] = allScheduledCids[i];
+        ++count;
+      }
+    }
+
+    // Resize the array in memory to match the number of active schedules
+    assembly ("memory-safe") {
+      mstore(activeCids, count)
+    }
   }
 
   /**
