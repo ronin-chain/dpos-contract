@@ -43,6 +43,7 @@ contract GeneralConfig is BaseGeneralConfig {
     _mapContractName(Contract.RoninRandomBeacon);
     _mapContractName(Contract.PostChecker);
     _mapContractName(Contract.RoninValidatorSetREP10Migrator);
+    _mapContractName(Contract.RoninBaseFeeTreasury);
 
     setContractAbsolutePathMap(Contract.PostChecker.key(), "out/PostChecker.sol/PostChecker.json");
 
