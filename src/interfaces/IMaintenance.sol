@@ -128,6 +128,11 @@ interface IMaintenance {
   ) external view returns (bool);
 
   /**
+   * @dev Returns all active schedules candidate ids.
+   */
+  function getActiveSchedules() external view returns (address[] memory activeCids);
+
+  /**
    * @dev Returns the bool array indicating the validators maintained at block number `k` or not.
    */
   function checkManyMaintained(
