@@ -2,12 +2,60 @@
 
 pragma solidity ^0.8.9;
 
+import { console } from "forge-std/console.sol";
+
 import { IBaseFeeTreasury } from "src/interfaces/basefee-treasury/IBaseFeeTreasury.sol";
 
 import { LibApplyCandidate } from "script/shared/libraries/LibApplyCandidate.sol";
 import { BaseFeeTreasury_Base_Test } from "test/foundry/unit/ronin/basefee-treasury/BaseFeeTreasury.base.t.sol";
 
+import { MaliciousAdmin } from "test/foundry/unit/ronin/basefee-treasury/mocks/MaliciousAdmin.sol";
+
 contract BaseFeeTreasury_Vote_Concrete_Test is BaseFeeTreasury_Base_Test {
+  function testConcrete_RevertIf_ReentrantByContractAdminCandidate_WhenProposalPassed_vote() external {
+    MaliciousAdmin maliciousAdmin = new MaliciousAdmin();
+    address[] memory cids = validatorSet.getValidatorCandidateIds();
+    address proposerAdmin = profile.getId2Admin(cids[0]);
+    address lastAdmin = profile.getId2Admin(cids[cids.length - 1]);
+
+    console.log("Cid count", cids.length);
+
+    vm.deal(address(baseFeeTreasury), 200 ether);
+
+    // Change the last admin to malicious admin
+    vm.prank(lastAdmin);
+    profile.changeAdminAddr(cids[cids.length - 1], address(maliciousAdmin));
+
+    vm.warp(block.timestamp + 1 days);
+
+    IBaseFeeTreasury.Proposal memory proposal = this.getValidProposal(cids[0], address(baseFeeTreasury));
+    proposal.recipients[0] = address(maliciousAdmin);
+    proposal.amounts[0] = 50 ether;
+    proposal.amounts[1] = 50 ether;
+
+    bytes32 hash = baseFeeTreasury.hashProposal(proposal);
+    maliciousAdmin.setTarget(
+      address(baseFeeTreasury),
+      abi.encodeWithSelector(IBaseFeeTreasury.vote.selector, cids[cids.length - 1], hash, IBaseFeeTreasury.Vote.For)
+    );
+
+    this.propose(proposerAdmin, proposal, "");
+
+    uint256 idx = 1;
+
+    while (baseFeeTreasury.getCurrentVotePower(hash).vFor < baseFeeTreasury.getMinimumVotePowerToPass(hash)) {
+      vm.prank(profile.getId2Admin(cids[idx]));
+      baseFeeTreasury.vote(cids[idx], hash, IBaseFeeTreasury.Vote.For);
+      idx = (idx + 1) % cids.length;
+    }
+
+    console.log("idx", idx);
+
+    assertTrue(baseFeeTreasury.getState(hash) == IBaseFeeTreasury.State.Executed, "Proposal should be passed");
+    assertEq(address(baseFeeTreasury).balance, 0, "BaseFeeTreasury balance should be 0");
+    assertEq(address(maliciousAdmin).balance, 100 ether, "MaliciousAdmin balance should be 100 ether");
+  }
+
   function testConcrete_RevertIf_ActiveProposal_IsCancelledByProposer_CannotVoteFor_vote() external {
     address[] memory cids = validatorSet.getValidatorCandidateIds();
     address proposerAdmin = profile.getId2Admin(cids[0]);
