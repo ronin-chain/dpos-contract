@@ -425,14 +425,14 @@ contract RoninBaseFeeTreasury is EIP712, Initializable, HasContracts, GlobalConf
       return false;
     }
 
+    $._state = State.Executed;
+
     uint256 length = $p.recipients.length;
 
     for (uint256 i; i < length; ++i) {
       (bool success, bytes memory ret) = $p.recipients[i].call{ value: $p.amounts[i] }($p.callDatas[i]);
       success.handleRevert(bytes4($p.callDatas[i]), ret);
     }
-
-    $._state = State.Executed;
 
     emit ProposalExecuted(msg.sender, hash);
 
