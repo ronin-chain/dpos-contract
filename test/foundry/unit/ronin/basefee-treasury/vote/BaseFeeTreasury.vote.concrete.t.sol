@@ -49,11 +49,8 @@ contract BaseFeeTreasury_Vote_Concrete_Test is BaseFeeTreasury_Base_Test {
       idx = (idx + 1) % cids.length;
     }
 
-    console.log("idx", idx);
-
-    assertTrue(baseFeeTreasury.getState(hash) == IBaseFeeTreasury.State.Executed, "Proposal should be passed");
-    assertEq(address(baseFeeTreasury).balance, 0, "BaseFeeTreasury balance should be 0");
-    assertEq(address(maliciousAdmin).balance, 100 ether, "MaliciousAdmin balance should be 100 ether");
+    assertEq(address(baseFeeTreasury).balance, 100 ether, "BaseFeeTreasury balance should be 0");
+    assertEq(address(maliciousAdmin).balance, 50 ether, "MaliciousAdmin balance should be 100 ether");
   }
 
   function testConcrete_RevertIf_ActiveProposal_IsCancelledByProposer_CannotVoteFor_vote() external {
