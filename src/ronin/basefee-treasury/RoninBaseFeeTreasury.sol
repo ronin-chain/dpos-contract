@@ -168,7 +168,7 @@ contract RoninBaseFeeTreasury is EIP712, Initializable, HasContracts, GlobalConf
 
     for (uint256 i; i < length; ++i) {
       require(p.amounts[i] != 0, ErrZeroAmount(i));
-      require(recipients[i] != address(0) && recipients[i] != address(this), ErrInvalidRecipient(i, recipients[i]));
+      require(recipients[i] != address(this), ErrInvalidRecipient(i, recipients[i]));
     }
   }
 
