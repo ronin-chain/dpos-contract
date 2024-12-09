@@ -74,9 +74,9 @@ Given:
 #### Formula
 
 For a validator \\( v \\) in epoch \\( e \\):
-\[
+$$
 \text{score}_{v, e} = \frac{\text{normalizedStake}_v}{\text{totalVoterStake}} \times \frac{\text{totalVoterStake}^2}{\text{normalizedSum}^2}
-\]
+$$
 
 Where:
 
