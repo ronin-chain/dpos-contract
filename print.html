@@ -216,7 +216,7 @@
 <li>The scoring formula accounts for:
 <ul>
 <li>Total stake of the validator (including self-stake and delegator stake amounts).</li>
-<li>The validator's normalized stake.</li>
+<li>The validator’s normalized stake.</li>
 <li>The total normalized stake of voters.</li>
 <li>The ratio of votes cast to the total possible votes.</li>
 </ul>
@@ -298,7 +298,7 @@
 </li>
 <li>The system verifies the following:
 <ul>
-<li>Validator is eligible and is the caller's candidate.</li>
+<li>Validator is eligible and is the caller’s candidate.</li>
 <li>The schedule adheres to constraints.</li>
 <li>No other active schedule exists for the validator.</li>
 </ul>
@@ -769,8 +769,8 @@
 <ul>
 <li>Rewards are distributed based on:
 <ul>
-<li>Validator's commission rate.</li>
-<li>Delegator's staked amount.</li>
+<li>Validator’s commission rate.</li>
+<li>Delegator’s staked amount.</li>
 </ul>
 </li>
 </ul>
@@ -790,6 +790,286 @@
 <li><strong>Delegators</strong>: Stake tokens with validators to share in rewards and indirectly support the network.</li>
 </ol>
 <hr />
+<div style="break-before: page; page-break-before: always;"></div><h1 id="specification-fast-finality-tracking-score-with-detailed-normalization-technique"><a class="header" href="#specification-fast-finality-tracking-score-with-detailed-normalization-technique">Specification: Fast Finality Tracking Score with Detailed Normalization Technique</a></h1>
+<p>The <code>FastFinalityTracking</code> score system is designed to evaluate and reward validators based on their contributions to achieving block finality in the Ronin network. This specification focuses on the methodology, particularly the normalization technique used to ensure fair scoring, as well as the implications for validator performance.</p>
+<hr />
+<h2 id="objectives"><a class="header" href="#objectives">Objectives</a></h2>
+<ul>
+<li>Measure and reward validators for their contributions to block finality.</li>
+<li>Normalize staking data to balance scoring and prevent dominance by validators with excessively high stakes.</li>
+<li>Ensure a secure, efficient, and fair system for validators.</li>
+</ul>
+<hr />
+<h2 id="components"><a class="header" href="#components">Components</a></h2>
+<h3 id="1-normalization-technique"><a class="header" href="#1-normalization-technique">1. <strong>Normalization Technique</strong></a></h3>
+<p>The normalization process adjusts validators’ stake values to meet specific criteria:</p>
+<ul>
+<li>Maintain relative differences between stake values.</li>
+<li>Cap excessive stakes to ensure fairness.</li>
+<li>Use a pivot-based algorithm to determine the threshold for capping stake values.</li>
+</ul>
+<h4 id="algorithm-overview"><a class="header" href="#algorithm-overview">Algorithm Overview</a></h4>
+<p>Given:</p>
+<ul>
+<li>An array of stake values \( a \): Descending-sorted stakes of validators.</li>
+<li>The sum of stakes \( s \): \( s = \text{sum}(a) \).</li>
+<li>The divisor \( d \): Maximum number of validators.</li>
+<li>An initial pivot \( k \): \( k = s / d \).</li>
+</ul>
+<p><strong>Normalization Goals</strong>:</p>
+<ol>
+<li>Adjust stake values such that all \( a[i] \leq k \).</li>
+<li>Maintain the relative order of \( a \) after adjustment.</li>
+<li>Recalculate \( k \) iteratively based on the remaining values.</li>
+</ol>
+<p><strong>Process</strong>:</p>
+<ol>
+<li>Initialize \( k = s / d \).</li>
+<li>Iterate through the array \( a \):
+<ul>
+<li>Replace \( a[i] &gt; k \) with \( k \).</li>
+<li>Recalculate \( s \) and \( k \) using only unchanged values.</li>
+<li>Repeat until \( k \) stabilizes and all \( a[i] \leq k \).</li>
+</ul>
+</li>
+</ol>
+<p><strong>Example</strong>:</p>
+<ul>
+<li>Input:
+<ul>
+<li>\( a = [100, 70, 20, 15, 3] \)</li>
+<li>\( d = 3 \)</li>
+</ul>
+</li>
+<li>Calculation:
+<ul>
+<li>Step 1: \( k = \text{sum}(a) / d = 208 / 3 = 69.3 \).</li>
+<li>Step 2: Adjust \( a \) to \( [69, 69, 20, 15, 3] \), recalculate \( k = 177 / 3 = 59 \).</li>
+<li>Step 3: Adjust \( a \) to \( [59, 59, 20, 15, 3] \), \( k \) stabilizes at 59.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Output</strong>:</p>
+<ul>
+<li>Normalized stakes: \( [59, 59, 20, 15, 3] \).</li>
+<li>Normalized sum: \( 114 \).</li>
+</ul>
+<hr />
+<h3 id="2-tracking-finality-votes"><a class="header" href="#2-tracking-finality-votes">2. <strong>Tracking Finality Votes</strong></a></h3>
+<ul>
+<li>A record of votes is maintained for each validator in every epoch.</li>
+<li>Votes are tracked in <code>_tracker</code>, which maps epochs to validators and their voting activity.</li>
+</ul>
+<hr />
+<h3 id="3-finality-score-calculation"><a class="header" href="#3-finality-score-calculation">3. <strong>Finality Score Calculation</strong></a></h3>
+<h4 id="formula"><a class="header" href="#formula">Formula</a></h4>
+<p>For a validator \( v \) in epoch \( e \):
+[
+\text{score}_{v, e} = \frac{\text{normalizedStake}_v}{\text{totalVoterStake}} \times \frac{\text{totalVoterStake}^2}{\text{normalizedSum}^2}
+]</p>
+<p>Where:</p>
+<ul>
+<li>\( \text{normalizedStake}_v \): Normalized stake of validator \( v \).</li>
+<li>\( \text{totalVoterStake} \): Sum of normalized stakes of all voters in the epoch.</li>
+<li>\( \text{normalizedSum} \): Total normalized stake across all validators.</li>
+</ul>
+<hr />
+<h2 id="data-structure-1"><a class="header" href="#data-structure-1">Data Structure</a></h2>
+<h3 id="normalized-data-1"><a class="header" href="#normalized-data-1"><strong>Normalized Data</strong></a></h3>
+<ul>
+<li><strong><code>_normalizedData</code></strong>:
+<ul>
+<li>Stores normalized stake values for validators in a period.</li>
+<li>Includes:
+<ul>
+<li><code>normalizedStake</code>: A mapping of validator IDs to their normalized stake values.</li>
+<li><code>normalizedSum</code>: The total normalized stake across validators.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="tracking-records-1"><a class="header" href="#tracking-records-1"><strong>Tracking Records</strong></a></h3>
+<ul>
+<li><strong><code>_tracker</code></strong>:
+<ul>
+<li>Maps each epoch to validator performance.</li>
+<li>Records:
+<ul>
+<li><code>qcVoteCount</code>: Number of finality votes cast by the validator.</li>
+<li><code>score</code>: Cumulative score of the validator in the epoch.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="implications-of-normalization"><a class="header" href="#implications-of-normalization">Implications of Normalization</a></h2>
+<ol>
+<li>
+<p><strong>Fair Competition</strong>:</p>
+<ul>
+<li>Caps excessive stakes to prevent validators with high stakes from dominating the network.</li>
+<li>Ensures smaller validators can compete fairly in scoring.</li>
+</ul>
+</li>
+<li>
+<p><strong>Dynamic Adjustments</strong>:</p>
+<ul>
+<li>Normalized values are recalculated for every new period.</li>
+<li>Reflects changes in staking data and validator activity.</li>
+</ul>
+</li>
+<li>
+<p><strong>Efficient Scoring</strong>:</p>
+<ul>
+<li>The iterative pivot-based normalization ensures an efficient and balanced scoring system.</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
+<p>The <code>FastFinalityTracking</code> contract ensures fairness and incentivizes validator participation by combining a robust normalization technique with dynamic score calculations. By capping excessive stakes and rewarding active participation, it strengthens the Ronin network’s security and efficiency.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="specification-fast-finality-tracking-score-with-detailed-normalization-technique-1"><a class="header" href="#specification-fast-finality-tracking-score-with-detailed-normalization-technique-1">Specification: Fast Finality Tracking Score with Detailed Normalization Technique</a></h1>
+<p>The <code>FastFinalityTracking</code> score system is designed to evaluate and reward validators based on their contributions to achieving block finality in the Ronin network. This specification focuses on the methodology, particularly the normalization technique used to ensure fair scoring, as well as the implications for validator performance.</p>
+<hr />
+<h2 id="objectives-1"><a class="header" href="#objectives-1">Objectives</a></h2>
+<ul>
+<li>Measure and reward validators for their contributions to block finality.</li>
+<li>Normalize staking data to balance scoring and prevent dominance by validators with excessively high stakes.</li>
+<li>Ensure a secure, efficient, and fair system for validators.</li>
+</ul>
+<hr />
+<h2 id="components-1"><a class="header" href="#components-1">Components</a></h2>
+<h3 id="1-normalization-technique-1"><a class="header" href="#1-normalization-technique-1">1. <strong>Normalization Technique</strong></a></h3>
+<p>The normalization process adjusts validators’ stake values to meet specific criteria:</p>
+<ul>
+<li>Maintain relative differences between stake values.</li>
+<li>Cap excessive stakes to ensure fairness.</li>
+<li>Use a pivot-based algorithm to determine the threshold for capping stake values.</li>
+</ul>
+<h4 id="algorithm-overview-1"><a class="header" href="#algorithm-overview-1">Algorithm Overview</a></h4>
+<p>Given:</p>
+<ul>
+<li>An array of stake values \( a \): Descending-sorted stakes of validators.</li>
+<li>The sum of stakes \( s \): \( s = \text{sum}(a) \).</li>
+<li>The divisor \( d \): Maximum number of validators.</li>
+<li>An initial pivot \( k \): \( k = s / d \).</li>
+</ul>
+<p><strong>Normalization Goals</strong>:</p>
+<ol>
+<li>Adjust stake values such that all \( a[i] \leq k \).</li>
+<li>Maintain the relative order of \( a \) after adjustment.</li>
+<li>Recalculate \( k \) iteratively based on the remaining values.</li>
+</ol>
+<p><strong>Process</strong>:</p>
+<ol>
+<li>Initialize \( k = s / d \).</li>
+<li>Iterate through the array \( a \):
+<ul>
+<li>Replace \( a[i] &gt; k \) with \( k \).</li>
+<li>Recalculate \( s \) and \( k \) using only unchanged values.</li>
+<li>Repeat until \( k \) stabilizes and all \( a[i] \leq k \).</li>
+</ul>
+</li>
+</ol>
+<p><strong>Example</strong>:</p>
+<ul>
+<li>Input:
+<ul>
+<li>\( a = [100, 70, 20, 15, 3] \)</li>
+<li>\( d = 3 \)</li>
+</ul>
+</li>
+<li>Calculation:
+<ul>
+<li>Step 1: \( k = \text{sum}(a) / d = 208 / 3 = 69.3 \).</li>
+<li>Step 2: Adjust \( a \) to \( [69, 69, 20, 15, 3] \), recalculate \( k = 177 / 3 = 59 \).</li>
+<li>Step 3: Adjust \( a \) to \( [59, 59, 20, 15, 3] \), \( k \) stabilizes at 59.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Output</strong>:</p>
+<ul>
+<li>Normalized stakes: \( [59, 59, 20, 15, 3] \).</li>
+<li>Normalized sum: \( 114 \).</li>
+</ul>
+<hr />
+<h3 id="2-tracking-finality-votes-1"><a class="header" href="#2-tracking-finality-votes-1">2. <strong>Tracking Finality Votes</strong></a></h3>
+<ul>
+<li>A record of votes is maintained for each validator in every epoch.</li>
+<li>Votes are tracked in <code>_tracker</code>, which maps epochs to validators and their voting activity.</li>
+</ul>
+<hr />
+<h3 id="3-finality-score-calculation-1"><a class="header" href="#3-finality-score-calculation-1">3. <strong>Finality Score Calculation</strong></a></h3>
+<h4 id="formula-1"><a class="header" href="#formula-1">Formula</a></h4>
+<p>For a validator \( v \) in epoch \( e \):
+[
+\text{score}_{v, e} = \frac{\text{normalizedStake}_v}{\text{totalVoterStake}} \times \frac{\text{totalVoterStake}^2}{\text{normalizedSum}^2}
+]</p>
+<p>Where:</p>
+<ul>
+<li>\( \text{normalizedStake}_v \): Normalized stake of validator \( v \).</li>
+<li>\( \text{totalVoterStake} \): Sum of normalized stakes of all voters in the epoch.</li>
+<li>\( \text{normalizedSum} \): Total normalized stake across all validators.</li>
+</ul>
+<hr />
+<h2 id="data-structure-2"><a class="header" href="#data-structure-2">Data Structure</a></h2>
+<h3 id="normalized-data-2"><a class="header" href="#normalized-data-2"><strong>Normalized Data</strong></a></h3>
+<ul>
+<li><strong><code>_normalizedData</code></strong>:
+<ul>
+<li>Stores normalized stake values for validators in a period.</li>
+<li>Includes:
+<ul>
+<li><code>normalizedStake</code>: A mapping of validator IDs to their normalized stake values.</li>
+<li><code>normalizedSum</code>: The total normalized stake across validators.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="tracking-records-2"><a class="header" href="#tracking-records-2"><strong>Tracking Records</strong></a></h3>
+<ul>
+<li><strong><code>_tracker</code></strong>:
+<ul>
+<li>Maps each epoch to validator performance.</li>
+<li>Records:
+<ul>
+<li><code>qcVoteCount</code>: Number of finality votes cast by the validator.</li>
+<li><code>score</code>: Cumulative score of the validator in the epoch.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="implications-of-normalization-1"><a class="header" href="#implications-of-normalization-1">Implications of Normalization</a></h2>
+<ol>
+<li>
+<p><strong>Fair Competition</strong>:</p>
+<ul>
+<li>Caps excessive stakes to prevent validators with high stakes from dominating the network.</li>
+<li>Ensures smaller validators can compete fairly in scoring.</li>
+</ul>
+</li>
+<li>
+<p><strong>Dynamic Adjustments</strong>:</p>
+<ul>
+<li>Normalized values are recalculated for every new period.</li>
+<li>Reflects changes in staking data and validator activity.</li>
+</ul>
+</li>
+<li>
+<p><strong>Efficient Scoring</strong>:</p>
+<ul>
+<li>The iterative pivot-based normalization ensures an efficient and balanced scoring system.</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h2 id="summary-1"><a class="header" href="#summary-1">Summary</a></h2>
+<p>The <code>FastFinalityTracking</code> contract ensures fairness and incentivizes validator participation by combining a robust normalization technique with dynamic score calculations. By capping excessive stakes and rewarding active participation, it strengthens the Ronin network’s security and efficiency.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="block-based-operations"><a class="header" href="#block-based-operations">Block Based Operations</a></h1>
 <p><img src="validator_lifecycle/../assets/block-based-operations.svg" alt="Block Based Operations" /></p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="block-based-operations-1"><a class="header" href="#block-based-operations-1">Block Based Operations</a></h1>
