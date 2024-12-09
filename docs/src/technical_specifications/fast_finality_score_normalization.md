@@ -1,4 +1,4 @@
-# Specification: Fast Finality Tracking Score with Detailed Normalization Technique
+# Fast Finality Tracking Score
 
 The `FastFinalityTracking` score system is designed to evaluate and reward validators based on their contributions to achieving block finality in the Ronin network. This specification focuses on the methodology, particularly the normalization technique used to ensure fair scoring, as well as the implications for validator performance.
 
