@@ -1,0 +1,9 @@
+[book]
+authors = ["TuDo1403"]
+language = "en"
+multilingual = false
+src = "src"
+title = "Ronin DPoS"
+
+[output.html]
+mathjax-support = true
