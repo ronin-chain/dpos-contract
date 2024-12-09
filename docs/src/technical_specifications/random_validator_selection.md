@@ -1,4 +1,4 @@
-# Validator Selection Specification for Ronin Network
+# Weighted Random Selection Specification for Validators
 
 This document outlines the detailed specification for selecting validators in the Ronin Network using the `LibSortValidatorsByBeacon` library and the `RoninRandomBeacon` contract. The selection process ensures a fair, decentralized, and efficient mechanism for determining the validator set for each period and epoch.
 

@@ -9,6 +9,7 @@
   - [Validator Roles](core_concepts/validator_roles.md)
 - [Technical Specifications](technical_specifications/fast_finality_score_normalization.md)
   - [Fast Finality Score Normalization](technical_specifications/fast_finality_score_normalization.md)
+  - [Random Validator Selection](technical_specifications/random_validator_selection.md)
 - [Validator Lifecycle](validator_lifecycle/block_based_op.md)
   - [Block-Based Operations](validator_lifecycle/block_based_op.md)
   - [Epoch-Based Operations](validator_lifecycle/epoch_based_op.md)
