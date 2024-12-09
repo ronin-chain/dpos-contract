@@ -342,15 +342,15 @@ contract RoninBaseFeeTreasury is EIP712, Initializable, HasContracts, GlobalConf
     bytes32 hash
   ) internal returns (uint256 totalVotePower) {
     address[] memory allCids = ICandidateManager(getContract(ContractType.VALIDATOR)).getValidatorCandidateIds();
-    uint256[] memory selfStakes = IStaking(getContract(ContractType.STAKING)).getManySelfStakingsById(allCids);
+    uint256[] memory totalStakes = IStaking(getContract(ContractType.STAKING)).getManyStakingTotalsById(allCids);
 
     uint256 length = allCids.length;
-    require(length == selfStakes.length, ErrLengthMismatch(msg.sig));
+    require(length == totalStakes.length, ErrLengthMismatch(msg.sig));
 
     ProposalInfo storage $ = _info[hash];
 
     for (uint256 i; i < length; ++i) {
-      uint96 scaledStake = (selfStakes[i] / 1 ether).toUint96();
+      uint96 scaledStake = (totalStakes[i] / 1 ether).toUint96();
       totalVotePower += scaledStake;
 
       $._votePower[allCids[i]] = scaledStake;
