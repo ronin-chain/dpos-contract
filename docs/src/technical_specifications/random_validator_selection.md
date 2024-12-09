@@ -18,7 +18,7 @@ The validator selection process is divided into two phases:
 ### General Inputs
 
 - **Candidates (`cids`):** List of validator candidate IDs.
-- **Trusted Weights (`trustedWeights`):** Weights assigned to validators based on governance criteria.
+- **Trusted Weights (`trustedWeights`):** Weights assigned to validators based on governance criteria. Weights are the same for all governing validators.
 - **Staking Amounts (`stakedAmounts`):** Total staked RON for each candidate.
 - **Beacon Value (`beacon`):** A pseudo-random number generated at the period level, used for rotating validator selection.
 - **Epoch Number (`epoch`):** The epoch within the period for which rotating validators are being selected.
@@ -38,6 +38,7 @@ The validator selection process is divided into two phases:
 1. **Input Validation:**
    - Ensure `cids`, `trustedWeights`, and `stakedAmounts` arrays have the same length.
    - Check that the total number of validators does not exceed the sum of `nGV`, `nSV`, and `nRV`.
+   - If the number of all candidates \\( \leq \sum(nGV, nSV, nRV) \\), take all candidates as validators.
 
 2. **Filter Governance Validators:**
    - Use `trustedWeights` to filter out validators with non-zero governance weights.
@@ -52,6 +53,8 @@ The validator selection process is divided into two phases:
 4. **Filter Rotating Validators:**
    - From the remaining candidates, select up to `nRV` validators.
    - Use beacon randomness and staking amounts for weighted selection.
+
+   **Edge-case: If number of actual governing validators \\( \geq nGV \\), unused governance slots are in random selection process.**
 
 5. **Save Validators:**
    - Save governance and standard validators as non-rotating.
@@ -73,15 +76,18 @@ The validator selection process is divided into two phases:
    - Ensure the number of rotating validators does not exceed `nRV`.
 
 2. **Beacon-Based Weight Calculation:**
-   - For each rotating validator:
-     - Generate a weight using the formula:  
-       **`weight = stake^2 * XOR(hash1, hash2)`**  
-       - `hash1, hash2`: Split parts of the hashed beacon value combined with validator ID and epoch.
-       - `stake`: Staked amount of the validator.
-   - Normalize the weights for fairness.
+   - Formula:
+     - denote the address of candidate \\( i \\) as \\( \text{cid}_i \\).
+     - denote the stake amount of candidate \\( i \\) of period \\( p \\) as \\( \text{s}_{ip} \\).
+     - denote the random beacon of period \\( p \\) as \\( \text{r}_p \\).
+     - denote the weight of a candidate \\( i \\) at epoch \\(e \\) in period \\(p \\) as \\( w_{iep} \\)
+
+   \\[ w_{iep} = \frac{\text{s}_{ip}}{1e18}^2 \times \texttt{h}(e, \text{cid}_i, \text{r}_p) \\]
+
+   where \\( \texttt{h} \\) is hash of concatenating \\(  e \\), \\( \text{cid}_i \\) and \\( \text{r}_p \\)
 
 3. **Top-k Selection:**
-   - Sort the rotating validators by their calculated weights.
+   - Sort the rotating validators by their calculated beacon weights.
    - Select the top `nRV` validators for the current epoch.
 
 4. **Combine Validator Sets:**
@@ -95,22 +101,30 @@ The validator selection process is divided into two phases:
 
 ## Examples and Visualization
 
+Consider threshold values for the number of governance, standard, and rotating validators:
+
+- `nGV = 2`
+- `nSV = 2`
+- `nRV = 2`
+
 ### Period Level Sorting Example
 
 | Candidate ID | Trusted Weight | Staked Amount (RON) | Governance Validator (GV) | Standard Validator (SV) | Rotating Validator (RV) |
 | ------------ | -------------- | ------------------- | ------------------------- | ----------------------- | ----------------------- |
 | Validator A  | 100            | 50,000              | ✔                         |                         |                         |
 | Validator B  | 100            | 40,000              | ✔                         |                         |                         |
-| Validator C  | 0              | 30,000              |                           | ✔                       |                         |
+| Validator C  | 100            | 30,000              |                           |                         | ✔                       |
 | Validator D  | 0              | 25,000              |                           | ✔                       |                         |
-| Validator E  | 0              | 20,000              |                           |                         | ✔                       |
+| Validator E  | 0              | 20,000              |                           | ✔                       |                         |
 | Validator F  | 0              | 15,000              |                           |                         | ✔                       |
+| Validator G  | 0              | 14,000              |                           |                         | ✔                       |
+| Validator H  | 0              | 13,000              |                           |                         | ✔                       |
 
 **Summary:**
 
 - Governance Validators (GV): Validator A, Validator B
-- Standard Validators (SV): Validator C, Validator D
-- Rotating Validators (RV): Validator E, Validator F
+- Standard Validators (SV): Validator D, Validator E
+- Rotating Validators (RV) List: Validator C, Validator F, Validator G, Validator H
 
 ---
 
@@ -118,11 +132,12 @@ The validator selection process is divided into two phases:
 
 | Rotating Validator | Staked Amount (RON) | Beacon Hash | Weight  |
 | ------------------ | ------------------- | ----------- | ------- |
-| Validator E        | 20,000              | `0x1234`    | `8,000` |
-| Validator F        | 15,000              | `0x5678`    | `5,625` |
-| Validator G        | 10,000              | `0x9abc`    | `2,500` |
+| Validator C        | 30,000              | `0x1234`    | `8,500` |
+| Validator G        | 15,000              | `0x5678`    | `5,100` |
+| Validator F        | 14,000              | `0x9abc`    | `5,625` |
+| Validator H        | 13,000              | `0x9def`    | `2,500` |
 
-**Selected Rotating Validators for Epoch:**
+**Selected Rotating Validators for Epoch: 1**
 
-- Validator E (Weight: `8,000`)
-- Validator F (Weight: `5,625`)
+- Validator C (Weight: `8,500`)
+- Validator G (Weight: `5,625`)

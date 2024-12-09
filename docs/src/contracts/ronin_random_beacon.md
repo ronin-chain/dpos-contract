@@ -37,7 +37,7 @@ The `RoninRandomBeacon` contract ensures that only eligible candidates are inclu
      - Rotating Validators (RV)
 
 3. **Sort by Weights and Staking Amounts and Random Seed**:
-   - Governing Validators (GV) are given priority based on their trusted weights.
+   - Governing Validators (GV) are given priority based on their trusted weights and sorted based on their staking amounts.
    - Standard Validators (SV) are sorted based on their staking amounts.
    - Rotating Validators (RV) are selected based on a random seed.
 
