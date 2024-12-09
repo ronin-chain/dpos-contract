@@ -1,0 +1,845 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Ronin DPoS</title>
+        <meta name="robots" content="noindex">
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Ronin DPoS</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <div style="break-before: page; page-break-before: always;"></div><h1 id="fast-finality-tracking"><a class="header" href="#fast-finality-tracking">Fast Finality Tracking</a></h1>
+<p>The <code>FastFinalityTracking</code> contract is responsible for tracking and scoring validator performance based on their participation in finalizing blocks. This mechanism ensures the reliability of validators by incentivizing active participation and maintaining a secure and efficient network.</p>
+<hr />
+<h2 id="key-responsibilities"><a class="header" href="#key-responsibilities">Key Responsibilities</a></h2>
+<ol>
+<li>
+<p><strong>Tracking Finality Votes</strong>:</p>
+<ul>
+<li>Records votes submitted by validators for block finality.</li>
+<li>Keeps a count of finality votes (<code>qcVoteCount</code>) for each validator in each epoch.</li>
+</ul>
+</li>
+<li>
+<p><strong>Scoring Validators</strong>:</p>
+<ul>
+<li>Assigns scores to validators based on the quality of their finality votes and their normalized stake values.</li>
+<li>Scores are calculated dynamically for each epoch to reflect validator performance accurately.</li>
+</ul>
+</li>
+<li>
+<p><strong>Normalizing Stake Data</strong>:</p>
+<ul>
+<li>Ensures fair scoring by normalizing staking amounts across all validators.</li>
+<li>Applies a pivot-based normalization to cap excessive stakes and balance scoring metrics.</li>
+</ul>
+</li>
+<li>
+<p><strong>Integration with Epochs and Periods</strong>:</p>
+<ul>
+<li>Operates on an epoch-based system to ensure timely and accurate tracking of validator actions.</li>
+<li>Normalized data is updated per period for consistent calculations.</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h2 id="workflow"><a class="header" href="#workflow">Workflow</a></h2>
+<h3 id="1-recording-finality-votes"><a class="header" href="#1-recording-finality-votes">1. <strong>Recording Finality Votes</strong></a></h3>
+<ul>
+<li>The <code>recordFinality</code> function is called by the block producer (via <code>block.coinbase</code>) once per block.</li>
+<li>Validators who voted for block finality are recorded.</li>
+<li>Scores are updated for each validator based on:
+<ul>
+<li>Their normalized stake.</li>
+<li>The total normalized stake of voters.</li>
+</ul>
+</li>
+</ul>
+<h3 id="2-normalization-of-stake-values"><a class="header" href="#2-normalization-of-stake-values">2. <strong>Normalization of Stake Values</strong></a></h3>
+<ul>
+<li>Stake values are normalized using the <code>inplaceFindNormalizedSumAndPivot</code> function from <code>LibArray</code>:
+<ul>
+<li>Excessively large stakes are capped to prevent unfair advantages.</li>
+<li>The normalized stake values are stored for future calculations.</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-scoring-validators"><a class="header" href="#3-scoring-validators">3. <strong>Scoring Validators</strong></a></h3>
+<ul>
+<li>The scoring formula accounts for:
+<ul>
+<li>Total stake of the validator (including self-stake and delegator stake amounts).</li>
+<li>The validator's normalized stake.</li>
+<li>The total normalized stake of voters.</li>
+<li>The ratio of votes cast to the total possible votes.</li>
+</ul>
+</li>
+<li>Scores reflect the contribution of each validator to the block finality process.</li>
+</ul>
+<h3 id="4-epoch-based-tracking"><a class="header" href="#4-epoch-based-tracking">4. <strong>Epoch-Based Tracking</strong></a></h3>
+<ul>
+<li>Votes and scores are tracked for each epoch.</li>
+<li>The <code>epochOf</code> function from the <code>RoninValidatorSet</code> contract is used to determine the current epoch based on the block number.</li>
+</ul>
+<hr />
+<h2 id="data-structure"><a class="header" href="#data-structure">Data Structure</a></h2>
+<h3 id="tracking-records"><a class="header" href="#tracking-records">Tracking Records</a></h3>
+<ul>
+<li><strong><code>_tracker</code></strong>:
+<ul>
+<li>Maps each epoch to a list of records for validators.</li>
+<li>Each record includes:
+<ul>
+<li><code>qcVoteCount</code>: The number of finality votes cast by the validator.</li>
+<li><code>score</code>: The cumulative score for the validator in the epoch.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="normalized-data"><a class="header" href="#normalized-data">Normalized Data</a></h3>
+<ul>
+<li><strong><code>_normalizedData</code></strong>:
+<ul>
+<li>Stores normalized stake values for each validator in a period.</li>
+<li>Includes:
+<ul>
+<li><code>normalizedStake</code>: A mapping of validator IDs to their normalized stake values.</li>
+<li><code>normalizedSum</code>: The total normalized stake in the period.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr />
+<div style="break-before: page; page-break-before: always;"></div><h1 id="maintenance-overview"><a class="header" href="#maintenance-overview">Maintenance Overview</a></h1>
+<p>The <code>Maintenance</code> contract manages the scheduling, execution, and tracking of maintenance periods for validators in the Ronin network. It ensures that validators can temporarily exit block production without being slashed.</p>
+<hr />
+<h2 id="key-responsibilities-1"><a class="header" href="#key-responsibilities-1">Key Responsibilities</a></h2>
+<ol>
+<li>
+<p><strong>Scheduling Maintenance</strong>:</p>
+<ul>
+<li>Validators can request maintenance schedules within defined time frames.</li>
+<li>Maintenance schedules are subject to duration, block offset, and maximum schedule constraints.</li>
+</ul>
+</li>
+<li>
+<p><strong>Exiting Maintenance</strong>:</p>
+<ul>
+<li>Validators can exit maintenance early, marking the end of their scheduled maintenance period.</li>
+<li>Exiting requires updating the maintenance state and ensuring synchronization.</li>
+</ul>
+</li>
+<li>
+<p><strong>Tracking Maintenance</strong>:</p>
+<ul>
+<li>Active maintenance schedules are tracked and synchronized to ensure accurate status updates.</li>
+<li>The contract maintains an up-to-date list of active maintenance schedules.</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h2 id="workflow-1"><a class="header" href="#workflow-1">Workflow</a></h2>
+<h3 id="1-scheduling-maintenance"><a class="header" href="#1-scheduling-maintenance">1. <strong>Scheduling Maintenance</strong></a></h3>
+<ul>
+<li>A validator requests a maintenance schedule by specifying:
+<ul>
+<li>Start and end blocks within allowed offsets.</li>
+<li>A duration within the defined minimum and maximum maintenance block ranges.</li>
+</ul>
+</li>
+<li>The system verifies the following:
+<ul>
+<li>Validator is eligible and is the caller's candidate.</li>
+<li>The schedule adheres to constraints.</li>
+<li>No other active schedule exists for the validator.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h3 id="2-maintenance-execution"><a class="header" href="#2-maintenance-execution">2. <strong>Maintenance Execution</strong></a></h3>
+<ul>
+<li>Validators in maintenance are excluded from block production during their scheduled period.</li>
+<li>The state of maintenance is actively tracked using block ranges and synchronization checks.</li>
+</ul>
+<hr />
+<h3 id="3-exiting-maintenance"><a class="header" href="#3-exiting-maintenance">3. <strong>Exiting Maintenance</strong></a></h3>
+<ul>
+<li>Validators can exit maintenance early by:
+<ul>
+<li>Updating the end block to the current block.</li>
+<li>Synchronizing the maintenance schedule to remove the validator from active lists.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h3 id="4-synchronization-of-active-schedules"><a class="header" href="#4-synchronization-of-active-schedules">4. <strong>Synchronization of Active Schedules</strong></a></h3>
+<ul>
+<li>At each synchronization point:
+<ul>
+<li>The system checks if scheduled maintenance has ended for any validator.</li>
+<li>Validators with expired schedules are removed from the active schedule list.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="integration"><a class="header" href="#integration">Integration</a></h2>
+<p>The <code>Maintenance</code> contract integrates with the <code>RoninValidatorSet</code> to ensure:</p>
+<ul>
+<li>Validation of maintenance eligibility.</li>
+<li>Removal of validators under maintenance from block production.</li>
+</ul>
+<hr />
+<div style="break-before: page; page-break-before: always;"></div><h1 id="roninrandombeacon-contract-documentation"><a class="header" href="#roninrandombeacon-contract-documentation">RoninRandomBeacon Contract Documentation</a></h1>
+<p>The <code>RoninRandomBeacon</code> contract is responsible for generating secure random beacons, managing validator thresholds, and ensuring fair validator selection.</p>
+<hr />
+<h2 id="overview"><a class="header" href="#overview">Overview</a></h2>
+<h3 id="1-random-beacon-management"><a class="header" href="#1-random-beacon-management"><strong>1. Random Beacon Management</strong></a></h3>
+<ul>
+<li>Handles the lifecycle of random beacon requests, including:
+<ul>
+<li>Requesting a random seed for the next period.</li>
+<li>Validating and finalizing the random seed with cryptographic proofs.</li>
+<li>Storing the finalized beacon value for validator selection.</li>
+</ul>
+</li>
+</ul>
+<h3 id="2-validator-threshold-management"><a class="header" href="#2-validator-threshold-management"><strong>2. Validator Threshold Management</strong></a></h3>
+<ul>
+<li>Maintains and updates thresholds for different validator types:
+<ul>
+<li>Governing Validators.</li>
+<li>Standard Validators.</li>
+<li>Rotating Validators.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="validator-selection-filtering-valid-candidates"><a class="header" href="#validator-selection-filtering-valid-candidates">Validator Selection: Filtering Valid Candidates</a></h2>
+<p>The <code>RoninRandomBeacon</code> contract ensures that only eligible candidates are included in the validator set. The filtering process applies the following criteria:</p>
+<ol>
+<li>
+<p><strong>Exclude Newly Registered Candidates</strong>:</p>
+<ul>
+<li>Candidates within the cooldown period are excluded from selection.</li>
+<li>Ensures fairness by preventing immediate participation of new candidates.</li>
+</ul>
+</li>
+<li>
+<p><strong>Enforce Thresholds</strong>:</p>
+<ul>
+<li>Valid candidates are filtered based on thresholds defined for each validator type:
+<ul>
+<li>Governing Validators (GV)</li>
+<li>Standard Validators (SV)</li>
+<li>Rotating Validators (RV)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Sort by Weights and Staking Amounts and Random Seed</strong>:</p>
+<ul>
+<li>Governing Validators (GV) are given priority based on their trusted weights.</li>
+<li>Standard Validators (SV) are sorted based on their staking amounts.</li>
+<li>Rotating Validators (RV) are selected based on a random seed.</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h3 id="4-unavailability-management"><a class="header" href="#4-unavailability-management"><strong>4. Unavailability Management</strong></a></h3>
+<ul>
+<li>Tracks validator unavailability and enforces slashing penalties when thresholds are exceeded.</li>
+</ul>
+<hr />
+<h2 id="flow"><a class="header" href="#flow">Flow</a></h2>
+<h3 id="1-random-seed-request"><a class="header" href="#1-random-seed-request"><strong>1. Random Seed Request</strong></a></h3>
+<ul>
+<li>At the beginning of a new period, the <code>RoninValidatorSet</code> contract requests a random seed.</li>
+<li>Validators submit cryptographic proofs to fulfill the request.</li>
+</ul>
+<h3 id="2-random-beacon-finalization"><a class="header" href="#2-random-beacon-finalization"><strong>2. Random Beacon Finalization</strong></a></h3>
+<ul>
+<li>At the end of the period:
+<ul>
+<li>The random beacon is finalized using the submitted proofs.</li>
+<li>Pending validator IDs are finalized for the next period.</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-validator-selection"><a class="header" href="#3-validator-selection"><strong>3. Validator Selection</strong></a></h3>
+<ul>
+<li>Finalized random beacon values are used to select validators for the current period and epoch.</li>
+<li>Selected validators are used for promoting to block producer.</li>
+</ul>
+<h3 id="4-unavailability-tracking-and-slashing"><a class="header" href="#4-unavailability-tracking-and-slashing"><strong>4. Unavailability Tracking and Slashing</strong></a></h3>
+<ul>
+<li>Validator activity is monitored throughout the period.</li>
+<li>Validators failing to meet availability thresholds are penalized via slashing.</li>
+</ul>
+<h3 id="5-transition-to-new-period"><a class="header" href="#5-transition-to-new-period"><strong>5. Transition to New Period</strong></a></h3>
+<ul>
+<li>At the end of the each epoch, the contract transitions to a new period with updated validator sets and configurations.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="epoch-vs-period"><a class="header" href="#epoch-vs-period">Epoch vs Period</a></h1>
+<p>Understanding the distinction between <strong>Epoch</strong> and <strong>Period</strong> is critical for grasping the underlying mechanics of the system. Both terms are used to represent time intervals but serve different purposes and are calculated differently.</p>
+<hr />
+<h2 id="1-what-is-an-epoch"><a class="header" href="#1-what-is-an-epoch">1. What is an Epoch?</a></h2>
+<p>An <strong>epoch</strong> is a fixed time unit measured in <strong>blocks</strong>. It represents the core timing mechanism for operations within the blockchain.</p>
+<ul>
+<li><strong>Definition</strong>:
+<ul>
+<li>An epoch is defined as a set number of blocks.</li>
+</ul>
+</li>
+<li><strong>Configuration</strong>:
+<ul>
+<li>In this system, 1 epoch = <strong>200 blocks</strong>.</li>
+</ul>
+</li>
+<li><strong>Approximate Duration</strong>:
+<ul>
+<li>Each block takes approximately <strong>3 seconds</strong> to generate.</li>
+<li>Thus, 1 epoch ≈ <strong>10 minutes</strong>.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Example</strong>:</p>
+<ul>
+<li>Blocks 0–199 belong to epoch 0.</li>
+<li>Blocks 200–399 belong to epoch 1.</li>
+<li>Blocks 400–599 belong to epoch 2, and so on.</li>
+</ul>
+<p>Epochs are used for:</p>
+<ul>
+<li>Validator rotation.</li>
+<li>Slashing mechanisms.</li>
+<li>Reward distribution calculations.</li>
+</ul>
+<hr />
+<h2 id="2-what-is-a-period"><a class="header" href="#2-what-is-a-period">2. What is a Period?</a></h2>
+<p>A <strong>period</strong> is a broader time unit measured in <strong>timestamps</strong>, typically aligned with <strong>calendar days</strong>. It serves as a higher-level grouping of epochs.</p>
+<ul>
+<li><strong>Definition</strong>:
+<ul>
+<li>A period ideally starts at <strong>00:00 UTC</strong> each day.</li>
+</ul>
+</li>
+<li><strong>Challenges in Blockchain</strong>:
+<ul>
+<li>Blockchain works with block numbers, not timestamps, making it difficult to align perfectly with real-world time.</li>
+<li>Instead, the system determines a new period when the timestamp of the current epoch exceeds the next day’s threshold.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Key Notes</strong>:</p>
+<ul>
+<li>A period starts between <strong>00:00 UTC → 00:15 UTC</strong>, depending on block generation timing.</li>
+<li>Period duration is variable and influenced by network performance.</li>
+</ul>
+<hr />
+<h2 id="3-key-differences"><a class="header" href="#3-key-differences">3. Key Differences</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Feature</th><th><strong>Epoch</strong></th><th><strong>Period</strong></th></tr></thead><tbody>
+<tr><td><strong>Measurement Unit</strong></td><td>Number of blocks</td><td>Timestamps (real-world time)</td></tr>
+<tr><td><strong>Duration</strong></td><td>Fixed (200 blocks ≈ 10 minutes)</td><td>Variable (aligned with calendar)</td></tr>
+<tr><td><strong>Purpose</strong></td><td>Operational tasks (e.g., record stats, validator rotation)</td><td>High-level grouping of epochs (e.g., reward distribution, randomization, slashing)</td></tr>
+<tr><td><strong>Start Condition</strong></td><td>Based on block number</td><td>Based on UTC timestamp</td></tr>
+</tbody></table>
+</div>
+<hr />
+<h2 id="4-interplay-between-epochs-and-periods"><a class="header" href="#4-interplay-between-epochs-and-periods">4. Interplay Between Epochs and Periods</a></h2>
+<p>Periods are determined by epochs, and the transition is triggered as follows:</p>
+<ol>
+<li>At the end of each epoch, the system checks the <strong>timestamp</strong> of the last block.</li>
+<li>If the timestamp indicates a new calendar day, a new period begins.</li>
+<li>Validator roles, random beacons, and other operations are changed at the period boundary.</li>
+</ol>
+<p><strong>Key Implications</strong>:</p>
+<ul>
+<li>A period may contain fewer epochs if the network is slow (fewer blocks are produced per day).</li>
+<li>Epoch-based calculations remain deterministic, while period-based calculations adapt to timestamp variability.</li>
+</ul>
+<hr />
+<h2 id="5-practical-example"><a class="header" href="#5-practical-example">5. Practical Example</a></h2>
+<p>Consider the following scenario:</p>
+<ul>
+<li>Block production rate: ~1 block per 3 seconds.</li>
+<li>Daily period duration: 24 hours = 86,400 seconds.</li>
+<li>Expected epochs per period: $$\approx (\frac{86,400}{(200 \times 3)} $$</li>
+</ul>
+<hr />
+<h2 id="6-visual-representation"><a class="header" href="#6-visual-representation">6. Visual Representation</a></h2>
+<pre><code class="language-plaintext">+--------+-----------------------------------------------+-------------------------------------------------------------+
+| Period |                       1                       |                              2                              |
++========+=======+=========+=========+=====+=============+=============+=============+=============+=====+=============+
+|  Epoch |   0   |    1    |    2    | ... |     239     |     240     |     241     |     242     |     |             |
++--------+-------+---------+---------+-----+-------------+-------------+-------------+-------------+-----+-------------+
+|  Block | 0-199 | 200-399 | 400-599 | ... | 47800-47999 | 48000–48199 | 48200–48399 | 48400–48599 | ... | 95800–95999 |
++--------+-------+---------+---------+-----+-------------+-------------+-------------+-------------+-----+-------------+
+</code></pre>
+<p>In this table:</p>
+<ul>
+<li>Each <strong>period</strong> consists of multiple <strong>epochs</strong>.</li>
+<li>Each <strong>epoch</strong> is defined by a range of block numbers.</li>
+<li>A <strong>new period</strong> starts when the UTC timestamp exceeds <strong>00:00 UTC</strong>.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="epoch-vs-period-1"><a class="header" href="#epoch-vs-period-1">Epoch vs Period</a></h1>
+<p>Understanding the distinction between <strong>Epoch</strong> and <strong>Period</strong> is critical for grasping the underlying mechanics of the system. Both terms are used to represent time intervals but serve different purposes and are calculated differently.</p>
+<hr />
+<h2 id="1-what-is-an-epoch-1"><a class="header" href="#1-what-is-an-epoch-1">1. What is an Epoch?</a></h2>
+<p>An <strong>epoch</strong> is a fixed time unit measured in <strong>blocks</strong>. It represents the core timing mechanism for operations within the blockchain.</p>
+<ul>
+<li><strong>Definition</strong>:
+<ul>
+<li>An epoch is defined as a set number of blocks.</li>
+</ul>
+</li>
+<li><strong>Configuration</strong>:
+<ul>
+<li>In this system, 1 epoch = <strong>200 blocks</strong>.</li>
+</ul>
+</li>
+<li><strong>Approximate Duration</strong>:
+<ul>
+<li>Each block takes approximately <strong>3 seconds</strong> to generate.</li>
+<li>Thus, 1 epoch ≈ <strong>10 minutes</strong>.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Example</strong>:</p>
+<ul>
+<li>Blocks 0–199 belong to epoch 0.</li>
+<li>Blocks 200–399 belong to epoch 1.</li>
+<li>Blocks 400–599 belong to epoch 2, and so on.</li>
+</ul>
+<p>Epochs are used for:</p>
+<ul>
+<li>Validator rotation.</li>
+<li>Slashing mechanisms.</li>
+<li>Reward distribution calculations.</li>
+</ul>
+<hr />
+<h2 id="2-what-is-a-period-1"><a class="header" href="#2-what-is-a-period-1">2. What is a Period?</a></h2>
+<p>A <strong>period</strong> is a broader time unit measured in <strong>timestamps</strong>, typically aligned with <strong>calendar days</strong>. It serves as a higher-level grouping of epochs.</p>
+<ul>
+<li><strong>Definition</strong>:
+<ul>
+<li>A period ideally starts at <strong>00:00 UTC</strong> each day.</li>
+</ul>
+</li>
+<li><strong>Challenges in Blockchain</strong>:
+<ul>
+<li>Blockchain works with block numbers, not timestamps, making it difficult to align perfectly with real-world time.</li>
+<li>Instead, the system determines a new period when the timestamp of the current epoch exceeds the next day’s threshold.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Key Notes</strong>:</p>
+<ul>
+<li>A period starts between <strong>00:00 UTC → 00:15 UTC</strong>, depending on block generation timing.</li>
+<li>Period duration is variable and influenced by network performance.</li>
+</ul>
+<hr />
+<h2 id="3-key-differences-1"><a class="header" href="#3-key-differences-1">3. Key Differences</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Feature</th><th><strong>Epoch</strong></th><th><strong>Period</strong></th></tr></thead><tbody>
+<tr><td><strong>Measurement Unit</strong></td><td>Number of blocks</td><td>Timestamps (real-world time)</td></tr>
+<tr><td><strong>Duration</strong></td><td>Fixed (200 blocks ≈ 10 minutes)</td><td>Variable (aligned with calendar)</td></tr>
+<tr><td><strong>Purpose</strong></td><td>Operational tasks (e.g., record stats, validator rotation)</td><td>High-level grouping of epochs (e.g., reward distribution, randomization, slashing)</td></tr>
+<tr><td><strong>Start Condition</strong></td><td>Based on block number</td><td>Based on UTC timestamp</td></tr>
+</tbody></table>
+</div>
+<hr />
+<h2 id="4-interplay-between-epochs-and-periods-1"><a class="header" href="#4-interplay-between-epochs-and-periods-1">4. Interplay Between Epochs and Periods</a></h2>
+<p>Periods are determined by epochs, and the transition is triggered as follows:</p>
+<ol>
+<li>At the end of each epoch, the system checks the <strong>timestamp</strong> of the last block.</li>
+<li>If the timestamp indicates a new calendar day, a new period begins.</li>
+<li>Validator roles, random beacons, and other operations are changed at the period boundary.</li>
+</ol>
+<p><strong>Key Implications</strong>:</p>
+<ul>
+<li>A period may contain fewer epochs if the network is slow (fewer blocks are produced per day).</li>
+<li>Epoch-based calculations remain deterministic, while period-based calculations adapt to timestamp variability.</li>
+</ul>
+<hr />
+<h2 id="5-practical-example-1"><a class="header" href="#5-practical-example-1">5. Practical Example</a></h2>
+<p>Consider the following scenario:</p>
+<ul>
+<li>Block production rate: ~1 block per 3 seconds.</li>
+<li>Daily period duration: 24 hours = 86,400 seconds.</li>
+<li>Expected epochs per period: $$\approx (\frac{86,400}{(200 \times 3)} $$</li>
+</ul>
+<hr />
+<h2 id="6-visual-representation-1"><a class="header" href="#6-visual-representation-1">6. Visual Representation</a></h2>
+<pre><code class="language-plaintext">+--------+-----------------------------------------------+-------------------------------------------------------------+
+| Period |                       1                       |                              2                              |
++========+=======+=========+=========+=====+=============+=============+=============+=============+=====+=============+
+|  Epoch |   0   |    1    |    2    | ... |     239     |     240     |     241     |     242     |     |             |
++--------+-------+---------+---------+-----+-------------+-------------+-------------+-------------+-----+-------------+
+|  Block | 0-199 | 200-399 | 400-599 | ... | 47800-47999 | 48000–48199 | 48200–48399 | 48400–48599 | ... | 95800–95999 |
++--------+-------+---------+---------+-----+-------------+-------------+-------------+-------------+-----+-------------+
+</code></pre>
+<p>In this table:</p>
+<ul>
+<li>Each <strong>period</strong> consists of multiple <strong>epochs</strong>.</li>
+<li>Each <strong>epoch</strong> is defined by a range of block numbers.</li>
+<li>A <strong>new period</strong> starts when the UTC timestamp exceeds <strong>00:00 UTC</strong>.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="roles-explained"><a class="header" href="#roles-explained">Roles Explained</a></h1>
+<p>This document explains the key roles in the Delegated Proof of Stake (DPoS) system, with a focus on validators, their responsibilities, and the hierarchical structure within the Ronin network.</p>
+<hr />
+<h2 id="1-candidate"><a class="header" href="#1-candidate">1. Candidate</a></h2>
+<h3 id="definition"><a class="header" href="#definition">Definition</a></h3>
+<ul>
+<li>A <strong>candidate</strong> is an entity that applies to become a validator.</li>
+<li>Candidates must meet specific requirements, such as staking a minimum amount of tokens.</li>
+<li>Candidates hold specific data:
+<ul>
+<li><code>admin</code>: The address used for rotating the consensus address and other information, identical to the treasury address.</li>
+<li><code>treasury</code>: The address to receive rewards, identical to the admin address.</li>
+<li><code>governor</code>: Used for voting on proposals; only governing validators have this information.</li>
+<li><code>commissionRate</code>: The percentage of rewards the validator shares with their delegators.</li>
+<li><code>pubKeyHash</code>: Hash of the public key used to vote for finality.</li>
+<li><code>vrfKeyHash</code>: Hash of the VRF key used to submit random seeds; only governing validators have this information.</li>
+</ul>
+</li>
+</ul>
+<h3 id="responsibilities"><a class="header" href="#responsibilities">Responsibilities</a></h3>
+<ul>
+<li>Maintain their staking balance to remain eligible for promotion.</li>
+<li>Await selection to join the validator set.</li>
+<li>Submit fast finality proofs to finalize blocks.</li>
+</ul>
+<h3 id="process"><a class="header" href="#process">Process</a></h3>
+<ol>
+<li>A user applies to become a candidate by calling the <code>applyValidatorCandidate</code> function in the smart contract.</li>
+<li>Eligible candidates may be promoted to validator status.</li>
+</ol>
+<hr />
+<h2 id="2-validator"><a class="header" href="#2-validator">2. Validator</a></h2>
+<h3 id="definition-1"><a class="header" href="#definition-1">Definition</a></h3>
+<ul>
+<li>A <strong>validator</strong> is a candidate that has been selected to participate in block production and governance of the network.</li>
+<li>Validators are divided into three types:
+<ol>
+<li><strong>Governing Validators (GV)</strong>: Trusted entities with governance privileges.</li>
+<li><strong>Standard Validators (SV)</strong>: Selected based on their staking amounts.</li>
+<li><strong>Rotating Validators (RV)</strong>: Temporarily promoted validators selected randomly for fairness.</li>
+</ol>
+</li>
+</ul>
+<hr />
+<h3 id="types-of-validators"><a class="header" href="#types-of-validators">Types of Validators</a></h3>
+<h4 id="1-governing-validators-gv"><a class="header" href="#1-governing-validators-gv">1. <strong>Governing Validators (GV)</strong></a></h4>
+<ul>
+<li><strong>Role</strong>: Act as core participants in network governance and block production.</li>
+<li><strong>Selection</strong>: Chosen based on predefined trusted organization weights.</li>
+<li><strong>Special Privileges</strong>:
+<ul>
+<li>Submit VRF proofs to generate random seeds.</li>
+<li>Participate in voting for proposals and changes to network parameters.</li>
+<li>Maintain a public <code>vrfKeyHash</code> and <code>governor</code> address for governance.</li>
+</ul>
+</li>
+</ul>
+<h4 id="2-standard-validators-sv"><a class="header" href="#2-standard-validators-sv">2. <strong>Standard Validators (SV)</strong></a></h4>
+<ul>
+<li><strong>Role</strong>: Provide block production support with no governance privileges.</li>
+<li><strong>Selection</strong>: Chosen based on staking amounts from the top-ranked candidates after governing validators.</li>
+<li><strong>Special Privileges</strong>:
+<ul>
+<li>Contribute to block production.</li>
+<li>Earn rewards from transaction fees and block rewards.</li>
+</ul>
+</li>
+<li><strong>Limitation</strong>: Excluded from voting on governance proposals.</li>
+</ul>
+<h4 id="3-rotating-validators-rv"><a class="header" href="#3-rotating-validators-rv">3. <strong>Rotating Validators (RV)</strong></a></h4>
+<ul>
+<li><strong>Role</strong>: Promote decentralization by allowing temporary participation.</li>
+<li><strong>Selection</strong>:
+<ul>
+<li>Randomly selected from the remaining candidates after GV and SV are assigned.</li>
+<li>Determined by the random seed generated during beacon finalization.</li>
+</ul>
+</li>
+<li><strong>Special Privileges</strong>:
+<ul>
+<li>Participate in block production during assigned epochs.</li>
+</ul>
+</li>
+<li><strong>Limitation</strong>:
+<ul>
+<li>Rotation occurs periodically; their validator status is not permanent.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h3 id="responsibilities-of-validators"><a class="header" href="#responsibilities-of-validators">Responsibilities of Validators</a></h3>
+<ul>
+<li><strong>Block Production</strong>:
+<ul>
+<li>Validate and include transactions in blocks.</li>
+<li>Produce blocks during assigned epochs.</li>
+</ul>
+</li>
+<li><strong>Finality Proofs</strong>:
+<ul>
+<li>All candidates, including non-block producers, contribute fast finality proofs to finalize blocks.</li>
+</ul>
+</li>
+<li><strong>Compliance</strong>:
+<ul>
+<li>Maintain active participation to avoid penalties or slashing.</li>
+<li>Ensure sufficient staking to retain validator status.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="3-block-producer"><a class="header" href="#3-block-producer">3. Block Producer</a></h2>
+<h3 id="definition-2"><a class="header" href="#definition-2">Definition</a></h3>
+<ul>
+<li>A <strong>block producer</strong> is a validator assigned to create blocks during a specific epoch.</li>
+</ul>
+<h3 id="responsibilities-1"><a class="header" href="#responsibilities-1">Responsibilities</a></h3>
+<ul>
+<li>Validate transactions and include them in new blocks.</li>
+</ul>
+<h3 id="key-points"><a class="header" href="#key-points">Key Points</a></h3>
+<ul>
+<li>Block producers are a subset of validators assigned to create blocks during specific epochs.</li>
+<li>All candidates (not just block producers) are responsible for submitting finality proofs.</li>
+</ul>
+<hr />
+<h2 id="4-delegator"><a class="header" href="#4-delegator">4. Delegator</a></h2>
+<h3 id="definition-3"><a class="header" href="#definition-3">Definition</a></h3>
+<ul>
+<li>A <strong>delegator</strong> is a token holder who stakes their tokens with a validator.</li>
+<li>Delegators share in validator rewards and indirectly influence governance by supporting specific validators.</li>
+</ul>
+<h3 id="reward-sharing"><a class="header" href="#reward-sharing">Reward Sharing</a></h3>
+<ul>
+<li>Rewards are distributed based on:
+<ul>
+<li>Validator's commission rate.</li>
+<li>Delegator's staked amount.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="5-hierarchical-relationship"><a class="header" href="#5-hierarchical-relationship">5. Hierarchical Relationship</a></h2>
+<h3 id="structure"><a class="header" href="#structure">Structure</a></h3>
+<ol>
+<li><strong>Candidates</strong>: The initial pool of participants awaiting promotion.</li>
+<li><strong>Validators</strong>:
+<ul>
+<li>Governing Validators (GV): Trusted and responsible for governance and block production.</li>
+<li>Standard Validators (SV): Support block production without governance roles.</li>
+<li>Rotating Validators (RV): Temporarily promoted to encourage decentralization.</li>
+</ul>
+</li>
+<li><strong>Block Producers</strong>: A subset of validators responsible for creating blocks during specific epochs.</li>
+<li><strong>Delegators</strong>: Stake tokens with validators to share in rewards and indirectly support the network.</li>
+</ol>
+<hr />
+<div style="break-before: page; page-break-before: always;"></div><h1 id="block-based-operations"><a class="header" href="#block-based-operations">Block Based Operations</a></h1>
+<p><img src="validator_lifecycle/../assets/block-based-operations.svg" alt="Block Based Operations" /></p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="block-based-operations-1"><a class="header" href="#block-based-operations-1">Block Based Operations</a></h1>
+<p><img src="validator_lifecycle/../assets/block-based-operations.svg" alt="Block Based Operations" /></p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="epoch-based-operations"><a class="header" href="#epoch-based-operations">Epoch Based Operations</a></h1>
+<p><img src="validator_lifecycle/../assets/epoch-based-operation.svg" alt="Epoch Based Operations" /></p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+        <script>
+        window.addEventListener('load', function() {
+            MathJax.Hub.Register.StartupHook('End', function() {
+                window.setTimeout(window.print, 100);
+            });
+        });
+        </script>
+
+    </div>
+    </body>
+</html>
