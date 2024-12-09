@@ -6,4 +6,5 @@ src = "src"
 title = "Ronin DPoS"
 
 [output.html]
+smart-punctuation = true
 mathjax-support = true
