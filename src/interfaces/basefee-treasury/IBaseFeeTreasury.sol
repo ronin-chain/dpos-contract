@@ -2,6 +2,9 @@
 pragma solidity ^0.8.9;
 
 interface IBaseFeeTreasury {
+  /**
+   * @dev Emitted when the specified amount is withdrawn to the specified address.
+   */
   event Withdrawn(address indexed by, address indexed to, uint256 amount);
 
   /**

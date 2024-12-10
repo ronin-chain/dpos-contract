@@ -20,6 +20,9 @@ contract RoninBaseFeeTreasury is Initializable, HasProxyAdmin, IBaseFeeTreasury 
     _disableInitializers();
   }
 
+  /**
+   * @inherit IBaseFeeTreasury
+   */
   function withdrawTo(address to, uint256 amount) external onlyAdmin {
     (bool success, bytes memory ret) = to.call{ value: amount }("");
     success.handleRevert(0x0, ret);
