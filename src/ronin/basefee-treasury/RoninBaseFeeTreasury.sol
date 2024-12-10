@@ -3,15 +3,14 @@ pragma solidity ^0.8.27;
 
 import { Initializable } from "@openzeppelin-v5/contracts/proxy/utils/Initializable.sol";
 
-import { HasContracts } from "src/extensions/collections/HasContracts.sol";
+import { HasProxyAdmin } from "src/extensions/collections/HasProxyAdmin.sol";
 
 import { IBaseFeeTreasury } from "src/interfaces/basefee-treasury/IBaseFeeTreasury.sol";
 
 import { ErrorHandler } from "src/libraries/ErrorHandler.sol";
 
-contract RoninBaseFeeTreasury is Initializable, HasContracts, IBaseFeeTreasury {
+contract RoninBaseFeeTreasury is Initializable, HasProxyAdmin, IBaseFeeTreasury {
   using ErrorHandler for bool;
-
 
   receive() external payable {
     // Allow receiving donations.
