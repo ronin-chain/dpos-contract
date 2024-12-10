@@ -213,7 +213,7 @@ interface IBaseFeeTreasury {
    * - `p.recipients`, `p.amounts`, and `p.callDatas` must have the same length.
    * - `p.executor` must either be valid address or `address(this)`.
    * - `p.amounts` must not contain zero.
-   * - `p.recipients` must not contain zero address or dead address.
+   * - `p.recipients` can contain zero or dead address.
    */
   function validateProposal(
     Proposal calldata p
