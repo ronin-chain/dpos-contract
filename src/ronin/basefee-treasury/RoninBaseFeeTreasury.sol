@@ -12,7 +12,6 @@ import { ErrorHandler } from "src/libraries/ErrorHandler.sol";
 contract RoninBaseFeeTreasury is Initializable, HasContracts, IBaseFeeTreasury {
   using ErrorHandler for bool;
 
-  uint256[50] private __gap;
 
   receive() external payable {
     // Allow receiving donations.
