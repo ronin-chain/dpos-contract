@@ -1,0 +1,42 @@
+sequenceDiagram
+    actor block producer
+    
+    participant RoninValidatorSet
+    participant FastFinalityTracking
+    participant RoninRandomBeacon
+    participant SlashIndicator
+    participant Staking
+    participant Maintenance
+
+    
+
+    loop Every Block
+        block producer->>FastFinalityTracking: recordFinality([] voters)
+    
+    alt Have not snapshot candidate total stakes at the beginning of new period
+        FastFinalityTracking->>Staking: snapshot total stakes of all candidates and normalize.
+        FastFinalityTracking-->FastFinalityTracking: accumulate voter scores of given epoch based on snapshot data.
+    end
+    end
+
+    
+
+    loop Every Block
+        block producer->>SlashIndicator: slashUnavailibility(otherValidator)
+        SlashIndicator->>RoninValidatorSet: check is block producer now.
+        SlashIndicator->>Maintenance: check is maintaining now.
+
+        alt In block producer set and not maintenance
+            SlashIndicator->>SlashIndicator: record miss block.
+        end
+
+        alt Meet Slash threshold
+            SlashIndicator->>RoninValidatorSet: execute slash with corresponding threshold.
+        end
+
+    end
+
+    loop Every Block
+        block producer->>RoninValidatorSet: submitBlockReward(blockFee)
+        RoninValidatorSet->>RoninValidatorSet: credit reward between validator and delegator based on agreed commission rate.
+    end

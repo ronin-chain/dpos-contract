@@ -137,7 +137,7 @@ Consider threshold values for the number of governance, standard, and rotating v
 | Validator F        | 14,000              | `0x9abc`    | `5,625` |
 | Validator H        | 13,000              | `0x9def`    | `2,500` |
 
-**Selected Rotating Validators for Epoch: 1**
+**Selected Rotating Validators for Epoch**
 
 - Validator C (Weight: `8,500`)
 - Validator G (Weight: `5,625`)

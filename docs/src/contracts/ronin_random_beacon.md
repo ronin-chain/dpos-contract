@@ -1,4 +1,4 @@
-# RoninRandomBeacon Contract Documentation
+# Ronin Random Beacon
 
 The `RoninRandomBeacon` contract is responsible for generating secure random beacons, managing validator thresholds, and ensuring fair validator selection.
 
