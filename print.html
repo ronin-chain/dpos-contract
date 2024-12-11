@@ -259,7 +259,7 @@
 </li>
 </ul>
 <hr />
-<div style="break-before: page; page-break-before: always;"></div><h1 id="maintenance-overview"><a class="header" href="#maintenance-overview">Maintenance Overview</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="maintenance"><a class="header" href="#maintenance">Maintenance</a></h1>
 <p>The <code>Maintenance</code> contract manages the scheduling, execution, and tracking of maintenance periods for validators in the Ronin network. It ensures that validators can temporarily exit block production without being slashed.</p>
 <hr />
 <h2 id="key-responsibilities-1"><a class="header" href="#key-responsibilities-1">Key Responsibilities</a></h2>
@@ -338,7 +338,7 @@
 <li>Removal of validators under maintenance from block production.</li>
 </ul>
 <hr />
-<div style="break-before: page; page-break-before: always;"></div><h1 id="roninrandombeacon-contract-documentation"><a class="header" href="#roninrandombeacon-contract-documentation">RoninRandomBeacon Contract Documentation</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="ronin-random-beacon"><a class="header" href="#ronin-random-beacon">Ronin Random Beacon</a></h1>
 <p>The <code>RoninRandomBeacon</code> contract is responsible for generating secure random beacons, managing validator thresholds, and ensuring fair validator selection.</p>
 <hr />
 <h2 id="overview"><a class="header" href="#overview">Overview</a></h2>
@@ -429,6 +429,95 @@
 <ul>
 <li>At the end of the each epoch, the contract transitions to a new period with updated validator sets and configurations.</li>
 </ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="staking-vesting"><a class="header" href="#staking-vesting">Staking Vesting</a></h1>
+<hr />
+<h2 id="purpose"><a class="header" href="#purpose">Purpose</a></h2>
+<p>The <code>StakingVesting</code> contract manages staking rewards, including block producer bonuses and fast finality rewards. It is designed to handle dynamic reward mechanisms, supporting seamless upgrades and integration with REP-10 for enhanced reward distribution.</p>
+<hr />
+<h2 id="core-logic"><a class="header" href="#core-logic">Core Logic</a></h2>
+<h3 id="reward-distribution"><a class="header" href="#reward-distribution">Reward Distribution</a></h3>
+<p>The contract allocates rewards for block producers and implements a fast finality reward mechanism. Fast finality rewards incentivize validators to contribute to consensus, enhancing network stability.</p>
+<ul>
+<li>Rewards are credited per block, calculated based on the configured bonus amounts for each block produced.</li>
+<li>The contract ensures rewards are sent only once per block to prevent duplicate distributions.</li>
+</ul>
+<h3 id="rep-10-integration"><a class="header" href="#rep-10-integration">REP-10 Integration</a></h3>
+<p>REP-10 introduces an upgraded reward mechanism for fast finality incentives. Its activation must occur at the start of a new period to ensure accurate reward distribution and consistency.</p>
+<ul>
+<li><strong>Activation Process</strong>:
+<ul>
+<li>The contract tracks the predefined activation period (<code>_rep10ActivationPeriod</code>).</li>
+<li>REP-10 is activated at the start of the first period that meets or exceeds this threshold.</li>
+</ul>
+</li>
+<li><strong>Legacy Reward Percentage</strong>:
+<ul>
+<li>Until REP-10 is activated, the contract uses the legacy fast finality reward percentage.</li>
+<li>This ensures that rewards for the current period are distributed correctly under the pre-REP-10 configuration.</li>
+</ul>
+</li>
+<li><strong>Transition</strong>:
+<ul>
+<li>Upon activation, the reward percentage is updated to the REP-10 value (<code>_fastFinalityRewardPercentageREP10</code>), replacing the legacy percentage.</li>
+</ul>
+</li>
+</ul>
+<h3 id="bonus-transfer-mechanism"><a class="header" href="#bonus-transfer-mechanism">Bonus Transfer Mechanism</a></h3>
+<p>The contract handles reward transfers securely and ensures uninterrupted operations even under constrained conditions.</p>
+<ul>
+<li>Bonus transfers are executed for block producers only when sufficient balance is available.</li>
+<li>If the contract lacks funds, the transfer fails gracefully without reverting the transaction, avoiding disruptions to the network.</li>
+</ul>
+<hr />
+<h2 id="upgrade-and-configuration"><a class="header" href="#upgrade-and-configuration">Upgrade and Configuration</a></h2>
+<p>The contract supports phased upgrades to introduce new features and refine reward mechanisms. Each initialization phase builds upon the previous configurations:</p>
+<ol>
+<li><strong>Initial Setup</strong>:
+<ul>
+<li>Configures block producer bonuses and validator contract addresses.</li>
+</ul>
+</li>
+<li><strong>REP-10 Activation</strong>:
+<ul>
+<li>Adds dynamic updates for fast finality rewards, enabling more granular control.</li>
+</ul>
+</li>
+<li><strong>Backward Compatibility</strong>:
+<ul>
+<li>Retains legacy configurations until new features are activated, ensuring smooth transitions.</li>
+</ul>
+</li>
+</ol>
+<hr />
+<hr />
+<div style="break-before: page; page-break-before: always;"></div><h1 id="ronin-basefee-treasury"><a class="header" href="#ronin-basefee-treasury">Ronin BaseFee Treasury</a></h1>
+<hr />
+<h2 id="overview-1"><a class="header" href="#overview-1">Overview</a></h2>
+<p>The <code>RoninBaseFeeTreasury</code> contract serves as a treasury for collecting and managing base fees from EIP1559 transactions.</p>
+<hr />
+<h2 id="core-logic-1"><a class="header" href="#core-logic-1">Core Logic</a></h2>
+<h3 id="1-receiving-funds"><a class="header" href="#1-receiving-funds">1. Receiving Funds</a></h3>
+<p>When an EIP-1559 transaction occurs, the Ronin node directs the base fee to this treasury contract.</p>
+<ul>
+<li><strong>Base Fee Source</strong>: The base fee from EIP-1559 transactions is automatically credited to the contract’s balance by the underlying node logic.</li>
+</ul>
+<h3 id="2-managing-balances"><a class="header" href="#2-managing-balances">2. Managing Balances</a></h3>
+<p>The contract holds the collected base fees securely, ensuring that the Ether remains within the contract balance until explicitly withdrawn through <code>RoninGovernanceAdmin</code> voting process.</p>
+<ul>
+<li>The balance of the contract reflects the cumulative base fees collected from network transactions.</li>
+</ul>
+<h3 id="3-integration-with-node-logic"><a class="header" href="#3-integration-with-node-logic">3. Integration with Node Logic</a></h3>
+<p>The Ronin node interacts directly with this contract as part of the EIP-1559 fee mechanism:</p>
+<ul>
+<li><strong>Node Behavior</strong>: Upon processing a transaction, the node routes the base fee to the <code>RoninBaseFeeTreasury</code>.</li>
+<li><strong>Automatic Updates</strong>: The contract balance is updated dynamically based on incoming base fees from node-managed transactions.</li>
+</ul>
+<hr />
+<h2 id="purpose-1"><a class="header" href="#purpose-1">Purpose</a></h2>
+<ul>
+<li><strong>Base Fee Treasury</strong>: Acts as a dedicated repository for EIP-1559 base fees, ensuring the funds are securely stored and managed.</li>
+</ul>
+<hr />
 <div style="break-before: page; page-break-before: always;"></div><h1 id="epoch-vs-period"><a class="header" href="#epoch-vs-period">Epoch vs Period</a></h1>
 <p>Understanding the distinction between <strong>Epoch</strong> and <strong>Period</strong> is critical for grasping the underlying mechanics of the system. Both terms are used to represent time intervals but serve different purposes and are calculated differently.</p>
 <hr />
@@ -790,6 +879,86 @@
 <li><strong>Delegators</strong>: Stake tokens with validators to share in rewards and indirectly support the network.</li>
 </ol>
 <hr />
+<div style="break-before: page; page-break-before: always;"></div><h1 id="overview-comparing-emergency-exit-and-renounce-processes"><a class="header" href="#overview-comparing-emergency-exit-and-renounce-processes">Overview: Comparing Emergency Exit and Renounce Processes</a></h1>
+<hr />
+<h2 id="introduction"><a class="header" href="#introduction">Introduction</a></h2>
+<p>This document highlights the differences between the <strong>Emergency Exit</strong> and <strong>Renounce</strong> processes available to validators in the Ronin network. Both mechanisms allow validators to exit their roles, but they serve distinct purposes and workflows. Additionally, their impact on a validator’s block production role and candidate status varies significantly.</p>
+<hr />
+<h2 id="key-differences"><a class="header" href="#key-differences">Key Differences</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Feature</th><th><strong>Emergency Exit</strong></th><th><strong>Renounce</strong></th></tr></thead><tbody>
+<tr><td><strong>Purpose</strong></td><td>For validators facing exceptional circumstances.</td><td>For validators voluntarily stepping down.</td></tr>
+<tr><td><strong>Eligibility</strong></td><td>Available to all validators.</td><td>Restricted for governing validators.</td></tr>
+<tr><td><strong>Stake Handling</strong></td><td>Stake is locked during the process and managed by governance.</td><td>Stake remains unaffected; role renunciation is scheduled.</td></tr>
+<tr><td><strong>Governance Voting</strong></td><td>Requires governor approval through an emergency exit poll.</td><td>No governance voting required.</td></tr>
+<tr><td><strong>Impact on Block Production</strong></td><td>Block producer role is disabled immediately after the next epoch.</td><td>Candidate continues to join validator selection process until the revocation timestamp.</td></tr>
+<tr><td><strong>Impact on Candidate List</strong></td><td>Remains in candidate list until period ending of the revoking timestamp and eligible for rewards.</td><td>Same as renounce</td></tr>
+<tr><td><strong>Fund Recycling</strong></td><td>Locked funds are recycled if the poll expires.</td><td>No recycling mechanism; funds remain intact.</td></tr>
+</tbody></table>
+</div>
+<hr />
+<h2 id="emergency-exit-process"><a class="header" href="#emergency-exit-process">Emergency Exit Process</a></h2>
+<ul>
+<li><strong>Use Case</strong>: Designed for validators encountering unexpected issues, such as security threats, operational failures, or loss of private keys.</li>
+<li><strong>Governance Role</strong>:
+<ul>
+<li>Governors must vote on an <strong>emergency exit poll</strong>.</li>
+<li>Approval releases the validator’s locked stake; disapproval or expiration results in recycling the stake.</li>
+</ul>
+</li>
+<li><strong>Impact on Block Production</strong>:
+<ul>
+<li>The validator is removed as a block producer starting from the next epoch.</li>
+<li>Ensures immediate mitigation of risks from compromised validators.</li>
+</ul>
+</li>
+<li><strong>Impact on Candidate Status</strong>:
+<ul>
+<li>The validator remains in the candidate list util the period ending of revoking timestamp.</li>
+</ul>
+</li>
+<li><strong>Fund Management</strong>:
+<ul>
+<li>Locked funds are securely managed in <code>RoninValidatorSet</code>.</li>
+<li>Upon poll expiration, locked funds are recycled into the <code>StakingVesting</code> contract.</li>
+</ul>
+</li>
+<li><strong>Outcome</strong>:
+<ul>
+<li>The validator is removed from block production and candidate list.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="renounce-process"><a class="header" href="#renounce-process">Renounce Process</a></h2>
+<ul>
+<li><strong>Use Case</strong>: Allows validators to voluntarily step down while maintaining network continuity.</li>
+<li><strong>Governance Role</strong>:
+<ul>
+<li>Non-governing validators can renounce freely.</li>
+<li>Governing validators cannot renounce due to their critical role in governance.</li>
+</ul>
+</li>
+<li><strong>Impact on Block Production</strong>:
+<ul>
+<li>The candidate continues to join validator selection and responsibilities until the revocation timestamp is reached.</li>
+</ul>
+</li>
+<li><strong>Impact on Candidate Status</strong>:
+<ul>
+<li>The validator remains fully eligible for rewards and voting until the revocation timestamp.</li>
+</ul>
+</li>
+<li><strong>Fund Management</strong>:
+<ul>
+<li>No stake is locked or recycled during the process.</li>
+</ul>
+</li>
+<li><strong>Outcome</strong>:
+<ul>
+<li>The validator exits the set after the revocation timestamp, allowing for controlled role handover.</li>
+</ul>
+</li>
+</ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="fast-finality-tracking-score"><a class="header" href="#fast-finality-tracking-score">Fast Finality Tracking Score</a></h1>
 <p>The <code>FastFinalityTracking</code> score system is designed to evaluate and reward validators based on their contributions to achieving block finality in the Ronin network. This specification focuses on the methodology, particularly the normalization technique used to ensure fair scoring, as well as the implications for validator performance.</p>
 <hr />
@@ -1073,7 +1242,7 @@ $$</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="weighted-random-selection-specification-for-validators"><a class="header" href="#weighted-random-selection-specification-for-validators">Weighted Random Selection Specification for Validators</a></h1>
 <p>This document outlines the detailed specification for selecting validators in the Ronin Network using the <code>LibSortValidatorsByBeacon</code> library and the <code>RoninRandomBeacon</code> contract. The selection process ensures a fair, decentralized, and efficient mechanism for determining the validator set for each period and epoch.</p>
 <hr />
-<h2 id="overview-1"><a class="header" href="#overview-1">Overview</a></h2>
+<h2 id="overview-2"><a class="header" href="#overview-2">Overview</a></h2>
 <p>The validator selection process is divided into two phases:</p>
 <ol>
 <li><strong>Sorting and Saving Validators (Period Level):</strong> Filtering and categorizing validators into governance, standard, and rotating types, based on trusted weights and staking amounts.</li>
@@ -1223,17 +1392,266 @@ $$</p>
 <tr><td>Validator H</td><td>13,000</td><td><code>0x9def</code></td><td><code>2,500</code></td></tr>
 </tbody></table>
 </div>
-<p><strong>Selected Rotating Validators for Epoch: 1</strong></p>
+<p><strong>Selected Rotating Validators for Epoch</strong></p>
 <ul>
 <li>Validator C (Weight: <code>8,500</code>)</li>
 <li>Validator G (Weight: <code>5,625</code>)</li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="block-based-operations"><a class="header" href="#block-based-operations">Block Based Operations</a></h1>
 <p><img src="validator_lifecycle/../assets/block-based-operations.svg" alt="Block Based Operations" /></p>
+<hr />
+<h2 id="1-finality-tracking"><a class="header" href="#1-finality-tracking">1. Finality Tracking</a></h2>
+<ul>
+<li><strong>Block Producer</strong> records voter data in <code>FastFinalityTracking</code>.</li>
+<li>If no snapshot exists for the period:
+<ul>
+<li><code>FastFinalityTracking</code> takes a <strong>staking snapshot</strong> via <code>Staking</code> and normalizes data.</li>
+<li>Voter scores are accumulated for the epoch based on snapshot data.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="2-slashing-mechanism"><a class="header" href="#2-slashing-mechanism">2. Slashing Mechanism</a></h2>
+<ul>
+<li><strong>Block Producer</strong> reports unavailable validators to <code>SlashIndicator</code>.</li>
+<li><strong>Verification</strong>:
+<ul>
+<li>Validator’s block producer status (<code>RoninValidatorSet</code>).</li>
+<li>Validator’s maintenance status (<code>Maintenance</code>).</li>
+</ul>
+</li>
+<li><strong>Actions</strong>:
+<ul>
+<li>Record missed blocks for eligible validators.</li>
+<li>Executes slashing when thresholds are met via <code>RoninValidatorSet</code>.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="3-reward-distribution"><a class="header" href="#3-reward-distribution">3. Reward Distribution</a></h2>
+<ul>
+<li><strong>Block Producer</strong> submits block fees to <code>RoninValidatorSet</code>.</li>
+<li><strong>Reward Flow</strong>:
+<ul>
+<li>Bonus rewards for block production are requested via <code>StakingVesting</code>.</li>
+<li>Rewards are distributed between validators and delegators based on the commission rate.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h3 id="key-insights"><a class="header" href="#key-insights">Key Insights</a></h3>
+<ul>
+<li><strong>Efficiency</strong>: Tracks finality, distributes rewards, and enforces penalties consistently.</li>
+<li><strong>Accountability</strong>: Maintains validator performance through slashing.</li>
+<li><strong>Incentives</strong>: Encourages participation with bonus and commission-based rewards.</li>
+</ul>
+<hr />
+<div style="break-before: page; page-break-before: always;"></div><h1 id="emergency-exit"><a class="header" href="#emergency-exit">Emergency Exit</a></h1>
+<p><img src="validator_lifecycle/../assets/emergency-exit.svg" alt="Emergency Exit" /></p>
+<h2 id="overview-3"><a class="header" href="#overview-3">Overview</a></h2>
+<p>The emergency exit process allows all candidates to withdraw their stake under exceptional circumstances. It involves governance approval and ensures the integrity of the network through a structured workflow.</p>
+<hr />
+<h2 id="1-emergency-exit-request"><a class="header" href="#1-emergency-exit-request">1. Emergency Exit Request</a></h2>
+<ul>
+<li><strong>Actor</strong>: Candidate Admin</li>
+<li><strong>Process</strong>:
+<ol>
+<li><strong>Request Initiation</strong>:
+<ul>
+<li>The candidate admin submits a <code>requestEmergencyExit(consensus)</code> call to the <code>Staking</code> contract.</li>
+</ul>
+</li>
+<li><strong>Stake Locking</strong>:
+<ul>
+<li><code>Staking</code> forwards the emergency request to <code>RoninValidatorSet</code>.</li>
+<li><code>RoninValidatorSet</code> deducts the validator’s stake and locks it in its contract.</li>
+</ul>
+</li>
+<li><strong>Poll Creation</strong>:
+<ul>
+<li><code>RoninValidatorSet</code> submits a request to <code>RoninGovernanceAdmin</code> to create an emergency exit poll.</li>
+</ul>
+</li>
+</ol>
+</li>
+</ul>
+<hr />
+<h2 id="2-governance-voting"><a class="header" href="#2-governance-voting">2. Governance Voting</a></h2>
+<ul>
+<li><strong>Actor</strong>: Governors</li>
+<li><strong>Process</strong>:
+<ul>
+<li>Governors vote on the emergency exit poll created by <code>RoninGovernanceAdmin</code>.</li>
+</ul>
+</li>
+</ul>
+<h3 id="outcomes"><a class="header" href="#outcomes">Outcomes</a></h3>
+<ol>
+<li><strong>Poll Approved</strong>:
+<ul>
+<li><strong>Actions</strong>:
+<ul>
+<li><code>RoninGovernanceAdmin</code> instructs <code>RoninValidatorSet</code> to release the locked funds for the validator.</li>
+<li>Locked funds are returned to the candidate admin’s treasury.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Poll Expired</strong>:
+<ul>
+<li><strong>Actions</strong>:
+<ul>
+<li>Expired polls result in the locked funds being recycled into the <code>StakingVesting</code> contract.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h2 id="notice"><a class="header" href="#notice">Notice</a></h2>
+<ul>
+<li>Validators who initiate an emergency exit are no longer eligible for block production.</li>
+<li>However, they remain on the candidate list until the epoch ending of the revoking timestamp.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="renouncing-as-a-validator"><a class="header" href="#renouncing-as-a-validator">Renouncing as a Validator</a></h1>
+<p><img src="validator_lifecycle/../assets/renounce.svg" alt="Renounce" /></p>
+<hr />
+<h2 id="overview-4"><a class="header" href="#overview-4">Overview</a></h2>
+<p>The renounce process allows non governing validators to voluntarily step down from their role. This action is initiated by the candidate admin and processed through the <code>Staking</code> and <code>RoninValidatorSet</code> contracts. Governing validators are restricted from renouncing their role.</p>
+<hr />
+<h2 id="1-renounce-request"><a class="header" href="#1-renounce-request">1. Renounce Request</a></h2>
+<ul>
+<li><strong>Actor</strong>: Candidate Admin</li>
+<li><strong>Process</strong>:
+<ol>
+<li>The candidate admin submits a <code>requestRenounce(consensus)</code> call to the <code>Staking</code> contract.</li>
+<li><code>Staking</code> forwards the renounce request to the <code>RoninValidatorSet</code>.</li>
+</ol>
+</li>
+</ul>
+<hr />
+<h2 id="2-governance-restriction"><a class="header" href="#2-governance-restriction">2. Governance Restriction</a></h2>
+<ul>
+<li><strong>Condition</strong>: If the validator is a <strong>Governing Validator</strong>, the <code>RoninValidatorSet</code> will reject the renounce request and revert the transaction.</li>
+</ul>
+<hr />
+<h2 id="3-renunciation-process"><a class="header" href="#3-renunciation-process">3. Renunciation Process</a></h2>
+<ul>
+<li><strong>Condition</strong>: For non-governing validators, the renounce request proceeds.</li>
+<li><strong>Actions</strong>:
+<ol>
+<li><code>RoninValidatorSet</code> schedules a <strong>revoking timestamp</strong>.</li>
+<li>The validator remains in their role until the target timestamp is reached.</li>
+</ol>
+</li>
+</ul>
+<hr />
+<hr />
+<h2 id="notice-1"><a class="header" href="#notice-1">Notice</a></h2>
+<ul>
+<li>Validators in the renounce process are still eligible for block production and rewards until their role is officially revoked at the target timestamp.</li>
+<li>Once revoked, they are removed from the candidate list and can no longer participate in block production.</li>
+<li>On renunciation, the validator’s can still be slashed for any missed blocks or malicious behavior.</li>
+</ul>
+<hr />
 <div style="break-before: page; page-break-before: always;"></div><h1 id="block-based-operations-1"><a class="header" href="#block-based-operations-1">Block Based Operations</a></h1>
 <p><img src="validator_lifecycle/../assets/block-based-operations.svg" alt="Block Based Operations" /></p>
+<hr />
+<h2 id="1-finality-tracking-1"><a class="header" href="#1-finality-tracking-1">1. Finality Tracking</a></h2>
+<ul>
+<li><strong>Block Producer</strong> records voter data in <code>FastFinalityTracking</code>.</li>
+<li>If no snapshot exists for the period:
+<ul>
+<li><code>FastFinalityTracking</code> takes a <strong>staking snapshot</strong> via <code>Staking</code> and normalizes data.</li>
+<li>Voter scores are accumulated for the epoch based on snapshot data.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="2-slashing-mechanism-1"><a class="header" href="#2-slashing-mechanism-1">2. Slashing Mechanism</a></h2>
+<ul>
+<li><strong>Block Producer</strong> reports unavailable validators to <code>SlashIndicator</code>.</li>
+<li><strong>Verification</strong>:
+<ul>
+<li>Validator’s block producer status (<code>RoninValidatorSet</code>).</li>
+<li>Validator’s maintenance status (<code>Maintenance</code>).</li>
+</ul>
+</li>
+<li><strong>Actions</strong>:
+<ul>
+<li>Record missed blocks for eligible validators.</li>
+<li>Executes slashing when thresholds are met via <code>RoninValidatorSet</code>.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="3-reward-distribution-1"><a class="header" href="#3-reward-distribution-1">3. Reward Distribution</a></h2>
+<ul>
+<li><strong>Block Producer</strong> submits block fees to <code>RoninValidatorSet</code>.</li>
+<li><strong>Reward Flow</strong>:
+<ul>
+<li>Bonus rewards for block production are requested via <code>StakingVesting</code>.</li>
+<li>Rewards are distributed between validators and delegators based on the commission rate.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h3 id="key-insights-1"><a class="header" href="#key-insights-1">Key Insights</a></h3>
+<ul>
+<li><strong>Efficiency</strong>: Tracks finality, distributes rewards, and enforces penalties consistently.</li>
+<li><strong>Accountability</strong>: Maintains validator performance through slashing.</li>
+<li><strong>Incentives</strong>: Encourages participation with bonus and commission-based rewards.</li>
+</ul>
+<hr />
 <div style="break-before: page; page-break-before: always;"></div><h1 id="epoch-based-operations"><a class="header" href="#epoch-based-operations">Epoch Based Operations</a></h1>
 <p><img src="validator_lifecycle/../assets/epoch-based-operation.svg" alt="Epoch Based Operations" /></p>
+<hr />
+<h2 id="1-finality-tracking-2"><a class="header" href="#1-finality-tracking-2">1. Finality Tracking</a></h2>
+<ul>
+<li><strong>Block Producer</strong> records voter data in <code>FastFinalityTracking</code>.</li>
+<li>If no snapshot exists for the period:
+<ul>
+<li><code>FastFinalityTracking</code> takes a <strong>staking snapshot</strong> via <code>Staking</code> and normalizes data.</li>
+<li>Voter scores are accumulated for the epoch based on snapshot data.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="2-slashing-mechanism-2"><a class="header" href="#2-slashing-mechanism-2">2. Slashing Mechanism</a></h2>
+<ul>
+<li><strong>Block Producer</strong> reports block missing validator to <code>SlashIndicator</code>.</li>
+<li><strong>Verification</strong>:
+<ul>
+<li>Validator’s block producer status (<code>RoninValidatorSet</code>).</li>
+<li>Validator’s maintenance status (<code>Maintenance</code>).</li>
+</ul>
+</li>
+<li><strong>Actions</strong>:
+<ul>
+<li>Logs missed blocks for eligible validators.</li>
+<li>Executes slashing when thresholds are met via <code>RoninValidatorSet</code>.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="3-reward-distribution-2"><a class="header" href="#3-reward-distribution-2">3. Reward Distribution</a></h2>
+<ul>
+<li><strong>Block Producer</strong> submits block fees to <code>RoninValidatorSet</code>.</li>
+<li><strong>Reward Flow</strong>:
+<ul>
+<li>Bonus rewards for block production are requested via <code>StakingVesting</code>.</li>
+<li>Rewards are distributed between validators and delegators based on the commission rate.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h3 id="key-insights-2"><a class="header" href="#key-insights-2">Key Insights</a></h3>
+<ul>
+<li><strong>Efficiency</strong>: Tracks finality, distributes rewards, and enforces penalties consistently.</li>
+<li><strong>Accountability</strong>: Maintains validator performance through slashing.</li>
+<li><strong>Incentives</strong>: Encourages participation with bonus and commission-based rewards.</li>
+</ul>
+<hr />
 
                     </main>
 

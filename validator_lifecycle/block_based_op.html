@@ -156,6 +156,53 @@
                     <main>
                         <h1 id="block-based-operations"><a class="header" href="#block-based-operations">Block Based Operations</a></h1>
 <p><img src="../assets/block-based-operations.svg" alt="Block Based Operations" /></p>
+<hr />
+<h2 id="1-finality-tracking"><a class="header" href="#1-finality-tracking">1. Finality Tracking</a></h2>
+<ul>
+<li><strong>Block Producer</strong> records voter data in <code>FastFinalityTracking</code>.</li>
+<li>If no snapshot exists for the period:
+<ul>
+<li><code>FastFinalityTracking</code> takes a <strong>staking snapshot</strong> via <code>Staking</code> and normalizes data.</li>
+<li>Voter scores are accumulated for the epoch based on snapshot data.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="2-slashing-mechanism"><a class="header" href="#2-slashing-mechanism">2. Slashing Mechanism</a></h2>
+<ul>
+<li><strong>Block Producer</strong> reports unavailable validators to <code>SlashIndicator</code>.</li>
+<li><strong>Verification</strong>:
+<ul>
+<li>Validator’s block producer status (<code>RoninValidatorSet</code>).</li>
+<li>Validator’s maintenance status (<code>Maintenance</code>).</li>
+</ul>
+</li>
+<li><strong>Actions</strong>:
+<ul>
+<li>Record missed blocks for eligible validators.</li>
+<li>Executes slashing when thresholds are met via <code>RoninValidatorSet</code>.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="3-reward-distribution"><a class="header" href="#3-reward-distribution">3. Reward Distribution</a></h2>
+<ul>
+<li><strong>Block Producer</strong> submits block fees to <code>RoninValidatorSet</code>.</li>
+<li><strong>Reward Flow</strong>:
+<ul>
+<li>Bonus rewards for block production are requested via <code>StakingVesting</code>.</li>
+<li>Rewards are distributed between validators and delegators based on the commission rate.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h3 id="key-insights"><a class="header" href="#key-insights">Key Insights</a></h3>
+<ul>
+<li><strong>Efficiency</strong>: Tracks finality, distributes rewards, and enforces penalties consistently.</li>
+<li><strong>Accountability</strong>: Maintains validator performance through slashing.</li>
+<li><strong>Incentives</strong>: Encourages participation with bonus and commission-based rewards.</li>
+</ul>
+<hr />
 
                     </main>
 
@@ -165,7 +212,7 @@
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next prefetch" href="../validator_lifecycle/block_based_op.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../validator_lifecycle/emergency_exit.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -179,7 +226,7 @@
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next prefetch" href="../validator_lifecycle/block_based_op.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../validator_lifecycle/emergency_exit.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>
