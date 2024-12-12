@@ -100,7 +100,7 @@ The `RewardCalculation` module determines and distributes staking rewards for pa
 
 4. **User 1 Claims Reward**:
    - The system calculates **User 1’s Reward** for **Period 1**:
-     - Outstanding Reward: 50 RON.
+     - Reward: 50 RON.
      - **Reward Transferred**: 50 RON.
    - **User 1's Reward Balance** is reset to 0.
 
