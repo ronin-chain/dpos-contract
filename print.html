@@ -1225,6 +1225,199 @@
 </ul>
 </li>
 </ul>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="reward-calculation"><a class="header" href="#reward-calculation">Reward Calculation</a></h2>
+<hr />
+<h3 id="overview-9"><a class="header" href="#overview-9">Overview</a></h3>
+<p>The <code>RewardCalculation</code> module determines and distributes staking rewards for participants in the Ronin network. It ensures rewards are calculated accurately based on staking contributions and updates user balances dynamically as staking amounts change. The reward mechanism incentivizes long-term staking and aligns validator and delegator interests.</p>
+<hr />
+<h3 id="core-logic-8"><a class="header" href="#core-logic-8">Core Logic</a></h3>
+<h4 id="1-reward-accumulation"><a class="header" href="#1-reward-accumulation">1. Reward Accumulation</a></h4>
+<ul>
+<li>
+<p><strong>Period-Based Rewards</strong>:</p>
+<ul>
+<li>Rewards are calculated and accrued on a per-period basis for each staking pool.</li>
+<li>The accumulated rewards per share (RPS) for a pool are updated at the end of each period.</li>
+</ul>
+</li>
+<li>
+<p><strong>Proportional Distribution</strong>:</p>
+<ul>
+<li>Rewards are distributed proportionally based on the staking amount.</li>
+<li>Stakers earn rewards relative to their share of the total pool.</li>
+</ul>
+</li>
+</ul>
+<h4 id="2-user-reward-calculation"><a class="header" href="#2-user-reward-calculation">2. User Reward Calculation</a></h4>
+<ul>
+<li><strong>Debited Rewards</strong>:
+<ul>
+<li>Tracks rewards earned by each user (<code>debited</code>) to prevent recalculation and ensure correctness.</li>
+</ul>
+</li>
+<li><strong>New Rewards</strong>:
+<ul>
+<li>New rewards are computed based on the difference in RPS since the last update and the user’s current staking amount.</li>
+</ul>
+</li>
+<li><strong>Fallback Mechanism</strong>:
+<ul>
+<li>If RPS for a period is unavailable, the last known RPS value is used to estimate rewards.</li>
+</ul>
+</li>
+</ul>
+<h4 id="3-reward-syncing"><a class="header" href="#3-reward-syncing">3. Reward Syncing</a></h4>
+<ul>
+<li><strong>Dynamic Updates</strong>:
+<ul>
+<li>User rewards are recalculated whenever staking amounts change or at the end of a period.</li>
+</ul>
+</li>
+<li><strong>Pool Shares Adjustment</strong>:
+<ul>
+<li>Updates total pool shares to ensure consistent reward distribution.</li>
+</ul>
+</li>
+</ul>
+<h4 id="4-reward-claiming"><a class="header" href="#4-reward-claiming">4. Reward Claiming</a></h4>
+<ul>
+<li>Users can claim their accumulated rewards, which are settled and reset for the next period.</li>
+<li>Claiming rewards triggers updates to the user’s reward state to prevent double claims.</li>
+</ul>
+<hr />
+<h3 id="workflow-2"><a class="header" href="#workflow-2">Workflow</a></h3>
+<ol>
+<li>
+<p><strong>Reward Accumulation</strong>:</p>
+<ul>
+<li>Rewards for each staking pool are recorded at the end of every period.</li>
+<li>The RPS is recalculated based on the total staking amount in the pool and the rewards allocated.</li>
+</ul>
+</li>
+<li>
+<p><strong>Reward Syncing</strong>:</p>
+<ul>
+<li>User rewards are synced dynamically when their staking amount changes.</li>
+<li>The system ensures rewards reflect the latest RPS and staking contributions.</li>
+</ul>
+</li>
+<li>
+<p><strong>Reward Claiming</strong>:</p>
+<ul>
+<li>Users claim their rewards through a structured process:
+<ul>
+<li>Outstanding rewards are calculated based on the user’s current staking amount and RPS.</li>
+<li>The rewards are transferred, and the user’s reward state is reset.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h3 id="key-features-1"><a class="header" href="#key-features-1">Key Features</a></h3>
+<ul>
+<li><strong>Accurate Proportional Rewards</strong>:
+<ul>
+<li>Ensures rewards are distributed fairly based on individual contributions to the staking pool.</li>
+</ul>
+</li>
+<li><strong>Dynamic Updates</strong>:
+<ul>
+<li>User rewards and pool shares are updated in real-time as staking amounts change.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h3 id="example-reward-calculation-workflow"><a class="header" href="#example-reward-calculation-workflow">Example: Reward Calculation Workflow</a></h3>
+<h4 id="scenario"><a class="header" href="#scenario">Scenario</a></h4>
+<ul>
+<li>A staking pool (<code>Pool A</code>) has the following participants at the beginning of <strong>Period 1</strong>:
+<ul>
+<li><strong>User 1</strong>: Staked 1,000 RON.</li>
+<li><strong>User 2</strong>: Staked 2,000 RON.</li>
+</ul>
+</li>
+<li>The total reward allocated to <code>Pool A</code> for <strong>Period 1</strong> is 300 RON.</li>
+</ul>
+<hr />
+<h4 id="step-by-step-calculation"><a class="header" href="#step-by-step-calculation">Step-by-Step Calculation</a></h4>
+<ol>
+<li>
+<p><strong>Determine Total Staking Amount</strong>:</p>
+<ul>
+<li><strong>Pool A Total Staking</strong> = 1,000 (User 1) + 2,000 (User 2) + 3,000 (Validator Self-Stake) = 6,000 RON.</li>
+</ul>
+</li>
+<li>
+<p><strong>Calculate Reward Per Share (RPS)</strong>:</p>
+<ul>
+<li><strong>Reward Per Share (RPS)</strong> = Total Reward / Total Staking = \( \frac{300 \times 10^{18}}{6,000 \times 10^{18}} \) = 0,05 per RON.</li>
+</ul>
+</li>
+<li>
+<p><strong>Accumulate User Rewards</strong>:</p>
+<ul>
+<li><strong>User 1 Reward</strong>:
+\( 1,000 \times 0,05 = 50 \ RON \).</li>
+<li><strong>User 2 Reward</strong>:
+\( 2,000 \times 0,05 = 100 \ RON \).</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h3 id="reward-claiming"><a class="header" href="#reward-claiming">Reward Claiming</a></h3>
+<ol start="4">
+<li><strong>User 1 Claims Reward</strong>:
+<ul>
+<li>The system calculates <strong>User 1’s Reward</strong> for <strong>Period 1</strong>:
+<ul>
+<li>Outstanding Reward: 50 RON.</li>
+<li><strong>Reward Transferred</strong>: 50 RON.</li>
+</ul>
+</li>
+<li><strong>User 1’s Reward Balance</strong> is reset to 0.</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h3 id="period-transition"><a class="header" href="#period-transition">Period Transition</a></h3>
+<ol start="5">
+<li>
+<p><strong>New Stakes at Period 2</strong>:</p>
+<ul>
+<li><strong>User 1</strong>: Adds 500 RON (Total: 1,500 RON).</li>
+<li><strong>User 2</strong>: Withdraws 1,000 RON (Total: 1,000 RON).</li>
+</ul>
+</li>
+<li>
+<p><strong>Record Period 2 Rewards</strong>:</p>
+<ul>
+<li><strong>Pool A Total Staking</strong>: 1,500 (User 1) + 1,000 (User 2) + 3,000 (Validator Self-Stake) = 5,500 RON.</li>
+<li>New Reward Allocation: 500 RON.</li>
+<li><strong>New Reward Per Share (RPS)</strong>:<br />
+\( \frac{500 \times 10^{18}}{5,500^{18}} = 0,09 \) per RON.</li>
+</ul>
+</li>
+<li>
+<p><strong>Calculate Updated Rewards</strong>:</p>
+<ul>
+<li><strong>User 1 Reward for Period 2</strong>:<br />
+\( 0 + 500 \times 0,09 = 45 \ \text{RON} \).</li>
+<li><strong>User 2 Reward for Period 2</strong>:<br />
+\( 100 + 1000 \times 0,09 = 190 \ \text{RON} \).</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h3 id="summary-of-rewards"><a class="header" href="#summary-of-rewards">Summary of Rewards</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Period</th><th>User</th><th>Staked Tokens</th><th>Reward Per Share (RPS)</th><th>Reward Earned (RON)</th></tr></thead><tbody>
+<tr><td>1</td><td>U1</td><td>1,000</td><td>0.05</td><td>50</td></tr>
+<tr><td>1</td><td>U2</td><td>2,000</td><td>0.05</td><td>100</td></tr>
+<tr><td>2</td><td>U1</td><td>1,500</td><td>0.09</td><td>95</td></tr>
+<tr><td>2</td><td>U2</td><td>1,000</td><td>0.09</td><td>90</td></tr>
+</tbody></table>
+</div>
+<hr />
 <div style="break-before: page; page-break-before: always;"></div><h1 id="fast-finality-tracking-score"><a class="header" href="#fast-finality-tracking-score">Fast Finality Tracking Score</a></h1>
 <p>The <code>FastFinalityTracking</code> score system is designed to evaluate and reward validators based on their contributions to achieving block finality in the Ronin network. This specification focuses on the methodology, particularly the normalization technique used to ensure fair scoring, as well as the implications for validator performance.</p>
 <hr />
@@ -1508,7 +1701,7 @@ $$</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="weighted-random-selection-specification-for-validators"><a class="header" href="#weighted-random-selection-specification-for-validators">Weighted Random Selection Specification for Validators</a></h1>
 <p>This document outlines the detailed specification for selecting validators in the Ronin Network using the <code>LibSortValidatorsByBeacon</code> library and the <code>RoninRandomBeacon</code> contract. The selection process ensures a fair, decentralized, and efficient mechanism for determining the validator set for each period and epoch.</p>
 <hr />
-<h2 id="overview-9"><a class="header" href="#overview-9">Overview</a></h2>
+<h2 id="overview-10"><a class="header" href="#overview-10">Overview</a></h2>
 <p>The validator selection process is divided into two phases:</p>
 <ol>
 <li><strong>Sorting and Saving Validators (Period Level):</strong> Filtering and categorizing validators into governance, standard, and rotating types, based on trusted weights and staking amounts.</li>
@@ -1714,7 +1907,7 @@ $$</p>
 <hr />
 <div style="break-before: page; page-break-before: always;"></div><h1 id="emergency-exit"><a class="header" href="#emergency-exit">Emergency Exit</a></h1>
 <p><img src="validator_lifecycle/../assets/emergency-exit.svg" alt="Emergency Exit" /></p>
-<h2 id="overview-10"><a class="header" href="#overview-10">Overview</a></h2>
+<h2 id="overview-11"><a class="header" href="#overview-11">Overview</a></h2>
 <p>The emergency exit process allows all candidates to withdraw their stake under exceptional circumstances. It involves governance approval and ensures the integrity of the network through a structured workflow.</p>
 <hr />
 <h2 id="1-emergency-exit-request"><a class="header" href="#1-emergency-exit-request">1. Emergency Exit Request</a></h2>
@@ -1782,7 +1975,7 @@ $$</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="renouncing-as-a-validator"><a class="header" href="#renouncing-as-a-validator">Renouncing as a Validator</a></h1>
 <p><img src="validator_lifecycle/../assets/renounce.svg" alt="Renounce" /></p>
 <hr />
-<h2 id="overview-11"><a class="header" href="#overview-11">Overview</a></h2>
+<h2 id="overview-12"><a class="header" href="#overview-12">Overview</a></h2>
 <p>The renounce process allows non governing validators to voluntarily step down from their role. This action is initiated by the candidate admin and processed through the <code>Staking</code> and <code>RoninValidatorSet</code> contracts. Governing validators are restricted from renouncing their role.</p>
 <hr />
 <h2 id="1-renounce-request"><a class="header" href="#1-renounce-request">1. Renounce Request</a></h2>

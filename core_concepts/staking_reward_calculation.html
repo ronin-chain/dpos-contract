@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Emergency Exit vs Renounce - Ronin DPoS</title>
+        <title>Staking Reward Calculation - Ronin DPoS</title>
 
 
         <!-- Custom HTML head -->
@@ -154,96 +154,209 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="overview-comparing-emergency-exit-and-renounce-processes"><a class="header" href="#overview-comparing-emergency-exit-and-renounce-processes">Overview: Comparing Emergency Exit and Renounce Processes</a></h1>
+                        <h2 id="reward-calculation"><a class="header" href="#reward-calculation">Reward Calculation</a></h2>
 <hr />
-<h2 id="introduction"><a class="header" href="#introduction">Introduction</a></h2>
-<p>This document highlights the differences between the <strong>Emergency Exit</strong> and <strong>Renounce</strong> processes available to validators in the Ronin network. Both mechanisms allow validators to exit their roles, but they serve distinct purposes and workflows. Additionally, their impact on a validator’s block production role and candidate status varies significantly.</p>
+<h3 id="overview"><a class="header" href="#overview">Overview</a></h3>
+<p>The <code>RewardCalculation</code> module determines and distributes staking rewards for participants in the Ronin network. It ensures rewards are calculated accurately based on staking contributions and updates user balances dynamically as staking amounts change. The reward mechanism incentivizes long-term staking and aligns validator and delegator interests.</p>
 <hr />
-<h2 id="key-differences"><a class="header" href="#key-differences">Key Differences</a></h2>
-<div class="table-wrapper"><table><thead><tr><th>Feature</th><th><strong>Emergency Exit</strong></th><th><strong>Renounce</strong></th></tr></thead><tbody>
-<tr><td><strong>Purpose</strong></td><td>For validators facing exceptional circumstances.</td><td>For validators voluntarily stepping down.</td></tr>
-<tr><td><strong>Eligibility</strong></td><td>Available to all validators.</td><td>Restricted for governing validators.</td></tr>
-<tr><td><strong>Stake Handling</strong></td><td>Stake is locked during the process and managed by governance.</td><td>Stake remains unaffected; role renunciation is scheduled.</td></tr>
-<tr><td><strong>Governance Voting</strong></td><td>Requires governor approval through an emergency exit poll.</td><td>No governance voting required.</td></tr>
-<tr><td><strong>Impact on Block Production</strong></td><td>Block producer role is disabled immediately after the next epoch.</td><td>Candidate continues to join validator selection process until the revocation timestamp.</td></tr>
-<tr><td><strong>Impact on Candidate List</strong></td><td>Remains in candidate list until period ending of the revoking timestamp and eligible for rewards.</td><td>Same as renounce</td></tr>
-<tr><td><strong>Fund Recycling</strong></td><td>Locked funds are recycled if the poll expires.</td><td>No recycling mechanism; funds remain intact.</td></tr>
+<h3 id="core-logic"><a class="header" href="#core-logic">Core Logic</a></h3>
+<h4 id="1-reward-accumulation"><a class="header" href="#1-reward-accumulation">1. Reward Accumulation</a></h4>
+<ul>
+<li>
+<p><strong>Period-Based Rewards</strong>:</p>
+<ul>
+<li>Rewards are calculated and accrued on a per-period basis for each staking pool.</li>
+<li>The accumulated rewards per share (RPS) for a pool are updated at the end of each period.</li>
+</ul>
+</li>
+<li>
+<p><strong>Proportional Distribution</strong>:</p>
+<ul>
+<li>Rewards are distributed proportionally based on the staking amount.</li>
+<li>Stakers earn rewards relative to their share of the total pool.</li>
+</ul>
+</li>
+</ul>
+<h4 id="2-user-reward-calculation"><a class="header" href="#2-user-reward-calculation">2. User Reward Calculation</a></h4>
+<ul>
+<li><strong>Debited Rewards</strong>:
+<ul>
+<li>Tracks rewards earned by each user (<code>debited</code>) to prevent recalculation and ensure correctness.</li>
+</ul>
+</li>
+<li><strong>New Rewards</strong>:
+<ul>
+<li>New rewards are computed based on the difference in RPS since the last update and the user’s current staking amount.</li>
+</ul>
+</li>
+<li><strong>Fallback Mechanism</strong>:
+<ul>
+<li>If RPS for a period is unavailable, the last known RPS value is used to estimate rewards.</li>
+</ul>
+</li>
+</ul>
+<h4 id="3-reward-syncing"><a class="header" href="#3-reward-syncing">3. Reward Syncing</a></h4>
+<ul>
+<li><strong>Dynamic Updates</strong>:
+<ul>
+<li>User rewards are recalculated whenever staking amounts change or at the end of a period.</li>
+</ul>
+</li>
+<li><strong>Pool Shares Adjustment</strong>:
+<ul>
+<li>Updates total pool shares to ensure consistent reward distribution.</li>
+</ul>
+</li>
+</ul>
+<h4 id="4-reward-claiming"><a class="header" href="#4-reward-claiming">4. Reward Claiming</a></h4>
+<ul>
+<li>Users can claim their accumulated rewards, which are settled and reset for the next period.</li>
+<li>Claiming rewards triggers updates to the user’s reward state to prevent double claims.</li>
+</ul>
+<hr />
+<h3 id="workflow"><a class="header" href="#workflow">Workflow</a></h3>
+<ol>
+<li>
+<p><strong>Reward Accumulation</strong>:</p>
+<ul>
+<li>Rewards for each staking pool are recorded at the end of every period.</li>
+<li>The RPS is recalculated based on the total staking amount in the pool and the rewards allocated.</li>
+</ul>
+</li>
+<li>
+<p><strong>Reward Syncing</strong>:</p>
+<ul>
+<li>User rewards are synced dynamically when their staking amount changes.</li>
+<li>The system ensures rewards reflect the latest RPS and staking contributions.</li>
+</ul>
+</li>
+<li>
+<p><strong>Reward Claiming</strong>:</p>
+<ul>
+<li>Users claim their rewards through a structured process:
+<ul>
+<li>Outstanding rewards are calculated based on the user’s current staking amount and RPS.</li>
+<li>The rewards are transferred, and the user’s reward state is reset.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h3 id="key-features"><a class="header" href="#key-features">Key Features</a></h3>
+<ul>
+<li><strong>Accurate Proportional Rewards</strong>:
+<ul>
+<li>Ensures rewards are distributed fairly based on individual contributions to the staking pool.</li>
+</ul>
+</li>
+<li><strong>Dynamic Updates</strong>:
+<ul>
+<li>User rewards and pool shares are updated in real-time as staking amounts change.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h3 id="example-reward-calculation-workflow"><a class="header" href="#example-reward-calculation-workflow">Example: Reward Calculation Workflow</a></h3>
+<h4 id="scenario"><a class="header" href="#scenario">Scenario</a></h4>
+<ul>
+<li>A staking pool (<code>Pool A</code>) has the following participants at the beginning of <strong>Period 1</strong>:
+<ul>
+<li><strong>User 1</strong>: Staked 1,000 RON.</li>
+<li><strong>User 2</strong>: Staked 2,000 RON.</li>
+</ul>
+</li>
+<li>The total reward allocated to <code>Pool A</code> for <strong>Period 1</strong> is 300 RON.</li>
+</ul>
+<hr />
+<h4 id="step-by-step-calculation"><a class="header" href="#step-by-step-calculation">Step-by-Step Calculation</a></h4>
+<ol>
+<li>
+<p><strong>Determine Total Staking Amount</strong>:</p>
+<ul>
+<li><strong>Pool A Total Staking</strong> = 1,000 (User 1) + 2,000 (User 2) + 3,000 (Validator Self-Stake) = 6,000 RON.</li>
+</ul>
+</li>
+<li>
+<p><strong>Calculate Reward Per Share (RPS)</strong>:</p>
+<ul>
+<li><strong>Reward Per Share (RPS)</strong> = Total Reward / Total Staking = \( \frac{300 \times 10^{18}}{6,000 \times 10^{18}} \) = 0,05 per RON.</li>
+</ul>
+</li>
+<li>
+<p><strong>Accumulate User Rewards</strong>:</p>
+<ul>
+<li><strong>User 1 Reward</strong>:
+\( 1,000 \times 0,05 = 50 \ RON \).</li>
+<li><strong>User 2 Reward</strong>:
+\( 2,000 \times 0,05 = 100 \ RON \).</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h3 id="reward-claiming"><a class="header" href="#reward-claiming">Reward Claiming</a></h3>
+<ol start="4">
+<li><strong>User 1 Claims Reward</strong>:
+<ul>
+<li>The system calculates <strong>User 1’s Reward</strong> for <strong>Period 1</strong>:
+<ul>
+<li>Outstanding Reward: 50 RON.</li>
+<li><strong>Reward Transferred</strong>: 50 RON.</li>
+</ul>
+</li>
+<li><strong>User 1’s Reward Balance</strong> is reset to 0.</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h3 id="period-transition"><a class="header" href="#period-transition">Period Transition</a></h3>
+<ol start="5">
+<li>
+<p><strong>New Stakes at Period 2</strong>:</p>
+<ul>
+<li><strong>User 1</strong>: Adds 500 RON (Total: 1,500 RON).</li>
+<li><strong>User 2</strong>: Withdraws 1,000 RON (Total: 1,000 RON).</li>
+</ul>
+</li>
+<li>
+<p><strong>Record Period 2 Rewards</strong>:</p>
+<ul>
+<li><strong>Pool A Total Staking</strong>: 1,500 (User 1) + 1,000 (User 2) + 3,000 (Validator Self-Stake) = 5,500 RON.</li>
+<li>New Reward Allocation: 500 RON.</li>
+<li><strong>New Reward Per Share (RPS)</strong>:<br />
+\( \frac{500 \times 10^{18}}{5,500^{18}} = 0,09 \) per RON.</li>
+</ul>
+</li>
+<li>
+<p><strong>Calculate Updated Rewards</strong>:</p>
+<ul>
+<li><strong>User 1 Reward for Period 2</strong>:<br />
+\( 0 + 500 \times 0,09 = 45 \ \text{RON} \).</li>
+<li><strong>User 2 Reward for Period 2</strong>:<br />
+\( 100 + 1000 \times 0,09 = 190 \ \text{RON} \).</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h3 id="summary-of-rewards"><a class="header" href="#summary-of-rewards">Summary of Rewards</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Period</th><th>User</th><th>Staked Tokens</th><th>Reward Per Share (RPS)</th><th>Reward Earned (RON)</th></tr></thead><tbody>
+<tr><td>1</td><td>U1</td><td>1,000</td><td>0.05</td><td>50</td></tr>
+<tr><td>1</td><td>U2</td><td>2,000</td><td>0.05</td><td>100</td></tr>
+<tr><td>2</td><td>U1</td><td>1,500</td><td>0.09</td><td>95</td></tr>
+<tr><td>2</td><td>U2</td><td>1,000</td><td>0.09</td><td>90</td></tr>
 </tbody></table>
 </div>
 <hr />
-<h2 id="emergency-exit-process"><a class="header" href="#emergency-exit-process">Emergency Exit Process</a></h2>
-<ul>
-<li><strong>Use Case</strong>: Designed for validators encountering unexpected issues, such as security threats, operational failures, or loss of private keys.</li>
-<li><strong>Governance Role</strong>:
-<ul>
-<li>Governors must vote on an <strong>emergency exit poll</strong>.</li>
-<li>Approval releases the validator’s locked stake; disapproval or expiration results in recycling the stake.</li>
-</ul>
-</li>
-<li><strong>Impact on Block Production</strong>:
-<ul>
-<li>The validator is removed as a block producer starting from the next epoch.</li>
-<li>Ensures immediate mitigation of risks from compromised validators.</li>
-</ul>
-</li>
-<li><strong>Impact on Candidate Status</strong>:
-<ul>
-<li>The validator remains in the candidate list util the period ending of revoking timestamp.</li>
-</ul>
-</li>
-<li><strong>Fund Management</strong>:
-<ul>
-<li>Locked funds are securely managed in <code>RoninValidatorSet</code>.</li>
-<li>Upon poll expiration, locked funds are recycled into the <code>StakingVesting</code> contract.</li>
-</ul>
-</li>
-<li><strong>Outcome</strong>:
-<ul>
-<li>The validator is removed from block production and candidate list.</li>
-</ul>
-</li>
-</ul>
-<hr />
-<h2 id="renounce-process"><a class="header" href="#renounce-process">Renounce Process</a></h2>
-<ul>
-<li><strong>Use Case</strong>: Allows validators to voluntarily step down while maintaining network continuity.</li>
-<li><strong>Governance Role</strong>:
-<ul>
-<li>Non-governing validators can renounce freely.</li>
-<li>Governing validators cannot renounce due to their critical role in governance.</li>
-</ul>
-</li>
-<li><strong>Impact on Block Production</strong>:
-<ul>
-<li>The candidate continues to join validator selection and responsibilities until the revocation timestamp is reached.</li>
-</ul>
-</li>
-<li><strong>Impact on Candidate Status</strong>:
-<ul>
-<li>The validator remains fully eligible for rewards and voting until the revocation timestamp.</li>
-</ul>
-</li>
-<li><strong>Fund Management</strong>:
-<ul>
-<li>No stake is locked or recycled during the process.</li>
-</ul>
-</li>
-<li><strong>Outcome</strong>:
-<ul>
-<li>The validator exits the set after the revocation timestamp, allowing for controlled role handover.</li>
-</ul>
-</li>
-</ul>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../core_concepts/validator_roles.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../core_concepts/renounce_vs_emergency_exit.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next prefetch" href="../core_concepts/staking_reward_calculation.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../technical_specifications/fast_finality_score_normalization.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -253,11 +366,11 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../core_concepts/validator_roles.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../core_concepts/renounce_vs_emergency_exit.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next prefetch" href="../core_concepts/staking_reward_calculation.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../technical_specifications/fast_finality_score_normalization.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>
