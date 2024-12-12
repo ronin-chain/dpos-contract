@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Epoch vs Period - Ronin DPoS</title>
+        <title>Slash Indicator - Ronin DPoS</title>
 
 
         <!-- Custom HTML head -->
@@ -154,114 +154,195 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="epoch-vs-period"><a class="header" href="#epoch-vs-period">Epoch vs Period</a></h1>
-<p>Understanding the distinction between <strong>Epoch</strong> and <strong>Period</strong> is critical for grasping the underlying mechanics of the system. Both terms are used to represent time intervals but serve different purposes and are calculated differently.</p>
+                        <h1 id="slash-indicator"><a class="header" href="#slash-indicator">Slash Indicator</a></h1>
 <hr />
-<h2 id="1-what-is-an-epoch"><a class="header" href="#1-what-is-an-epoch">1. What is an Epoch?</a></h2>
-<p>An <strong>epoch</strong> is a fixed time unit measured in <strong>blocks</strong>. It represents the core timing mechanism for operations within the blockchain.</p>
-<ul>
-<li><strong>Definition</strong>:
-<ul>
-<li>An epoch is defined as a set number of blocks.</li>
-</ul>
-</li>
-<li><strong>Configuration</strong>:
-<ul>
-<li>In this system, 1 epoch = <strong>200 blocks</strong>.</li>
-</ul>
-</li>
-<li><strong>Approximate Duration</strong>:
-<ul>
-<li>Each block takes approximately <strong>3 seconds</strong> to generate.</li>
-<li>Thus, 1 epoch ≈ <strong>10 minutes</strong>.</li>
-</ul>
-</li>
-</ul>
-<p><strong>Example</strong>:</p>
-<ul>
-<li>Blocks 0–199 belong to epoch 0.</li>
-<li>Blocks 200–399 belong to epoch 1.</li>
-<li>Blocks 400–599 belong to epoch 2, and so on.</li>
-</ul>
-<p>Epochs are used for:</p>
-<ul>
-<li>Validator rotation.</li>
-<li>Slashing mechanisms.</li>
-<li>Reward distribution calculations.</li>
-</ul>
+<h2 id="overview"><a class="header" href="#overview">Overview</a></h2>
+<p>The Slash Indicator system enforces validator accountability by applying penalties for misbehavior or failure to meet network responsibilities. These penalties include slashing RON, jailing validators, and reducing rewards. Additionally, the system uses a <strong>Credit Score</strong> mechanism to incentivize good behavior and allow recovery from penalties. The system ensures network security and reliability by deterring harmful activities and encouraging validators to adhere to protocol rules.</p>
 <hr />
-<h2 id="2-what-is-a-period"><a class="header" href="#2-what-is-a-period">2. What is a Period?</a></h2>
-<p>A <strong>period</strong> is a broader time unit measured in <strong>timestamps</strong>, typically aligned with <strong>calendar days</strong>. It serves as a higher-level grouping of epochs.</p>
+<h2 id="credit-score-system"><a class="header" href="#credit-score-system">Credit Score System</a></h2>
+<h3 id="overview-1"><a class="header" href="#overview-1">Overview</a></h3>
+<p>The <strong>Credit Score</strong> incentivizes validators to maintain high performance and provides a mechanism to bail out from penalties like jailing. This scoring system promotes fairness by allowing recovery while ensuring consistent participation in the network.</p>
+<hr />
+<h3 id="core-logic"><a class="header" href="#core-logic">Core Logic</a></h3>
+<h4 id="1-credit-score-management"><a class="header" href="#1-credit-score-management">1. Credit Score Management</a></h4>
 <ul>
-<li><strong>Definition</strong>:
+<li>
+<p><strong>Earning Credit</strong>:</p>
 <ul>
-<li>A period ideally starts at <strong>00:00 UTC</strong> each day.</li>
+<li>Validators earn scores based on their performance in each period, excluding jailed or maintenance periods.</li>
+<li>Scores are capped at a configurable maximum (<code>_maxCreditScore</code>).</li>
 </ul>
 </li>
-<li><strong>Challenges in Blockchain</strong>:
+<li>
+<p><strong>Resetting Credit</strong>:</p>
 <ul>
-<li>Blockchain works with block numbers, not timestamps, making it difficult to align perfectly with real-world time.</li>
-<li>Instead, the system determines a new period when the timestamp of the current epoch exceeds the next day’s threshold.</li>
+<li>Scores can be reset by the system for specific validators when they are kicked-out when insufficient self-stake amount, renounced or emergency exit met revoking timestamp.</li>
 </ul>
 </li>
 </ul>
-<p><strong>Key Notes</strong>:</p>
+<h4 id="2-bailout-mechanism"><a class="header" href="#2-bailout-mechanism">2. Bailout Mechanism</a></h4>
 <ul>
-<li>A period starts between <strong>00:00 UTC → 00:15 UTC</strong>, depending on block generation timing.</li>
-<li>Period duration is variable and influenced by network performance.</li>
+<li>
+<p><strong>Eligibility</strong>:</p>
+<ul>
+<li>Validators can use credit scores to bail out of jailing if they:
+<ul>
+<li>Have sufficient scores to cover the cost (<code>jailedEpochLeft * _bailOutCostMultiplier</code>).</li>
+<li>Have not bailed out previously during the same period.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Bailout Execution</strong>:</p>
+<ul>
+<li>Once bailed out, the credit score is deducted by the cost of <code>jailedEpochLeft * _bailOutCostMultiplier</code> and the validator is unjailed and allowed to resume operations.</li>
+<li>No further penalties apply, as rewards are already reduced at the point of slashing.</li>
+</ul>
+</li>
 </ul>
 <hr />
-<h2 id="3-key-differences"><a class="header" href="#3-key-differences">3. Key Differences</a></h2>
-<div class="table-wrapper"><table><thead><tr><th>Feature</th><th><strong>Epoch</strong></th><th><strong>Period</strong></th></tr></thead><tbody>
-<tr><td><strong>Measurement Unit</strong></td><td>Number of blocks</td><td>Timestamps (real-world time)</td></tr>
-<tr><td><strong>Duration</strong></td><td>Fixed (200 blocks ≈ 10 minutes)</td><td>Variable (aligned with calendar)</td></tr>
-<tr><td><strong>Purpose</strong></td><td>Operational tasks (e.g., record stats, validator rotation)</td><td>High-level grouping of epochs (e.g., reward distribution, randomization, slashing)</td></tr>
-<tr><td><strong>Start Condition</strong></td><td>Based on block number</td><td>Based on UTC timestamp</td></tr>
+<h3 id="integration"><a class="header" href="#integration">Integration</a></h3>
+<ul>
+<li><strong>RoninValidatorSet</strong>:
+<ul>
+<li>Executes jailing, bailout, and unavailability indicator resets.</li>
+</ul>
+</li>
+<li><strong>Maintenance Contract</strong>:
+<ul>
+<li>Tracks maintenance periods, affecting credit score calculations.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="slash-unavailability"><a class="header" href="#slash-unavailability">Slash Unavailability</a></h2>
+<h3 id="overview-2"><a class="header" href="#overview-2">Overview</a></h3>
+<p>The <strong>Slash Unavailability</strong> penalizes validators for failing to participate in block production.</p>
+<hr />
+<h3 id="core-logic-1"><a class="header" href="#core-logic-1">Core Logic</a></h3>
+<ol>
+<li>
+<p><strong>Unavailability Tracking</strong>:</p>
+<ul>
+<li>If a block producer fails to produce blocks during their assigned round and a lower-priority block producer steps in to produce them, the assigned block producer can be subject to slashing.</li>
+<li>Prevents redundant slashes within the same block.</li>
+</ul>
+</li>
+<li>
+<p><strong>Slashing Tiers</strong>:</p>
+<ul>
+<li><strong>Tier 1</strong>: Loss of rewards for mining reward for exceeding the first threshold.</li>
+<li><strong>Tier 2</strong>: Loss of rewards for mining reward and deducting self-stake and temporary jailing but allowing bail out.</li>
+<li><strong>Tier 3</strong>: Severe penalties if bail-outed once in the current period, loss of mining rewards, deducting self-stake and jailed and cannot bail out.</li>
+</ul>
+</li>
+<li>
+<p><strong>Penalty Execution</strong>:</p>
+<ul>
+<li>Enforced via the <code>RoninValidatorSet</code> contract.</li>
+<li>Includes RON deduction, jailing, and progressive penalties.</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h3 id="configuration"><a class="header" href="#configuration">Configuration</a></h3>
+<ul>
+<li>Thresholds, slashing amounts, and jail durations are dynamically configurable via <code>setUnavailabilitySlashingConfigs</code>.</li>
+</ul>
+<hr />
+<h2 id="slash-double-sign"><a class="header" href="#slash-double-sign">Slash Double Sign</a></h2>
+<h3 id="overview-3"><a class="header" href="#overview-3">Overview</a></h3>
+<p>The <strong>Slash Double Sign</strong> module addresses validators signing multiple blocks at the same height, which compromises consensus.</p>
+<hr />
+<h3 id="core-logic-2"><a class="header" href="#core-logic-2">Core Logic</a></h3>
+<ol>
+<li>
+<p><strong>Governance Voting</strong>:</p>
+<ul>
+<li>Requires evidence validation and approval by governing validators before penalties are applied.</li>
+</ul>
+</li>
+<li>
+<p><strong>Penalties</strong>:</p>
+<ul>
+<li>Slashing of RON and jailing until a specified block.</li>
+<li>No bailout is allowed for double-signing violations.</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h3 id="key-features"><a class="header" href="#key-features">Key Features</a></h3>
+<ul>
+<li><strong>Governance Oversight</strong>:
+<ul>
+<li>Ensures penalties are applied only after governing validator approval.</li>
+</ul>
+</li>
+<li><strong>Replay Protection</strong>:
+<ul>
+<li>Prevents duplicate slashing for the same evidence.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="slash-fast-finality"><a class="header" href="#slash-fast-finality">Slash Fast Finality</a></h2>
+<h3 id="overview-4"><a class="header" href="#overview-4">Overview</a></h3>
+<p>The <strong>Slash Fast Finality</strong> penalizes validators who sign for finality on conflicting headers at the same height.</p>
+<hr />
+<h3 id="core-logic-3"><a class="header" href="#core-logic-3">Core Logic</a></h3>
+<ul>
+<li><strong>Detection</strong>:
+<ul>
+<li>Validates evidence of conflicting finality signatures using cryptographic verification.</li>
+</ul>
+</li>
+<li><strong>Penalties</strong>:
+<ul>
+<li>Includes RON slashing and jailing until a specific block.</li>
+<li>Bailout is disallowed for fast finality violations.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="slash-random-beacon"><a class="header" href="#slash-random-beacon">Slash Random Beacon</a></h2>
+<h3 id="overview-5"><a class="header" href="#overview-5">Overview</a></h3>
+<p>The <strong>Slash Random Beacon</strong> module ensures validators fulfill their duty to submit random beacon values.</p>
+<hr />
+<h3 id="core-logic-4"><a class="header" href="#core-logic-4">Core Logic</a></h3>
+<ul>
+<li><strong>Responsibility</strong>:
+<ul>
+<li>Validators must submit beacon values during specific periods.</li>
+</ul>
+</li>
+<li><strong>Penalties</strong>:
+<ul>
+<li>RON slashing for non-compliance.</li>
+<li>No jailing, and bailout is allowed.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="comparisons-between-slash-types"><a class="header" href="#comparisons-between-slash-types">Comparisons Between Slash Types</a></h2>
+<div class="table-wrapper"><table><thead><tr><th><strong>Feature</strong></th><th><strong>Unavailability</strong></th><th><strong>Double Sign</strong></th><th><strong>Fast Finality</strong></th><th><strong>Random Beacon</strong></th></tr></thead><tbody>
+<tr><td><strong>Penalty</strong></td><td>Slashing, jailing</td><td>Slashing, jailing</td><td>Slashing, jailing</td><td>Slashing</td></tr>
+<tr><td><strong>Trigger</strong></td><td>Missed blocks</td><td>Double-sign evidence</td><td>Conflicting finality signatures</td><td>Missing random beacon submissions</td></tr>
+<tr><td><strong>Authorization</strong></td><td>Block Producer</td><td>Governance Voting</td><td>Governor</td><td>System transaction</td></tr>
+<tr><td><strong>Bailout</strong></td><td>Allowed Tier 2, Not allowed Tier 3</td><td>Not allowed</td><td>Not allowed</td><td>Not required</td></tr>
+<tr><td><strong>Jailing</strong></td><td>Yes (Tier 2/3)</td><td>Yes</td><td>Yes</td><td>No</td></tr>
 </tbody></table>
 </div>
 <hr />
-<h2 id="4-interplay-between-epochs-and-periods"><a class="header" href="#4-interplay-between-epochs-and-periods">4. Interplay Between Epochs and Periods</a></h2>
-<p>Periods are determined by epochs, and the transition is triggered as follows:</p>
-<ol>
-<li>At the end of each epoch, the system checks the <strong>timestamp</strong> of the last block.</li>
-<li>If the timestamp indicates a new calendar day, a new period begins.</li>
-<li>Validator roles, random beacons, and other operations are changed at the period boundary.</li>
-</ol>
-<p><strong>Key Implications</strong>:</p>
-<ul>
-<li>A period may contain fewer epochs if the network is slow (fewer blocks are produced per day).</li>
-<li>Epoch-based calculations remain deterministic, while period-based calculations adapt to timestamp variability.</li>
-</ul>
+<h2 id="conclusion"><a class="header" href="#conclusion">Conclusion</a></h2>
+<p>The Slash Indicator system, coupled with the Credit Score module, provides a robust framework for maintaining validator accountability and network security. The combination of slashing, jailing, and scoring mechanisms ensures validators act responsibly while offering a path to recovery for occasional lapses in performance.</p>
 <hr />
-<h2 id="5-practical-example"><a class="header" href="#5-practical-example">5. Practical Example</a></h2>
-<p>Consider the following scenario:</p>
-<ul>
-<li>Block production rate: ~1 block per 3 seconds.</li>
-<li>Daily period duration: 24 hours = 86,400 seconds.</li>
-<li>Expected epochs per period: $$\approx (\frac{86,400}{(200 \times 3)} $$</li>
-</ul>
-<hr />
-<h2 id="6-visual-representation"><a class="header" href="#6-visual-representation">6. Visual Representation</a></h2>
-<pre><code class="language-plaintext">+--------+-----------------------------------------------+-------------------------------------------------------------+
-| Period |                       1                       |                              2                              |
-+========+=======+=========+=========+=====+=============+=============+=============+=============+=====+=============+
-|  Epoch |   0   |    1    |    2    | ... |     239     |     240     |     241     |     242     |     |             |
-+--------+-------+---------+---------+-----+-------------+-------------+-------------+-------------+-----+-------------+
-|  Block | 0-199 | 200-399 | 400-599 | ... | 47800-47999 | 48000–48199 | 48200–48399 | 48400–48599 | ... | 95800–95999 |
-+--------+-------+---------+---------+-----+-------------+-------------+-------------+-------------+-----+-------------+
-</code></pre>
-<p>In this table:</p>
-<ul>
-<li>Each <strong>period</strong> consists of multiple <strong>epochs</strong>.</li>
-<li>Each <strong>epoch</strong> is defined by a range of block numbers.</li>
-<li>A <strong>new period</strong> starts when the UTC timestamp exceeds <strong>00:00 UTC</strong>.</li>
-</ul>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../contracts/slash_indicator.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../contracts/ronin_basefee_treasury.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
@@ -275,7 +356,7 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../contracts/slash_indicator.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../contracts/ronin_basefee_treasury.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 

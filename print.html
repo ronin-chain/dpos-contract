@@ -601,6 +601,189 @@
 <li><strong>Base Fee Treasury</strong>: Acts as a dedicated repository for EIP-1559 base fees, ensuring the funds are securely stored and managed.</li>
 </ul>
 <hr />
+<div style="break-before: page; page-break-before: always;"></div><h1 id="slash-indicator"><a class="header" href="#slash-indicator">Slash Indicator</a></h1>
+<hr />
+<h2 id="overview-3"><a class="header" href="#overview-3">Overview</a></h2>
+<p>The Slash Indicator system enforces validator accountability by applying penalties for misbehavior or failure to meet network responsibilities. These penalties include slashing RON, jailing validators, and reducing rewards. Additionally, the system uses a <strong>Credit Score</strong> mechanism to incentivize good behavior and allow recovery from penalties. The system ensures network security and reliability by deterring harmful activities and encouraging validators to adhere to protocol rules.</p>
+<hr />
+<h2 id="credit-score-system"><a class="header" href="#credit-score-system">Credit Score System</a></h2>
+<h3 id="overview-4"><a class="header" href="#overview-4">Overview</a></h3>
+<p>The <strong>Credit Score</strong> incentivizes validators to maintain high performance and provides a mechanism to bail out from penalties like jailing. This scoring system promotes fairness by allowing recovery while ensuring consistent participation in the network.</p>
+<hr />
+<h3 id="core-logic-3"><a class="header" href="#core-logic-3">Core Logic</a></h3>
+<h4 id="1-credit-score-management"><a class="header" href="#1-credit-score-management">1. Credit Score Management</a></h4>
+<ul>
+<li>
+<p><strong>Earning Credit</strong>:</p>
+<ul>
+<li>Validators earn scores based on their performance in each period, excluding jailed or maintenance periods.</li>
+<li>Scores are capped at a configurable maximum (<code>_maxCreditScore</code>).</li>
+</ul>
+</li>
+<li>
+<p><strong>Resetting Credit</strong>:</p>
+<ul>
+<li>Scores can be reset by the system for specific validators when they are kicked-out when insufficient self-stake amount, renounced or emergency exit met revoking timestamp.</li>
+</ul>
+</li>
+</ul>
+<h4 id="2-bailout-mechanism"><a class="header" href="#2-bailout-mechanism">2. Bailout Mechanism</a></h4>
+<ul>
+<li>
+<p><strong>Eligibility</strong>:</p>
+<ul>
+<li>Validators can use credit scores to bail out of jailing if they:
+<ul>
+<li>Have sufficient scores to cover the cost (<code>jailedEpochLeft * _bailOutCostMultiplier</code>).</li>
+<li>Have not bailed out previously during the same period.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Bailout Execution</strong>:</p>
+<ul>
+<li>Once bailed out, the credit score is deducted by the cost of <code>jailedEpochLeft * _bailOutCostMultiplier</code> and the validator is unjailed and allowed to resume operations.</li>
+<li>No further penalties apply, as rewards are already reduced at the point of slashing.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h3 id="integration-1"><a class="header" href="#integration-1">Integration</a></h3>
+<ul>
+<li><strong>RoninValidatorSet</strong>:
+<ul>
+<li>Executes jailing, bailout, and unavailability indicator resets.</li>
+</ul>
+</li>
+<li><strong>Maintenance Contract</strong>:
+<ul>
+<li>Tracks maintenance periods, affecting credit score calculations.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="slash-unavailability"><a class="header" href="#slash-unavailability">Slash Unavailability</a></h2>
+<h3 id="overview-5"><a class="header" href="#overview-5">Overview</a></h3>
+<p>The <strong>Slash Unavailability</strong> penalizes validators for failing to participate in block production.</p>
+<hr />
+<h3 id="core-logic-4"><a class="header" href="#core-logic-4">Core Logic</a></h3>
+<ol>
+<li>
+<p><strong>Unavailability Tracking</strong>:</p>
+<ul>
+<li>If a block producer fails to produce blocks during their assigned round and a lower-priority block producer steps in to produce them, the assigned block producer can be subject to slashing.</li>
+<li>Prevents redundant slashes within the same block.</li>
+</ul>
+</li>
+<li>
+<p><strong>Slashing Tiers</strong>:</p>
+<ul>
+<li><strong>Tier 1</strong>: Loss of rewards for mining reward for exceeding the first threshold.</li>
+<li><strong>Tier 2</strong>: Loss of rewards for mining reward and deducting self-stake and temporary jailing but allowing bail out.</li>
+<li><strong>Tier 3</strong>: Severe penalties if bail-outed once in the current period, loss of mining rewards, deducting self-stake and jailed and cannot bail out.</li>
+</ul>
+</li>
+<li>
+<p><strong>Penalty Execution</strong>:</p>
+<ul>
+<li>Enforced via the <code>RoninValidatorSet</code> contract.</li>
+<li>Includes RON deduction, jailing, and progressive penalties.</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h3 id="configuration"><a class="header" href="#configuration">Configuration</a></h3>
+<ul>
+<li>Thresholds, slashing amounts, and jail durations are dynamically configurable via <code>setUnavailabilitySlashingConfigs</code>.</li>
+</ul>
+<hr />
+<h2 id="slash-double-sign"><a class="header" href="#slash-double-sign">Slash Double Sign</a></h2>
+<h3 id="overview-6"><a class="header" href="#overview-6">Overview</a></h3>
+<p>The <strong>Slash Double Sign</strong> module addresses validators signing multiple blocks at the same height, which compromises consensus.</p>
+<hr />
+<h3 id="core-logic-5"><a class="header" href="#core-logic-5">Core Logic</a></h3>
+<ol>
+<li>
+<p><strong>Governance Voting</strong>:</p>
+<ul>
+<li>Requires evidence validation and approval by governing validators before penalties are applied.</li>
+</ul>
+</li>
+<li>
+<p><strong>Penalties</strong>:</p>
+<ul>
+<li>Slashing of RON and jailing until a specified block.</li>
+<li>No bailout is allowed for double-signing violations.</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h3 id="key-features"><a class="header" href="#key-features">Key Features</a></h3>
+<ul>
+<li><strong>Governance Oversight</strong>:
+<ul>
+<li>Ensures penalties are applied only after governing validator approval.</li>
+</ul>
+</li>
+<li><strong>Replay Protection</strong>:
+<ul>
+<li>Prevents duplicate slashing for the same evidence.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="slash-fast-finality"><a class="header" href="#slash-fast-finality">Slash Fast Finality</a></h2>
+<h3 id="overview-7"><a class="header" href="#overview-7">Overview</a></h3>
+<p>The <strong>Slash Fast Finality</strong> penalizes validators who sign for finality on conflicting headers at the same height.</p>
+<hr />
+<h3 id="core-logic-6"><a class="header" href="#core-logic-6">Core Logic</a></h3>
+<ul>
+<li><strong>Detection</strong>:
+<ul>
+<li>Validates evidence of conflicting finality signatures using cryptographic verification.</li>
+</ul>
+</li>
+<li><strong>Penalties</strong>:
+<ul>
+<li>Includes RON slashing and jailing until a specific block.</li>
+<li>Bailout is disallowed for fast finality violations.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="slash-random-beacon"><a class="header" href="#slash-random-beacon">Slash Random Beacon</a></h2>
+<h3 id="overview-8"><a class="header" href="#overview-8">Overview</a></h3>
+<p>The <strong>Slash Random Beacon</strong> module ensures validators fulfill their duty to submit random beacon values.</p>
+<hr />
+<h3 id="core-logic-7"><a class="header" href="#core-logic-7">Core Logic</a></h3>
+<ul>
+<li><strong>Responsibility</strong>:
+<ul>
+<li>Validators must submit beacon values during specific periods.</li>
+</ul>
+</li>
+<li><strong>Penalties</strong>:
+<ul>
+<li>RON slashing for non-compliance.</li>
+<li>No jailing, and bailout is allowed.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="comparisons-between-slash-types"><a class="header" href="#comparisons-between-slash-types">Comparisons Between Slash Types</a></h2>
+<div class="table-wrapper"><table><thead><tr><th><strong>Feature</strong></th><th><strong>Unavailability</strong></th><th><strong>Double Sign</strong></th><th><strong>Fast Finality</strong></th><th><strong>Random Beacon</strong></th></tr></thead><tbody>
+<tr><td><strong>Penalty</strong></td><td>Slashing, jailing</td><td>Slashing, jailing</td><td>Slashing, jailing</td><td>Slashing</td></tr>
+<tr><td><strong>Trigger</strong></td><td>Missed blocks</td><td>Double-sign evidence</td><td>Conflicting finality signatures</td><td>Missing random beacon submissions</td></tr>
+<tr><td><strong>Authorization</strong></td><td>Block Producer</td><td>Governance Voting</td><td>Governor</td><td>System transaction</td></tr>
+<tr><td><strong>Bailout</strong></td><td>Allowed Tier 2, Not allowed Tier 3</td><td>Not allowed</td><td>Not allowed</td><td>Not required</td></tr>
+<tr><td><strong>Jailing</strong></td><td>Yes (Tier 2/3)</td><td>Yes</td><td>Yes</td><td>No</td></tr>
+</tbody></table>
+</div>
+<hr />
+<h2 id="conclusion"><a class="header" href="#conclusion">Conclusion</a></h2>
+<p>The Slash Indicator system, coupled with the Credit Score module, provides a robust framework for maintaining validator accountability and network security. The combination of slashing, jailing, and scoring mechanisms ensures validators act responsibly while offering a path to recovery for occasional lapses in performance.</p>
+<hr />
 <div style="break-before: page; page-break-before: always;"></div><h1 id="epoch-vs-period"><a class="header" href="#epoch-vs-period">Epoch vs Period</a></h1>
 <p>Understanding the distinction between <strong>Epoch</strong> and <strong>Period</strong> is critical for grasping the underlying mechanics of the system. Both terms are used to represent time intervals but serve different purposes and are calculated differently.</p>
 <hr />
@@ -1325,7 +1508,7 @@ $$</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="weighted-random-selection-specification-for-validators"><a class="header" href="#weighted-random-selection-specification-for-validators">Weighted Random Selection Specification for Validators</a></h1>
 <p>This document outlines the detailed specification for selecting validators in the Ronin Network using the <code>LibSortValidatorsByBeacon</code> library and the <code>RoninRandomBeacon</code> contract. The selection process ensures a fair, decentralized, and efficient mechanism for determining the validator set for each period and epoch.</p>
 <hr />
-<h2 id="overview-3"><a class="header" href="#overview-3">Overview</a></h2>
+<h2 id="overview-9"><a class="header" href="#overview-9">Overview</a></h2>
 <p>The validator selection process is divided into two phases:</p>
 <ol>
 <li><strong>Sorting and Saving Validators (Period Level):</strong> Filtering and categorizing validators into governance, standard, and rotating types, based on trusted weights and staking amounts.</li>
@@ -1531,7 +1714,7 @@ $$</p>
 <hr />
 <div style="break-before: page; page-break-before: always;"></div><h1 id="emergency-exit"><a class="header" href="#emergency-exit">Emergency Exit</a></h1>
 <p><img src="validator_lifecycle/../assets/emergency-exit.svg" alt="Emergency Exit" /></p>
-<h2 id="overview-4"><a class="header" href="#overview-4">Overview</a></h2>
+<h2 id="overview-10"><a class="header" href="#overview-10">Overview</a></h2>
 <p>The emergency exit process allows all candidates to withdraw their stake under exceptional circumstances. It involves governance approval and ensures the integrity of the network through a structured workflow.</p>
 <hr />
 <h2 id="1-emergency-exit-request"><a class="header" href="#1-emergency-exit-request">1. Emergency Exit Request</a></h2>
@@ -1599,7 +1782,7 @@ $$</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="renouncing-as-a-validator"><a class="header" href="#renouncing-as-a-validator">Renouncing as a Validator</a></h1>
 <p><img src="validator_lifecycle/../assets/renounce.svg" alt="Renounce" /></p>
 <hr />
-<h2 id="overview-5"><a class="header" href="#overview-5">Overview</a></h2>
+<h2 id="overview-11"><a class="header" href="#overview-11">Overview</a></h2>
 <p>The renounce process allows non governing validators to voluntarily step down from their role. This action is initiated by the candidate admin and processed through the <code>Staking</code> and <code>RoninValidatorSet</code> contracts. Governing validators are restricted from renouncing their role.</p>
 <hr />
 <h2 id="1-renounce-request"><a class="header" href="#1-renounce-request">1. Renounce Request</a></h2>
