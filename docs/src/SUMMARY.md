@@ -13,6 +13,7 @@
   - [Epoch vs Period](core_concepts/epoch_vs_period.md)
   - [Validator Roles](core_concepts/validator_roles.md)
   - [Emergency Exit vs Renounce](core_concepts/renounce_vs_emergency_exit.md)
+  - [Staking Reward Calculation](core_concepts/staking_reward_calculation.md)
 - [Technical Specifications](technical_specifications/fast_finality_score_normalization.md)
   - [Fast Finality Score Normalization](technical_specifications/fast_finality_score_normalization.md)
   - [Random Validator Selection](technical_specifications/random_validator_selection.md)
