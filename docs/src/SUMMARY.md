@@ -1,7 +1,9 @@
 # Summary
 
 - [Contracts](contracts/ronin_validator_set.md)
+  - [Profile](contracts/profile.md)
   - [Fast Finality Tracking](contracts/fast_finality_tracking.md)
+  - [Ronin Trusted Organization](contracts/ronin_trusted_organization.md)
   - [Maintenance](contracts/maintenance.md)
   - [Ronin Random Beacon](contracts/ronin_random_beacon.md)
   - [Staking Vesting](contracts/staking_vesting.md)
