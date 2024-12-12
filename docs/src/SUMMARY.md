@@ -8,6 +8,7 @@
   - [Ronin Random Beacon](contracts/ronin_random_beacon.md)
   - [Staking Vesting](contracts/staking_vesting.md)
   - [Ronin Base Fee Treasury](contracts/ronin_basefee_treasury.md)
+  - [Slash Indicator](contracts/slash_indicator.md)
 - [Core Concepts](core_concepts/epoch_vs_period.md)
   - [Epoch vs Period](core_concepts/epoch_vs_period.md)
   - [Validator Roles](core_concepts/validator_roles.md)
