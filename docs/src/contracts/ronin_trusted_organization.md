@@ -1,4 +1,4 @@
-# Ronin Trusted Organization Contract Documentation
+# Ronin Trusted Organization
 
 ---
 
