@@ -155,7 +155,31 @@
 
                 <div id="content" class="content">
                     <main>
-                        <div style="break-before: page; page-break-before: always;"></div><h1 id="fast-finality-tracking"><a class="header" href="#fast-finality-tracking">Fast Finality Tracking</a></h1>
+                        <div style="break-before: page; page-break-before: always;"></div><h1 id="profile"><a class="header" href="#profile">Profile</a></h1>
+<hr />
+<h2 id="key-highlights"><a class="header" href="#key-highlights">Key Highlights</a></h2>
+<h3 id="source-of-truth-for-validator-data"><a class="header" href="#source-of-truth-for-validator-data">Source of Truth for Validator Data</a></h3>
+<ul>
+<li>The <code>Profile</code> contract serves as the <strong>centralized registry</strong> for all validator-related information, including consensus addresses, treasury accounts, admin details, and cryptographic keys.</li>
+<li>It maintains the integrity and accuracy of validator data, ensuring reliable governance and staking operations.</li>
+</ul>
+<h3 id="cross-contract-interactions"><a class="header" href="#cross-contract-interactions">Cross-Contract Interactions</a></h3>
+<ul>
+<li>Integrates seamlessly with other Ronin contracts to facilitate dynamic updates:
+<ul>
+<li><strong>Staking Contract</strong>: Automatically updates profiles when a candidate applies for validator roles.</li>
+<li><strong>RoninValidatorSet</strong>: Provides essential validator data for operations like consensus participation and governance voting.</li>
+</ul>
+</li>
+<li>Changes to key profile attributes (e.g., consensus or public keys) trigger updates in dependent contracts to maintain consistency across the ecosystem.</li>
+</ul>
+<h3 id="centralized-mapping-for-data-integrity"><a class="header" href="#centralized-mapping-for-data-integrity">Centralized Mapping for Data Integrity</a></h3>
+<ul>
+<li>Uses a <strong>single mapping</strong> as the registry for all validator profile data.</li>
+<li>Ensures that critical data (e.g., public keys, VRF key hashes, consensus addresses) is unique across the network, preventing duplication and maintaining trust in the system.</li>
+</ul>
+<hr />
+<div style="break-before: page; page-break-before: always;"></div><h1 id="fast-finality-tracking"><a class="header" href="#fast-finality-tracking">Fast Finality Tracking</a></h1>
 <p>The <code>FastFinalityTracking</code> contract is responsible for tracking and scoring validator performance based on their participation in finalizing blocks. This mechanism ensures the reliability of validators by incentivizing active participation and maintaining a secure and efficient network.</p>
 <hr />
 <h2 id="key-responsibilities"><a class="header" href="#key-responsibilities">Key Responsibilities</a></h2>
@@ -259,6 +283,65 @@
 </li>
 </ul>
 <hr />
+<div style="break-before: page; page-break-before: always;"></div><h1 id="ronin-trusted-organization-contract-documentation"><a class="header" href="#ronin-trusted-organization-contract-documentation">Ronin Trusted Organization Contract Documentation</a></h1>
+<hr />
+<h2 id="overview"><a class="header" href="#overview">Overview</a></h2>
+<p>The <code>RoninTrustedOrganization</code> contract is responsible for managing governor keys and weights for governing validators..</p>
+<hr />
+<h2 id="core-logic"><a class="header" href="#core-logic">Core Logic</a></h2>
+<h3 id="1-trusted-organization-management"><a class="header" href="#1-trusted-organization-management">1. Trusted Organization Management</a></h3>
+<p>The contract provides <code>RoninGovernanceAdmin</code> with the ability to manage trusted organizations, which include:</p>
+<ul>
+<li><strong>Consensus Address</strong>: Represents the operational node account.</li>
+<li><strong>Governor Address</strong>: An externally owned account (EOA) used for voting on governance proposals.</li>
+<li><strong>Weight</strong>: All governors are assigned the same weight for governance decisions, ensuring equal influence.</li>
+</ul>
+<p>Management operations include:</p>
+<ul>
+<li><strong>Create, Update, and Delete (CRUD)</strong> trusted organizations.</li>
+</ul>
+<hr />
+<h3 id="2-quorum-thresholds"><a class="header" href="#2-quorum-thresholds">2. Quorum Thresholds</a></h3>
+<p>The contract sets a threshold for achieving quorum in governance decisions:</p>
+<ul>
+<li><strong>Threshold Parameters</strong>:
+<ul>
+<li><strong>Numerator (<code>_num</code>)</strong> and <strong>Denominator (<code>_denom</code>)</strong> are used to define the quorum percentage required for a decision to pass.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h3 id="3-threshold-evaluation"><a class="header" href="#3-threshold-evaluation">3. Threshold Evaluation</a></h3>
+<p>To ensure governance decisions are valid, the contract evaluates votes against the quorum threshold:</p>
+<ul>
+<li><strong>Minimum Vote Weight</strong>:
+<ul>
+<li>Computes the minimum required vote weight to meet the quorum.</li>
+</ul>
+</li>
+<li><strong>Threshold Check</strong>:
+<ul>
+<li>Validates whether the provided vote weight meets or exceeds the quorum percentage.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h3 id="4-data-integrity-and-sanity-checks"><a class="header" href="#4-data-integrity-and-sanity-checks">4. Data Integrity and Sanity Checks</a></h3>
+<p>The contract enforces strict data integrity for trusted organization management:</p>
+<ul>
+<li><strong>Sanity Checks</strong>:
+<ul>
+<li>Validates that weights are greater than zero.</li>
+<li>Ensures that the consensus address, governor address, and deprecated bridge voter address are unique.</li>
+</ul>
+</li>
+<li><strong>Duplicate Prevention</strong>:
+<ul>
+<li>Prevent duplication of addresses in the organization mappings.</li>
+</ul>
+</li>
+</ul>
+<hr />
 <div style="break-before: page; page-break-before: always;"></div><h1 id="maintenance"><a class="header" href="#maintenance">Maintenance</a></h1>
 <p>The <code>Maintenance</code> contract manages the scheduling, execution, and tracking of maintenance periods for validators in the Ronin network. It ensures that validators can temporarily exit block production without being slashed.</p>
 <hr />
@@ -341,7 +424,7 @@
 <div style="break-before: page; page-break-before: always;"></div><h1 id="ronin-random-beacon"><a class="header" href="#ronin-random-beacon">Ronin Random Beacon</a></h1>
 <p>The <code>RoninRandomBeacon</code> contract is responsible for generating secure random beacons, managing validator thresholds, and ensuring fair validator selection.</p>
 <hr />
-<h2 id="overview"><a class="header" href="#overview">Overview</a></h2>
+<h2 id="overview-1"><a class="header" href="#overview-1">Overview</a></h2>
 <h3 id="1-random-beacon-management"><a class="header" href="#1-random-beacon-management"><strong>1. Random Beacon Management</strong></a></h3>
 <ul>
 <li>Handles the lifecycle of random beacon requests, including:
@@ -434,7 +517,7 @@
 <h2 id="purpose"><a class="header" href="#purpose">Purpose</a></h2>
 <p>The <code>StakingVesting</code> contract manages staking rewards, including block producer bonuses and fast finality rewards. It is designed to handle dynamic reward mechanisms, supporting seamless upgrades and integration with REP-10 for enhanced reward distribution.</p>
 <hr />
-<h2 id="core-logic"><a class="header" href="#core-logic">Core Logic</a></h2>
+<h2 id="core-logic-1"><a class="header" href="#core-logic-1">Core Logic</a></h2>
 <h3 id="reward-distribution"><a class="header" href="#reward-distribution">Reward Distribution</a></h3>
 <p>The contract allocates rewards for block producers and implements a fast finality reward mechanism. Fast finality rewards incentivize validators to contribute to consensus, enhancing network stability.</p>
 <ul>
@@ -492,10 +575,10 @@
 <hr />
 <div style="break-before: page; page-break-before: always;"></div><h1 id="ronin-basefee-treasury"><a class="header" href="#ronin-basefee-treasury">Ronin BaseFee Treasury</a></h1>
 <hr />
-<h2 id="overview-1"><a class="header" href="#overview-1">Overview</a></h2>
+<h2 id="overview-2"><a class="header" href="#overview-2">Overview</a></h2>
 <p>The <code>RoninBaseFeeTreasury</code> contract serves as a treasury for collecting and managing base fees from EIP1559 transactions.</p>
 <hr />
-<h2 id="core-logic-1"><a class="header" href="#core-logic-1">Core Logic</a></h2>
+<h2 id="core-logic-2"><a class="header" href="#core-logic-2">Core Logic</a></h2>
 <h3 id="1-receiving-funds"><a class="header" href="#1-receiving-funds">1. Receiving Funds</a></h3>
 <p>When an EIP-1559 transaction occurs, the Ronin node directs the base fee to this treasury contract.</p>
 <ul>
@@ -1242,7 +1325,7 @@ $$</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="weighted-random-selection-specification-for-validators"><a class="header" href="#weighted-random-selection-specification-for-validators">Weighted Random Selection Specification for Validators</a></h1>
 <p>This document outlines the detailed specification for selecting validators in the Ronin Network using the <code>LibSortValidatorsByBeacon</code> library and the <code>RoninRandomBeacon</code> contract. The selection process ensures a fair, decentralized, and efficient mechanism for determining the validator set for each period and epoch.</p>
 <hr />
-<h2 id="overview-2"><a class="header" href="#overview-2">Overview</a></h2>
+<h2 id="overview-3"><a class="header" href="#overview-3">Overview</a></h2>
 <p>The validator selection process is divided into two phases:</p>
 <ol>
 <li><strong>Sorting and Saving Validators (Period Level):</strong> Filtering and categorizing validators into governance, standard, and rotating types, based on trusted weights and staking amounts.</li>
@@ -1448,7 +1531,7 @@ $$</p>
 <hr />
 <div style="break-before: page; page-break-before: always;"></div><h1 id="emergency-exit"><a class="header" href="#emergency-exit">Emergency Exit</a></h1>
 <p><img src="validator_lifecycle/../assets/emergency-exit.svg" alt="Emergency Exit" /></p>
-<h2 id="overview-3"><a class="header" href="#overview-3">Overview</a></h2>
+<h2 id="overview-4"><a class="header" href="#overview-4">Overview</a></h2>
 <p>The emergency exit process allows all candidates to withdraw their stake under exceptional circumstances. It involves governance approval and ensures the integrity of the network through a structured workflow.</p>
 <hr />
 <h2 id="1-emergency-exit-request"><a class="header" href="#1-emergency-exit-request">1. Emergency Exit Request</a></h2>
@@ -1516,7 +1599,7 @@ $$</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="renouncing-as-a-validator"><a class="header" href="#renouncing-as-a-validator">Renouncing as a Validator</a></h1>
 <p><img src="validator_lifecycle/../assets/renounce.svg" alt="Renounce" /></p>
 <hr />
-<h2 id="overview-4"><a class="header" href="#overview-4">Overview</a></h2>
+<h2 id="overview-5"><a class="header" href="#overview-5">Overview</a></h2>
 <p>The renounce process allows non governing validators to voluntarily step down from their role. This action is initiated by the candidate admin and processed through the <code>Staking</code> and <code>RoninValidatorSet</code> contracts. Governing validators are restricted from renouncing their role.</p>
 <hr />
 <h2 id="1-renounce-request"><a class="header" href="#1-renounce-request">1. Renounce Request</a></h2>
