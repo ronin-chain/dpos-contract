@@ -784,6 +784,146 @@
 <h2 id="conclusion"><a class="header" href="#conclusion">Conclusion</a></h2>
 <p>The Slash Indicator system, coupled with the Credit Score module, provides a robust framework for maintaining validator accountability and network security. The combination of slashing, jailing, and scoring mechanisms ensures validators act responsibly while offering a path to recovery for occasional lapses in performance.</p>
 <hr />
+<div style="break-before: page; page-break-before: always;"></div><h1 id="staking-documentation"><a class="header" href="#staking-documentation">Staking Documentation</a></h1>
+<hr />
+<h2 id="overview-9"><a class="header" href="#overview-9">Overview</a></h2>
+<p>The Staking module manages the network’s core participation mechanism, allowing both validator candidates and delegators to stake RON, earn rewards, and contribute to the network’s security and governance. This module includes distinct functionalities for <strong>Candidate Staking</strong> and <strong>Delegator Staking</strong>, each tailored to different roles within the ecosystem.</p>
+<h3 id="summary-of-features"><a class="header" href="#summary-of-features">Summary of Features</a></h3>
+<ul>
+<li><strong>Candidate Staking</strong>: Facilitates validator candidates to stake RON, apply for validator roles, and manage their staking pools.</li>
+<li><strong>Delegator Staking</strong>: Enables participants to delegate RON to validators, withdraw or transfer stakes, and claim rewards.</li>
+</ul>
+<hr />
+<h2 id="candidate-staking"><a class="header" href="#candidate-staking">Candidate Staking</a></h2>
+<h3 id="overview-10"><a class="header" href="#overview-10">Overview</a></h3>
+<p>The <code>CandidateStaking</code> module allows individuals to apply as validators, stake RON, and manage their staking pools. It governs the minimum requirements and operational guidelines for candidates aiming to become validators.</p>
+<h3 id="core-features"><a class="header" href="#core-features">Core Features</a></h3>
+<ol>
+<li>
+<p><strong>Validator Application</strong>:</p>
+<ul>
+<li>Candidates must stake the minimum required amount and submit public keys, proof of possession, and commission rates.</li>
+<li>Prevents admins of active pools from becoming candidates.</li>
+</ul>
+</li>
+<li>
+<p><strong>Staking and Unstaking</strong>:</p>
+<ul>
+<li>Candidates can increase their stake to maintain their status.</li>
+<li>Unstaking requires adherence to minimum thresholds and cooldown periods.</li>
+</ul>
+</li>
+<li>
+<p><strong>Commission Rate Management</strong>:</p>
+<ul>
+<li>Allows candidates to set and adjust commission rates for delegators within configurable admin-defined limits.</li>
+</ul>
+</li>
+<li>
+<p><strong>Pool Deprecation</strong>:</p>
+<ul>
+<li>Handles the transition when a candidate exits, redistributing unclaimed rewards and returning stakes to the admin.</li>
+</ul>
+</li>
+<li>
+<p><strong>Emergency Exit and Renunciation</strong>:</p>
+<ul>
+<li>Enables candidates to renounce their validator roles or perform emergency exits to cease operations.</li>
+</ul>
+</li>
+</ol>
+<h3 id="workflow-2"><a class="header" href="#workflow-2">Workflow</a></h3>
+<ul>
+<li><strong>Application</strong>: Candidates register using <code>applyValidatorCandidate</code>, providing necessary details and staking the required amount.</li>
+<li><strong>Staking</strong>: Candidates call <code>stake</code> to increase their pool’s total stake.</li>
+<li><strong>Unstaking</strong>: Candidates use <code>unstake</code> to withdraw funds, observing cooldown and minimum stake requirements.</li>
+<li><strong>Commission Management</strong>: Candidates can request commission rate updates using <code>requestUpdateCommissionRate</code>.</li>
+<li><strong>Deprecation</strong>: Exiting candidates transfer stake and rewards to their admin via pool deprecation mechanisms.</li>
+</ul>
+<h3 id="configuration-1"><a class="header" href="#configuration-1">Configuration</a></h3>
+<ul>
+<li><strong>Staking Requirements</strong>:
+<ul>
+<li>Admins configure minimum staking amounts via <code>setMinValidatorStakingAmount</code>.</li>
+</ul>
+</li>
+<li><strong>Commission Rates</strong>:
+<ul>
+<li>Admin-defined limits control fairness and flexibility.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="delegator-staking"><a class="header" href="#delegator-staking">Delegator Staking</a></h2>
+<h3 id="overview-11"><a class="header" href="#overview-11">Overview</a></h3>
+<p>The <code>DelegatorStaking</code> module allows network participants to stake RON with validators, supporting the network while earning rewards. Delegators actively participate in governance and network security by contributing to validator pools.</p>
+<h3 id="core-features-1"><a class="header" href="#core-features-1">Core Features</a></h3>
+<ol>
+<li>
+<p><strong>Delegation</strong>:</p>
+<ul>
+<li>Delegators stake RON with active validator pools to support the network.</li>
+<li>Their stake contributes to the validator’s total staking amount, influencing their network role.</li>
+</ul>
+</li>
+<li>
+<p><strong>Undelegation</strong>:</p>
+<ul>
+<li>Delegators can withdraw their stake, subject to cooldown periods and pool status.</li>
+</ul>
+</li>
+<li>
+<p><strong>Redelegation</strong>:</p>
+<ul>
+<li>RON can be transferred between pools without unstaking, enabling flexibility in delegator support.</li>
+</ul>
+</li>
+<li>
+<p><strong>Reward Claiming</strong>:</p>
+<ul>
+<li>Rewards earned by delegators are based on their stake and the pool’s reward allocation.</li>
+</ul>
+</li>
+<li>
+<p><strong>Reward Delegation</strong>:</p>
+<ul>
+<li>Delegators can reinvest their earned rewards directly into another pool.</li>
+</ul>
+</li>
+</ol>
+<h3 id="workflow-3"><a class="header" href="#workflow-3">Workflow</a></h3>
+<ul>
+<li><strong>Delegation</strong>: Delegators call <code>delegate</code> to stake RON with a validator.</li>
+<li><strong>Undelegation</strong>: Delegators call <code>undelegate</code> to withdraw their stake after passing validation checks.</li>
+<li><strong>Redelegation</strong>: Delegators call <code>redelegate</code> to transfer their stake between pools.</li>
+<li><strong>Reward Claiming</strong>: Rewards are claimed using <code>claimRewards</code>.</li>
+<li><strong>Reward Delegation</strong>: Delegators call <code>delegateRewards</code> to reinvest their rewards into another pool.</li>
+</ul>
+<h3 id="configuration-2"><a class="header" href="#configuration-2">Configuration</a></h3>
+<ul>
+<li><strong>Cooldown Periods</strong>:
+<ul>
+<li>Admin-defined cooldown periods regulate staking, undelegation, and redelegation actions.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="summary-of-key-features"><a class="header" href="#summary-of-key-features">Summary of Key Features</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Feature</th><th>Candidate Staking</th><th>Delegator Staking</th></tr></thead><tbody>
+<tr><td>Role</td><td>Validator Candidates</td><td>Network Participants</td></tr>
+<tr><td>Staking</td><td>Minimum required self-stake</td><td>Delegated RON with no minimum</td></tr>
+<tr><td>Unstaking</td><td>Cooldown periods, minimum balance enforced</td><td>Cooldown periods for undelegation</td></tr>
+<tr><td>Rewards</td><td>Receive rewards based on pool activity</td><td>Earn proportional rewards from validator pools</td></tr>
+<tr><td>Additional Functions</td><td>Commission rate management, emergency exits</td><td>Reward redelegation, flexible pool switching</td></tr>
+</tbody></table>
+</div>
+<hr />
+<h2 id="integration-2"><a class="header" href="#integration-2">Integration</a></h2>
+<ul>
+<li><strong>RoninValidatorSet</strong>: Coordinates validator operations, including candidacy approval and commission rate updates.</li>
+<li><strong>Profile Contract</strong>: Registers candidate profiles with cryptographic details.</li>
+<li><strong>BaseStaking</strong>: Manages core staking balances and interactions for both candidates and delegators.</li>
+</ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="epoch-vs-period"><a class="header" href="#epoch-vs-period">Epoch vs Period</a></h1>
 <p>Understanding the distinction between <strong>Epoch</strong> and <strong>Period</strong> is critical for grasping the underlying mechanics of the system. Both terms are used to represent time intervals but serve different purposes and are calculated differently.</p>
 <hr />
@@ -1227,7 +1367,7 @@
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h2 id="reward-calculation"><a class="header" href="#reward-calculation">Reward Calculation</a></h2>
 <hr />
-<h3 id="overview-9"><a class="header" href="#overview-9">Overview</a></h3>
+<h3 id="overview-12"><a class="header" href="#overview-12">Overview</a></h3>
 <p>The <code>RewardCalculation</code> module determines and distributes staking rewards for participants in the Ronin network. It ensures rewards are calculated accurately based on staking contributions and updates user balances dynamically as staking amounts change. The reward mechanism incentivizes long-term staking and aligns validator and delegator interests.</p>
 <hr />
 <h3 id="core-logic-8"><a class="header" href="#core-logic-8">Core Logic</a></h3>
@@ -1285,7 +1425,7 @@
 <li>Claiming rewards triggers updates to the user’s reward state to prevent double claims.</li>
 </ul>
 <hr />
-<h3 id="workflow-2"><a class="header" href="#workflow-2">Workflow</a></h3>
+<h3 id="workflow-4"><a class="header" href="#workflow-4">Workflow</a></h3>
 <ol>
 <li>
 <p><strong>Reward Accumulation</strong>:</p>
@@ -1701,7 +1841,7 @@ $$</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="weighted-random-selection-specification-for-validators"><a class="header" href="#weighted-random-selection-specification-for-validators">Weighted Random Selection Specification for Validators</a></h1>
 <p>This document outlines the detailed specification for selecting validators in the Ronin Network using the <code>LibSortValidatorsByBeacon</code> library and the <code>RoninRandomBeacon</code> contract. The selection process ensures a fair, decentralized, and efficient mechanism for determining the validator set for each period and epoch.</p>
 <hr />
-<h2 id="overview-10"><a class="header" href="#overview-10">Overview</a></h2>
+<h2 id="overview-13"><a class="header" href="#overview-13">Overview</a></h2>
 <p>The validator selection process is divided into two phases:</p>
 <ol>
 <li><strong>Sorting and Saving Validators (Period Level):</strong> Filtering and categorizing validators into governance, standard, and rotating types, based on trusted weights and staking amounts.</li>
@@ -1907,7 +2047,7 @@ $$</p>
 <hr />
 <div style="break-before: page; page-break-before: always;"></div><h1 id="emergency-exit"><a class="header" href="#emergency-exit">Emergency Exit</a></h1>
 <p><img src="validator_lifecycle/../assets/emergency-exit.svg" alt="Emergency Exit" /></p>
-<h2 id="overview-11"><a class="header" href="#overview-11">Overview</a></h2>
+<h2 id="overview-14"><a class="header" href="#overview-14">Overview</a></h2>
 <p>The emergency exit process allows all candidates to withdraw their stake under exceptional circumstances. It involves governance approval and ensures the integrity of the network through a structured workflow.</p>
 <hr />
 <h2 id="1-emergency-exit-request"><a class="header" href="#1-emergency-exit-request">1. Emergency Exit Request</a></h2>
@@ -1975,7 +2115,7 @@ $$</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="renouncing-as-a-validator"><a class="header" href="#renouncing-as-a-validator">Renouncing as a Validator</a></h1>
 <p><img src="validator_lifecycle/../assets/renounce.svg" alt="Renounce" /></p>
 <hr />
-<h2 id="overview-12"><a class="header" href="#overview-12">Overview</a></h2>
+<h2 id="overview-15"><a class="header" href="#overview-15">Overview</a></h2>
 <p>The renounce process allows non governing validators to voluntarily step down from their role. This action is initiated by the candidate admin and processed through the <code>Staking</code> and <code>RoninValidatorSet</code> contracts. Governing validators are restricted from renouncing their role.</p>
 <hr />
 <h2 id="1-renounce-request"><a class="header" href="#1-renounce-request">1. Renounce Request</a></h2>
