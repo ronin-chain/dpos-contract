@@ -282,7 +282,7 @@ contract DeployDPoS is RoninMigration {
     ISharedArgument.RoninValidatorSetParam memory param
   ) internal logFn("_initValidatorSet") {
     address migrator = new RoninValidatorSetREP10MigratorLogicDeploy().run();
-    
+
     {
       vm.broadcast(sender());
       address constructorLogic = deployCode("RoninValidatorSetConstructor.sol:RoninValidatorSetConstructor");
