@@ -12,6 +12,7 @@ import { LibPrecompile } from "script/shared/libraries/LibPrecompile.sol";
 import { Contract } from "script/utils/Contract.sol";
 import { TransparentUpgradeableProxyV2 } from "src/extensions/TransparentUpgradeableProxyV2.sol";
 
+import { IBaseStaking } from "src/interfaces/staking/IBaseStaking.sol";
 import { ICandidateStaking } from "src/interfaces/staking/ICandidateStaking.sol";
 import { IRoninValidatorSet } from "src/interfaces/validator/IRoninValidatorSet.sol";
 import { Maintenance } from "src/ronin/Maintenance.sol";
@@ -67,6 +68,43 @@ contract StakingTest is Test {
     vm.prank(newAdmin);
     vm.expectRevert(ICandidateStaking.ErrUnstakeTooEarly.selector);
     staking.unstake(TConsensus.wrap(consensus), 1 ether);
+  }
+
+  function testConcrete_RevertIf_ChangeAdminToDelegatorDifferentPool() external {
+    LibApplyCandidate.applyValidatorCandidate(address(staking), makeAddr("test-admin-1"), makeAddr("test-consensus-1"));
+    LibApplyCandidate.applyValidatorCandidate(address(staking), makeAddr("test-admin-2"), makeAddr("test-consensus-2"));
+    LibApplyCandidate.applyValidatorCandidate(address(staking), makeAddr("test-admin-3"), makeAddr("test-consensus-3"));
+
+    TConsensus consensus1 = TConsensus.wrap(makeAddr("test-consensus-1"));
+    TConsensus consensus2 = TConsensus.wrap(makeAddr("test-consensus-2"));
+    TConsensus consensus3 = TConsensus.wrap(makeAddr("test-consensus-3"));
+
+    address admin1 = makeAddr("test-admin-1");
+    address admin2 = makeAddr("test-admin-2");
+
+    // actor
+    address delegator = makeAddr("delegator");
+    deal(delegator, 1000 ether);
+    vm.prank(delegator);
+    staking.delegate{ value: 100 ether }(consensus1);
+
+    // admin2 transfer to delegator
+    vm.prank(admin2);
+    profile.changeAdminAddr(TConsensus.unwrap(consensus2), delegator);
+    vm.warp(block.timestamp + staking.cooldownSecsToUndelegate() + 1);
+
+    // delegator can re-delegate existing pool 1 stake to other pools except pool 2
+    vm.startPrank(delegator);
+
+    // attempting to redelegate to pool 2 should revert (cos it's the new admin)
+    vm.expectPartialRevert(IBaseStaking.ErrAdminOfAnyActivePoolForbidden.selector);
+    staking.redelegate(consensus1, consensus2, 100 ether);
+
+    // other pool should revert as well
+    vm.expectPartialRevert(IBaseStaking.ErrAdminOfAnyActivePoolForbidden.selector);
+    staking.redelegate(consensus1, consensus3, 100 ether);
+
+    vm.stopPrank();
   }
 
   function testConcrete_RevertIf_ChangeAdminAddr_IntoDelegator() external {
