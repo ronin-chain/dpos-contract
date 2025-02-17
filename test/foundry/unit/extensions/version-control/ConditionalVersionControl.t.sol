@@ -145,7 +145,10 @@ contract ConditionalImplementControlTest is Test {
    * @notice Checks whether the proxy can receive native token using old implementation after upgrading to the contract
    * switcher.
    */
-  function testConcrete_AfterUsingContractSwitcher_ReceiveNativeToken_OldImpl(address user, uint256 amount) external virtual {
+  function testConcrete_AfterUsingContractSwitcher_ReceiveNativeToken_OldImpl(
+    address user,
+    uint256 amount
+  ) external virtual {
     vm.assume(amount > 0 && user != _proxyAdmin);
     vm.deal(user, amount);
     _manualUpgradeTo(_switcher);
@@ -162,7 +165,10 @@ contract ConditionalImplementControlTest is Test {
    * @notice Checks whether the proxy can receive native token using new implementation after upgrading to the contract
    * switcher.
    */
-  function testConcrete_AfterUsingContractSwitcher_ReceiveNativeToken_NewImpl(address user, uint256 amount) external virtual {
+  function testConcrete_AfterUsingContractSwitcher_ReceiveNativeToken_NewImpl(
+    address user,
+    uint256 amount
+  ) external virtual {
     vm.assume(amount > 0 && user != _proxyAdmin);
     vm.deal(user, amount);
     _manualUpgradeTo(_switcher);

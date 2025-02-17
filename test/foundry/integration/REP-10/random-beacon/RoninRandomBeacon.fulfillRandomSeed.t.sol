@@ -117,10 +117,7 @@ contract RoninRandomBeacon_FulfillRandomSeed_Test is REP10_BaseTest {
     this.wrapUpPeriods({ times: 1, shouldSubmitBeacon: true });
   }
 
-  function wrapUpPeriods(
-    uint256 times,
-    bool shouldSubmitBeacon
-  ) external returns (VmSafe.Log[][] memory logs) {
+  function wrapUpPeriods(uint256 times, bool shouldSubmitBeacon) external returns (VmSafe.Log[][] memory logs) {
     LibWrapUpEpoch.wrapUpPeriods({ times: times, shouldSubmitBeacon: shouldSubmitBeacon });
   }
 
