@@ -4,17 +4,26 @@ pragma solidity ^0.8.13;
 import "../../REP-10_Base.t.sol";
 
 contract RoninRandomBeaconXProfileTest is REP10_BaseTest {
-  function testFail_ChangeSameKeyAsOtherAdmin() external {
+  function testConcrete_RevertIf_ChangeSameKeyAsOtherAdmin() external {
     LibVRFProof.VRFKey[] memory keys = abi.decode(vme.getUserDefinedConfig("vrf-keys"), (LibVRFProof.VRFKey[]));
     LibVRFProof.VRFKey memory keyToChange = keys[keys.length - 1];
 
     address cidToChangeVRF = profile.getVRFKeyHash2Id(keyToChange.keyHash);
     address adminToChangeVRF = profile.getId2Admin(cidToChangeVRF);
 
+    vm.expectRevert();
     vm.prank(adminToChangeVRF);
     profile.changeVRFKeyHash(cidToChangeVRF, keys[0].keyHash);
+  }
 
+  function wrapUpPeriod() external {
     LibWrapUpEpoch.wrapUpPeriod();
+  }
+
+  function wrapUpEpochAndSubmitBeacons(
+    LibVRFProof.VRFKey[] memory keys
+  ) external {
+    LibWrapUpEpoch.wrapUpEpochAndSubmitBeacons(keys);
   }
 
   function testConcrete_NewlyChangedVRFKey_CanSubmitRandom_ForNextPeriod() external {
@@ -34,7 +43,7 @@ contract RoninRandomBeaconXProfileTest is REP10_BaseTest {
     LibWrapUpEpoch.wrapUpPeriod();
   }
 
-  function testFailConcrete_RevertWhen_NewlyChangedVRFKey_SubmitForBeacon() external {
+  function testConcrete_RevertWhen_NewlyChangedVRFKey_SubmitForBeacon() external {
     LibWrapUpEpoch.wrapUpPeriods({ times: 1, shouldSubmitBeacon: false });
 
     LibVRFProof.VRFKey[] memory keys = abi.decode(vme.getUserDefinedConfig("vrf-keys"), (LibVRFProof.VRFKey[]));
@@ -56,7 +65,8 @@ contract RoninRandomBeaconXProfileTest is REP10_BaseTest {
     vm.prank(adminToChangeVRF);
     profile.changeVRFKeyHash(cidToChangeVRF, newKey.keyHash);
 
-    LibWrapUpEpoch.wrapUpEpochAndSubmitBeacons(keys);
+    vm.expectRevert();
+    this.wrapUpEpochAndSubmitBeacons(keys);
   }
 
   function testConcrete_WhenPassedRegisteredCoolDown_NewlyJoinedGoverningValidator_canSubmitBeacon() external {

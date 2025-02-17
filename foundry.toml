@@ -18,6 +18,7 @@ evm_version = 'london'
 cache_path = 'cache_foundry'
 fs_permissions = [{ access = "read-write", path = "./" }]
 gas_limit = "18446744073709551615"
+allow_internal_expect_revert = true
 
 [fmt]
 line_length = 120
