@@ -74,7 +74,7 @@ contract RoninRandomBeacon_FulfillRandomSeed_Test is REP10_BaseTest {
     }
   }
 
-  function testFail_IfResubmitBeacon() external {
+  function testConcrete_RevertIf_IfResubmitBeacon() external {
     vm.skip(true);
     LibVRFProof.VRFKey[] memory keys = abi.decode(vme.getUserDefinedConfig("vrf-keys"), (LibVRFProof.VRFKey[]));
     // Duplicate the last key
@@ -85,7 +85,7 @@ contract RoninRandomBeacon_FulfillRandomSeed_Test is REP10_BaseTest {
     LibWrapUpEpoch.wrapUpPeriods({ times: 1, shouldSubmitBeacon: true });
   }
 
-  function testFail_VRFKeyHashOwner_IsNotGoverningValidator() external {
+  function testConcrete_RevertIf_VRFKeyHashOwner_IsNotGoverningValidator() external {
     LibVRFProof.VRFKey[] memory keys = abi.decode(vme.getUserDefinedConfig("vrf-keys"), (LibVRFProof.VRFKey[]));
     LibVRFProof.VRFKey[] memory newKeys = new LibVRFProof.VRFKey[](keys.length + 1);
 
@@ -113,10 +113,18 @@ contract RoninRandomBeacon_FulfillRandomSeed_Test is REP10_BaseTest {
     vm.prank(adminToChangeVRF);
     profile.changeVRFKeyHash(standardValidatorId, invalidKey.keyHash);
 
-    LibWrapUpEpoch.wrapUpPeriods({ times: 1, shouldSubmitBeacon: true });
+    vm.expectRevert();
+    this.wrapUpPeriods({ times: 1, shouldSubmitBeacon: true });
   }
 
-  function testFailConcrete_RevertIf_NewlyJoinedGoverningValidator_SubmitBeacon() external {
+  function wrapUpPeriods(
+    uint256 times,
+    bool shouldSubmitBeacon
+  ) external returns (VmSafe.Log[][] memory logs) {
+    LibWrapUpEpoch.wrapUpPeriods({ times: times, shouldSubmitBeacon: shouldSubmitBeacon });
+  }
+
+  function testConcrete_RevertIf_NewlyJoinedGoverningValidator_SubmitBeacon() external {
     LibWrapUpEpoch.wrapUpPeriods({ times: 1, shouldSubmitBeacon: false });
 
     address newCandidate = makeAddr("new-candidate");
@@ -156,7 +164,13 @@ contract RoninRandomBeacon_FulfillRandomSeed_Test is REP10_BaseTest {
     // Update key hash for new GV
     vm.prank(profile.getId2Admin(cid));
     profile.changeVRFKeyHash(cid, newKey.keyHash);
+    vm.expectRevert();
+    this.wrapUpEpochAndSubmitBeacons(newKeys);
+  }
 
-    LibWrapUpEpoch.wrapUpEpochAndSubmitBeacons(newKeys);
+  function wrapUpEpochAndSubmitBeacons(
+    LibVRFProof.VRFKey[] memory keys
+  ) external returns (VmSafe.Log[] memory logs) {
+    LibWrapUpEpoch.wrapUpEpochAndSubmitBeacons(keys);
   }
 }

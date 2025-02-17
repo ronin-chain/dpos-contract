@@ -39,7 +39,7 @@ contract LibIndexMapTest is Test {
     uint16 length = 10;
     IndexMap memory map = LibIndexMap.create(length);
 
-    vm.expectRevert();
+    vm.expectRevert(abi.encodeWithSelector(LibIndexMap.ErrOutOfRange.selector, uint256(1000)));
     map.set(1000);
   }
 

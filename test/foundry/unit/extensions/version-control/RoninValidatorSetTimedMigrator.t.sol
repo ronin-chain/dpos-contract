@@ -85,7 +85,7 @@ contract RoninValidatorSetTimedMigratorTest is ConditionalImplementControlTest {
   /**
    * @notice Checks before upgrading.
    */
-  function test_BeforeUpgrading() public view override {
+  function testConcrete_BeforeUpgrading() public view override {
     assertEq(ILogicValidatorSet(_proxy).currentPeriod(), 0);
   }
 
@@ -93,8 +93,8 @@ contract RoninValidatorSetTimedMigratorTest is ConditionalImplementControlTest {
    * @notice Checks whether the delegate calls are still to the old implementation contract after upgrading to the
    * contract switcher.
    */
-  function test_AfterUsingContractSwitcher_DelegateCall_OldImpl() public override {
-    test_BeforeUpgrading();
+  function testConcrete_AfterUsingContractSwitcher_DelegateCall_OldImpl() public override {
+    testConcrete_BeforeUpgrading();
     _manualUpgradeTo(_switcher);
     assertEq(ILogicValidatorSet(_proxy).version(), ILogicValidatorSet(_oldImpl).version());
     ILogicValidatorSet(_proxy).wrapUpEpoch();
@@ -105,9 +105,9 @@ contract RoninValidatorSetTimedMigratorTest is ConditionalImplementControlTest {
    * @notice Checks whether the delegate calls are to the new implementation contract after upgrading to the contract
    * switcher and the switch condition is met.
    */
-  function test_AfterUsingContractSwitcher_DelegateCall_NewImpl() external override {
+  function testConcrete_AfterUsingContractSwitcher_DelegateCall_NewImpl() external override {
     vm.skip(true);
-    test_AfterUsingContractSwitcher_DelegateCall_OldImpl();
+    testConcrete_AfterUsingContractSwitcher_DelegateCall_OldImpl();
     vm.roll(_upgradedAtBlock);
     assertEq(ILogicValidatorSet(_proxy).version(), ILogicValidatorSet(_oldImpl).version());
     ILogicValidatorSet(_proxy).wrapUpEpoch();
@@ -118,7 +118,7 @@ contract RoninValidatorSetTimedMigratorTest is ConditionalImplementControlTest {
    * @notice Checks whether the proxy can receive native token using old implemenation after upgrading to the contract
    * switcher.
    */
-  function test_AfterUsingContractSwitcher_ReceiveNativeToken_OldImpl(address user, uint256 amount) external override {
+  function testConcrete_AfterUsingContractSwitcher_ReceiveNativeToken_OldImpl(address user, uint256 amount) external override {
     vm.assume(amount > 0 && user != _proxyAdmin);
     vm.deal(user, amount);
     _manualUpgradeTo(_switcher);
@@ -135,7 +135,7 @@ contract RoninValidatorSetTimedMigratorTest is ConditionalImplementControlTest {
    * @notice Checks whether the proxy can receive native token using new implemenation after upgrading to the contract
    * switcher.
    */
-  function test_AfterUsingContractSwitcher_ReceiveNativeToken_NewImpl(address user, uint256 amount) external override {
+  function testConcrete_AfterUsingContractSwitcher_ReceiveNativeToken_NewImpl(address user, uint256 amount) external override {
     vm.skip(true);
     vm.assume(amount > 0 && user != _proxyAdmin);
     vm.deal(user, amount);
