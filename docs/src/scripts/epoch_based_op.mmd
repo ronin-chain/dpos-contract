@@ -1,0 +1,74 @@
+sequenceDiagram
+    actor block producer
+    
+    participant RoninValidatorSet
+    participant FastFinalityTracking
+    participant RoninRandomBeacon
+    participant SlashIndicator
+    participant Staking
+    participant StakingVesting
+    participant Maintenance
+    participant RoninTrustedOrganizations
+
+    loop Every Epoch
+    block producer->>RoninValidatorSet: wrapUpEpoch()
+
+    alt Have not requested randomize round for next period
+        RoninValidatorSet->>RoninRandomBeacon: request random seed for next period.
+    end
+
+    loop Every Candidate
+        RoninValidatorSet->>FastFinalityTracking: accumulate fast finality reward by score of last epoch.
+    end
+
+    alt Period is ending
+    loop Every Candidate
+        alt Is Governing Validator
+            RoninValidatorSet->>RoninRandomBeacon: slash who have missed random beacon submission.
+            RoninRandomBeacon->>RoninRandomBeacon: check unavailiblity count meet threshold
+
+            alt Meet threshold
+                RoninRandomBeacon->>SlashIndicator: slash random beacon
+                SlashIndicator->>RoninValidatorSet: execute slash
+            end
+        end
+        
+        RoninValidatorSet->>SlashIndicator: update credit score.
+        SlashIndicator->>Maintenance: check maintenance status.
+        SlashIndicator->>RoninValidatorSet: check jail status.
+
+        alt Is on maintenance or jailed
+            SlashIndicator->>SlashIndicator: credit score += 0.
+        else
+            SlashIndicator->>SlashIndicator: credit score += default score - num block missed.
+        end
+
+        RoninValidatorSet-->RoninValidatorSet: exclude who are not eligible for receiving rewards.
+        RoninValidatorSet->>block producer: distribute reward.
+    end
+
+    RoninValidatorSet->>Staking: credit rewards for delegators.
+    alt Is reward deprecated
+        RoninValidatorSet->>StakingVesting: recycle deprecate reward
+    end
+    RoninValidatorSet->>StakingVesting: recycle locked funds from emergency exit.
+
+    alt Is revoked
+        RoninValidatorSet->>SlashIndicator: reset credit score.
+    end
+
+    RoninValidatorSet->>RoninRandomBeacon: finalize random seed for next period validator selection
+
+    end
+
+    RoninValidatorSet-->RoninRandomBeacon: get new set of validators for next epoch
+
+    alt Validator set is empty
+        RoninValidatorSet-->RoninTrustedOrganizations: fallback to governing validators
+    end
+
+    RoninValidatorSet-->RoninValidatorSet: check jail status
+    RoninValidatorSet-->Maintenance: check is on maintenance
+    RoninValidatorSet-->RoninValidatorSet: exclude those who are jailed, on maintenance, renounced or emergency exit from new list.
+
+    end
