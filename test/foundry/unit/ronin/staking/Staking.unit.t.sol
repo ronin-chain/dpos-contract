@@ -11,6 +11,8 @@ import { LibApplyCandidate } from "script/shared/libraries/LibApplyCandidate.sol
 import { LibPrecompile } from "script/shared/libraries/LibPrecompile.sol";
 import { Contract } from "script/utils/Contract.sol";
 import { TransparentUpgradeableProxyV2 } from "src/extensions/TransparentUpgradeableProxyV2.sol";
+
+import { ICandidateStaking } from "src/interfaces/staking/ICandidateStaking.sol";
 import { IRoninValidatorSet } from "src/interfaces/validator/IRoninValidatorSet.sol";
 import { Maintenance } from "src/ronin/Maintenance.sol";
 import { IProfile, Profile, TConsensus } from "src/ronin/profile/Profile.sol";
@@ -44,6 +46,27 @@ contract StakingTest is Test {
     staking = Staking(config.getAddressFromCurrentNetwork(Contract.Staking.key()));
     maintenance = Maintenance(config.getAddressFromCurrentNetwork(Contract.Maintenance.key()));
     validatorSet = IRoninValidatorSet(config.getAddressFromCurrentNetwork(Contract.RoninValidatorSet.key()));
+
+    vm.warp(vm.unixTime() / 1000);
+  }
+
+  function testConcrete_RevertIf_WhenChangeAdminAddr_ImmediateUnstake() external {
+    address admin = makeAddr("admin");
+    address consensus = makeAddr("consensus");
+
+    LibApplyCandidate.applyValidatorCandidate(address(staking), admin, consensus);
+    deal(admin, 2000 ether);
+    vm.prank(admin);
+    staking.stake{ value: 2000 ether }(TConsensus.wrap(consensus));
+
+    address newAdmin = makeAddr("new-admin");
+
+    vm.prank(admin);
+    profile.changeAdminAddr(consensus, newAdmin);
+
+    vm.prank(newAdmin);
+    vm.expectRevert(ICandidateStaking.ErrUnstakeTooEarly.selector);
+    staking.unstake(TConsensus.wrap(consensus), 1 ether);
   }
 
   function testConcrete_RevertIf_ChangeAdminAddr_IntoDelegator() external {
@@ -60,5 +83,20 @@ contract StakingTest is Test {
     vm.prank(admin);
     vm.expectRevert(abi.encodeWithSelector(StakingCallback.ErrAlreadyDelegator.selector));
     profile.changeAdminAddr(consensus, delegator);
+  }
+
+  function testConcrete_ChangeAdminAddr() external {
+    address admin = makeAddr("admin");
+    address consensus = makeAddr("consensus");
+
+    LibApplyCandidate.applyValidatorCandidate(address(staking), admin, consensus);
+
+    address newAdmin = makeAddr("new-admin");
+
+    vm.prank(admin);
+    profile.changeAdminAddr(consensus, newAdmin);
+
+    (address adminAddr,,) = staking.getPoolDetail(TConsensus.wrap(consensus));
+    assertEq(adminAddr, newAdmin, "!newAdmin");
   }
 }

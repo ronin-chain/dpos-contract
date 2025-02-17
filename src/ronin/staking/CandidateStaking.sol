@@ -280,6 +280,7 @@ abstract contract CandidateStaking is BaseStaking, ICandidateStaking, GlobalConf
     address newStakeholder
   ) internal onlyPoolAdmin(_pool, requester) {
     uint256 stakingAmount = _pool.stakingAmount;
+    _pool.lastDelegatingTimestamp[newStakeholder] = _pool.lastDelegatingTimestamp[requester];
 
     _changeDelegatingAmount(_pool, requester, 0, _pool.stakingTotal - stakingAmount);
     _changeDelegatingAmount(_pool, newStakeholder, stakingAmount, _pool.stakingTotal + stakingAmount);
