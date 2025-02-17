@@ -3,10 +3,12 @@ pragma solidity ^0.8.9;
 
 import "../../interfaces/IProfile.sol";
 import "../../interfaces/staking/IStakingCallback.sol";
-import "./CandidateStaking.sol";
+import "./CandidateStaking.sol";      
 import "./DelegatorStaking.sol";
 
 abstract contract StakingCallback is CandidateStaking, DelegatorStaking, IStakingCallback {
+  error ErrAlreadyDelegator();
+
   /**
    * @dev Requirements:
    * - Only Profile contract can call this method.
@@ -17,6 +19,8 @@ abstract contract StakingCallback is CandidateStaking, DelegatorStaking, IStakin
     address newAdminAddr
   ) external override onlyContract(ContractType.PROFILE) {
     PoolDetail storage _pool = _poolDetail[poolId];
+
+    if (_pool.delegatingAmount[currAdminAddr] != 0) revert ErrAlreadyDelegator();
 
     _pool.wasAdmin[newAdminAddr] = true;
     _changeStakeholder({ _pool: _pool, requester: currAdminAddr, newStakeholder: newAdminAddr });
