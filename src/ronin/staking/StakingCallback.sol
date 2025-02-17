@@ -3,7 +3,7 @@ pragma solidity ^0.8.9;
 
 import "../../interfaces/IProfile.sol";
 import "../../interfaces/staking/IStakingCallback.sol";
-import "./CandidateStaking.sol";      
+import "./CandidateStaking.sol";
 import "./DelegatorStaking.sol";
 
 abstract contract StakingCallback is CandidateStaking, DelegatorStaking, IStakingCallback {
