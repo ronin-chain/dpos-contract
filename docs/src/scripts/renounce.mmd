@@ -1,0 +1,12 @@
+sequenceDiagram
+    actor candidate admin
+    
+    participant RoninValidatorSet
+    participant Staking
+
+    candidate->>Staking: requestRenounce(consensus)
+    Staking->>RoninValidatorSet: request renounce for validator
+    alt Is Governing Validator
+        RoninValidatorSet-->>RoninValidatorSet: revert
+    end
+    RoninValidatorSet->>RoninValidatorSet: set target timestamp revoking as candidate
