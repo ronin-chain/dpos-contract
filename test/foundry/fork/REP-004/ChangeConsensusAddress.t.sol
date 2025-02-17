@@ -884,7 +884,7 @@ contract ChangeConsensusAddressForkTest is Test {
     assertEq(afterUpgradedReward, beforeUpgradeReward, "afterUpgradedReward != beforeUpgradeReward");
   }
 
-  function testFailFork_RevertWhen_AfterUpgraded_DifferentAdmins_ShareSameConsensusAddr() external upgrade {
+  function testFork_RevertWhen_AfterUpgraded_DifferentAdmins_ShareSameConsensusAddr() external upgrade {
     TConsensus[] memory validatorCandidates = _validator.getValidatorCandidates();
     TConsensus validatorCandidate = validatorCandidates[0];
     address cid = TConsensus.unwrap(validatorCandidate);
@@ -916,13 +916,13 @@ contract ChangeConsensusAddressForkTest is Test {
     _applyValidatorCandidate("candidate-admin-1", "consensus-1");
   }
 
-  function testFailFork_RevertWhen_AfterUpgraded_ReapplyValidatorCandidateByPeriod() external upgrade {
+  function testFork_RevertWhen_AfterUpgraded_ReapplyValidatorCandidateByPeriod() external upgrade {
     _applyValidatorCandidate("candidate-admin", "consensus");
     _bulkWrapUpEpoch(1);
     _applyValidatorCandidate("candidate-admin", "consensus");
   }
 
-  function testFailFork_RevertWhen_AfterUpgraded_ReapplyValidatorCandidate() external upgrade {
+  function testFork_RevertWhen_AfterUpgraded_ReapplyValidatorCandidate() external upgrade {
     _applyValidatorCandidate("candidate-admin", "consensus");
     _applyValidatorCandidate("candidate-admin", "consensus");
   }

@@ -8,10 +8,10 @@ fi
 name="$1"
 
 # Check if the input JSON file exists
-json_file="config/${name}.json"
+json_file="script/config/${name}.json"
 
 # Generate the YAML file path dynamically
-yaml_file="config/${name}.yaml"
+yaml_file="script/config/${name}.yaml"
 
 # Use yq to convert JSON to YAML
 yq eval -o yaml "$json_file" >"$yaml_file"
