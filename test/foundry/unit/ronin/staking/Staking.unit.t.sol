@@ -51,7 +51,117 @@ contract StakingTest is Test {
     vm.warp(vm.unixTime() / 1000);
   }
 
-  function testConcrete_RevertIf_WhenChangeAdminAddr_ImmediateUnstake() external {
+  function testConcrete_RevertIf_ChangeAdminAddr_ToDelegator_DelegateToManyPools_IfNotUndelegateAll() external {
+    address admin1 = makeAddr("admin1");
+    address admin2 = makeAddr("admin2");
+    address consensus1 = makeAddr("consensus1");
+    address consensus2 = makeAddr("consensus2");
+    address delegator = makeAddr("delegator");
+
+    LibApplyCandidate.applyValidatorCandidate(address(staking), admin1, consensus1);
+    LibApplyCandidate.applyValidatorCandidate(address(staking), admin2, consensus2);
+
+    deal(delegator, 100 ether);
+    vm.prank(delegator);
+    staking.delegate{ value: 100 ether }(TConsensus.wrap(consensus1));
+
+    deal(delegator, 200 ether);
+    vm.prank(delegator);
+    staking.delegate{ value: 200 ether }(TConsensus.wrap(consensus2));
+
+    uint256 cooldownSecToUndelegate = staking.cooldownSecsToUndelegate();
+    vm.warp(block.timestamp + cooldownSecToUndelegate + 1);
+
+    vm.prank(delegator);
+    staking.undelegate(TConsensus.wrap(consensus2), 200 ether);
+
+    vm.prank(admin1);
+    vm.expectRevert(IBaseStaking.ErrAlreadyDelegator.selector);
+    profile.changeAdminAddr(consensus1, delegator);
+
+    vm.prank(delegator);
+    staking.undelegate(TConsensus.wrap(consensus1), 100 ether);
+
+    // Should pass
+    vm.prank(admin1);
+    profile.changeAdminAddr(consensus1, delegator);
+  }
+
+  function testConcrete_SuccessIf_ChangeAdminAddr_ToDelegator_OfSamePool_IfUndelegateAll() external {
+    address admin = makeAddr("admin");
+    address consensus = makeAddr("consensus");
+    address delegator = makeAddr("delegator");
+
+    LibApplyCandidate.applyValidatorCandidate(address(staking), admin, consensus);
+
+    uint256 cooldownSecToUndelegate = staking.cooldownSecsToUndelegate();
+
+    deal(delegator, 100 ether);
+    vm.prank(delegator);
+    staking.delegate{ value: 100 ether }(TConsensus.wrap(consensus));
+
+    vm.warp(block.timestamp + cooldownSecToUndelegate + 1);
+
+    vm.prank(delegator);
+    staking.undelegate(TConsensus.wrap(consensus), 100 ether);
+
+    assertEq(staking.getStakingAmount(TConsensus.wrap(consensus), delegator), 0, "!delegatedStake");
+
+    vm.prank(admin);
+    profile.changeAdminAddr(consensus, delegator);
+
+    (address adminAddr,,) = staking.getPoolDetail(TConsensus.wrap(consensus));
+    assertEq(adminAddr, delegator, "!delegator");
+
+    // New admin should not be able to delegate to any pool
+    address consensus2 = makeAddr("consensus2");
+    address admin2 = makeAddr("admin2");
+
+    LibApplyCandidate.applyValidatorCandidate(address(staking), admin2, consensus2);
+
+    deal(delegator, 100 ether);
+    vm.prank(delegator);
+    vm.expectPartialRevert(IBaseStaking.ErrAdminOfAnyActivePoolForbidden.selector);
+    staking.delegate{ value: 100 ether }(TConsensus.wrap(consensus2));
+
+    vm.prank(delegator);
+    vm.expectPartialRevert(IBaseStaking.ErrAdminOfAnyActivePoolForbidden.selector);
+    staking.delegate{ value: 100 ether }(TConsensus.wrap(consensus));
+  }
+
+  function testConcrete_SuccessIf_ChangeAdminAddr_ToDelegator_DifferentPool_IfUndelegateAll() external {
+    address admin1 = makeAddr("admin1");
+    address admin2 = makeAddr("admin2");
+
+    address consensus1 = makeAddr("test-consensus-0");
+    address consensus2 = makeAddr("test-consensus-1");
+
+    address delegator = makeAddr("delegator");
+
+    LibApplyCandidate.applyValidatorCandidate(address(staking), admin1, consensus1);
+    LibApplyCandidate.applyValidatorCandidate(address(staking), admin2, consensus2);
+
+    uint256 cooldownSecToUndelegate = staking.cooldownSecsToUndelegate();
+
+    deal(delegator, 100 ether);
+    vm.prank(delegator);
+    staking.delegate{ value: 100 ether }(TConsensus.wrap(consensus2));
+
+    vm.warp(block.timestamp + cooldownSecToUndelegate + 1);
+
+    vm.prank(delegator);
+    staking.undelegate(TConsensus.wrap(consensus2), 100 ether);
+
+    assertEq(staking.getStakingAmount(TConsensus.wrap(consensus2), delegator), 0, "!delegatedStake");
+
+    vm.prank(admin1);
+    profile.changeAdminAddr(consensus1, delegator);
+
+    (address adminAddr,,) = staking.getPoolDetail(TConsensus.wrap(consensus1));
+    assertEq(adminAddr, delegator, "!delegator");
+  }
+
+  function testConcrete_RevertIf_ChangeAdminAddr_ImmediateUnstake() external {
     address admin = makeAddr("admin");
     address consensus = makeAddr("consensus");
 
@@ -119,11 +229,11 @@ contract StakingTest is Test {
     staking.delegate{ value: 100 ether }(TConsensus.wrap(consensus));
 
     vm.prank(admin);
-    vm.expectRevert(abi.encodeWithSelector(StakingCallback.ErrAlreadyDelegator.selector));
+    vm.expectRevert(abi.encodeWithSelector(IBaseStaking.ErrAlreadyDelegator.selector));
     profile.changeAdminAddr(consensus, delegator);
   }
 
-  function testConcrete_ChangeAdminAddr() external {
+  function testConcrete_ChangeAdminAddr_ToCleanAddress() external {
     address admin = makeAddr("admin");
     address consensus = makeAddr("consensus");
 

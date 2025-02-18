@@ -7,8 +7,6 @@ import "./CandidateStaking.sol";
 import "./DelegatorStaking.sol";
 
 abstract contract StakingCallback is CandidateStaking, DelegatorStaking, IStakingCallback {
-  error ErrAlreadyDelegator();
-
   /**
    * @dev Requirements:
    * - Only Profile contract can call this method.

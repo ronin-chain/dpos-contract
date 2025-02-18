@@ -47,6 +47,9 @@ interface IBaseStaking {
   error ErrInactivePool(TConsensus consensusAddr, address poolId);
   /// @dev Error of length of input arrays are not of the same.
   error ErrInvalidArrays();
+  /// @dev Error of the targeting pool admin address is already a delegator.
+  error ErrAlreadyDelegator();
+
 
   /**
    * @dev Returns whether the `admin` is currently active.
