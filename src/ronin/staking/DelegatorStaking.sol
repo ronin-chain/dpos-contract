@@ -62,6 +62,7 @@ abstract contract DelegatorStaking is BaseStaking, IDelegatorStaking {
     uint256 amount
   ) external nonReentrant poolOfConsensusIsActive(consensusAddrDst) {
     address delegator = msg.sender;
+    if (isAdminOfActivePool(msg.sender)) revert ErrAdminOfAnyActivePoolForbidden(msg.sender);
     _undelegate(consensusAddrSrc, _poolDetail[__css2cid(consensusAddrSrc)], delegator, amount);
     _delegate(_poolDetail[__css2cid(consensusAddrDst)], delegator, amount);
   }

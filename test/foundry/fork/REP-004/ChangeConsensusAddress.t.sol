@@ -31,6 +31,8 @@ import { ContractType } from "src/utils/ContractType.sol";
 contract ChangeConsensusAddressForkTest is Test {
   using StdStyle for *;
 
+  error ErrAlreadyDelegator();
+
   string constant RONIN_TEST_RPC = "https://saigon-archive.roninchain.com/rpc";
   string constant RONIN_MAIN_RPC = "https://api-archived.roninchain.com/rpc";
   bytes32 constant ADMIN_SLOT = 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103;
@@ -1077,7 +1079,7 @@ contract ChangeConsensusAddressForkTest is Test {
 
     uint256 amount = _staking.minValidatorStakingAmount();
     vm.deal(candidateAdmin, amount);
-    vm.prank(candidateAdmin, candidateAdmin);
+    vm.prank(candidateAdmin);
     _staking.applyValidatorCandidate{ value: amount }(
       candidateAdmin, consensusAddr, payable(candidateAdmin), 1500, pubKey, ""
     );

@@ -18,6 +18,8 @@ abstract contract StakingCallback is CandidateStaking, DelegatorStaking, IStakin
   ) external override onlyContract(ContractType.PROFILE) {
     PoolDetail storage _pool = _poolDetail[poolId];
 
+    if (_pool.delegatingAmount[newAdminAddr] != 0) revert ErrAlreadyDelegator();
+
     _pool.wasAdmin[newAdminAddr] = true;
     _changeStakeholder({ _pool: _pool, requester: currAdminAddr, newStakeholder: newAdminAddr });
 
