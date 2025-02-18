@@ -233,7 +233,7 @@ contract StakingTest is Test {
     profile.changeAdminAddr(consensus, delegator);
   }
 
-  function testConcrete_ChangeAdminAddr_ToCleanAddress() external {
+  function testConcrete_SuccessIf_ChangeAdminAddr_ToCleanAddress() external {
     address admin = makeAddr("admin");
     address consensus = makeAddr("consensus");
 
