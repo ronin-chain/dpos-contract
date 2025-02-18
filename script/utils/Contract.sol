@@ -30,7 +30,8 @@ enum Contract {
   Profile_Mainnet,
   PostChecker,
   RoninRandomBeacon,
-  RoninValidatorSetREP10Migrator
+  RoninValidatorSetREP10Migrator,
+  RoninBaseFeeTreasury
 }
 
 using { key, name } for Contract global;
@@ -71,6 +72,7 @@ function name(
   if (contractEnum == Contract.RoninRandomBeacon) return "RoninRandomBeacon";
   if (contractEnum == Contract.PostChecker) return "PostChecker";
   if (contractEnum == Contract.RoninValidatorSetREP10Migrator) return "RoninValidatorSetREP10Migrator";
+  if (contractEnum == Contract.RoninBaseFeeTreasury) return "RoninBaseFeeTreasury";
 
   revert("Contract: Unknown contract");
 }

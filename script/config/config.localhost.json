@@ -1,0 +1,130 @@
+{
+    "initialOwner": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+    "maintenance": {
+        "cooldownSecsToMaintain": 259200,
+        "maxMaintenanceDurationInBlock": 1000,
+        "maxOffsetToStartSchedule": 1400,
+        "maxSchedules": 3,
+        "minMaintenanceDurationInBlock": 100,
+        "minOffsetToStartSchedule": 200
+    },
+    "profile": {
+        "cooldown": 0
+    },
+    "roninBaseFeeTreasury": {
+        "denom": 3,
+        "num": 2
+    },
+    "roninGovernanceAdmin": {
+        "proposalExpiryDuration": 1209600
+    },
+    "roninRandomBeacon": {
+        "activatedAtPeriod": 20049,
+        "slashThreshold": 3,
+        "thresholds": [
+            4,
+            0,
+            11,
+            15
+        ],
+        "validatorTypes": [
+            2,
+            3,
+            4,
+            1
+        ]
+    },
+    "roninTrustedOrganization": {
+        "denominator": 1,
+        "numerator": 0,
+        "trustedOrganizations": [
+            {
+                "__deprecatedBridgeVoter": "0x0000000000000000000000000000000000000000",
+                "addedBlock": 0,
+                "consensusAddr": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+                "governor": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+                "weight": 100
+            },
+            {
+                "__deprecatedBridgeVoter": "0x0000000000000000000000000000000000000000",
+                "addedBlock": 0,
+                "consensusAddr": "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
+                "governor": "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",
+                "weight": 100
+            },
+            {
+                "__deprecatedBridgeVoter": "0x0000000000000000000000000000000000000000",
+                "addedBlock": 0,
+                "consensusAddr": "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
+                "governor": "0x976EA74026E726554dB657fA54763abd0C3a0aa9",
+                "weight": 100
+            },
+            {
+                "__deprecatedBridgeVoter": "0x0000000000000000000000000000000000000000",
+                "addedBlock": 0,
+                "consensusAddr": "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955",
+                "governor": "0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f",
+                "weight": 100
+            }
+        ]
+    },
+    "roninValidatorSet": {
+        "emergencyExitLockedAmount": 500,
+        "emergencyExpiryDuration": 1209600,
+        "maxPrioritizedValidatorNumber": 4,
+        "maxValidatorCandidate": 100,
+        "maxValidatorNumber": 15,
+        "minEffectiveDaysOnwards": 7,
+        "numberOfBlocksInEpoch": 200
+    },
+    "roninValidatorSetREP10Migrator": {
+        "activatedAtPeriod": 20049
+    },
+    "slashIndicator": {
+        "__deprecatedSlashBridgeOperator": {
+            "jailDurationForMissingVotesRatioTier2": 57600,
+            "missingVotesRatioTier1": 1000,
+            "missingVotesRatioTier2": 2000,
+            "skipBridgeOperatorSlashingThreshold": 10
+        },
+        "__deprecatedSlashBridgeVoting": {
+            "bridgeVotingSlashAmount": 10000000000000000000000,
+            "bridgeVotingThreshold": 86400
+        },
+        "creditScore": {
+            "bailOutCostMultiplier": 2,
+            "cutOffPercentageAfterBailout": 5000,
+            "gainCreditScore": 100,
+            "maxCreditScore": 2400
+        },
+        "slashDoubleSign": {
+            "doubleSigningJailUntilBlock": 100,
+            "doubleSigningOffsetLimitBlock": 28800,
+            "slashDoubleSignAmount": 10000000000000000000
+        },
+        "slashRandomBeacon": {
+            "activatedAtPeriod": 20049,
+            "randomBeaconSlashAmount": 10000000000000000000
+        },
+        "slashUnavailability": {
+            "jailDurationForUnavailabilityTier2Threshold": 57600,
+            "slashAmountForUnavailabilityTier2Threshold": 1000000000000000000,
+            "unavailabilityTier1Threshold": 5,
+            "unavailabilityTier2Threshold": 10
+        }
+    },
+    "staking": {
+        "cooldownSecsToUndelegate": 259200,
+        "maxCommissionRate": 10000,
+        "minValidatorStakingAmount": 100000000000000000000,
+        "waitingSecsToRevoke": 604800
+    },
+    "stakingVesting": {
+        "activatedAtPeriod": 20049,
+        "blockProducerBonusPerBlock": 1000,
+        "bridgeOperatorBonusPerBlock": 1100,
+        "fastFinalityRewardPercent": 100,
+        "fastFinalityRewardPercentREP10": 8500,
+        "topupAmount": 100000000000
+    }
+}

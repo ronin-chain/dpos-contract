@@ -98,6 +98,10 @@ library LibWrapUpEpoch {
           console.log("LibWrapUpEpoch: WARNING: EMPTY VALIDATOR SET".yellow());
         }
 
+        if (logs[i].topics[0] == ICoinbaseExecution.ZeroSumFastFinalityScore.selector) {
+          console.log("LibWrapUpEpoch: WARNING: Zero sum fast finality score");
+        }
+
         if (logs[i].topics[0] == ICoinbaseExecution.FastFinalityRewardDelegatorsDistributionFailed.selector) {
           revert("PANIC: Fast finality reward distribution for delegators failed");
         }
