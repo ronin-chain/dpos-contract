@@ -40,7 +40,5 @@ contract Migration_01_Upgrade_TestnetShadow_Release_v0_8_2 is RoninMigration {
     LibProposal.executeProposal(_governanceAdmin, _trustedOrg, _proposal);
   }
 
-  function _afterRunningScript() internal virtual override {
-
-  }
+  function _afterRunningScript() internal virtual override { }
 }

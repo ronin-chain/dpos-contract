@@ -10,9 +10,10 @@ import { Vm } from "forge-std/Vm.sol";
 import { console } from "forge-std/console.sol";
 
 import { IRoninGovernanceAdmin } from "src/interfaces/IRoninGovernanceAdmin.sol";
-import { ICoreGovernance } from "src/interfaces/extensions/sequential-governance/ICoreGovernance.sol";
+
 import { IRoninTrustedOrganization } from "src/interfaces/IRoninTrustedOrganization.sol";
 import { VoteStatusConsumer } from "src/interfaces/consumers/VoteStatusConsumer.sol";
+import { ICoreGovernance } from "src/interfaces/extensions/sequential-governance/ICoreGovernance.sol";
 import { Ballot } from "src/libraries/Ballot.sol";
 import { Proposal } from "src/libraries/Proposal.sol";
 
@@ -42,7 +43,8 @@ library LibProposal {
     Vm.Log[] memory logs = voteProposalUntilSuccess(governanceAdmin, roninTrustedOrg, proposal, support);
 
     for (uint256 i; i < logs.length; ++i) {
-      if (logs[i].emitter == address(governanceAdmin) && logs[i].topics[0] == ICoreGovernance.ProposalExecuted.selector) {
+      if (logs[i].emitter == address(governanceAdmin) && logs[i].topics[0] == ICoreGovernance.ProposalExecuted.selector)
+      {
         bool[] memory successes = abi.decode(logs[i].data, (bool[]));
         for (uint256 j; j < successes.length; ++j) {
           require(successes[j], string.concat("LibProposal: Proposal execution failed at call index ", vm.toString(j)));
@@ -51,7 +53,7 @@ library LibProposal {
       }
     }
 
-    revert ("LibProposal: Proposal execution logs not found");
+    revert("LibProposal: Proposal execution logs not found");
   }
 
   function _getStorageLogs() internal pure returns (Vm.Log[] storage $) {
@@ -117,7 +119,7 @@ library LibProposal {
       }
     }
 
-    logs =  _logs;
+    logs = _logs;
     for (uint256 i; i < logs.length; ++i) {
       delete _logs[i];
     }
