@@ -200,7 +200,7 @@ contract RoninMigration is BaseMigration {
       if (
         currentNetwork == DefaultNetwork.RoninTestnet.key() || currentNetwork == DefaultNetwork.RoninMainnet.key()
           || currentNetwork == Network.RoninDevnet.key() || currentNetwork == DefaultNetwork.LocalHost.key()
-          || currentNetwork == Network.ShadowForkMainnet.key()
+          || currentNetwork == Network.ShadowForkMainnet.key() || currentNetwork == Network.ShadowForkTestnet.key()
       ) {
         // handle for ronin network
         console.log(StdStyle.yellow("Voting on RoninGovernanceAdmin for upgrading..."));

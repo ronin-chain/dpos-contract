@@ -8,6 +8,6 @@ import { IBaseFeeTreasury } from "src/interfaces/basefee-treasury/IBaseFeeTreasu
 
 contract RoninBaseFeeTreasuryDeploy is RoninMigration {
   function run() public returns (IBaseFeeTreasury) {
-    return IBaseFeeTreasury(_deployImmutable(Contract.RoninBaseFeeTreasury.key()));
+    return IBaseFeeTreasury(_deployProxy(Contract.RoninBaseFeeTreasury.key()));
   }
 }

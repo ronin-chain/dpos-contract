@@ -10,6 +10,7 @@ import { Vm } from "forge-std/Vm.sol";
 import { console } from "forge-std/console.sol";
 
 import { IRoninGovernanceAdmin } from "src/interfaces/IRoninGovernanceAdmin.sol";
+import { ICoreGovernance } from "src/interfaces/extensions/sequential-governance/ICoreGovernance.sol";
 import { IRoninTrustedOrganization } from "src/interfaces/IRoninTrustedOrganization.sol";
 import { VoteStatusConsumer } from "src/interfaces/consumers/VoteStatusConsumer.sol";
 import { Ballot } from "src/libraries/Ballot.sol";
@@ -38,7 +39,26 @@ library LibProposal {
     Proposal.ProposalDetail memory proposal
   ) internal {
     Ballot.VoteType support = Ballot.VoteType.For;
-    voteProposalUntilSuccess(governanceAdmin, roninTrustedOrg, proposal, support);
+    Vm.Log[] memory logs = voteProposalUntilSuccess(governanceAdmin, roninTrustedOrg, proposal, support);
+
+    for (uint256 i; i < logs.length; ++i) {
+      if (logs[i].emitter == address(governanceAdmin) && logs[i].topics[0] == ICoreGovernance.ProposalExecuted.selector) {
+        bool[] memory successes = abi.decode(logs[i].data, (bool[]));
+        for (uint256 j; j < successes.length; ++j) {
+          require(successes[j], string.concat("LibProposal: Proposal execution failed at call index ", vm.toString(j)));
+        }
+        return;
+      }
+    }
+
+    revert ("LibProposal: Proposal execution logs not found");
+  }
+
+  function _getStorageLogs() internal pure returns (Vm.Log[] storage $) {
+    bytes32 slot = keccak256("storage-logs");
+    assembly {
+      $.slot := slot
+    }
   }
 
   function voteProposalUntilReject(
@@ -55,7 +75,7 @@ library LibProposal {
     IRoninTrustedOrganization roninTrustedOrg,
     Proposal.ProposalDetail memory proposal,
     Ballot.VoteType support
-  ) internal {
+  ) internal returns (Vm.Log[] memory logs) {
     IRoninTrustedOrganization.TrustedOrganization[] memory allTrustedOrgs = roninTrustedOrg.getAllTrustedOrganizations();
 
     bool shouldPrankOnly = config.isPostChecking();
@@ -69,7 +89,7 @@ library LibProposal {
     if (totalGas < DEFAULT_PROPOSAL_GAS) {
       totalGas = (DEFAULT_PROPOSAL_GAS * 12_000) / 10_000;
     }
-
+    Vm.Log[] storage _logs = _getStorageLogs();
     for (uint256 i = 0; i < allTrustedOrgs.length; ++i) {
       address iTrustedOrg = allTrustedOrgs[i].governor;
 
@@ -87,7 +107,19 @@ library LibProposal {
       } else {
         vm.broadcast(iTrustedOrg);
       }
+
+      vm.recordLogs();
       governanceAdmin.castProposalVoteForCurrentNetwork{ gas: totalGas }(proposal, support);
+      logs = vm.getRecordedLogs();
+
+      for (uint256 i; i < logs.length; ++i) {
+        _logs.push(logs[i]);
+      }
+    }
+
+    logs =  _logs;
+    for (uint256 i; i < logs.length; ++i) {
+      delete _logs[i];
     }
   }
 
