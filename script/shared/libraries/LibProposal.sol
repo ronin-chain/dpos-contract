@@ -30,7 +30,18 @@ library LibProposal {
     IRoninTrustedOrganization roninTrustedOrg,
     Proposal.ProposalDetail memory proposal
   ) internal {
-    proposeProposal(governanceAdmin, roninTrustedOrg, proposal, address(0));
+    Vm.Log[] memory logs = proposeProposal(governanceAdmin, roninTrustedOrg, proposal, address(0));
+    for (uint256 i; i < logs.length; ++i) {
+      if (logs[i].emitter == address(governanceAdmin) && logs[i].topics[0] == ICoreGovernance.ProposalExecuted.selector)
+      {
+        bool[] memory successes = abi.decode(logs[i].data, (bool[]));
+        for (uint256 j; j < successes.length; ++j) {
+          require(successes[j], string.concat("LibProposal: Proposal execution failed at call index ", vm.toString(j)));
+        }
+        return;
+      }
+    }
+
     voteProposalUntilExecute(governanceAdmin, roninTrustedOrg, proposal);
   }
 
@@ -114,8 +125,8 @@ library LibProposal {
       governanceAdmin.castProposalVoteForCurrentNetwork{ gas: totalGas }(proposal, support);
       logs = vm.getRecordedLogs();
 
-      for (uint256 i; i < logs.length; ++i) {
-        _logs.push(logs[i]);
+      for (uint256 j; j < logs.length; ++j) {
+        _logs.push(logs[j]);
       }
     }
 
@@ -130,7 +141,7 @@ library LibProposal {
     IRoninTrustedOrganization roninTrustedOrg,
     Proposal.ProposalDetail memory proposal,
     address proposer
-  ) internal {
+  ) internal returns (Vm.Log[] memory logs) {
     if (proposer == address(0)) {
       IRoninTrustedOrganization.TrustedOrganization[] memory allTrustedOrgs =
         roninTrustedOrg.getAllTrustedOrganizations();
@@ -144,6 +155,7 @@ library LibProposal {
     } else {
       vm.broadcast(proposer);
     }
+    vm.recordLogs();
     governanceAdmin.proposeProposalForCurrentNetwork(
       proposal.expiryTimestamp,
       proposal.targets,
@@ -152,6 +164,7 @@ library LibProposal {
       proposal.gasAmounts,
       Ballot.VoteType.For
     );
+    logs = vm.getRecordedLogs();
   }
 
   function executeProposal(
