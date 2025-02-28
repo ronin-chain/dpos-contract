@@ -9,7 +9,7 @@ import { MockProfile } from "src/mocks/MockProfile.sol";
 import { TConsensus } from "src/udvts/Types.sol";
 import { MockValidatorSet } from "test/foundry/mocks/MockValidatorSet.sol";
 
-contract Profile_Concrete_Unit_Test is Test {
+contract Profile_Concrete_Test is Test {
   MockProfile internal _profile;
   MockValidatorSet internal _validatorSetContract;
   address internal immutable _stakingContract = address(0x10000);
