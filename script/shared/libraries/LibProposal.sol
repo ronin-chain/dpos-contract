@@ -34,7 +34,7 @@ library LibProposal {
     for (uint256 i; i < logs.length; ++i) {
       if (logs[i].emitter == address(governanceAdmin) && logs[i].topics[0] == ICoreGovernance.ProposalExecuted.selector)
       {
-        bool[] memory successes = abi.decode(logs[i].data, (bool[]));
+        (bool[] memory successes,) = abi.decode(logs[i].data, (bool[]));
         for (uint256 j; j < successes.length; ++j) {
           require(successes[j], string.concat("LibProposal: Proposal execution failed at call index ", vm.toString(j)));
         }
@@ -54,9 +54,8 @@ library LibProposal {
     Vm.Log[] memory logs = voteProposalUntilSuccess(governanceAdmin, roninTrustedOrg, proposal, support);
 
     for (uint256 i; i < logs.length; ++i) {
-      if (logs[i].emitter == address(governanceAdmin) && logs[i].topics[0] == ICoreGovernance.ProposalExecuted.selector)
-      {
-        bool[] memory successes = abi.decode(logs[i].data, (bool[]));
+      if (logs[i].topics[0] == ICoreGovernance.ProposalExecuted.selector) {
+        (bool[] memory successes,) = abi.decode(logs[i].data, (bool[], bool[]));
         for (uint256 j; j < successes.length; ++j) {
           require(successes[j], string.concat("LibProposal: Proposal execution failed at call index ", vm.toString(j)));
         }
