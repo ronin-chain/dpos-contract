@@ -20,9 +20,9 @@ contract StakingVesting is
   RONTransferHelper
 {
   /// @dev The block bonus for the block producer whenever a new block is mined.
-  uint256 internal _blockProducerBonusPerBlock;
+  uint256 internal __deprecatedBlockProducerBonusPerBlock;
   /// @dev The block bonus for the bridge operator whenever a new block is mined.
-  uint256 internal _bridgeOperatorBonusPerBlock;
+  uint256 internal __deprecatedBridgeOperatorBonusPerBlock;
   /// @dev The last block number that the staking vesting sent.
   uint256 internal _lastBlockSendingBonus;
   /// @dev The percentage that extracted from reward of block producer for fast finality.
@@ -30,9 +30,12 @@ contract StakingVesting is
   /// @dev The fast finality reward percentage after REP-10 upgrade.
   uint256 internal _fastFinalityRewardPercentageREP10;
   /// @dev The period that REP-10 is activated.
-  uint256 internal _rep10ActivationPeriod;
+  uint256 internal __deprecatedRep10ActivationPeriod;
   /// @dev The boolean flag to check if REP-10 is activated.
-  bool internal _isREP10Activated;
+  bool internal __deprecatedIsREP10Activated;
+  Reward[] internal _blockRewards;
+  uint64 internal _minRewardAmount;
+  uint64 internal _maxRewardAmount;
 
   constructor() {
     _disableInitializers();
@@ -43,12 +46,10 @@ contract StakingVesting is
    */
   function initialize(
     address validatorContract,
-    uint256 blockProducerBonusPerBlock,
-    uint256 bridgeOperatorBonusPerBlock
+    uint256, /* blockProducerBonusPerBlock */ // Deprecated, no longer used
+    uint256 /* bridgeOperatorBonusPerBlock */ // Deprecated, no longer used
   ) external payable initializer {
     _setContract(ContractType.VALIDATOR, validatorContract);
-    _setBlockProducerBonusPerBlock(blockProducerBonusPerBlock);
-    _setBridgeOperatorBonusPerBlock(bridgeOperatorBonusPerBlock);
   }
 
   function initializeV2() external reinitializer(2) {
@@ -60,17 +61,91 @@ contract StakingVesting is
     _setFastFinalityRewardPercentage(fastFinalityRewardPercent);
   }
 
-  function initializeV4(uint256 activatedAtPeriod, uint256 fastFinalityRewardPercentREP10) external reinitializer(4) {
-    _rep10ActivationPeriod = activatedAtPeriod;
-    _fastFinalityRewardPercentageREP10 = fastFinalityRewardPercentREP10;
-    emit FastFinalityRewardPercentageUpdatedForREP10(fastFinalityRewardPercentREP10);
+  function initializeV4(
+    uint256, /* activatedAtPeriod */
+    uint256 /* fastFinalityRewardPercentREP10 */
+  ) external reinitializer(4) { }
+
+  function initializeV5(
+    uint64 minRewardAmount,
+    uint64 maxRewardAmount,
+    Reward[] calldata rewards
+  ) external reinitializer(5) {
+    _setBlockRewardRange(minRewardAmount, maxRewardAmount);
+    _updateBlockRewards(rewards);
   }
 
   /**
    * @inheritdoc IStakingVesting
    */
-  function getREP10ActivatedAtPeriod() external view override returns (uint256) {
-    return _rep10ActivationPeriod;
+  function updateBlockRewards(
+    Reward[] calldata rewards
+  ) external onlyAdmin {
+    _updateBlockRewards(rewards);
+  }
+
+  /**
+   * @inheritdoc IStakingVesting
+   */
+  function getBlockRewards() external view returns (Reward[] memory) {
+    return _blockRewards;
+  }
+
+  /**
+   * @inheritdoc IStakingVesting
+   */
+  function setBlockRewardRange(uint64 minRewardAmount, uint64 maxRewardAmount) external onlyAdmin {
+    _setBlockRewardRange(minRewardAmount, maxRewardAmount);
+  }
+
+  /**
+   * @inheritdoc IStakingVesting
+   */
+  function getBlockRewardRange() external view returns (uint64 minRewardAmount, uint64 maxRewardAmount) {
+    return (_minRewardAmount, _maxRewardAmount);
+  }
+
+  /**
+   * @dev See {IStakingVesting-setBlockRewardRange}.
+   */
+  function _setBlockRewardRange(uint64 minRewardAmount, uint64 maxRewardAmount) internal {
+    if (minRewardAmount > maxRewardAmount) revert ErrInvalidArguments(msg.sig);
+    _minRewardAmount = minRewardAmount;
+    _maxRewardAmount = maxRewardAmount;
+    emit BlockRewardRangeUpdated(msg.sender, minRewardAmount, maxRewardAmount);
+  }
+
+  /**
+   * @dev See {IStakingVesting-updateBlockRewards}.
+   */
+  function _updateBlockRewards(
+    Reward[] calldata rewards
+  ) internal {
+    uint256 length = rewards.length;
+    if (length == 0) revert ErrEmptyArray();
+    delete _blockRewards;
+
+    uint64 min = _minRewardAmount;
+    uint64 max = _maxRewardAmount;
+
+    for (uint256 i; i < length; ++i) {
+      if (rewards[i].amount < min || rewards[i].amount > max) revert ErrOutOfBound(rewards[i].amount, min, max);
+      // ensure descending order of startBlock
+      if (i > 0 && rewards[i].startBlock >= rewards[i - 1].startBlock) {
+        revert ErrOutOfOrder(i, rewards[i].startBlock, rewards[i - 1].startBlock);
+      }
+
+      _blockRewards.push(rewards[i]);
+    }
+
+    emit BlockProducerBonusPerBlockUpdated(msg.sender, rewards);
+  }
+
+  /**
+   * @inheritdoc IStakingVesting
+   */
+  function getREP10ActivatedAtPeriod() external view returns (uint256) {
+    return __deprecatedRep10ActivationPeriod;
   }
 
   /**
@@ -81,15 +156,19 @@ contract StakingVesting is
   /**
    * @inheritdoc IStakingVesting
    */
-  function blockProducerBlockBonus(uint256 /* _block */ ) public view override returns (uint256) {
-    return _blockProducerBonusPerBlock;
-  }
+  function blockProducerBlockBonus(
+    uint256 blockNumber
+  ) public view returns (uint64 bonus) {
+    bonus = _minRewardAmount;
+    Reward[] memory blockRewards = _blockRewards;
+    uint256 length = blockRewards.length;
 
-  /**
-   * @inheritdoc IStakingVesting
-   */
-  function bridgeOperatorBlockBonus(uint256 /* _block */ ) public view override returns (uint256) {
-    return _bridgeOperatorBonusPerBlock;
+    for (uint256 i; i < length; ++i) {
+      if (blockNumber >= blockRewards[i].startBlock) {
+        bonus = blockRewards[i].amount;
+        break;
+      }
+    }
   }
 
   /**
@@ -102,7 +181,7 @@ contract StakingVesting is
   /**
    * @inheritdoc IStakingVesting
    */
-  function fastFinalityRewardPercentage() external view override returns (uint256) {
+  function fastFinalityRewardPercentage() external view returns (uint256) {
     return _fastFinalityRewardPercentage;
   }
 
@@ -111,10 +190,9 @@ contract StakingVesting is
    */
   function requestBonus(
     bool forBlockProducer,
-    bool forBridgeOperator
+    bool /* forBridgeOperator */ // Deprecated, no longer used
   )
     external
-    override
     onlyContract(ContractType.VALIDATOR)
     returns (bool success, uint256 blockProducerBonus, uint256 bridgeOperatorBonus, uint256 fastFinalityRewardPercent)
   {
@@ -123,20 +201,9 @@ contract StakingVesting is
     _lastBlockSendingBonus = block.number;
 
     blockProducerBonus = forBlockProducer ? blockProducerBlockBonus(block.number) : 0;
-    bridgeOperatorBonus = forBridgeOperator ? bridgeOperatorBlockBonus(block.number) : 0;
-
-    if (!_isREP10Activated) {
-      uint256 currPeriod = IRoninValidatorSet(getContract(ContractType.VALIDATOR)).currentPeriod();
-      if (currPeriod >= _rep10ActivationPeriod) {
-        _isREP10Activated = true;
-        _setFastFinalityRewardPercentage(_fastFinalityRewardPercentageREP10);
-        emit REP10FastFinalityRewardActivated(currPeriod, _fastFinalityRewardPercentage);
-      }
-    }
-
     fastFinalityRewardPercent = _fastFinalityRewardPercentage;
 
-    uint256 totalAmount = blockProducerBonus + bridgeOperatorBonus;
+    uint256 totalAmount = blockProducerBonus;
 
     if (totalAmount > 0) {
       address payable validatorContractAddr = payable(msg.sender);
@@ -157,45 +224,11 @@ contract StakingVesting is
   /**
    * @inheritdoc IStakingVesting
    */
-  function setBlockProducerBonusPerBlock(uint256 amount) external override onlyAdmin {
-    _setBlockProducerBonusPerBlock(amount);
-  }
-
-  /**
-   * @inheritdoc IStakingVesting
-   */
-  function setBridgeOperatorBonusPerBlock(uint256 amount) external override onlyAdmin {
-    _setBridgeOperatorBonusPerBlock(amount);
-  }
-
-  /**
-   * @inheritdoc IStakingVesting
-   */
-  function setFastFinalityRewardPercentage(uint256 percent) external override onlyAdmin {
+  function setFastFinalityRewardPercentage(
+    uint256 percent
+  ) external onlyAdmin {
     if (percent > _MAX_PERCENTAGE) revert ErrInvalidArguments(msg.sig);
     _setFastFinalityRewardPercentage(percent);
-  }
-
-  /**
-   * @dev Sets the bonus amount per block for block producer.
-   *
-   * Emits the event `BlockProducerBonusPerBlockUpdated`.
-   *
-   */
-  function _setBlockProducerBonusPerBlock(uint256 amount) internal {
-    _blockProducerBonusPerBlock = amount;
-    emit BlockProducerBonusPerBlockUpdated(amount);
-  }
-
-  /**
-   * @dev Sets the bonus amount per block for bridge operator.
-   *
-   * Emits the event `BridgeOperatorBonusPerBlockUpdated`.
-   *
-   */
-  function _setBridgeOperatorBonusPerBlock(uint256 amount) internal {
-    _bridgeOperatorBonusPerBlock = amount;
-    emit BridgeOperatorBonusPerBlockUpdated(amount);
   }
 
   /**

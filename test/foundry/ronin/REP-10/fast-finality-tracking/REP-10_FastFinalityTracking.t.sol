@@ -64,9 +64,14 @@ contract REP_10_FastFinalityTrackingTest is REP10_BaseTest {
   }
 
   function _overrideRewardConfig() private {
+    IStakingVesting.Reward[] memory rewards = new IStakingVesting.Reward[](1);
+    rewards[0] = IStakingVesting.Reward({
+      startBlock: 0,
+      amount: uint64(blockBonus)
+    });
     vm.startPrank(address(governanceAdmin));
     TransparentUpgradeableProxyV2(payable(address(stakingVesting))).functionDelegateCall(
-      abi.encodeCall(IStakingVesting.setBlockProducerBonusPerBlock, (blockBonus))
+      abi.encodeCall(IStakingVesting.updateBlockRewards, (rewards))
     );
     TransparentUpgradeableProxyV2(payable(address(stakingVesting))).functionDelegateCall(
       abi.encodeCall(IStakingVesting.setFastFinalityRewardPercentage, (fastFinalityRewardPercentage))
