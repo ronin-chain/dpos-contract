@@ -8,7 +8,8 @@ enum Network {
   Goerli,
   EthMainnet,
   RoninDevnet,
-  ShadowForkMainnet
+  ShadowForkMainnet,
+  ShadowForkTestnet
 }
 
 using { key, chainId, chainAlias, explorer, data } for Network global;
@@ -32,6 +33,7 @@ function blockTime(
   if (network == Network.EthMainnet) return 15;
   if (network == Network.RoninDevnet) return 3;
   if (network == Network.ShadowForkMainnet) return 3;
+  if (network == Network.ShadowForkTestnet) return 2021;
   revert("Network: Unknown block time");
 }
 
@@ -42,6 +44,7 @@ function chainId(
   if (network == Network.EthMainnet) return 1;
   if (network == Network.RoninDevnet) return 2021;
   if (network == Network.ShadowForkMainnet) return 6060;
+  if (network == Network.ShadowForkTestnet) return 2021;
   revert("Network: Unknown chain id");
 }
 
@@ -66,5 +69,6 @@ function chainAlias(
   if (network == Network.EthMainnet) return "ethereum";
   if (network == Network.RoninDevnet) return "ronin-devnet";
   if (network == Network.ShadowForkMainnet) return "ronin-mainnet-shadow";
+  if (network == Network.ShadowForkTestnet) return "ronin-testnet-shadow";
   revert("Network: Unknown network alias");
 }

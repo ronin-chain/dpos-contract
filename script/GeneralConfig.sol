@@ -17,6 +17,7 @@ contract GeneralConfig is BaseGeneralConfig {
     setNetworkInfo(Network.EthMainnet.data());
     setNetworkInfo(Network.RoninDevnet.data());
     setNetworkInfo(Network.ShadowForkMainnet.data());
+    setNetworkInfo(Network.ShadowForkTestnet.data());
   }
 
   function _setUpContracts() internal virtual override {

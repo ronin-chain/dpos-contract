@@ -50,7 +50,6 @@ interface IBaseStaking {
   /// @dev Error of the targeting pool admin address is already a delegator.
   error ErrAlreadyDelegator();
 
-
   /**
    * @dev Returns whether the `admin` is currently active.
    */
