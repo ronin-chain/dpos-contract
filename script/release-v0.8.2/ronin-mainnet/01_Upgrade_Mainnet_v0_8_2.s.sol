@@ -18,7 +18,6 @@ contract Migration_01_Upgrade_Mainnet_Release_v0_8_2 is RoninMigration {
   address internal constant proposer = 0xe880802580a1fbdeF67ACe39D1B21c5b2C74f059;
 
   function run() public {
-    _deployProxy(Contract.RoninBaseFeeTreasury.key());
     address newStaking = _deployLogic(Contract.Staking.key());
     address newMaintenance = _deployLogic(Contract.Maintenance.key());
 
