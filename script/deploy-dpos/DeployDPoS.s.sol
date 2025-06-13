@@ -1,35 +1,43 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { TransparentUpgradeableProxyV2 } from "@ronin/contracts/extensions/TransparentUpgradeableProxyV2.sol";
-import { IProfile } from "@ronin/contracts/interfaces/IProfile.sol";
-import { IMaintenance } from "@ronin/contracts/interfaces/IMaintenance.sol";
-import { IStaking } from "@ronin/contracts/interfaces/staking/IStaking.sol";
-import { ISlashIndicator } from "@ronin/contracts/interfaces/slash-indicator/ISlashIndicator.sol";
-import { IStakingVesting } from "@ronin/contracts/interfaces/IStakingVesting.sol";
-import { IRoninValidatorSet } from "@ronin/contracts/interfaces/validator/IRoninValidatorSet.sol";
-import { IFastFinalityTracking } from "@ronin/contracts/interfaces/IFastFinalityTracking.sol";
-import { console } from "forge-std/console.sol";
-import { StdStyle } from "forge-std/StdStyle.sol";
 import { LibProxy } from "@fdk/libraries/LibProxy.sol";
-import { ProfileDeploy } from "script/contracts/ProfileDeploy.s.sol";
-import { StakingDeploy } from "script/contracts/StakingDeploy.s.sol";
-import { MaintenanceDeploy } from "script/contracts/MaintenanceDeploy.s.sol";
-import { SlashIndicatorDeploy } from "script/contracts/SlashIndicatorDeploy.s.sol";
-import { StakingVestingDeploy } from "script/contracts/StakingVestingDeploy.s.sol";
-import { RoninValidatorSetDeploy } from "script/contracts/RoninValidatorSetDeploy.s.sol";
+import { StdStyle } from "forge-std/StdStyle.sol";
+import { console } from "forge-std/console.sol";
+
+import "script/RoninMigration.s.sol";
 import { FastFinalityTrackingDeploy } from "script/contracts/FastFinalityTrackingDeploy.s.sol";
+import { MaintenanceDeploy } from "script/contracts/MaintenanceDeploy.s.sol";
+import { ProfileDeploy } from "script/contracts/ProfileDeploy.s.sol";
+
+import { RoninBaseFeeTreasuryDeploy } from "script/contracts/RoninBaseFeeTreasuryDeploy.s.sol";
 import { RoninGovernanceAdminDeploy } from "script/contracts/RoninGovernanceAdminDeploy.s.sol";
-import { RoninTrustedOrganizationDeploy } from "script/contracts/RoninTrustedOrganizationDeploy.s.sol";
 import { RoninRandomBeaconDeploy } from "script/contracts/RoninRandomBeaconDeploy.s.sol";
+import { RoninTrustedOrganizationDeploy } from "script/contracts/RoninTrustedOrganizationDeploy.s.sol";
+import { RoninValidatorSetDeploy } from "script/contracts/RoninValidatorSetDeploy.s.sol";
+
 import {
   RoninValidatorSetREP10Migrator,
   RoninValidatorSetREP10MigratorLogicDeploy
 } from "script/contracts/RoninValidatorSetRep10MigratorLogicDeploy.s.sol";
-import "script/RoninMigration.s.sol";
-import { LibVRFProof } from "script/shared/libraries/LibVRFProof.sol";
+import { SlashIndicatorDeploy } from "script/contracts/SlashIndicatorDeploy.s.sol";
+import { StakingDeploy } from "script/contracts/StakingDeploy.s.sol";
+import { StakingVestingDeploy } from "script/contracts/StakingVestingDeploy.s.sol";
+
 import { LibPrecompile } from "script/shared/libraries/LibPrecompile.sol";
+import { LibVRFProof } from "script/shared/libraries/LibVRFProof.sol";
 import { LibWrapUpEpoch } from "script/shared/libraries/LibWrapUpEpoch.sol";
+import { TransparentUpgradeableProxyV2 } from "src/extensions/TransparentUpgradeableProxyV2.sol";
+import { IFastFinalityTracking } from "src/interfaces/IFastFinalityTracking.sol";
+import { IMaintenance } from "src/interfaces/IMaintenance.sol";
+import { IProfile } from "src/interfaces/IProfile.sol";
+
+import { IStakingVesting } from "src/interfaces/IStakingVesting.sol";
+import { IBaseFeeTreasury } from "src/interfaces/basefee-treasury/IBaseFeeTreasury.sol";
+import { ISlashIndicator } from "src/interfaces/slash-indicator/ISlashIndicator.sol";
+import { IStaking } from "src/interfaces/staking/IStaking.sol";
+
+import { IRoninValidatorSet } from "src/interfaces/validator/IRoninValidatorSet.sol";
 
 contract DeployDPoS is RoninMigration {
   using LibProxy for *;
@@ -48,6 +56,7 @@ contract DeployDPoS is RoninMigration {
   IStakingVesting stakingVesting;
   IRoninValidatorSet validatorSet;
   IRandomBeacon randomBeacon;
+  IBaseFeeTreasury baseFeeTreasury;
   IRoninTrustedOrganization trustedOrg;
   IRoninGovernanceAdmin governanceAdmin;
   IFastFinalityTracking fastFinalityTracking;
@@ -68,6 +77,7 @@ contract DeployDPoS is RoninMigration {
     stakingVesting = new StakingVestingDeploy().run();
     fastFinalityTracking = new FastFinalityTrackingDeploy().run();
     randomBeacon = new RoninRandomBeaconDeploy().run();
+    baseFeeTreasury = new RoninBaseFeeTreasuryDeploy().run();
 
     // change ProxyAdmin to RoninGovernanceAdmin
     vm.startBroadcast(initialOwner);
@@ -99,7 +109,7 @@ contract DeployDPoS is RoninMigration {
   function _postCheck() internal virtual override {
     LibPrecompile.deployPrecompile();
     // Localhost will init block timestamp to 0, so we need to fast forward to current unix time
-    vm.warp(vm.unixTime() / 1_000);
+    vm.warp(vm.unixTime() / 1000);
 
     _cheatApplyGoverningValidatorCandidates();
     _cheatAddVRFKeysForGoverningValidators();
@@ -126,7 +136,8 @@ contract DeployDPoS is RoninMigration {
     uint256 commissionRate = min + (max - min) / 2;
 
     for (uint256 i; i < allTrustedOrgs.length; ++i) {
-      (address candidateAdmin, uint256 privateKey) = makeAddrAndKey(string.concat("gv-candidate-", vm.toString(i)));
+      (address candidateAdmin, uint256 pk) = makeAddrAndKey(string.concat("gv-candidate-", vm.toString(i)));
+      vm.rememberKey(pk);
       bytes memory pubKey = bytes(string.concat("gv-pubKey-", vm.toString(allTrustedOrgs[i].governor)));
       uint256 stakeAmount =
         _bound(uint256(keccak256(abi.encode(vm.unixTime()))), minValidatorStakingAmount, type(uint96).max);
@@ -141,20 +152,6 @@ contract DeployDPoS is RoninMigration {
       staking.applyValidatorCandidate{ value: stakeAmount }(
         candidateAdmin, allTrustedOrgs[i].consensusAddr, payable(candidateAdmin), commissionRate, pubKey, ""
       );
-
-      console.log(
-        string.concat(
-          "Governing Candidate Admin:",
-          " ",
-          vm.toString(i),
-          " ",
-          vm.toString(candidateAdmin),
-          " ",
-          "Private key:",
-          " ",
-          vm.toString(privateKey)
-        )
-      );
     }
   }
 
@@ -166,15 +163,14 @@ contract DeployDPoS is RoninMigration {
     for (uint256 i; i < vrfKeys.length; ++i) {
       address cid = profile.getConsensus2Id(allTrustedOrgs[i].consensusAddr);
       address admin = profile.getId2Admin(cid);
-      vm.broadcast(admin);
+      prankOrBroadcast(admin);
       profile.changeVRFKeyHash(cid, vrfKeys[i].keyHash);
     }
   }
 
-  function _initRoninRandomBeacon(ISharedArgument.RoninRandomBeaconParam memory param)
-    internal
-    logFn("_initRoninRandomBeacon")
-  {
+  function _initRoninRandomBeacon(
+    ISharedArgument.RoninRandomBeaconParam memory param
+  ) internal logFn("_initRoninRandomBeacon") {
     vm.startBroadcast(sender());
     vm.recordLogs();
     randomBeacon.initialize({
@@ -225,7 +221,9 @@ contract DeployDPoS is RoninMigration {
     vm.stopBroadcast();
   }
 
-  function _initSlashIndicator(ISharedArgument.SlashIndicatorParam memory param) internal logFn("_initSlashIndicator") {
+  function _initSlashIndicator(
+    ISharedArgument.SlashIndicatorParam memory param
+  ) internal logFn("_initSlashIndicator") {
     uint256[4] memory bridgeOperatorSlashingConfig;
     uint256[2] memory bridgeVotingSlashingConfig;
     uint256[3] memory doubleSignSlashingConfig;
@@ -234,17 +232,21 @@ contract DeployDPoS is RoninMigration {
 
     ISharedArgument.CreditScoreParam memory creditScore = param.creditScore;
     ISharedArgument.SlashDoubleSignParam memory doubleSignSlashing = param.slashDoubleSign;
-    ISharedArgument.SlashBridgeVotingParam memory bridgeVotingSlashing = param.__deprecatedSlashBridgeVoting;
     ISharedArgument.SlashUnavailabilityParam memory unavailabilitySlashing = param.slashUnavailability;
-    ISharedArgument.SlashBridgeOperatorParam memory bridgeOperatorSlashing = param.__deprecatedSlashBridgeOperator;
 
-    assembly ("memory-safe") {
-      bridgeOperatorSlashingConfig := bridgeOperatorSlashing
-      bridgeVotingSlashingConfig := bridgeVotingSlashing
-      doubleSignSlashingConfig := doubleSignSlashing
-      unavailabilitySlashingConfig := unavailabilitySlashing
-      creditScoreConfig := creditScore
-    }
+    doubleSignSlashingConfig[0] = doubleSignSlashing.slashDoubleSignAmount;
+    doubleSignSlashingConfig[1] = doubleSignSlashing.doubleSigningJailUntilBlock;
+    doubleSignSlashingConfig[2] = doubleSignSlashing.doubleSigningOffsetLimitBlock;
+
+    unavailabilitySlashingConfig[0] = unavailabilitySlashing.unavailabilityTier1Threshold;
+    unavailabilitySlashingConfig[1] = unavailabilitySlashing.unavailabilityTier2Threshold;
+    unavailabilitySlashingConfig[2] = unavailabilitySlashing.slashAmountForUnavailabilityTier2Threshold;
+    unavailabilitySlashingConfig[3] = unavailabilitySlashing.jailDurationForUnavailabilityTier2Threshold;
+
+    creditScoreConfig[0] = creditScore.gainCreditScore;
+    creditScoreConfig[1] = creditScore.maxCreditScore;
+    creditScoreConfig[2] = creditScore.bailOutCostMultiplier;
+    creditScoreConfig[3] = creditScore.cutOffPercentageAfterBailout;
 
     vm.startBroadcast(sender());
     slashIndicator.initialize(
@@ -267,29 +269,36 @@ contract DeployDPoS is RoninMigration {
     vm.stopBroadcast();
   }
 
-  function _initTrustedOrg(ISharedArgument.RoninTrustedOrganizationParam memory param)
-    internal
-    logFn("_initTrustedOrg")
-  {
+  function _initTrustedOrg(
+    ISharedArgument.RoninTrustedOrganizationParam memory param
+  ) internal logFn("_initTrustedOrg") {
     vm.startBroadcast(sender());
-    trustedOrg.initialize(param.trustedOrganizations, param.numerator, param.denominator);
+    trustedOrg.initialize(parseTrustedOrganizations(param.trustedOrganizations), param.numerator, param.denominator);
     trustedOrg.initializeV2(address(profile));
     vm.stopBroadcast();
   }
 
-  function _initValidatorSet(ISharedArgument.RoninValidatorSetParam memory param) internal logFn("_initValidatorSet") {
+  function _initValidatorSet(
+    ISharedArgument.RoninValidatorSetParam memory param
+  ) internal logFn("_initValidatorSet") {
     address migrator = new RoninValidatorSetREP10MigratorLogicDeploy().run();
 
-    UpgradeInfo({
-      proxy: address(validatorSet),
-      logic: deployCode("RoninValidatorSetConstructor.sol:RoninValidatorSetConstructor"),
-      callValue: 0,
-      shouldPrompt: true,
-      callData: "",
-      proxyInterface: ProxyInterface.Transparent,
-      upgradeCallback: this.upgradeCallback,
-      shouldUseCallback: true
-    }).upgrade();
+    {
+      vm.broadcast(sender());
+      address constructorLogic = deployCode("RoninValidatorSetConstructor.sol:RoninValidatorSetConstructor");
+      console.log("Constructor Logic: ", constructorLogic);
+
+      UpgradeInfo({
+        proxy: address(validatorSet),
+        logic: constructorLogic,
+        callValue: 0,
+        shouldPrompt: true,
+        callData: "",
+        proxyInterface: ProxyInterface.Transparent,
+        upgradeCallback: _upgradeCallback,
+        shouldUseCallback: true
+      }).upgrade();
+    }
 
     uint256[2] memory emergencyConfig;
     emergencyConfig[0] = param.emergencyExitLockedAmount;
@@ -322,12 +331,14 @@ contract DeployDPoS is RoninMigration {
       shouldPrompt: true,
       callData: abi.encodeCall(RoninValidatorSetREP10Migrator.initialize, (address(randomBeacon))),
       proxyInterface: ProxyInterface.Transparent,
-      upgradeCallback: this.upgradeCallback,
+      upgradeCallback: _upgradeCallback,
       shouldUseCallback: true
     }).upgrade();
   }
 
-  function _initStaking(ISharedArgument.StakingParam memory param) internal logFn("_initStaking") {
+  function _initStaking(
+    ISharedArgument.StakingParam memory param
+  ) internal logFn("_initStaking") {
     vm.startBroadcast(sender());
     staking.initialize(
       address(validatorSet),
@@ -341,7 +352,9 @@ contract DeployDPoS is RoninMigration {
     vm.stopBroadcast();
   }
 
-  function _initStakingVesting(ISharedArgument.StakingVestingParam memory param) internal logFn("_initStakingVesting") {
+  function _initStakingVesting(
+    ISharedArgument.StakingVestingParam memory param
+  ) internal logFn("_initStakingVesting") {
     vm.startBroadcast(sender());
     stakingVesting.initialize(
       address(validatorSet), param.blockProducerBonusPerBlock, param.bridgeOperatorBonusPerBlock
@@ -352,7 +365,9 @@ contract DeployDPoS is RoninMigration {
     vm.stopBroadcast();
   }
 
-  function _initMaintenance(ISharedArgument.MaintenanceParam memory param) internal logFn("_initMaintenance") {
+  function _initMaintenance(
+    ISharedArgument.MaintenanceParam memory param
+  ) internal logFn("_initMaintenance") {
     vm.startBroadcast(sender());
     maintenance.initialize(
       address(validatorSet),

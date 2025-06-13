@@ -1,17 +1,21 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
+import { IGeneralConfig } from "@fdk/interfaces/IGeneralConfig.sol";
+
+import { LibErrorHandler } from "@fdk/libraries/LibErrorHandler.sol";
+import { LibSharedAddress } from "@fdk/libraries/LibSharedAddress.sol";
+import { StdStyle } from "forge-std/StdStyle.sol";
 import { Vm } from "forge-std/Vm.sol";
 import { console } from "forge-std/console.sol";
-import { StdStyle } from "forge-std/StdStyle.sol";
-import { IGeneralConfig } from "@fdk/interfaces/IGeneralConfig.sol";
-import { LibSharedAddress } from "@fdk/libraries/LibSharedAddress.sol";
-import { IRoninGovernanceAdmin } from "@ronin/contracts/interfaces/IRoninGovernanceAdmin.sol";
-import { IRoninTrustedOrganization } from "@ronin/contracts/interfaces/IRoninTrustedOrganization.sol";
-import { Proposal } from "@ronin/contracts/libraries/Proposal.sol";
-import { Ballot } from "@ronin/contracts/libraries/Ballot.sol";
-import { LibErrorHandler } from "@fdk/libraries/LibErrorHandler.sol";
-import { VoteStatusConsumer } from "@ronin/contracts/interfaces/consumers/VoteStatusConsumer.sol";
+
+import { IRoninGovernanceAdmin } from "src/interfaces/IRoninGovernanceAdmin.sol";
+
+import { IRoninTrustedOrganization } from "src/interfaces/IRoninTrustedOrganization.sol";
+import { VoteStatusConsumer } from "src/interfaces/consumers/VoteStatusConsumer.sol";
+import { ICoreGovernance } from "src/interfaces/extensions/sequential-governance/ICoreGovernance.sol";
+import { Ballot } from "src/libraries/Ballot.sol";
+import { Proposal } from "src/libraries/Proposal.sol";
 
 library LibProposal {
   using StdStyle for *;
@@ -26,7 +30,18 @@ library LibProposal {
     IRoninTrustedOrganization roninTrustedOrg,
     Proposal.ProposalDetail memory proposal
   ) internal {
-    proposeProposal(governanceAdmin, roninTrustedOrg, proposal, address(0));
+    Vm.Log[] memory logs = proposeProposal(governanceAdmin, roninTrustedOrg, proposal, address(0));
+    for (uint256 i; i < logs.length; ++i) {
+      if (logs[i].emitter == address(governanceAdmin) && logs[i].topics[0] == ICoreGovernance.ProposalExecuted.selector)
+      {
+        (bool[] memory successes,) = abi.decode(logs[i].data, (bool[], bytes[]));
+        for (uint256 j; j < successes.length; ++j) {
+          require(successes[j], string.concat("LibProposal: Proposal execution failed at call index ", vm.toString(j)));
+        }
+        return;
+      }
+    }
+
     voteProposalUntilExecute(governanceAdmin, roninTrustedOrg, proposal);
   }
 
@@ -36,7 +51,26 @@ library LibProposal {
     Proposal.ProposalDetail memory proposal
   ) internal {
     Ballot.VoteType support = Ballot.VoteType.For;
-    voteProposalUntilSuccess(governanceAdmin, roninTrustedOrg, proposal, support);
+    Vm.Log[] memory logs = voteProposalUntilSuccess(governanceAdmin, roninTrustedOrg, proposal, support);
+
+    for (uint256 i; i < logs.length; ++i) {
+      if (logs[i].topics[0] == ICoreGovernance.ProposalExecuted.selector) {
+        (bool[] memory successes,) = abi.decode(logs[i].data, (bool[], bytes[]));
+        for (uint256 j; j < successes.length; ++j) {
+          require(successes[j], string.concat("LibProposal: Proposal execution failed at call index ", vm.toString(j)));
+        }
+        return;
+      }
+    }
+
+    revert("LibProposal: Proposal execution logs not found");
+  }
+
+  function _getStorageLogs() internal pure returns (Vm.Log[] storage $) {
+    bytes32 slot = keccak256("storage-logs");
+    assembly {
+      $.slot := slot
+    }
   }
 
   function voteProposalUntilReject(
@@ -53,7 +87,7 @@ library LibProposal {
     IRoninTrustedOrganization roninTrustedOrg,
     Proposal.ProposalDetail memory proposal,
     Ballot.VoteType support
-  ) internal {
+  ) internal returns (Vm.Log[] memory logs) {
     IRoninTrustedOrganization.TrustedOrganization[] memory allTrustedOrgs = roninTrustedOrg.getAllTrustedOrganizations();
 
     bool shouldPrankOnly = config.isPostChecking();
@@ -62,12 +96,12 @@ library LibProposal {
     for (uint256 i; i < proposal.gasAmounts.length; ++i) {
       totalGas += proposal.gasAmounts[i];
     }
-    totalGas += (totalGas * 20_00) / 100_00;
+    totalGas += (totalGas * 2000) / 10_000;
 
     if (totalGas < DEFAULT_PROPOSAL_GAS) {
-      totalGas = (DEFAULT_PROPOSAL_GAS * 120_00) / 100_00;
+      totalGas = (DEFAULT_PROPOSAL_GAS * 12_000) / 10_000;
     }
-
+    Vm.Log[] storage _logs = _getStorageLogs();
     for (uint256 i = 0; i < allTrustedOrgs.length; ++i) {
       address iTrustedOrg = allTrustedOrgs[i].governor;
 
@@ -85,7 +119,19 @@ library LibProposal {
       } else {
         vm.broadcast(iTrustedOrg);
       }
+
+      vm.recordLogs();
       governanceAdmin.castProposalVoteForCurrentNetwork{ gas: totalGas }(proposal, support);
+      logs = vm.getRecordedLogs();
+
+      for (uint256 j; j < logs.length; ++j) {
+        _logs.push(logs[j]);
+      }
+    }
+
+    logs = _logs;
+    for (uint256 i; i < logs.length; ++i) {
+      delete _logs[i];
     }
   }
 
@@ -94,7 +140,7 @@ library LibProposal {
     IRoninTrustedOrganization roninTrustedOrg,
     Proposal.ProposalDetail memory proposal,
     address proposer
-  ) internal {
+  ) internal returns (Vm.Log[] memory logs) {
     if (proposer == address(0)) {
       IRoninTrustedOrganization.TrustedOrganization[] memory allTrustedOrgs =
         roninTrustedOrg.getAllTrustedOrganizations();
@@ -108,6 +154,7 @@ library LibProposal {
     } else {
       vm.broadcast(proposer);
     }
+    vm.recordLogs();
     governanceAdmin.proposeProposalForCurrentNetwork(
       proposal.expiryTimestamp,
       proposal.targets,
@@ -116,6 +163,7 @@ library LibProposal {
       proposal.gasAmounts,
       Ballot.VoteType.For
     );
+    logs = vm.getRecordedLogs();
   }
 
   function executeProposal(
@@ -150,7 +198,7 @@ library LibProposal {
         gas -= gasleft();
         success.handleRevert(msg.sig, returnOrRevertData);
         // add 50% extra gas amount
-        gasAmounts[i] = gas < DEFAULT_PROPOSAL_GAS / 2 ? DEFAULT_PROPOSAL_GAS : (gas * 200_00) / 100_00;
+        gasAmounts[i] = gas < DEFAULT_PROPOSAL_GAS / 2 ? DEFAULT_PROPOSAL_GAS : (gas * 20_000) / 10_000;
       }
     }
     vm.stopPrank();

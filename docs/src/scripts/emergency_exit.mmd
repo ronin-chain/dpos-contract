@@ -1,0 +1,27 @@
+sequenceDiagram
+    actor candidate admin
+    actor governor
+    
+    participant RoninValidatorSet
+    participant Staking
+    participant StakingVesting
+    participant RoninGovernanceAdmin
+
+    candidate admin->>Staking: requestEmergencyExit(consensus)
+    Staking->>RoninValidatorSet: request emergency for validator
+    RoninValidatorSet->>Staking: deduct validator stake amount and lock in RoninValidatorSet contract
+    RoninValidatorSet->>RoninGovernanceAdmin: create emergency exit pol  
+    
+    loop Every Governor
+    governor->>RoninGovernanceAdmin: vote for emergency exit poll
+
+        alt Emergency Exit Poll Approved
+           RoninGovernanceAdmin->>RoninValidatorSet: release locked fund for requested validator
+            RoninGovernanceAdmin-->candidate admin: release locked fund to treasury
+        end  
+    end
+
+    alt Emergency Exit Poll Expired
+        RoninValidatorSet->>StakingVesting: recycle locked funds.
+    end
+

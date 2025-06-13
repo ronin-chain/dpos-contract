@@ -75,6 +75,6 @@ contract StakingVestingTest is Test {
     assertEq(blockProducerBonus, reward.amount, "Block producer bonus should match the second last reward amount");
     vm.roll(reward.startBlock + 365 * 28_800 * 9); // Roll to a block after the last reward
     blockProducerBonus = _stakingVesting.blockProducerBlockBonus(block.number);
-    assertEq(blockProducerBonus, 0 ether, "Block producer bonus should be 0 ether after the last reward"); 
+    assertEq(blockProducerBonus, 0 ether, "Block producer bonus should be 0 ether after the last reward");
   }
 }

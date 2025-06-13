@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { console } from "forge-std/console.sol";
-import { BaseGeneralConfig } from "@fdk/BaseGeneralConfig.sol";
-import { Network } from "./utils/Network.sol";
 import { Contract } from "./utils/Contract.sol";
-import { DefaultNetwork } from "@fdk/utils/DefaultNetwork.sol";
+import { Network } from "./utils/Network.sol";
+import { BaseGeneralConfig } from "@fdk/BaseGeneralConfig.sol";
+
 import { TNetwork } from "@fdk/types/TNetwork.sol";
+import { DefaultNetwork } from "@fdk/utils/DefaultNetwork.sol";
+import { console } from "forge-std/console.sol";
 
 contract GeneralConfig is BaseGeneralConfig {
   constructor() BaseGeneralConfig("", "deployments/") { }
@@ -16,6 +17,7 @@ contract GeneralConfig is BaseGeneralConfig {
     setNetworkInfo(Network.EthMainnet.data());
     setNetworkInfo(Network.RoninDevnet.data());
     setNetworkInfo(Network.ShadowForkMainnet.data());
+    setNetworkInfo(Network.ShadowForkTestnet.data());
   }
 
   function _setUpContracts() internal virtual override {
@@ -42,6 +44,7 @@ contract GeneralConfig is BaseGeneralConfig {
     _mapContractName(Contract.RoninRandomBeacon);
     _mapContractName(Contract.PostChecker);
     _mapContractName(Contract.RoninValidatorSetREP10Migrator);
+    _mapContractName(Contract.RoninBaseFeeTreasury);
 
     setContractAbsolutePathMap(Contract.PostChecker.key(), "out/PostChecker.sol/PostChecker.json");
 
@@ -62,7 +65,9 @@ contract GeneralConfig is BaseGeneralConfig {
     }
   }
 
-  function _mapContractName(Contract contractEnum) internal {
+  function _mapContractName(
+    Contract contractEnum
+  ) internal {
     _contractNameMap[contractEnum.key()] = contractEnum.name();
   }
 }

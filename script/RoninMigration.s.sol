@@ -1,29 +1,33 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { ProxyAdmin } from "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
-import { IRoninGovernanceAdmin } from "@ronin/contracts/interfaces/IRoninGovernanceAdmin.sol";
-import { TransparentUpgradeableProxy } from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
-import { IRoninTrustedOrganization } from "@ronin/contracts/interfaces/IRoninTrustedOrganization.sol";
-import { IRandomBeacon } from "@ronin/contracts/interfaces/random-beacon/IRandomBeacon.sol";
-import { TConsensus } from "@ronin/contracts/udvts/Types.sol";
-import { Proposal } from "@ronin/contracts/libraries/Proposal.sol";
-import { StdStyle } from "forge-std/StdStyle.sol";
-import { console } from "forge-std/console.sol";
+import { IPostCheck } from "./interfaces/IPostCheck.sol";
+import { ISharedArgument } from "./interfaces/ISharedArgument.sol";
+import { BaseMigration } from "@fdk/BaseMigration.s.sol";
+
+import { DeployInfo, LibDeploy, ProxyInterface, UpgradeInfo } from "@fdk/libraries/LibDeploy.sol";
 import { LibProxy } from "@fdk/libraries/LibProxy.sol";
 import { TContract, TNetwork } from "@fdk/types/Types.sol";
-import { Network } from "script/utils/Network.sol";
-import { Contract } from "script/utils/Contract.sol";
-import { DefaultNetwork } from "@fdk/utils/DefaultNetwork.sol";
-import { ISharedArgument } from "./interfaces/ISharedArgument.sol";
-import { IPostCheck } from "./interfaces/IPostCheck.sol";
-import { BaseMigration } from "@fdk/BaseMigration.s.sol";
 import { vme } from "@fdk/utils/Constants.sol";
+import { DefaultNetwork } from "@fdk/utils/DefaultNetwork.sol";
+import { ProxyAdmin } from "@openzeppelin-v4/contracts/proxy/transparent/ProxyAdmin.sol";
+import { TransparentUpgradeableProxy } from
+  "@openzeppelin-v4/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
+
 import { LibString } from "@solady/utils/LibString.sol";
-import { LibDeploy, DeployInfo, ProxyInterface, UpgradeInfo } from "@fdk/libraries/LibDeploy.sol";
+import { StdStyle } from "forge-std/StdStyle.sol";
+import { console } from "forge-std/console.sol";
+
+import { LibApplyCandidate } from "script/shared/libraries/LibApplyCandidate.sol";
 import { LibProposal } from "script/shared/libraries/LibProposal.sol";
 import { LibWrapUpEpoch } from "script/shared/libraries/LibWrapUpEpoch.sol";
-import { LibApplyCandidate } from "script/shared/libraries/LibApplyCandidate.sol";
+import { Contract } from "script/utils/Contract.sol";
+import { Network } from "script/utils/Network.sol";
+import { IRoninGovernanceAdmin } from "src/interfaces/IRoninGovernanceAdmin.sol";
+import { IRoninTrustedOrganization } from "src/interfaces/IRoninTrustedOrganization.sol";
+import { IRandomBeacon } from "src/interfaces/random-beacon/IRandomBeacon.sol";
+import { Proposal } from "src/libraries/Proposal.sol";
+import { TConsensus } from "src/udvts/Types.sol";
 
 contract RoninMigration is BaseMigration {
   using LibProxy for *;
@@ -31,7 +35,31 @@ contract RoninMigration is BaseMigration {
 
   ISharedArgument internal constant config = ISharedArgument(address(vme));
   uint256 internal constant OFFSET_TO_ACTIVATE = 3;
-  uint256 internal REP10_ACTIVATED_PERIOD = (vm.unixTime() / 1_000) / 1 days + OFFSET_TO_ACTIVATE;
+  uint256 internal REP10_ACTIVATED_PERIOD = (vm.unixTime() / 1000) / 1 days + OFFSET_TO_ACTIVATE;
+
+  string internal constant DEFAULT_CONFIG_PATH = "script/config/config.";
+  string internal _configPath;
+
+  constructor() BaseMigration() {
+    _saveSysContracts(address(this));
+  }
+
+  function _saveSysContracts(
+    address addr
+  ) internal {
+    address[] memory sysContracts;
+    try vme.getUserDefinedConfig("system-contracts") returns (bytes memory ret) {
+      if (ret.length != 0) sysContracts = abi.decode(ret, (address[]));
+    } catch { }
+
+    address[] memory newSysContracts = new address[](sysContracts.length + 1);
+    for (uint256 i = 0; i < sysContracts.length; i++) {
+      newSysContracts[i] = sysContracts[i];
+    }
+    newSysContracts[sysContracts.length] = addr;
+
+    vme.setUserDefinedConfig("system-contracts", abi.encode(newSysContracts));
+  }
 
   function _configByteCode() internal virtual override returns (bytes memory) {
     return vm.getCode("out/GeneralConfig.sol/GeneralConfig.json");
@@ -41,154 +69,51 @@ contract RoninMigration is BaseMigration {
     address postChecker = _deployImmutable(Contract.PostChecker.key());
     vm.allowCheatcodes(postChecker);
     IPostCheck(postChecker).run();
+    _saveSysContracts(postChecker);
   }
 
-  function _sharedArguments() internal virtual override returns (bytes memory rawCallData) {
+  function _sharedArguments() internal virtual override returns (bytes memory rawArgs) {
     ISharedArgument.SharedParameter memory param;
 
-    if (
-      network() == DefaultNetwork.LocalHost.key() || network() == DefaultNetwork.RoninTestnet.key()
-        || network() == Network.RoninDevnet.key() || network() == Network.ShadowForkMainnet.key()
-    ) {
-      param.initialOwner = makeAddr("initial-owner");
-      _setStakingParam(param.staking);
-      _setMaintenanceParam(param.maintenance);
-      _setStakingVestingParam(param.stakingVesting);
-      _setSlashIndicatorParam(param.slashIndicator);
-      _setGovernanceAdminParam(param.roninGovernanceAdmin);
-      _setRoninValidatorSetParam(param.roninValidatorSet);
-      _setTrustedOrganizationParam(param.roninTrustedOrganization);
-      _setRoninRandomBeaconParam(param.roninRandomBeacon);
-      _setRoninValidatorSetREP10Migrator(param.roninValidatorSetREP10Migrator);
-    } else if (network() == DefaultNetwork.RoninMainnet.key()) {
-      console.log("RoninMigration: RoninMainnet Migration");
+    param = _parseConfig(string.concat(DEFAULT_CONFIG_PATH));
+
+    rawArgs = abi.encode(param);
+  }
+
+  function _parseConfig(
+    string memory configPath
+  ) internal virtual returns (ISharedArgument.SharedParameter memory) {
+    string memory chainAlias = vme.getNetworkData(network()).chainAlias;
+    _configPath = string.concat(configPath, chainAlias, ".json");
+
+    bytes memory ret = vme.getUserDefinedConfig("config-loaded-network");
+    if (ret.length != 0 && keccak256(ret) == keccak256(bytes(chainAlias))) return config.sharedArguments();
+
+    if (vm.exists(_configPath)) {
+      string memory json = vm.readFile(_configPath);
+      vme.setUserDefinedConfig("config-loaded-network", bytes(chainAlias));
+      return abi.decode(vm.parseJson(json), (ISharedArgument.SharedParameter));
     } else {
-      revert("RoninMigration: Other network unsupported");
+      console.log("Config not found at path: ", _configPath);
     }
-
-    rawCallData = abi.encode(param);
   }
 
-  function _setRoninValidatorSetREP10Migrator(ISharedArgument.RoninValidatorSetREP10MigratorParam memory param)
-    internal
-    view
-  {
-    param.activatedAtPeriod = vm.envOr("RONIN_VALIDATOR_SET_REP10_MIGRATOR_ACTIVATED_AT_PERIOD", REP10_ACTIVATED_PERIOD);
-  }
-
-  function _setRoninRandomBeaconParam(ISharedArgument.RoninRandomBeaconParam memory param) internal view {
-    param.slashThreshold = vm.envOr("RANDOM_BEACON_SLASH_THRESHOLD", uint256(3));
-    param.activatedAtPeriod = vm.envOr("RANDOM_BEACON_ACTIVATED_AT_PERIOD", REP10_ACTIVATED_PERIOD);
-
-    param.validatorTypes = new IRandomBeacon.ValidatorType[](4);
-    param.validatorTypes[0] = IRandomBeacon.ValidatorType.Governing;
-    param.validatorTypes[1] = IRandomBeacon.ValidatorType.Standard;
-    param.validatorTypes[2] = IRandomBeacon.ValidatorType.Rotating;
-    param.validatorTypes[3] = IRandomBeacon.ValidatorType.All;
-    param.thresholds = new uint256[](4);
-    param.thresholds[0] = vm.envOr("GOVERNING_VALIDATOR_THRESHOLD", uint256(4));
-    param.thresholds[1] = vm.envOr("STANDARD_VALIDATOR_THRESHOLD", uint256(0));
-    param.thresholds[2] = vm.envOr("ROTATING_VALIDATOR_THRESHOLD", uint256(11));
-    param.thresholds[3] = vm.envOr("ALL_VALIDATOR_THRESHOLD", uint256(15));
-  }
-
-  function _setMaintenanceParam(ISharedArgument.MaintenanceParam memory param) internal view {
-    param.maxSchedules = vm.envOr("MAX_SCHEDULES", uint256(3));
-    param.minOffsetToStartSchedule = vm.envOr("MIN_OFFSET_TO_START_SCHEDULE", uint256(200));
-    param.cooldownSecsToMaintain = vm.envOr("COOLDOWN_SECS_TO_MAINTAIN", uint256(3 days));
-    param.maxOffsetToStartSchedule = vm.envOr("MAX_OFFSET_TO_START_SCHEDULE", uint256(200 * 7));
-    param.minMaintenanceDurationInBlock = vm.envOr("MIN_MAINTENANCE_DURATION_IN_BLOCK", uint256(100));
-    param.maxMaintenanceDurationInBlock = vm.envOr("MAX_MAINTENANCE_DURATION_IN_BLOCK", uint256(1000));
-  }
-
-  function _setStakingParam(ISharedArgument.StakingParam memory param) internal view {
-    param.maxCommissionRate = vm.envOr("MAX_COMMISSION_RATE", uint256(100_00));
-    param.waitingSecsToRevoke = vm.envOr("WAITING_SECS_TO_REVOKE", uint256(7 days));
-    param.minValidatorStakingAmount = vm.envOr("MIN_VALIDATOR_STAKING_AMOUNT", uint256(100 ether));
-    param.cooldownSecsToUndelegate = vm.envOr("COOLDOWN_SECS_TO_UNDELEGATE", uint256(3 days));
-  }
-
-  function _setStakingVestingParam(ISharedArgument.StakingVestingParam memory param) internal view {
-    param.topupAmount = vm.envOr("TOPUP_AMOUNT", uint256(100_000_000_000));
-    param.fastFinalityRewardPercent = vm.envOr("FAST_FINALITY_REWARD_PERCENT", uint256(1_00)); // 1%
-    param.fastFinalityRewardPercentREP10 = vm.envOr("FAST_FINALITY_REWARD_PERCENT_REP10", uint256(8_500)); // 85%
-    param.activatedAtPeriod = vm.envOr("FAST_FINALITY_REWARD_ACTIVATED_AT_PERIOD", uint256(REP10_ACTIVATED_PERIOD));
-    param.blockProducerBonusPerBlock = vm.envOr("BLOCK_PRODUCER_BONUS_PER_BLOCK", uint256(1_000));
-    param.bridgeOperatorBonusPerBlock = vm.envOr("BRIDGE_OPERATOR_BONUS_PER_BLOCK", uint256(1_100));
-  }
-
-  function _setSlashIndicatorParam(ISharedArgument.SlashIndicatorParam memory param) internal view {
-    // Deprecated slash bridge operator
-    param.__deprecatedSlashBridgeOperator.missingVotesRatioTier1 = vm.envOr("MISSING_VOTES_RATIO_TIER1", uint256(10_00)); // 10%
-    param.__deprecatedSlashBridgeOperator.missingVotesRatioTier2 = vm.envOr("MISSING_VOTES_RATIO_TIER2", uint256(20_00)); // 20%
-    param.__deprecatedSlashBridgeOperator.skipBridgeOperatorSlashingThreshold =
-      vm.envOr("SKIP_BRIDGE_OPERATOR_SLASHING_THRESHOLD", uint256(10));
-    param.__deprecatedSlashBridgeOperator.jailDurationForMissingVotesRatioTier2 =
-      vm.envOr("JAIL_DURATION_FOR_MISSING_VOTES_RATIO_TIER2", uint256(28800 * 2));
-
-    // Deprecated slash bridge voting
-    param.__deprecatedSlashBridgeVoting.bridgeVotingThreshold = vm.envOr("BRIDGE_VOTING_THRESHOLD", uint256(28800 * 3));
-    param.__deprecatedSlashBridgeVoting.bridgeVotingSlashAmount =
-      vm.envOr("BRIDGE_VOTING_SLASH_AMOUNT", uint256(10_000 ether));
-
-    // Slash double sign
-    param.slashDoubleSign.slashDoubleSignAmount = vm.envOr("SLASH_DOUBLE_SIGN_AMOUNT", uint256(10 ether));
-    param.slashDoubleSign.doubleSigningOffsetLimitBlock = vm.envOr("DOUBLE_SIGNING_OFFSET_LIMIT_BLOCK", uint256(28800));
-    param.slashDoubleSign.doubleSigningJailUntilBlock =
-      vm.envOr("DOUBLE_SIGNING_JAIL_UNTIL_BLOCK", uint256(type(uint256).max));
-
-    // Slash unavailability
-    param.slashUnavailability.unavailabilityTier1Threshold = vm.envOr("UNAVAILABILITY_TIER1_THRESHOLD", uint256(5));
-    param.slashUnavailability.unavailabilityTier2Threshold = vm.envOr("UNAVAILABILITY_TIER2_THRESHOLD", uint256(10));
-    param.slashUnavailability.slashAmountForUnavailabilityTier2Threshold =
-      vm.envOr("SLASH_AMOUNT_FOR_UNAVAILABILITY_TIER2_THRESHOLD", uint256(1 ether));
-    param.slashUnavailability.jailDurationForUnavailabilityTier2Threshold =
-      vm.envOr("JAIL_DURATION_FOR_UNAVAILABILITY_TIER2_THRESHOLD", uint256(28800 * 2));
-
-    // Slash random beacon
-    param.slashRandomBeacon.randomBeaconSlashAmount = vm.envOr("SLASH_RANDOM_BEACON_AMOUNT", uint256(10 ether));
-    param.slashRandomBeacon.activatedAtPeriod =
-      vm.envOr("SLASH_RANDOM_BEACON_ACTIVATED_AT_PERIOD", uint256(REP10_ACTIVATED_PERIOD));
-
-    // Credit score
-    param.creditScore.gainCreditScore = vm.envOr("GAIN_CREDIT_SCORE", uint256(100));
-    param.creditScore.maxCreditScore = vm.envOr("MAX_CREDIT_SCORE", uint256(2400));
-    param.creditScore.bailOutCostMultiplier = vm.envOr("BAIL_OUT_COST_MULTIPLIER", uint256(2));
-    param.creditScore.cutOffPercentageAfterBailout = vm.envOr("CUT_OFF_PERCENTAGE_AFTER_BAILOUT", uint256(50_00)); // 50%
-  }
-
-  function _setTrustedOrganizationParam(ISharedArgument.RoninTrustedOrganizationParam memory param) internal {
-    param.trustedOrganizations = new IRoninTrustedOrganization.TrustedOrganization[](4);
-    uint256 governorPk;
-    uint256 consensusPk;
-    address consensus;
-
-    for (uint256 i; i < param.trustedOrganizations.length; i++) {
-      param.trustedOrganizations[i].weight = vm.envOr("TRUSTED_ORGANIZATION_WEIGHT", uint256(100));
-      (param.trustedOrganizations[i].governor, governorPk) = makeAddrAndKey(string.concat("governor-", vm.toString(i)));
-      (consensus, consensusPk) = makeAddrAndKey(string.concat("consensus-", vm.toString(i)));
-      param.trustedOrganizations[i].consensusAddr = TConsensus.wrap(consensus);
+  function parseTrustedOrganizations(
+    ISharedArgument.TrustedOrganization[] memory data
+  ) internal pure returns (IRoninTrustedOrganization.TrustedOrganization[] memory ret) {
+    ret = new IRoninTrustedOrganization.TrustedOrganization[](data.length);
+    for (uint256 i; i < data.length; ++i) {
+      ret[i].__deprecatedBridgeVoter = data[i].__deprecatedBridgeVoter;
+      ret[i].addedBlock = data[i].addedBlock;
+      ret[i].consensusAddr = TConsensus.wrap(data[i].consensusAddr);
+      ret[i].governor = data[i].governor;
+      ret[i].weight = data[i].weight;
     }
-
-    param.numerator = vm.envOr("TRUSTED_ORGANIZATION_NUMERATOR", uint256(0));
-    param.denominator = vm.envOr("TRUSTED_ORGANIZATION_DENOMINATOR", uint256(1));
   }
 
-  function _setRoninValidatorSetParam(ISharedArgument.RoninValidatorSetParam memory param) internal view {
-    param.maxValidatorNumber = vm.envOr("MAX_VALIDATOR_NUMBER", uint256(15));
-    param.maxPrioritizedValidatorNumber = vm.envOr("MAX_PRIORITIZED_VALIDATOR_NUMBER", uint256(4));
-    param.numberOfBlocksInEpoch = vm.envOr("NUMBER_OF_BLOCKS_IN_EPOCH", uint256(200));
-    param.maxValidatorCandidate = vm.envOr("MAX_VALIDATOR_CANDIDATE", uint256(100));
-    param.minEffectiveDaysOnwards = vm.envOr("MIN_EFFECTIVE_DAYS_ONWARDS", uint256(7));
-    param.emergencyExitLockedAmount = vm.envOr("EMERGENCY_EXIT_LOCKED_AMOUNT", uint256(500));
-    param.emergencyExpiryDuration = vm.envOr("EMERGENCY_EXPIRY_DURATION", uint256(14 days));
-  }
-
-  function _setGovernanceAdminParam(ISharedArgument.RoninGovernanceAdminParam memory param) internal view {
-    param.proposalExpiryDuration = vm.envOr("PROPOSAL_EXPIRY_DURATION", uint256(14 days));
-  }
-
-  function _deployProxy(TContract contractType)
+  function _deployProxy(
+    TContract contractType
+  )
     internal
     virtual
     override
@@ -201,7 +126,7 @@ contract RoninMigration is BaseMigration {
     address proxyAdmin = _getProxyAdmin();
     assertTrue(proxyAdmin != address(0x0), "BaseMigration: Null ProxyAdmin");
 
-    deployed = LibDeploy.deployTransparentProxyV2({
+    deployed = LibDeploy.deployTransparentProxy({
       implInfo: DeployInfo({
         callValue: 0,
         by: sender(),
@@ -253,18 +178,18 @@ contract RoninMigration is BaseMigration {
       callData: args,
       proxyInterface: ProxyInterface.Transparent,
       shouldPrompt: false,
-      upgradeCallback: this.upgradeCallback,
+      upgradeCallback: _upgradeCallback,
       shouldUseCallback: true
     }).upgrade();
   }
 
-  function upgradeCallback(
+  function _upgradeCallback(
     address proxy,
     address logic,
     uint256, /* callValue */
     bytes memory callData,
     ProxyInterface /* proxyInterface */
-  ) public virtual override {
+  ) internal virtual override {
     address proxyAdmin = proxy.getProxyAdmin();
     assertTrue(proxyAdmin != address(0x0), "RoninMigration: Invalid {proxyAdmin} or {proxy} is not a Proxy contract");
     address governanceAdmin = _getProxyAdminFromCurrentNetwork();
@@ -275,7 +200,7 @@ contract RoninMigration is BaseMigration {
       if (
         currentNetwork == DefaultNetwork.RoninTestnet.key() || currentNetwork == DefaultNetwork.RoninMainnet.key()
           || currentNetwork == Network.RoninDevnet.key() || currentNetwork == DefaultNetwork.LocalHost.key()
-          || currentNetwork == Network.ShadowForkMainnet.key()
+          || currentNetwork == Network.ShadowForkMainnet.key() || currentNetwork == Network.ShadowForkTestnet.key()
       ) {
         // handle for ronin network
         console.log(StdStyle.yellow("Voting on RoninGovernanceAdmin for upgrading..."));

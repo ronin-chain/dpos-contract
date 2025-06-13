@@ -1,0 +1,10 @@
+database_url: postgresql://postgres:postgres@localhost/postgres?sslmode=disable
+private_key: 0xbfb891488ad33c1881948c1abb38aafe1d7f5470a1cd7b7ae2250c791cc27582
+verbosity: 5
+rpc_endpoint: http://localhost:8545
+chain_id: 31337
+secret_key: 0x3211fa49e9a8ee49f9b6f2c711ac26d3db3f4fdf869890696dbbce18ed813e59
+coordinator_address: 0xc7B87b2b892EA5C3CfF47168881FE168C00377FB
+coordinator_starting_block: 0
+tracker_safe_block_range: 0
+tracker_block_size: 100

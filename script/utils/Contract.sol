@@ -30,16 +30,21 @@ enum Contract {
   Profile_Mainnet,
   PostChecker,
   RoninRandomBeacon,
-  RoninValidatorSetREP10Migrator
+  RoninValidatorSetREP10Migrator,
+  RoninBaseFeeTreasury
 }
 
 using { key, name } for Contract global;
 
-function key(Contract contractEnum) pure returns (TContract) {
+function key(
+  Contract contractEnum
+) pure returns (TContract) {
   return TContract.wrap(LibString.packOne(name(contractEnum)));
 }
 
-function name(Contract contractEnum) pure returns (string memory) {
+function name(
+  Contract contractEnum
+) pure returns (string memory) {
   if (contractEnum == Contract.Profile) return "Profile";
   if (contractEnum == Contract.Profile_Mainnet) return "Profile_Mainnet";
   if (contractEnum == Contract.Staking) return "Staking";
@@ -67,6 +72,7 @@ function name(Contract contractEnum) pure returns (string memory) {
   if (contractEnum == Contract.RoninRandomBeacon) return "RoninRandomBeacon";
   if (contractEnum == Contract.PostChecker) return "PostChecker";
   if (contractEnum == Contract.RoninValidatorSetREP10Migrator) return "RoninValidatorSetREP10Migrator";
+  if (contractEnum == Contract.RoninBaseFeeTreasury) return "RoninBaseFeeTreasury";
 
   revert("Contract: Unknown contract");
 }
