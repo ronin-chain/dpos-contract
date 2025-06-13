@@ -74,11 +74,6 @@ interface IStakingVesting {
   function initializeV4(uint256 activatedAtPeriod, uint256 fastFinalityRewardPercentREP10) external;
 
   /**
-   * @dev Returns the destined period that REP10 is activated.
-   */
-  function getREP10ActivatedAtPeriod() external view returns (uint256);
-
-  /**
    * @dev Returns the bonus amount for the block producer at `blockNum`.
    */
   function blockProducerBlockBonus(

@@ -147,13 +147,6 @@ contract StakingVesting is
   /**
    * @inheritdoc IStakingVesting
    */
-  function getREP10ActivatedAtPeriod() external view returns (uint256) {
-    return __deprecatedRep10ActivationPeriod;
-  }
-
-  /**
-   * @inheritdoc IStakingVesting
-   */
   function receiveRON() external payable { }
 
   /**
