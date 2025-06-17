@@ -3,7 +3,7 @@ name = "chainlink"
 version = "1.6.0"
 url = "https://github.com/smartcontractkit/chainlink/archive/refs/tags/v1.6.0.zip"
 checksum = "4b7055e4c006e36a5853e24cb2a96e336ee0966721db412b5bb2d989703c4da7"
-integrity = "025f329f2886ae61cd5b4a3942d73dbdb60e8cd68e68abddacfeb109fb8f363f"
+integrity = "b9581335779c89b1aa839a2d0d01057d99e03819cf5613d0f8a177abf9a1c34a"
 
 [[dependencies]]
 name = "fdk"
@@ -31,21 +31,21 @@ name = "prb-math"
 version = "4.0.1"
 url = "https://github.com/PaulRBerg/prb-math/archive/refs/tags/v4.0.1.zip"
 checksum = "00dcafda9210bc4c4964748dc300e99b2a39fcbc92bf46d33785ed4a27182cc1"
-integrity = "ff5836b118be6e4933fabb547f2618c0a3b089c784a0c994f1d145a0c580698c"
+integrity = "040c3c59e17f34e0daff1554c36389490a6d52e960951fbb4aa73475ef8c41d1"
 
 [[dependencies]]
 name = "prb-test"
 version = "0.6.4"
 url = "https://github.com/PaulRBerg/prb-test/archive/refs/tags/v0.6.4.zip"
 checksum = "1458dc3760d4fa5ad2ecd778d04d61143785d0a10c1674aed29a69210ac4e072"
-integrity = "e61d2d4974d6461b650445295fa55b8065a802878c80672214762630339e2bac"
+integrity = "8cbb35fb248f9b8b73eaf35d1ba51d625c6ff12863e5403e5e4d799e0603f4df"
 
 [[dependencies]]
 name = "safe"
 version = "1.4.1"
 url = "https://github.com/safe-global/safe-smart-account/archive/refs/tags/v1.4.1.zip"
 checksum = "84348d4a1cf975f5d013cf8bdb74b8713bcccb40fceb5a1e7fc9debd27489e99"
-integrity = "65ed08a525b96c6b4d8316f827fcd799ff831e1a3b4e56bc55fbf200d27c372d"
+integrity = "6547392e6d5e82c9f45d4583f1a33b80558a84f00cb0278acbdb0c3b403dcef4"
 
 [[dependencies]]
 name = "storage-delta"
