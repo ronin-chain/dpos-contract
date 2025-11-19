@@ -27,7 +27,10 @@ abstract contract RewardCalculation is IRewardPool {
   /**
    * @inheritdoc IRewardPool
    */
-  function getReward(TConsensus consensusAddr, address user) external view returns (uint256) {
+  function getReward(
+    TConsensus consensusAddr,
+    address user
+  ) external view returns (uint256) {
     address poolId = __css2cid(consensusAddr);
     return getRewardById(poolId, user);
   }
@@ -35,14 +38,20 @@ abstract contract RewardCalculation is IRewardPool {
   /**
    * @inheritdoc IRewardPool
    */
-  function getRewardById(address poolId, address user) public view returns (uint256) {
+  function getRewardById(
+    address poolId,
+    address user
+  ) public view returns (uint256) {
     return _getReward(poolId, user, _currentPeriod(), _getStakingAmount(poolId, user));
   }
 
   /**
    * @dev See {IRewardPool-getStakingAmount}
    */
-  function _getStakingAmount(address poolId, address user) internal view virtual returns (uint256);
+  function _getStakingAmount(
+    address poolId,
+    address user
+  ) internal view virtual returns (uint256);
 
   /**
    * @dev See {IRewardPool-getStakingTotal}
@@ -93,7 +102,11 @@ abstract contract RewardCalculation is IRewardPool {
    * Note: The method should be called whenever the user's staking amount changes.
    *
    */
-  function _syncUserReward(address poolId, address user, uint256 newStakingAmount) internal {
+  function _syncUserReward(
+    address poolId,
+    address user,
+    uint256 newStakingAmount
+  ) internal {
     uint256 period = _currentPeriod();
     PoolFields storage _pool = _stakingPool[poolId];
     uint256 lastShares = _pool.shares.inner;
@@ -155,7 +168,11 @@ abstract contract RewardCalculation is IRewardPool {
    * Note: This method should be called before transferring rewards for the user.
    *
    */
-  function _claimReward(address poolId, address user, uint256 lastPeriod) internal virtual returns (uint256 amount) {
+  function _claimReward(
+    address poolId,
+    address user,
+    uint256 lastPeriod
+  ) internal virtual returns (uint256 amount) {
     uint256 currentStakingAmount = _getStakingAmount(poolId, user);
     amount = _getReward(poolId, user, lastPeriod, currentStakingAmount);
     emit RewardClaimed(poolId, user, amount);
@@ -178,7 +195,11 @@ abstract contract RewardCalculation is IRewardPool {
    * Note: This method should be called once at the period ending.
    *
    */
-  function _recordRewards(address[] memory poolIds, uint256[] calldata rewards, uint256 period) internal {
+  function _recordRewards(
+    address[] memory poolIds,
+    uint256[] calldata rewards,
+    uint256 period
+  ) internal {
     if (poolIds.length != rewards.length) {
       emit PoolsUpdateFailed(period, poolIds, rewards);
       return;

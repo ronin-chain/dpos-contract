@@ -52,9 +52,9 @@ abstract contract CommonGovernanceProposal is CoreGovernance {
       uint256 _weight = _getWeight(_signer);
       if (_weight > 0) {
         _hasValidVotes = true;
-        if (
-          _castVote(_proposal, _supports[_i], _minimumForVoteWeight, _minimumAgainstVoteWeight, _signer, _sig, _weight)
-        ) {
+        if (_castVote(
+            _proposal, _supports[_i], _minimumForVoteWeight, _minimumAgainstVoteWeight, _signer, _sig, _weight
+          )) {
           return;
         }
       }
@@ -113,7 +113,11 @@ abstract contract CommonGovernanceProposal is CoreGovernance {
   /**
    * @dev Returns whether the voter `_voter` casted vote for the proposal.
    */
-  function _proposalVoted(uint256 _chainId, uint256 _round, address _voter) internal view returns (bool) {
+  function _proposalVoted(
+    uint256 _chainId,
+    uint256 _round,
+    address _voter
+  ) internal view returns (bool) {
     return _voted(vote[_chainId][_round], _voter);
   }
 

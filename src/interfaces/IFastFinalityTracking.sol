@@ -59,7 +59,10 @@ interface IFastFinalityTracking {
   /**
    * @dev Returns normalized stake of `cid` in the `period`.
    */
-  function getNormalizedStake(uint256 period, address cid) external view returns (uint256 normalizedStake);
+  function getNormalizedStake(
+    uint256 period,
+    address cid
+  ) external view returns (uint256 normalizedStake);
 
   /**
    * @dev Returns vote count of `consensuses` in the `epoch`.

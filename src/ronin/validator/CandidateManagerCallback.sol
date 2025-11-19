@@ -105,14 +105,20 @@ abstract contract CandidateManagerCallback is ICandidateManagerCallback, Candida
   /**
    * @inheritdoc ICandidateManagerCallback
    */
-  function execChangeAdminAddr(address cid, address newAdmin) external onlyContract(ContractType.PROFILE) {
+  function execChangeAdminAddr(
+    address cid,
+    address newAdmin
+  ) external onlyContract(ContractType.PROFILE) {
     _candidateInfo[cid].__shadowedAdmin = newAdmin;
   }
 
   /**
    * @inheritdoc ICandidateManagerCallback
    */
-  function execChangeTreasuryAddr(address cid, address payable newTreasury) external onlyContract(ContractType.PROFILE) {
+  function execChangeTreasuryAddr(
+    address cid,
+    address payable newTreasury
+  ) external onlyContract(ContractType.PROFILE) {
     _candidateInfo[cid].__shadowedTreasury = newTreasury;
   }
 
@@ -122,8 +128,7 @@ abstract contract CandidateManagerCallback is ICandidateManagerCallback, Candida
   function _isTrustedOrg(
     address validatorId
   ) internal view override returns (bool) {
-    return IRoninTrustedOrganization(getContract(ContractType.RONIN_TRUSTED_ORGANIZATION)).getConsensusWeightById(
-      validatorId
-    ) > 0;
+    return IRoninTrustedOrganization(getContract(ContractType.RONIN_TRUSTED_ORGANIZATION))
+        .getConsensusWeightById(validatorId) > 0;
   }
 }

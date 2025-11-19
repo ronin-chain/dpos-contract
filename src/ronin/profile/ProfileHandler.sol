@@ -25,12 +25,18 @@ abstract contract ProfileHandler is PCUVerifyBLSPublicKey, ProfileStorage {
     _requireNonDuplicatedPubkey(profile.pubkey);
   }
 
-  function _requireNonZeroAndNonDuplicated(RoleAccess addressType, address addr) internal view {
+  function _requireNonZeroAndNonDuplicated(
+    RoleAccess addressType,
+    address addr
+  ) internal view {
     if (addr == address(0)) revert ErrZeroAddress(addressType);
     _requireNonDuplicated(addressType, addr);
   }
 
-  function _requireNonDuplicated(RoleAccess addressType, address addr) internal view {
+  function _requireNonDuplicated(
+    RoleAccess addressType,
+    address addr
+  ) internal view {
     if (_isRegisteredAddr(addr)) {
       revert ErrDuplicatedInfo(addressType, uint256(uint160(addr)));
     }
@@ -70,7 +76,10 @@ abstract contract ProfileHandler is PCUVerifyBLSPublicKey, ProfileStorage {
     return _registry[uint256(vrfKeyHash)];
   }
 
-  function _verifyPubkey(bytes calldata publicKey, bytes calldata proofOfPossession) internal {
+  function _verifyPubkey(
+    bytes calldata publicKey,
+    bytes calldata proofOfPossession
+  ) internal {
     if (!_pcVerifyBLSPublicKey(publicKey, proofOfPossession)) {
       revert ErrInvalidProofOfPossession(publicKey, proofOfPossession);
     } else {

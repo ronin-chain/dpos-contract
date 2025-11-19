@@ -11,8 +11,9 @@ import { TContract, TNetwork } from "@fdk/types/Types.sol";
 import { vme } from "@fdk/utils/Constants.sol";
 import { DefaultNetwork } from "@fdk/utils/DefaultNetwork.sol";
 import { ProxyAdmin } from "@openzeppelin-v4/contracts/proxy/transparent/ProxyAdmin.sol";
-import { TransparentUpgradeableProxy } from
-  "@openzeppelin-v4/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
+import {
+  TransparentUpgradeableProxy
+} from "@openzeppelin-v4/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 
 import { LibString } from "@solady/utils/LibString.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
@@ -172,15 +173,15 @@ contract RoninMigration is BaseMigration {
     address logic = _deployLogic(contractType, argsLogicConstructor);
 
     UpgradeInfo({
-      proxy: proxy,
-      logic: logic,
-      callValue: 0,
-      callData: args,
-      proxyInterface: ProxyInterface.Transparent,
-      shouldPrompt: false,
-      upgradeCallback: _upgradeCallback,
-      shouldUseCallback: true
-    }).upgrade();
+        proxy: proxy,
+        logic: logic,
+        callValue: 0,
+        callData: args,
+        proxyInterface: ProxyInterface.Transparent,
+        shouldPrompt: false,
+        upgradeCallback: _upgradeCallback,
+        shouldUseCallback: true
+      }).upgrade();
   }
 
   function _upgradeCallback(

@@ -69,15 +69,16 @@ contract RoninValidatorSetTimedMigratorTest is ConditionalImplementControlTest {
     super._manualUpgradeTo(impl);
 
     vm.startPrank(_proxyAdmin, _proxyAdmin);
-    TransparentUpgradeableProxyV2(payable(_proxy)).functionDelegateCall(
-      abi.encodeCall(IHasContracts.setContract, (ContractType.STAKING, _stakingProxy))
-    );
-    TransparentUpgradeableProxyV2(payable(_proxy)).functionDelegateCall(
-      abi.encodeCall(IHasContracts.setContract, (ContractType.SLASH_INDICATOR, _slashIndicatorProxy))
-    );
-    TransparentUpgradeableProxyV2(payable(_proxy)).functionDelegateCall(
-      abi.encodeCall(IHasContracts.setContract, (ContractType.RONIN_TRUSTED_ORGANIZATION, _roninTrustedOrgProxy))
-    );
+    TransparentUpgradeableProxyV2(payable(_proxy))
+      .functionDelegateCall(abi.encodeCall(IHasContracts.setContract, (ContractType.STAKING, _stakingProxy)));
+    TransparentUpgradeableProxyV2(payable(_proxy))
+      .functionDelegateCall(
+        abi.encodeCall(IHasContracts.setContract, (ContractType.SLASH_INDICATOR, _slashIndicatorProxy))
+      );
+    TransparentUpgradeableProxyV2(payable(_proxy))
+      .functionDelegateCall(
+        abi.encodeCall(IHasContracts.setContract, (ContractType.RONIN_TRUSTED_ORGANIZATION, _roninTrustedOrgProxy))
+      );
 
     vm.stopPrank();
   }

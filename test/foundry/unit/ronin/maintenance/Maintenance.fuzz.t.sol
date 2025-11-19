@@ -8,7 +8,10 @@ import { TConsensus } from "src/udvts/Types.sol";
 import { Maintenance_Base_Test } from "test/foundry/unit/ronin/maintenance/Maintenance.base.t.sol";
 
 contract Maintenance_Fuzz_Test is Maintenance_Base_Test {
-  function testFuzz_schedule(uint256 index, uint32 durationInBlock) external {
+  function testFuzz_schedule(
+    uint256 index,
+    uint32 durationInBlock
+  ) external {
     address[] memory validatorIds = validatorSet.getValidatorCandidateIds();
     address validatorId = validatorIds[index % validatorIds.length];
 

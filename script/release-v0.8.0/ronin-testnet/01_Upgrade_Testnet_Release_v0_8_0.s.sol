@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { TransparentUpgradeableProxy } from
-  "@openzeppelin-v4/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
+import {
+  TransparentUpgradeableProxy
+} from "@openzeppelin-v4/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 
 import { StdStyle } from "forge-std/StdStyle.sol";
 import { console } from "forge-std/console.sol";
@@ -27,8 +28,9 @@ import { LibProxy } from "@fdk/libraries/LibProxy.sol";
 import { TContract } from "@fdk/types/Types.sol";
 import { RoninMigration } from "script/RoninMigration.s.sol";
 import { RoninRandomBeaconDeploy } from "script/contracts/RoninRandomBeaconDeploy.s.sol";
-import { RoninValidatorSetREP10MigratorLogicDeploy } from
-  "script/contracts/RoninValidatorSetRep10MigratorLogicDeploy.s.sol";
+import {
+  RoninValidatorSetREP10MigratorLogicDeploy
+} from "script/contracts/RoninValidatorSetRep10MigratorLogicDeploy.s.sol";
 import { ISharedArgument } from "script/interfaces/ISharedArgument.sol";
 
 import { LibProposal } from "script/shared/libraries/LibProposal.sol";
@@ -292,7 +294,10 @@ contract Migration__01_Upgrade_Testnet_Release_V0_8_0 is RoninMigration {
     }
   }
 
-  function _recordContractToUpgrade(address gov, address payable[] memory allContracts) internal {
+  function _recordContractToUpgrade(
+    address gov,
+    address payable[] memory allContracts
+  ) internal {
     for (uint256 i; i < allContracts.length; i++) {
       address proxyAdmin = allContracts[i].getProxyAdmin(false);
       if (proxyAdmin != gov) {

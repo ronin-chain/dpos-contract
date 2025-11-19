@@ -35,7 +35,10 @@ abstract contract ProfileStorage is IProfile, HasContracts {
   /**
    * @dev Add a profile from memory to storage.
    */
-  function _addNewProfile(CandidateProfile storage _profile, CandidateProfile memory newProfile) internal {
+  function _addNewProfile(
+    CandidateProfile storage _profile,
+    CandidateProfile memory newProfile
+  ) internal {
     _profile.id = newProfile.id;
     _profile.registeredAt = newProfile.registeredAt;
 
@@ -49,7 +52,10 @@ abstract contract ProfileStorage is IProfile, HasContracts {
     emit ProfileAdded(newProfile.id);
   }
 
-  function _setConsensus(CandidateProfile storage _profile, TConsensus consensus) internal {
+  function _setConsensus(
+    CandidateProfile storage _profile,
+    TConsensus consensus
+  ) internal {
     // Backup old consensus
     _profile.oldConsensus = _profile.consensus;
 
@@ -64,14 +70,20 @@ abstract contract ProfileStorage is IProfile, HasContracts {
     emit ProfileAddressChanged(_profile.id, RoleAccess.CONSENSUS, TConsensus.unwrap(consensus));
   }
 
-  function _setAdmin(CandidateProfile storage _profile, address admin) internal {
+  function _setAdmin(
+    CandidateProfile storage _profile,
+    address admin
+  ) internal {
     _profile.admin = admin;
     _registry[uint256(uint160(admin))] = true;
 
     emit ProfileAddressChanged(_profile.id, RoleAccess.CANDIDATE_ADMIN, admin);
   }
 
-  function _setTreasury(CandidateProfile storage _profile, address payable treasury) internal {
+  function _setTreasury(
+    CandidateProfile storage _profile,
+    address payable treasury
+  ) internal {
     _profile.treasury = treasury;
     _registry[uint256(uint160(address(treasury)))] = true;
 
@@ -81,14 +93,20 @@ abstract contract ProfileStorage is IProfile, HasContracts {
   /**
    * @dev Allow to registry a profile without governor address since not all validators are governing validators.
    */
-  function _setGovernor(CandidateProfile storage _profile, address governor) internal {
+  function _setGovernor(
+    CandidateProfile storage _profile,
+    address governor
+  ) internal {
     _profile.__reservedGovernor = governor;
     if (governor != address(0)) {
       _registry[uint256(uint160(governor))] = true;
     }
   }
 
-  function _setPubkey(CandidateProfile storage _profile, bytes memory pubkey) internal {
+  function _setPubkey(
+    CandidateProfile storage _profile,
+    bytes memory pubkey
+  ) internal {
     if (_profile.pubkey.length != 0) {
       _profile.oldPubkey = _profile.pubkey;
     }
@@ -102,7 +120,10 @@ abstract contract ProfileStorage is IProfile, HasContracts {
   /**
    * @dev Set VRF Key Hash for the profile.
    */
-  function _setVRFKeyHash(CandidateProfile storage _profile, bytes32 vrfKeyHash) internal {
+  function _setVRFKeyHash(
+    CandidateProfile storage _profile,
+    bytes32 vrfKeyHash
+  ) internal {
     //  Prevent reverting or registering null vrf key hash in `registry`,
     //  in case normal candidate register for their profile,
     //  since only Governing Validator can utilize VRF Key Hash

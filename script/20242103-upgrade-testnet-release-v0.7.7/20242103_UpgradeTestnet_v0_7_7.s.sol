@@ -11,7 +11,8 @@ import { IRoninTrustedOrganization, Proposal, RoninMigration } from "script/Roni
 import { LibProposal } from "script/shared/libraries/LibProposal.sol";
 import { Contract } from "script/utils/Contract.sol";
 import {
-  TransparentUpgradeableProxy, TransparentUpgradeableProxyV2
+  TransparentUpgradeableProxy,
+  TransparentUpgradeableProxyV2
 } from "src/extensions/TransparentUpgradeableProxyV2.sol";
 import { IMaintenance } from "src/interfaces/IMaintenance.sol";
 import { IRoninGovernanceAdmin } from "src/interfaces/IRoninGovernanceAdmin.sol";
@@ -100,8 +101,7 @@ contract Migration__20242103_UpgradeReleaseV0_7_7_Testnet is RoninMigration {
     targets[at] = address(maintenance);
     callDatas[at] = abi.encodeCall(
       TransparentUpgradeableProxyV2.functionDelegateCall,
-      (
-        abi.encodeCall(
+      (abi.encodeCall(
           IMaintenance.setMaintenanceConfig,
           (
             maintenance.minMaintenanceDurationInBlock(),
@@ -111,8 +111,7 @@ contract Migration__20242103_UpgradeReleaseV0_7_7_Testnet is RoninMigration {
             maintenance.maxSchedule(),
             maintenance.cooldownSecsToMaintain()
           )
-        )
-      )
+        ))
     );
   }
 }

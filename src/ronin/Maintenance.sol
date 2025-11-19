@@ -160,7 +160,11 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
   /**
    * @inheritdoc IMaintenance
    */
-  function schedule(TConsensus consensusAddr, uint256 startedAtBlock, uint256 endedAtBlock) external override {
+  function schedule(
+    TConsensus consensusAddr,
+    uint256 startedAtBlock,
+    uint256 endedAtBlock
+  ) external override {
     IRoninValidatorSet validatorContract = IRoninValidatorSet(getContract(ContractType.VALIDATOR));
     address candidateId = __css2cid(consensusAddr);
 
@@ -353,7 +357,10 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
   /**
    * @inheritdoc IMaintenance
    */
-  function checkMaintained(TConsensus consensusAddr, uint256 atBlock) external view override returns (bool) {
+  function checkMaintained(
+    TConsensus consensusAddr,
+    uint256 atBlock
+  ) external view override returns (bool) {
     return _checkMaintainedById(__css2cid(consensusAddr), atBlock);
   }
 
@@ -379,11 +386,17 @@ contract Maintenance is IMaintenance, HasContracts, HasValidatorDeprecated, Init
   /**
    * @inheritdoc IMaintenance
    */
-  function checkMaintainedById(address candidateId, uint256 atBlock) external view override returns (bool) {
+  function checkMaintainedById(
+    address candidateId,
+    uint256 atBlock
+  ) external view override returns (bool) {
     return _checkMaintainedById(candidateId, atBlock);
   }
 
-  function _checkMaintainedById(address candidateId, uint256 atBlock) internal view returns (bool) {
+  function _checkMaintainedById(
+    address candidateId,
+    uint256 atBlock
+  ) internal view returns (bool) {
     Schedule storage _s = _schedule[candidateId];
     return _s.from <= atBlock && atBlock <= _s.to;
   }

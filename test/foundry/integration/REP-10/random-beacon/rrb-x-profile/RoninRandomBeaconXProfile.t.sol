@@ -89,9 +89,8 @@ contract RoninRandomBeaconXProfileTest is REP10_BaseTest {
     IRoninTrustedOrganization.TrustedOrganization[] memory gvs = new IRoninTrustedOrganization.TrustedOrganization[](1);
     gvs[0] = gov;
     vm.prank(address(governanceAdmin));
-    TransparentUpgradeableProxyV2(payable(address(roninTrustedOrganization))).functionDelegateCall(
-      abi.encodeCall(IRoninTrustedOrganization.addTrustedOrganizations, (gvs))
-    );
+    TransparentUpgradeableProxyV2(payable(address(roninTrustedOrganization)))
+      .functionDelegateCall(abi.encodeCall(IRoninTrustedOrganization.addTrustedOrganizations, (gvs)));
 
     LibVRFProof.VRFKey[] memory keys = abi.decode(vme.getUserDefinedConfig("vrf-keys"), (LibVRFProof.VRFKey[]));
     LibVRFProof.VRFKey[] memory newKeys = new LibVRFProof.VRFKey[](keys.length + 1);

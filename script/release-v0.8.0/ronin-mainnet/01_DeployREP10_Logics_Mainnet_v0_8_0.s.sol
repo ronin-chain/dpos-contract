@@ -145,7 +145,10 @@ contract Migration__01_DeployREP10_Logics_Mainnet_Release_V0_8_0 is REP10_Config
     }
   }
 
-  function _recordContractToUpgrade(address gov, address payable[] memory allContracts) internal {
+  function _recordContractToUpgrade(
+    address gov,
+    address payable[] memory allContracts
+  ) internal {
     for (uint256 i; i < allContracts.length; i++) {
       address proxyAdmin = allContracts[i].getProxyAdmin(false);
       if (proxyAdmin != gov) {

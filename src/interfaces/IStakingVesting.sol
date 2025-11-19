@@ -43,7 +43,10 @@ interface IStakingVesting {
     uint256 fastFinalityRewardPercent
   ) external;
 
-  function initializeV4(uint256 activatedAtPeriod, uint256 fastFinalityRewardPercentREP10) external;
+  function initializeV4(
+    uint256 activatedAtPeriod,
+    uint256 fastFinalityRewardPercentREP10
+  ) external;
 
   /**
    * @dev Returns the destined period that REP10 is activated.

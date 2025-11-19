@@ -97,7 +97,11 @@ abstract contract GovernanceProposal is CoreGovernance, CommonGovernanceProposal
   /**
    * @dev See {CommonGovernanceProposal-_proposalVoted}
    */
-  function proposalVoted(uint256 _chainId, uint256 _round, address _voter) external view returns (bool) {
+  function proposalVoted(
+    uint256 _chainId,
+    uint256 _round,
+    address _voter
+  ) external view returns (bool) {
     return _proposalVoted(_chainId, _round, _voter);
   }
 }

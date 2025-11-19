@@ -43,7 +43,10 @@ contract MockStaking is RewardCalculation, GlobalConfigConsumer {
     lastUpdatedPeriod++;
   }
 
-  function stake(address _user, uint256 _amount) external {
+  function stake(
+    address _user,
+    uint256 _amount
+  ) external {
     uint256 _lastStakingAmount = _stakingAmount[_user];
     uint256 _newStakingAmount = _lastStakingAmount + _amount;
     _syncUserReward(poolAddr, _user, _newStakingAmount);
@@ -51,7 +54,10 @@ contract MockStaking is RewardCalculation, GlobalConfigConsumer {
     _stakingTotal += _amount;
   }
 
-  function unstake(address _user, uint256 _amount) external {
+  function unstake(
+    address _user,
+    uint256 _amount
+  ) external {
     uint256 _lastStakingAmount = _stakingAmount[_user];
     uint256 _newStakingAmount = _lastStakingAmount - _amount;
     _syncUserReward(poolAddr, _user, _newStakingAmount);
@@ -71,7 +77,10 @@ contract MockStaking is RewardCalculation, GlobalConfigConsumer {
     pendingReward -= _amount;
   }
 
-  function execRecordRewards(address[] calldata poolIds, uint256[] calldata rewards) external {
+  function execRecordRewards(
+    address[] calldata poolIds,
+    uint256[] calldata rewards
+  ) external {
     _recordRewards(poolIds, rewards, _currentPeriod());
   }
 
@@ -85,7 +94,10 @@ contract MockStaking is RewardCalculation, GlobalConfigConsumer {
     _amount = _claimReward(poolAddr, _user, getPeriod());
   }
 
-  function getStakingAmount(TConsensus, address _user) public view override returns (uint256) {
+  function getStakingAmount(
+    TConsensus,
+    address _user
+  ) public view override returns (uint256) {
     return _getStakingAmount(address(0), _user);
   }
 
@@ -99,7 +111,10 @@ contract MockStaking is RewardCalculation, GlobalConfigConsumer {
     address[] calldata userList
   ) external view override returns (uint256[] memory) { }
 
-  function _getStakingAmount(address, address _user) internal view override returns (uint256) {
+  function _getStakingAmount(
+    address,
+    address _user
+  ) internal view override returns (uint256) {
     return _stakingAmount[_user];
   }
 

@@ -81,7 +81,10 @@ contract FastFinalityTracking is IFastFinalityTracking, Initializable, HasContra
   /**
    * @inheritdoc IFastFinalityTracking
    */
-  function getNormalizedStake(uint256 period, address cid) external view returns (uint256 normalizedStake) {
+  function getNormalizedStake(
+    uint256 period,
+    address cid
+  ) external view returns (uint256 normalizedStake) {
     normalizedStake = _normalizedData[period].normalizedStake[cid];
   }
 
@@ -135,9 +138,7 @@ contract FastFinalityTracking is IFastFinalityTracking, Initializable, HasContra
       uint256 pivot;
 
       (normalizedSum_, pivot) = LibArray.inplaceFindNormalizedSumAndPivot({
-        cids: allCids,
-        values: stakeAmounts,
-        divisor: validator.maxValidatorNumber()
+        cids: allCids, values: stakeAmounts, divisor: validator.maxValidatorNumber()
       });
 
       uint256[] memory normalizedStakeAmounts = LibArray.inplaceClip({ values: stakeAmounts, lower: 0, upper: pivot });

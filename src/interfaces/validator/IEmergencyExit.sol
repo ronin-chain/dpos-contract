@@ -70,7 +70,10 @@ interface IEmergencyExit {
    * Emits the event `EmergencyExitLockedFundReleasingFailed` if the fund is failed to unlock.
    *
    */
-  function execReleaseLockedFundForEmergencyExitRequest(address validatorId, address payable recipient) external;
+  function execReleaseLockedFundForEmergencyExitRequest(
+    address validatorId,
+    address payable recipient
+  ) external;
 
   /**
    * @dev Fallback function of `IStaking-requestEmergencyExit`.
@@ -79,5 +82,8 @@ interface IEmergencyExit {
    * - The method caller is staking contract.
    *
    */
-  function execRequestEmergencyExit(address validatorId, uint256 secLeftToRevoke) external;
+  function execRequestEmergencyExit(
+    address validatorId,
+    uint256 secLeftToRevoke
+  ) external;
 }

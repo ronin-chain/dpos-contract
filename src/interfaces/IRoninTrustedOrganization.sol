@@ -59,7 +59,11 @@ interface IRoninTrustedOrganization is IQuorum {
   /**
    * @dev Initializes the contract storage.
    */
-  function initialize(TrustedOrganization[] calldata trustedOrgs, uint256 num, uint256 denom) external;
+  function initialize(
+    TrustedOrganization[] calldata trustedOrgs,
+    uint256 num,
+    uint256 denom
+  ) external;
 
   function initializeV2(
     address profileContract
@@ -116,7 +120,10 @@ interface IRoninTrustedOrganization is IQuorum {
    *
    * Emits the event `ConsensusAddressOfTrustedOrgChanged` once an organization is removed.
    */
-  function execChangeConsensusAddressForTrustedOrg(TConsensus oldConsensusAddr, TConsensus newConsensusAddr) external;
+  function execChangeConsensusAddressForTrustedOrg(
+    TConsensus oldConsensusAddr,
+    TConsensus newConsensusAddr
+  ) external;
 
   /**
    * @dev Returns total weights.

@@ -28,7 +28,10 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
     _setContract(ContractType.VALIDATOR, validatorContract);
   }
 
-  function initializeV2(address stakingContract, address trustedOrgContract) external reinitializer(2) {
+  function initializeV2(
+    address stakingContract,
+    address trustedOrgContract
+  ) external reinitializer(2) {
     _setContract(ContractType.STAKING, stakingContract);
     _setContract(ContractType.RONIN_TRUSTED_ORGANIZATION, trustedOrgContract);
 
@@ -61,7 +64,11 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
    *
    * DO NOT use for any other purpose.
    */
-  function __migrate(address id, address candidateAdmin, address treasury) internal {
+  function __migrate(
+    address id,
+    address candidateAdmin,
+    address treasury
+  ) internal {
     CandidateProfile storage _profile = _id2Profile[id];
     _profile.id = id;
 
@@ -340,7 +347,10 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
    *
    * - See other side-effects for treasury in {changeTreasuryAddr}, since treasury and admin must be identical.
    */
-  function changeAdminAddr(address id, address newAdminAddr) external {
+  function changeAdminAddr(
+    address id,
+    address newAdminAddr
+  ) external {
     CandidateProfile storage _profile = _getId2ProfileHelper(id);
     _requireCandidateAdmin(_profile);
     _requireNonZeroAndNonDuplicated(RoleAccess.CANDIDATE_ADMIN, newAdminAddr);
@@ -383,7 +393,10 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
    *   + If the current consensus is not governor:
    *      - [x] Do nothing
    */
-  function changeConsensusAddr(address id, TConsensus newConsensusAddr) external hookChangeConsensus {
+  function changeConsensusAddr(
+    address id,
+    TConsensus newConsensusAddr
+  ) external hookChangeConsensus {
     CandidateProfile storage _profile = _getId2ProfileHelper(id);
     _requireCandidateAdmin(_profile);
     _requireNonZeroAndNonDuplicated(RoleAccess.CONSENSUS, TConsensus.unwrap(newConsensusAddr));
@@ -422,14 +435,22 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
    *          Cannot impl since we cannot cancel the previous the ballot and
    *          create a new ballot on behalf of the validator contract.
    */
-  function changeTreasuryAddr(address, /*id */ address payable /* newTreasury */ ) external pure {
+  function changeTreasuryAddr(
+    address,
+    /*id */
+    address payable /* newTreasury */
+  ) external pure {
     revert("Not supported");
   }
 
   /**
    * @inheritdoc IProfile
    */
-  function changePubkey(address id, bytes calldata pubkey, bytes calldata proofOfPossession) external {
+  function changePubkey(
+    address id,
+    bytes calldata pubkey,
+    bytes calldata proofOfPossession
+  ) external {
     CandidateProfile storage _profile = _getId2ProfileHelper(id);
     _requireCandidateAdmin(_profile);
     _requireNonDuplicatedPubkey(pubkey);
@@ -441,7 +462,10 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
   /**
    * @inheritdoc IProfile
    */
-  function changeVRFKeyHash(address id, bytes32 vrfKeyHash) external {
+  function changeVRFKeyHash(
+    address id,
+    bytes32 vrfKeyHash
+  ) external {
     CandidateProfile storage _profile = _getId2ProfileHelper(id);
     _requireCandidateAdmin(_profile);
     _requireNonDuplicatedVRFKeyHash(vrfKeyHash);

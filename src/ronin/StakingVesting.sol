@@ -63,7 +63,10 @@ contract StakingVesting is
     _setFastFinalityRewardPercentage(fastFinalityRewardPercent);
   }
 
-  function initializeV4(uint256 activatedAtPeriod, uint256 fastFinalityRewardPercentREP10) external reinitializer(4) {
+  function initializeV4(
+    uint256 activatedAtPeriod,
+    uint256 fastFinalityRewardPercentREP10
+  ) external reinitializer(4) {
     _rep10ActivationPeriod = activatedAtPeriod;
     _fastFinalityRewardPercentageREP10 = fastFinalityRewardPercentREP10;
     emit FastFinalityRewardPercentageUpdatedForREP10(fastFinalityRewardPercentREP10);

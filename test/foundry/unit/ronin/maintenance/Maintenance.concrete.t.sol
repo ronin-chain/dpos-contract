@@ -178,7 +178,9 @@ contract Maintenance_Concrete_Test is Maintenance_Base_Test {
     assertFalse(maintenance.checkScheduled(consensus), "Should not be in maintenance after end");
   }
 
-  function testConcrete_TwoNonBlockProducers_And_OneBlockProducer_CanSchedule_WithDifferent_FutureTimeWindow() external {
+  function testConcrete_TwoNonBlockProducers_And_OneBlockProducer_CanSchedule_WithDifferent_FutureTimeWindow()
+    external
+  {
     address[] memory validatorIds = validatorSet.getValidatorCandidateIds();
 
     // Jail two validators to make them non-block producers

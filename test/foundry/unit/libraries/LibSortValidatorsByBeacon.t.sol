@@ -110,7 +110,10 @@ contract LibSortValidatorsByBeaconTest is Test {
     }
   }
 
-  function random(uint256 numSample, uint256 v) private returns (uint256[] memory r) {
+  function random(
+    uint256 numSample,
+    uint256 v
+  ) private returns (uint256[] memory r) {
     r = new uint256[](numSample);
     for (uint256 i = 0; i < numSample; i++) {
       r[i] = uint256(keccak256(abi.encode(i, v, vm.unixTime())));
@@ -443,7 +446,11 @@ contract LibSortValidatorsByBeaconTest is Test {
     vm.resumeGasMetering();
   }
 
-  function testFuzzGas_sortValidatorsByBeaconOld(uint256 r, uint256 period, uint256 numStandardValidator) public {
+  function testFuzzGas_sortValidatorsByBeaconOld(
+    uint256 r,
+    uint256 period,
+    uint256 numStandardValidator
+  ) public {
     vm.pauseGasMetering();
 
     uint256 numGovernanceValidator = 12;
@@ -479,7 +486,11 @@ contract LibSortValidatorsByBeaconTest is Test {
     vm.resumeGasMetering();
   }
 
-  function testFuzzGas_sortValidatorsByBeacon(uint256 r, uint256 period, uint256 numStandardValidator) public {
+  function testFuzzGas_sortValidatorsByBeacon(
+    uint256 r,
+    uint256 period,
+    uint256 numStandardValidator
+  ) public {
     vm.pauseGasMetering();
 
     uint256 numGovernanceValidator = 12;
@@ -591,7 +602,11 @@ contract LibSortValidatorsByBeaconTest is Test {
     }
   }
 
-  function testFuzzGas_pickValidatorSet(uint256 r, uint256 period, uint256 numStandardValidator) public {
+  function testFuzzGas_pickValidatorSet(
+    uint256 r,
+    uint256 period,
+    uint256 numStandardValidator
+  ) public {
     vm.pauseGasMetering();
 
     uint256 numGovernanceValidator = 12;
@@ -631,7 +646,10 @@ contract LibSortValidatorsByBeaconTest is Test {
     vm.resumeGasMetering();
   }
 
-  function testFuzzGas_pickValidatorSetOld(uint256 r, uint256 period) public {
+  function testFuzzGas_pickValidatorSetOld(
+    uint256 r,
+    uint256 period
+  ) public {
     vm.pauseGasMetering();
 
     uint256 numGovernanceValidator = 12;

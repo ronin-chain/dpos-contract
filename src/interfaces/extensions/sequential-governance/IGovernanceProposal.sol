@@ -16,5 +16,9 @@ interface IGovernanceProposal is ICoreGovernance {
   /**
    * @dev See {CommonGovernanceProposal-_proposalVoted}
    */
-  function proposalVoted(uint256 chainId, uint256 round, address voter) external view returns (bool);
+  function proposalVoted(
+    uint256 chainId,
+    uint256 round,
+    address voter
+  ) external view returns (bool);
 }

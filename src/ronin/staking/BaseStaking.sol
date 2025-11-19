@@ -44,12 +44,18 @@ abstract contract BaseStaking is
     _;
   }
 
-  modifier anyExceptPoolAdmin(PoolDetail storage _pool, address delegator) {
+  modifier anyExceptPoolAdmin(
+    PoolDetail storage _pool,
+    address delegator
+  ) {
     _anyExceptPoolAdmin(_pool, delegator);
     _;
   }
 
-  modifier onlyPoolAdmin(PoolDetail storage _pool, address requester) {
+  modifier onlyPoolAdmin(
+    PoolDetail storage _pool,
+    address requester
+  ) {
     _requirePoolAdmin(_pool, requester);
     _;
   }
@@ -65,11 +71,17 @@ abstract contract BaseStaking is
     if (msg.value == 0) revert ErrZeroValue();
   }
 
-  function _requirePoolAdmin(PoolDetail storage _pool, address requester) private view {
+  function _requirePoolAdmin(
+    PoolDetail storage _pool,
+    address requester
+  ) private view {
     if (_pool.__shadowedPoolAdmin != requester) revert ErrOnlyPoolAdminAllowed();
   }
 
-  function _anyExceptPoolAdmin(PoolDetail storage _pool, address delegator) private view {
+  function _anyExceptPoolAdmin(
+    PoolDetail storage _pool,
+    address delegator
+  ) private view {
     if (_pool.wasAdmin[delegator]) revert ErrPoolAdminForbidden();
   }
 
@@ -208,7 +220,10 @@ abstract contract BaseStaking is
   /**
    * @inheritdoc IRewardPool
    */
-  function getStakingAmount(TConsensus consensusAddr, address user) external view override returns (uint256) {
+  function getStakingAmount(
+    TConsensus consensusAddr,
+    address user
+  ) external view override returns (uint256) {
     address poolId = __css2cid(consensusAddr);
     return _getStakingAmount(poolId, user);
   }
@@ -246,7 +261,10 @@ abstract contract BaseStaking is
     }
   }
 
-  function _getStakingAmount(address poolId, address user) internal view override returns (uint256) {
+  function _getStakingAmount(
+    address poolId,
+    address user
+  ) internal view override returns (uint256) {
     return _poolDetail[poolId].delegatingAmount[user];
   }
 

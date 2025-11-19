@@ -42,7 +42,10 @@ interface ICandidateManagerCallback {
    * Emits the event `CandidateRevokingTimestampUpdated`.
    *
    */
-  function execRequestRenounceCandidate(address cid, uint256 secsLeft) external;
+  function execRequestRenounceCandidate(
+    address cid,
+    uint256 secsLeft
+  ) external;
 
   /**
    * @dev Fallback function of `CandidateStaking-requestUpdateCommissionRate`.
@@ -55,7 +58,11 @@ interface ICandidateManagerCallback {
    * Emits the event `CommissionRateUpdateScheduled`.
    *
    */
-  function execRequestUpdateCommissionRate(address cid, uint256 effectiveTimestamp, uint256 rate) external;
+  function execRequestUpdateCommissionRate(
+    address cid,
+    uint256 effectiveTimestamp,
+    uint256 rate
+  ) external;
 
   /**
    * @dev Fallback function of `Profile-changeAdminAddr`.
@@ -64,7 +71,10 @@ interface ICandidateManagerCallback {
    * Requirements:
    * - The caller must be the Profile contract.
    */
-  function execChangeAdminAddr(address cid, address newAdmin) external;
+  function execChangeAdminAddr(
+    address cid,
+    address newAdmin
+  ) external;
 
   /**
    * @dev Fallback function of `Profile-changeConsensusAddr`.
@@ -73,7 +83,10 @@ interface ICandidateManagerCallback {
    * Requirements:
    * - The caller must be the Profile contract.
    */
-  function execChangeConsensusAddr(address cid, TConsensus newConsensus) external;
+  function execChangeConsensusAddr(
+    address cid,
+    TConsensus newConsensus
+  ) external;
 
   /**
    * @dev Fallback function of `Profile-changeTreasuryAddr`.
@@ -82,5 +95,8 @@ interface ICandidateManagerCallback {
    * Requirements:
    * - The caller must be the Profile contract.
    */
-  function execChangeTreasuryAddr(address cid, address payable newTreasury) external;
+  function execChangeTreasuryAddr(
+    address cid,
+    address payable newTreasury
+  ) external;
 }

@@ -128,7 +128,10 @@ interface IRandomBeacon {
    *
    * Callback function of {RoninValidatorSet-wrapUpEpoch}, only called at the end of an period.
    */
-  function execRequestRandomSeedForNextPeriod(uint256 lastUpdatedPeriod, uint256 newPeriod) external;
+  function execRequestRandomSeedForNextPeriod(
+    uint256 lastUpdatedPeriod,
+    uint256 newPeriod
+  ) external;
 
   /**
    * @dev Finalize the beacon and and pending cids for upcoming period.
@@ -164,7 +167,10 @@ interface IRandomBeacon {
    * @param validatorTypes An array of validator types.
    * @param thresholds An array of threshold values.
    */
-  function bulkSetValidatorThresholds(ValidatorType[] calldata validatorTypes, uint256[] calldata thresholds) external;
+  function bulkSetValidatorThresholds(
+    ValidatorType[] calldata validatorTypes,
+    uint256[] calldata thresholds
+  ) external;
 
   /**
    * @dev Sets the unavailability slash threshold.
@@ -200,7 +206,10 @@ interface IRandomBeacon {
    * @param req The random request.
    * @param proof The VRF proof.
    */
-  function fulfillRandomSeed(RandomRequest calldata req, VRF.Proof calldata proof) external;
+  function fulfillRandomSeed(
+    RandomRequest calldata req,
+    VRF.Proof calldata proof
+  ) external;
 
   /**
    * @dev Checks if a submission has been made by a specific oracle for a given period.
@@ -208,7 +217,10 @@ interface IRandomBeacon {
    * @param consensus The consensus address of governing validator.
    * @return submitted A boolean indicating whether the submission has been made or not.
    */
-  function isSubmittedAt(uint256 period, TConsensus consensus) external view returns (bool submitted);
+  function isSubmittedAt(
+    uint256 period,
+    TConsensus consensus
+  ) external view returns (bool submitted);
 
   /**
    * @dev Checks if a submission has been made by a specific oracle for a given period.
@@ -216,7 +228,10 @@ interface IRandomBeacon {
    * @param cid The candidate id of governing validator.
    * @return A boolean indicating whether the submission has been made or not.
    */
-  function isSubmittedAtById(uint256 period, address cid) external view returns (bool);
+  function isSubmittedAtById(
+    uint256 period,
+    address cid
+  ) external view returns (bool);
 
   /**
    * @dev Checks if a submission has been made by a specific key hash for a given period.
@@ -224,7 +239,10 @@ interface IRandomBeacon {
    * @param keyHash The key hash of the governing validator.
    * @return submitted A boolean indicating whether the submission has been made or not.
    */
-  function isSubmittedAtByKeyHash(uint256 period, bytes32 keyHash) external view returns (bool submitted);
+  function isSubmittedAtByKeyHash(
+    uint256 period,
+    bytes32 keyHash
+  ) external view returns (bool submitted);
 
   /**
    * @dev Calculates the key hash from public keys.
@@ -306,5 +324,8 @@ interface IRandomBeacon {
   /**
    * @dev Get selected validator ids that have been chosen in given `period` and `epoch`.
    */
-  function getSelectedValidatorSet(uint256 period, uint256 epoch) external view returns (address[] memory pickedCids);
+  function getSelectedValidatorSet(
+    uint256 period,
+    uint256 epoch
+  ) external view returns (address[] memory pickedCids);
 }

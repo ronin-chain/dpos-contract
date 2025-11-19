@@ -37,7 +37,10 @@ library LibVRFProof {
   string internal constant CONFIG_PATH = "script/config/vrf";
   IGeneralConfig internal constant config = IGeneralConfig(LibSharedAddress.VME);
 
-  function listenEventAndSubmitProof(VRFKey[] memory keys, VmSafe.Log[] memory logs) internal {
+  function listenEventAndSubmitProof(
+    VRFKey[] memory keys,
+    VmSafe.Log[] memory logs
+  ) internal {
     if (keys.length == 0) return;
 
     address randomBeacon;
@@ -201,7 +204,11 @@ library LibVRFProof {
     result = _bound(privateKey, 1, SECP256K1_ORDER - 1);
   }
 
-  function _bound(uint256 x, uint256 min, uint256 max) internal pure returns (uint256 result) {
+  function _bound(
+    uint256 x,
+    uint256 min,
+    uint256 max
+  ) internal pure returns (uint256 result) {
     require(min <= max, "StdUtils bound(uint256,uint256,uint256): Max is less than min.");
     // If x is between min and max, return x directly. This is to ensure that dictionary values
     // do not get shifted if the min is nonzero. More info: https://github.com/foundry-rs/forge-std/issues/188

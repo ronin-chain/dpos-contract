@@ -129,13 +129,11 @@ contract PostChecker is
       }
 
       vm.startPrank(governanceAdmin);
-      ITransparentUpgradeableProxyV2(address(trustedOrg)).functionDelegateCall(
-        abi.encodeCall(trustedOrg.removeTrustedOrganizations, (_gvsToRemove))
-      );
+      ITransparentUpgradeableProxyV2(address(trustedOrg))
+        .functionDelegateCall(abi.encodeCall(trustedOrg.removeTrustedOrganizations, (_gvsToRemove)));
       // Update change cooldown to 0 in case GV update their VRF key recently
-      ITransparentUpgradeableProxyV2(address(profile)).functionDelegateCall(
-        abi.encodeCall(IProfile.setCooldownConfig, (0))
-      );
+      ITransparentUpgradeableProxyV2(address(profile))
+        .functionDelegateCall(abi.encodeCall(IProfile.setCooldownConfig, (0)));
       vm.stopPrank();
     }
 

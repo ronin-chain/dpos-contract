@@ -70,7 +70,11 @@ abstract contract ConditionalImplementControl is
    * @param prevImpl The address of the current contract implementation.
    * @param newImpl The address of the new contract implementation.
    */
-  constructor(address proxyStorage, address prevImpl, address newImpl) {
+  constructor(
+    address proxyStorage,
+    address prevImpl,
+    address newImpl
+  ) {
     _requireHasCode(newImpl);
     _requireHasCode(prevImpl);
     _requireHasCode(proxyStorage);

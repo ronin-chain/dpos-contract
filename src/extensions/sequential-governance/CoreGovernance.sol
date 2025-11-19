@@ -66,7 +66,11 @@ abstract contract CoreGovernance is ICoreGovernance, ChainTypeConsumer {
   /**
    * @dev Saves new round voting for the proposal `_proposalHash` of chain `_chainId`.
    */
-  function _saveVotingRound(ProposalVote storage _vote, bytes32 _proposalHash, uint256 _expiryTimestamp) internal {
+  function _saveVotingRound(
+    ProposalVote storage _vote,
+    bytes32 _proposalHash,
+    uint256 _expiryTimestamp
+  ) internal {
     _vote.hash = _proposalHash;
     _vote.expiryTimestamp = _expiryTimestamp;
   }
@@ -235,7 +239,10 @@ abstract contract CoreGovernance is ICoreGovernance, ChainTypeConsumer {
   /**
    * @dev Executes the proposal and update the vote status once the proposal is executable.
    */
-  function _tryExecute(ProposalVote storage vote_, Proposal.ProposalDetail memory proposal) internal {
+  function _tryExecute(
+    ProposalVote storage vote_,
+    Proposal.ProposalDetail memory proposal
+  ) internal {
     if (proposal.executable()) {
       vote_.status = VoteStatus.Executed;
       (bool[] memory _successCalls, bytes[] memory _returnDatas) = proposal.execute();
@@ -263,7 +270,10 @@ abstract contract CoreGovernance is ICoreGovernance, ChainTypeConsumer {
   /**
    * @dev Returns whether the voter casted for the proposal.
    */
-  function _voted(ProposalVote storage vote_, address voter) internal view returns (bool) {
+  function _voted(
+    ProposalVote storage vote_,
+    address voter
+  ) internal view returns (bool) {
     return vote_.voted[voter];
   }
 

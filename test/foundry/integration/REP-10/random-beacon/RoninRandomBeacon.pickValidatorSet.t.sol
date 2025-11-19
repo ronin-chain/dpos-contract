@@ -49,7 +49,10 @@ contract RoninRandomBacon_PickValidatorSet_Test is REP10_BaseTest {
     }
   }
 
-  function testFuzz_AlwaysContainsGV_getValidatorIds(uint256 wrapUpEpochCount, uint256 wrapUpPeriodCount) external {
+  function testFuzz_AlwaysContainsGV_getValidatorIds(
+    uint256 wrapUpEpochCount,
+    uint256 wrapUpPeriodCount
+  ) external {
     wrapUpEpochCount = bound(wrapUpEpochCount, 1, 10);
     wrapUpPeriodCount = bound(wrapUpPeriodCount, 1, 5);
 
