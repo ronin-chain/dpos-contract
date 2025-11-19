@@ -8,12 +8,12 @@ interface IBaseStaking {
   struct PoolDetail {
     /**
      * @dev Address of the pool.
-     * @custom non-volatile-storage Permanently set to the first consensus address of the candidate.
+     * @custom:non-volatile-storage Permanently set to the first consensus address of the candidate.
      */
     address pid;
     /**
      * @dev The address of the pool admin.
-     * @custom shadowed-storage This storage slot is always kept in sync with the admin in `Profile-CandidateProfile`.
+     * @custom:shadowed-storage This storage slot is always kept in sync with the admin in `Profile-CandidateProfile`.
      */
     address __shadowedPoolAdmin;
     /// @dev Self-staking amount

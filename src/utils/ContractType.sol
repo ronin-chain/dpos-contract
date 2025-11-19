@@ -35,5 +35,7 @@ enum ContractType {
   /* 15 */
   PROFILE,
   /* 16 */
-  RANDOM_BEACON
+  RANDOM_BEACON,
+  /* 17 */
+  STAKING_MANAGER
 }

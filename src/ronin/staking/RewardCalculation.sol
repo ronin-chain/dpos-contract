@@ -155,7 +155,7 @@ abstract contract RewardCalculation is IRewardPool {
    * Note: This method should be called before transferring rewards for the user.
    *
    */
-  function _claimReward(address poolId, address user, uint256 lastPeriod) internal returns (uint256 amount) {
+  function _claimReward(address poolId, address user, uint256 lastPeriod) internal virtual returns (uint256 amount) {
     uint256 currentStakingAmount = _getStakingAmount(poolId, user);
     amount = _getReward(poolId, user, lastPeriod, currentStakingAmount);
     emit RewardClaimed(poolId, user, amount);
