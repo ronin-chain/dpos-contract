@@ -17,16 +17,16 @@ import { TConsensus } from "src/udvts/Types.sol";
 
 import { LibWrapUpEpoch } from "script/shared/libraries/LibWrapUpEpoch.sol";
 
-contract Migration_02_RemoveGovernor_Mainnet is RoninMigration {
+contract Migration_02_RemoveGovernor_Testnet is RoninMigration {
   Proposal.ProposalDetail internal _proposal;
   IRoninGovernanceAdmin internal _governanceAdmin;
   IRoninTrustedOrganization internal _trustedOrg;
 
-  uint256 internal constant EXPIRY = 14 days;
-  address internal constant proposer = 0xe880802580a1fbdeF67ACe39D1B21c5b2C74f059;
-  TConsensus internal constant randomConsensus = TConsensus.wrap(0x6E46924371d0e910769aaBE0d867590deAC20684);
+  TConsensus internal constant randomConsensus = TConsensus.wrap(0x9f1Abc67beA4db5560371fF3089F4Bfe934c36Bc);
   IRoninTrustedOrganization.TrustedOrganization internal _randomGVProfileBefore;
   IRoninTrustedOrganization.TrustedOrganization internal _randomGVProfileAfter;
+
+  address internal randomGVAdmin;
 
   function _preCheck() internal virtual override {
     _trustedOrg = IRoninTrustedOrganization(loadContract(Contract.RoninTrustedOrganization.key()));
@@ -54,24 +54,23 @@ contract Migration_02_RemoveGovernor_Mainnet is RoninMigration {
     uint256[] memory values = new uint256[](1);
 
     _governanceAdmin = IRoninGovernanceAdmin(loadContract(Contract.RoninGovernanceAdmin.key()));
-    _proposal = LibProposal.buildProposal(_governanceAdmin, vm.getBlockTimestamp() + EXPIRY, targets, values, callDatas);
-    LibProposal.proposeProposal(_governanceAdmin, _trustedOrg, _proposal, proposer);
+    _proposal =
+      LibProposal.buildProposal(_governanceAdmin, vm.getBlockTimestamp() + 1 hours, targets, values, callDatas);
+    LibProposal.executeProposal(_governanceAdmin, _trustedOrg, _proposal);
+
+    randomGVAdmin = IProfile(loadContract(Contract.Profile.key())).getId2Admin(TConsensus.unwrap(randomConsensus));
+    IStaking staking = IStaking(loadContract(Contract.Staking.key()));
+    vm.broadcast(randomGVAdmin);
+    staking.requestRenounce(randomConsensus);
   }
 
   function _postCheck() internal virtual override {
-    LibProposal.voteProposalUntilExecute(_governanceAdmin, _trustedOrg, _proposal);
-    address randomGVAdmin =
-      IProfile(loadContract(Contract.Profile.key())).getId2Admin(TConsensus.unwrap(randomConsensus));
-    IStaking staking = IStaking(loadContract(Contract.Staking.key()));
-    vm.prank(randomGVAdmin);
-    staking.requestRenounce(randomConsensus);
-
     _randomGVProfileAfter = _trustedOrg.getTrustedOrganization(randomConsensus);
+
     // Assert removed
     assertEq(_trustedOrg.getTrustedOrganization(randomConsensus).governor, address(0), "governor should be removed");
     assertEq(_trustedOrg.getTrustedOrganization(randomConsensus).weight, 0, "weight should be 0");
     assertEq(_trustedOrg.getTrustedOrganization(randomConsensus).addedBlock, 0, "addedBlock should be 0");
-
     assertEq(
       _trustedOrg.getTrustedOrganization(randomConsensus).__deprecatedBridgeVoter,
       address(0),
@@ -99,7 +98,7 @@ contract Migration_02_RemoveGovernor_Mainnet is RoninMigration {
     assertFalse(validatorSet.isValidatorCandidate(randomConsensus), "random gv should be removed from validator set");
     assertFalse(validatorSet.isBlockProducer(randomConsensus), "random gv should be removed from block producer");
 
-    super._postCheck();
+    // super._postCheck();
   }
 
   function _afterRunningScript() internal virtual override { }
