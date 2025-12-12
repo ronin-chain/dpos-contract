@@ -121,37 +121,35 @@ abstract contract CandidateStaking is BaseStaking, ICandidateStaking, GlobalConf
     address[] calldata poolIds,
     uint256 newPeriod
   ) external override onlyContract(ContractType.VALIDATOR) {
-    if (poolIds.length == 0) {
-      return;
-    }
+    uint256 length = poolIds.length;
+    if (length == 0) return;
 
-    for (uint256 i = 0; i < poolIds.length;) {
-      address poolId = poolIds[i];
-      PoolDetail storage _pool = _poolDetail[poolId];
-      // Deactivate the pool admin in the active mapping.
-      delete _adminOfActivePoolMapping[_pool.__shadowedPoolAdmin];
-
-      // Deduct and transfer the self staking amount to the pool admin.
-      uint256 deductingAmount = _pool.stakingAmount;
-      if (deductingAmount > 0) {
-        _deductStakingAmount(_pool, deductingAmount);
-        if (!_unsafeSendRONLimitGas(payable(_pool.__shadowedPoolAdmin), deductingAmount, DEFAULT_ADDITION_GAS)) {
-          emit StakingAmountTransferFailed(_pool.pid, _pool.__shadowedPoolAdmin, deductingAmount, address(this).balance);
-        }
-      }
-
-      // Settle the unclaimed reward and transfer to the pool admin.
-      uint256 lastRewardAmount = _claimReward(poolId, _pool.__shadowedPoolAdmin, newPeriod);
-      if (lastRewardAmount > 0) {
-        _unsafeSendRONLimitGas(payable(_pool.__shadowedPoolAdmin), lastRewardAmount, DEFAULT_ADDITION_GAS);
-      }
-
-      unchecked {
-        ++i;
-      }
+    for (uint256 i = 0; i < length; ++i) {
+      _deprecatePool(poolIds[i], newPeriod);
     }
 
     emit PoolsDeprecated(poolIds);
+  }
+
+  function _deprecatePool(address poolId, uint256 newPeriod) internal {
+    PoolDetail storage _pool = _poolDetail[poolId];
+    // Deactivate the pool admin in the active mapping.
+    delete _adminOfActivePoolMapping[_pool.__shadowedPoolAdmin];
+
+    // Deduct and transfer the self staking amount to the pool admin.
+    uint256 deductingAmount = _pool.stakingAmount;
+    if (deductingAmount > 0) {
+      _deductStakingAmount(_pool, deductingAmount);
+      if (!_unsafeSendRONLimitGas(payable(_pool.__shadowedPoolAdmin), deductingAmount, DEFAULT_ADDITION_GAS)) {
+        emit StakingAmountTransferFailed(_pool.pid, _pool.__shadowedPoolAdmin, deductingAmount, address(this).balance);
+      }
+    }
+
+    // Settle the unclaimed reward and transfer to the pool admin.
+    uint256 lastRewardAmount = _claimReward(poolId, _pool.__shadowedPoolAdmin, newPeriod);
+    if (lastRewardAmount > 0) {
+      _unsafeSendRONLimitGas(payable(_pool.__shadowedPoolAdmin), lastRewardAmount, DEFAULT_ADDITION_GAS);
+    }
   }
 
   /**

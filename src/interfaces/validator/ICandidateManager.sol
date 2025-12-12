@@ -8,17 +8,17 @@ interface ICandidateManager {
   struct ValidatorCandidate {
     /**
      * @dev The address of the candidate admin.
-     * @custom shadowed-storage This storage slot is always kept in sync with {Profile-CandidateProfile}.admin.
+     * @custom:shadowed-storage This storage slot is always kept in sync with {Profile-CandidateProfile}.admin.
      */
     address __shadowedAdmin;
     /**
      * @dev Address of the validator that produces block, e.g. block.coinbase. This is so-called validator address.
-     * @custom shadowed-storage This storage slot is always kept in sync with {Profile-CandidateProfile}.consensus.
+     * @custom:shadowed-storage This storage slot is always kept in sync with {Profile-CandidateProfile}.consensus.
      */
     TConsensus __shadowedConsensus;
     /**
      * @dev Address that receives mining reward of the validator
-     * @custom shadowed-storage This storage slot is always kept in sync with {Profile-CandidateProfile}.treasury.
+     * @custom:shadowed-storage This storage slot is always kept in sync with {Profile-CandidateProfile}.treasury.
      */
     address payable __shadowedTreasury;
     /// @dev Address of the bridge operator corresponding to the candidate

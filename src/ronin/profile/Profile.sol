@@ -422,7 +422,11 @@ contract Profile is IProfile, ProfileXComponents, Initializable {
    *          Cannot impl since we cannot cancel the previous the ballot and
    *          create a new ballot on behalf of the validator contract.
    */
-  function changeTreasuryAddr(address, /*id */ address payable /* newTreasury */ ) external pure {
+  function changeTreasuryAddr(
+    address,
+    /*id */
+    address payable /* newTreasury */
+  ) external pure {
     revert("Not supported");
   }
 

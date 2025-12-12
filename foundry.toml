@@ -20,6 +20,9 @@ fs_permissions = [{ access = "read-write", path = "./" }]
 gas_limit = "18446744073709551615"
 allow_internal_expect_revert = true
 
+[profile.fork]
+evm_version = 'cancun'
+
 [fmt]
 line_length = 120
 tab_width = 2

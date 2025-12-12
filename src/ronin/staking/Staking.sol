@@ -17,6 +17,15 @@ contract Staking is IStaking, StakingCallback, Initializable, AccessControlEnume
   bytes32 private constant $_StakingRep4MigratedStorageLocation =
     0x02b7258856b9f6bdff23dae2002215e15e9b3a0101a83005baf0725f1e37df00;
 
+  /// @notice Flag indicating whether the contract has been migrated to L2.
+  bool internal s_l2Migrated;
+
+  error ErrL2MigrationNotCompleted();
+  error ErrPoolRevokingTimestampNotReach(address poolId, uint256 revokingTimestamp, uint256 blockTimestamp);
+
+  event L2MigrationStatusUpdated(address indexed by, bool status);
+  event PoolDeprecated(address indexed poolId);
+
   modifier onRep4Migration() {
     uint256 val;
     assembly ("memory-safe") {
@@ -72,6 +81,41 @@ contract Staking is IStaking, StakingCallback, Initializable, AccessControlEnume
   function initializeV4(address admin, address migrator) external reinitializer(4) {
     _grantRole(DEFAULT_ADMIN_ROLE, admin);
     _grantRole(MIGRATOR_ROLE, migrator);
+  }
+
+  function initializeV5(
+    address migrator
+  ) external reinitializer(5) {
+    _grantRole(MIGRATOR_ROLE, migrator);
+  }
+
+  function setL2Migrated(
+    bool status
+  ) external onlyRole(MIGRATOR_ROLE) {
+    s_l2Migrated = status;
+    emit L2MigrationStatusUpdated(msg.sender, status);
+  }
+
+  function isL2Migrated() external view returns (bool) {
+    return s_l2Migrated;
+  }
+
+  function execRenounceAndDeprecatePool(
+    address poolId
+  ) external onlyPoolAdmin(_poolDetail[poolId], msg.sender) {
+    IRoninValidatorSet validatorContract = IRoninValidatorSet(getContract(ContractType.VALIDATOR));
+    uint256 revokingTimestamp = validatorContract.getCandidateInfoById(poolId).revokingTimestamp;
+    uint256 currentPeriod = validatorContract.currentPeriod();
+
+    require(s_l2Migrated, ErrL2MigrationNotCompleted());
+    require(
+      revokingTimestamp != 0 && revokingTimestamp < block.timestamp,
+      ErrPoolRevokingTimestampNotReach(poolId, revokingTimestamp, block.timestamp)
+    );
+
+    _deprecatePool(poolId, currentPeriod);
+
+    emit PoolDeprecated(poolId);
   }
 
   /**
