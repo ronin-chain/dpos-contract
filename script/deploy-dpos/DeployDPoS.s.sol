@@ -289,15 +289,15 @@ contract DeployDPoS is RoninMigration {
       console.log("Constructor Logic: ", constructorLogic);
 
       UpgradeInfo({
-        proxy: address(validatorSet),
-        logic: constructorLogic,
-        callValue: 0,
-        shouldPrompt: true,
-        callData: "",
-        proxyInterface: ProxyInterface.Transparent,
-        upgradeCallback: _upgradeCallback,
-        shouldUseCallback: true
-      }).upgrade();
+          proxy: address(validatorSet),
+          logic: constructorLogic,
+          callValue: 0,
+          shouldPrompt: true,
+          callData: "",
+          proxyInterface: ProxyInterface.Transparent,
+          upgradeCallback: _upgradeCallback,
+          shouldUseCallback: true
+        }).upgrade();
     }
 
     uint256[2] memory emergencyConfig;
@@ -325,15 +325,15 @@ contract DeployDPoS is RoninMigration {
     vm.stopBroadcast();
 
     UpgradeInfo({
-      proxy: address(validatorSet),
-      logic: migrator,
-      callValue: 0,
-      shouldPrompt: true,
-      callData: abi.encodeCall(RoninValidatorSetREP10Migrator.initialize, (address(randomBeacon))),
-      proxyInterface: ProxyInterface.Transparent,
-      upgradeCallback: _upgradeCallback,
-      shouldUseCallback: true
-    }).upgrade();
+        proxy: address(validatorSet),
+        logic: migrator,
+        callValue: 0,
+        shouldPrompt: true,
+        callData: abi.encodeCall(RoninValidatorSetREP10Migrator.initialize, (address(randomBeacon))),
+        proxyInterface: ProxyInterface.Transparent,
+        upgradeCallback: _upgradeCallback,
+        shouldUseCallback: true
+      }).upgrade();
   }
 
   function _initStaking(

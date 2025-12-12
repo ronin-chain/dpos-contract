@@ -12,7 +12,10 @@ abstract contract RONTransferHelper {
    * @dev See `_sendRON`.
    * Reverts if the recipient does not receive RON.
    */
-  function _transferRON(address payable recipient, uint256 amount) internal {
+  function _transferRON(
+    address payable recipient,
+    uint256 amount
+  ) internal {
     if (!_sendRON(recipient, amount)) revert ErrRecipientRevert(msg.sig);
   }
 
@@ -24,7 +27,10 @@ abstract contract RONTransferHelper {
    * Note: consider using `ReentrancyGuard` before calling this function.
    *
    */
-  function _sendRON(address payable recipient, uint256 amount) internal returns (bool success) {
+  function _sendRON(
+    address payable recipient,
+    uint256 amount
+  ) internal returns (bool success) {
     if (address(this).balance < amount) revert ErrInsufficientBalance(msg.sig, address(this).balance, amount);
     return _unsafeSendRON(recipient, amount);
   }
@@ -39,7 +45,10 @@ abstract contract RONTransferHelper {
    * - Consider using `ReentrancyGuard` before calling this function.
    *
    */
-  function _unsafeSendRON(address payable recipient, uint256 amount) internal returns (bool success) {
+  function _unsafeSendRON(
+    address payable recipient,
+    uint256 amount
+  ) internal returns (bool success) {
     (success,) = recipient.call{ value: amount }("");
   }
 

@@ -60,7 +60,10 @@ library LibIndexMap {
    * @param index The index to check.
    * @return A boolean indicating whether the index is present in the map.
    */
-  function contains(IndexMap memory indexmap, uint256 index) internal pure returns (bool) {
+  function contains(
+    IndexMap memory indexmap,
+    uint256 index
+  ) internal pure returns (bool) {
     unchecked {
       uint256 size = MAX_BIT;
       // if index is out of range, return false
@@ -79,7 +82,10 @@ library LibIndexMap {
    * @param index The value to record.
    * @return The updated indexmap with recorded existence of the element.
    */
-  function set(IndexMap memory indexmap, uint256 index) internal pure returns (IndexMap memory) {
+  function set(
+    IndexMap memory indexmap,
+    uint256 index
+  ) internal pure returns (IndexMap memory) {
     unchecked {
       uint256 size = MAX_BIT;
       uint256 pos = index / size;
@@ -102,7 +108,10 @@ library LibIndexMap {
    * @param indices The array of indices to record.
    * @return The updated indexmap with recorded existence of elements.
    */
-  function setBatch(IndexMap memory indexmap, uint256[] memory indices) internal pure returns (IndexMap memory) {
+  function setBatch(
+    IndexMap memory indexmap,
+    uint256[] memory indices
+  ) internal pure returns (IndexMap memory) {
     unchecked {
       uint256 pos;
       uint256 size = MAX_BIT;

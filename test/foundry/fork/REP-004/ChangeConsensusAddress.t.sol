@@ -6,7 +6,8 @@ import { Test } from "forge-std/Test.sol";
 import { console2 } from "forge-std/console2.sol";
 
 import {
-  TransparentUpgradeableProxy, TransparentUpgradeableProxyV2
+  TransparentUpgradeableProxy,
+  TransparentUpgradeableProxyV2
 } from "src/extensions/TransparentUpgradeableProxyV2.sol";
 import { HasContracts } from "src/extensions/collections/HasContracts.sol";
 import { ICandidateManager } from "src/interfaces/validator/ICandidateManager.sol";
@@ -306,9 +307,8 @@ contract ChangeConsensusAddressForkTest is Test {
     trustedOrgs[0].governor = newGovernor;
     trustedOrgs[0].consensusAddr = TConsensus.wrap(newConsensus);
     vm.prank(_getProxyAdmin(address(_roninTO)));
-    TransparentUpgradeableProxyV2(payable(address(_roninTO))).functionDelegateCall(
-      abi.encodeCall(RoninTrustedOrganization.updateTrustedOrganizations, trustedOrgs)
-    );
+    TransparentUpgradeableProxyV2(payable(address(_roninTO)))
+      .functionDelegateCall(abi.encodeCall(RoninTrustedOrganization.updateTrustedOrganizations, trustedOrgs));
 
     IProfile.CandidateProfile memory profile = _profile.getId2Profile(consensus);
     IRoninTrustedOrganization.TrustedOrganization memory trustedOrg =
@@ -367,9 +367,8 @@ contract ChangeConsensusAddressForkTest is Test {
     trustedOrgs[0].governor = newGovernor;
     trustedOrgs[0].consensusAddr = TConsensus.wrap(newConsensus);
     vm.prank(_getProxyAdmin(address(_roninTO)));
-    TransparentUpgradeableProxyV2(payable(address(_roninTO))).functionDelegateCall(
-      abi.encodeCall(RoninTrustedOrganization.updateTrustedOrganizations, trustedOrgs)
-    );
+    TransparentUpgradeableProxyV2(payable(address(_roninTO)))
+      .functionDelegateCall(abi.encodeCall(RoninTrustedOrganization.updateTrustedOrganizations, trustedOrgs));
 
     IProfile.CandidateProfile memory profile = _profile.getId2Profile(consensus);
     IRoninTrustedOrganization.TrustedOrganization memory trustedOrg =
@@ -388,7 +387,11 @@ contract ChangeConsensusAddressForkTest is Test {
     __assertWeight(TConsensus.wrap(consensus), consensus, 0);
   }
 
-  function __assertWeight(TConsensus consensus, address id, uint256 weight) private view {
+  function __assertWeight(
+    TConsensus consensus,
+    address id,
+    uint256 weight
+  ) private view {
     TConsensus[] memory consensuses = new TConsensus[](1);
     address[] memory ids = new address[](1);
 
@@ -929,7 +932,12 @@ contract ChangeConsensusAddressForkTest is Test {
     _applyValidatorCandidate("candidate-admin", "consensus");
   }
 
-  function schedule(address admin, TConsensus consensus, uint256 startAtBlock, uint256 endedAtBlock) external {
+  function schedule(
+    address admin,
+    TConsensus consensus,
+    uint256 startAtBlock,
+    uint256 endedAtBlock
+  ) external {
     vm.prank(admin);
     _maintenance.schedule(consensus, startAtBlock, endedAtBlock);
   }
@@ -943,7 +951,10 @@ contract ChangeConsensusAddressForkTest is Test {
     }
   }
 
-  function _bulkSlashIndicator(TConsensus consensus, uint256 times) internal {
+  function _bulkSlashIndicator(
+    TConsensus consensus,
+    uint256 times
+  ) internal {
     vm.startPrank(block.coinbase);
     for (uint256 i; i < times; ++i) {
       _slashIndicator.slashUnavailability(consensus);
@@ -978,9 +989,8 @@ contract ChangeConsensusAddressForkTest is Test {
     console2.log("gasleft 1", gl1);
 
     vm.prank(_getProxyAdmin(address(_profile)));
-    TransparentUpgradeableProxyV2(payable(address(_profile))).upgradeToAndCall(
-      address(logic), abi.encodeCall(Profile.initializeV2, (address(_staking), address(_roninTO)))
-    );
+    TransparentUpgradeableProxyV2(payable(address(_profile)))
+      .upgradeToAndCall(address(logic), abi.encodeCall(Profile.initializeV2, (address(_staking), address(_roninTO))));
 
     uint256 gl2 = gasleft();
     console2.log("gasleft 2", gl2);
@@ -1001,17 +1011,15 @@ contract ChangeConsensusAddressForkTest is Test {
   function _upgradeMaintenance() internal {
     Maintenance logic = new Maintenance();
     vm.prank(_getProxyAdmin(address(_maintenance)));
-    TransparentUpgradeableProxyV2(payable(address(_maintenance))).upgradeToAndCall(
-      address(logic), abi.encodeCall(Maintenance.initializeV3, (address(_profile)))
-    );
+    TransparentUpgradeableProxyV2(payable(address(_maintenance)))
+      .upgradeToAndCall(address(logic), abi.encodeCall(Maintenance.initializeV3, (address(_profile))));
   }
 
   function _upgradeRoninTO() internal {
     RoninTrustedOrganization logic = new RoninTrustedOrganization();
     vm.prank(_getProxyAdmin(address(_roninTO)));
-    TransparentUpgradeableProxyV2(payable(address(_roninTO))).upgradeToAndCall(
-      address(logic), abi.encodeCall(RoninTrustedOrganization.initializeV2, (address(_profile)))
-    );
+    TransparentUpgradeableProxyV2(payable(address(_roninTO)))
+      .upgradeToAndCall(address(logic), abi.encodeCall(RoninTrustedOrganization.initializeV2, (address(_profile))));
   }
 
   function _upgradeSlashIndicator() internal {
@@ -1023,17 +1031,15 @@ contract ChangeConsensusAddressForkTest is Test {
   function _upgradeStaking() internal {
     Staking logic = new Staking();
     vm.prank(_getProxyAdmin(address(_staking)));
-    TransparentUpgradeableProxyV2(payable(_staking)).upgradeToAndCall(
-      address(logic), abi.encodeCall(Staking.initializeV3, (address(_profile)))
-    );
+    TransparentUpgradeableProxyV2(payable(_staking))
+      .upgradeToAndCall(address(logic), abi.encodeCall(Staking.initializeV3, (address(_profile))));
   }
 
   function _upgradeValidator() internal {
     RoninValidatorSet logic = new RoninValidatorSet();
     vm.prank(_getProxyAdmin(address(_validator)));
-    TransparentUpgradeableProxyV2(payable(_validator)).upgradeToAndCall(
-      address(logic), abi.encodeCall(IRoninValidatorSet.initializeV4, (address(_profile)))
-    );
+    TransparentUpgradeableProxyV2(payable(_validator))
+      .upgradeToAndCall(address(logic), abi.encodeCall(IRoninValidatorSet.initializeV4, (address(_profile))));
   }
 
   function _getProxyAdmin(
@@ -1067,12 +1073,14 @@ contract ChangeConsensusAddressForkTest is Test {
     trustedOrgs = new IRoninTrustedOrganization.TrustedOrganization[](1);
     trustedOrgs[0] = trustedOrg;
     vm.prank(_getProxyAdmin(address(_roninTO)));
-    TransparentUpgradeableProxyV2(payable(address(_roninTO))).functionDelegateCall(
-      abi.encodeCall(RoninTrustedOrganization.addTrustedOrganizations, trustedOrgs)
-    );
+    TransparentUpgradeableProxyV2(payable(address(_roninTO)))
+      .functionDelegateCall(abi.encodeCall(RoninTrustedOrganization.addTrustedOrganizations, trustedOrgs));
   }
 
-  function _applyValidatorCandidate(string memory candidateAdminLabel, string memory consensusLabel) internal {
+  function _applyValidatorCandidate(
+    string memory candidateAdminLabel,
+    string memory consensusLabel
+  ) internal {
     address candidateAdmin = makeAddr(candidateAdminLabel);
     TConsensus consensusAddr = TConsensus.wrap(makeAddr(consensusLabel));
     bytes memory pubKey = bytes(candidateAdminLabel);

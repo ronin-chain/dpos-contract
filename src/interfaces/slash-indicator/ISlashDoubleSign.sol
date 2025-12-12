@@ -22,7 +22,11 @@ interface ISlashDoubleSign is IBaseSlash {
    *
    * Emits the event `Slashed` if the double signing evidence of the two headers valid.
    */
-  function slashDoubleSign(TConsensus _validatorAddr, bytes calldata _header1, bytes calldata _header2) external;
+  function slashDoubleSign(
+    TConsensus _validatorAddr,
+    bytes calldata _header1,
+    bytes calldata _header2
+  ) external;
 
   /**
    * @dev Returns the configs related to block producer slashing.

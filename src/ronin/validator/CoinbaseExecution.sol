@@ -59,8 +59,8 @@ abstract contract CoinbaseExecution is ICoinbaseExecution, CoinbaseExecutionDepe
       _isBlockProducerById(id) && !_isJailedById(id) && !_miningRewardDeprecatedById(id, currentPeriod());
 
     (, uint256 blockProducerBonus,, uint256 fastFinalityRewardPercentage) = IStakingVesting(
-      getContract(ContractType.STAKING_VESTING)
-    ).requestBonus({ forBlockProducer: requestForBlockProducer, forBridgeOperator: false });
+        getContract(ContractType.STAKING_VESTING)
+      ).requestBonus({ forBlockProducer: requestForBlockProducer, forBridgeOperator: false });
 
     // Deprecates reward for non-validator or slashed validator
     if (!requestForBlockProducer) {
@@ -169,7 +169,10 @@ abstract contract CoinbaseExecution is ICoinbaseExecution, CoinbaseExecutionDepe
    * Requirements:
    * - This method is only called once each epoch.
    */
-  function _syncFastFinalityReward(uint256 epoch, address[] memory validatorIds) private {
+  function _syncFastFinalityReward(
+    uint256 epoch,
+    address[] memory validatorIds
+  ) private {
     uint256[] memory scores = IFastFinalityTracking(getContract(ContractType.FAST_FINALITY_TRACKING))
       .getManyFinalityScoresById(epoch, validatorIds);
     uint256 divisor = scores.sum();
@@ -222,10 +225,7 @@ abstract contract CoinbaseExecution is ICoinbaseExecution, CoinbaseExecutionDepe
 
       if (!_isJailedById(vId) && !_miningRewardDeprecatedById(vId, lastPeriod)) {
         (uint256 validatorFFReward, uint256 delegatorFFReward) = _calcCommissionReward({
-          vId: vId,
-          totalReward: _fastFinalityReward[vId],
-          maxCommissionRate: maxRate,
-          minCommissionRate: minRate
+          vId: vId, totalReward: _fastFinalityReward[vId], maxCommissionRate: maxRate, minCommissionRate: minRate
         });
 
         delegatorBlockMiningRewards[i] = _delegatorMiningReward[vId];
@@ -252,7 +252,10 @@ abstract contract CoinbaseExecution is ICoinbaseExecution, CoinbaseExecutionDepe
    * Note: This method should be called once in the end of each period.
    *
    */
-  function _distributeMiningReward(address cid, address payable treasury) private {
+  function _distributeMiningReward(
+    address cid,
+    address payable treasury
+  ) private {
     uint256 amount = _validatorMiningReward[cid];
     if (amount > 0) {
       if (_unsafeSendRONLimitGas(treasury, amount, DEFAULT_ADDITION_GAS)) {
@@ -269,7 +272,11 @@ abstract contract CoinbaseExecution is ICoinbaseExecution, CoinbaseExecutionDepe
    *
    * Note: This amount must exclude the fast finality reward for delegators.
    */
-  function _distributeFastFinalityReward(address cid, address payable treasury, uint256 amount) private {
+  function _distributeFastFinalityReward(
+    address cid,
+    address payable treasury,
+    uint256 amount
+  ) private {
     if (amount > 0) {
       if (_unsafeSendRONLimitGas(treasury, amount, DEFAULT_ADDITION_GAS)) {
         emit FastFinalityRewardDistributed(cid, treasury, amount);
@@ -421,7 +428,11 @@ abstract contract CoinbaseExecution is ICoinbaseExecution, CoinbaseExecutionDepe
    * Note: This method should be called once in the end of each `epoch`.
    *
    */
-  function _updateNewValidatorSet(address[] memory newValidatorIds, uint256 newPeriod, uint256 nextEpoch) private {
+  function _updateNewValidatorSet(
+    address[] memory newValidatorIds,
+    uint256 newPeriod,
+    uint256 nextEpoch
+  ) private {
     uint256 newValidatorCount = newValidatorIds.length;
 
     for (uint256 i; i < newValidatorCount; ++i) {

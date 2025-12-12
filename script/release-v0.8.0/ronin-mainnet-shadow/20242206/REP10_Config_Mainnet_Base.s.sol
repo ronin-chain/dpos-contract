@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { TransparentUpgradeableProxy } from
-  "@openzeppelin-v4/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
+import {
+  TransparentUpgradeableProxy
+} from "@openzeppelin-v4/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 
 import { StdStyle } from "forge-std/StdStyle.sol";
 import { console } from "forge-std/console.sol";
@@ -35,8 +36,9 @@ import { TContract } from "@fdk/types/Types.sol";
 import { DefaultNetwork } from "@fdk/utils/DefaultNetwork.sol";
 import { RoninMigration } from "script/RoninMigration.s.sol";
 import { RoninRandomBeaconDeploy } from "script/contracts/RoninRandomBeaconDeploy.s.sol";
-import { RoninValidatorSetREP10MigratorLogicDeploy } from
-  "script/contracts/RoninValidatorSetRep10MigratorLogicDeploy.s.sol";
+import {
+  RoninValidatorSetREP10MigratorLogicDeploy
+} from "script/contracts/RoninValidatorSetRep10MigratorLogicDeploy.s.sol";
 import { ISharedArgument } from "script/interfaces/ISharedArgument.sol";
 
 import { LibProposal } from "script/shared/libraries/LibProposal.sol";

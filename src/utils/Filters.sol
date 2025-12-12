@@ -10,7 +10,10 @@ import { IndexMap, LibIndexMap } from "../libraries/LibIndexMap.sol";
  * @param indexMap The index map to search in.
  * @return A boolean value indicating whether the `index` is not present in the `indexMap`.
  */
-function notInIndexMapFilter(uint256 index, uint256[] memory indexMap) pure returns (bool) {
+function notInIndexMapFilter(
+  uint256 index,
+  uint256[] memory indexMap
+) pure returns (bool) {
   return !IndexMap(indexMap).contains(index);
 }
 
@@ -20,6 +23,9 @@ function notInIndexMapFilter(uint256 index, uint256[] memory indexMap) pure retu
  * @param trustedWeights The array of weights to check against.
  * @return A boolean indicating whether the weight at the given index is non-zero.
  */
-function nonZeroTrustedWeightFilter(uint256 index, uint256[] memory trustedWeights) pure returns (bool) {
+function nonZeroTrustedWeightFilter(
+  uint256 index,
+  uint256[] memory trustedWeights
+) pure returns (bool) {
   return trustedWeights[index] != 0;
 }

@@ -25,7 +25,11 @@ library IsolatedGovernance {
    * - The voter has not voted for the round.
    *
    */
-  function castVote(Vote storage _v, address _voter, bytes32 _hash) internal {
+  function castVote(
+    Vote storage _v,
+    address _voter,
+    bytes32 _hash
+  ) internal {
     if (_v.expiredAt > 0 && _v.expiredAt <= block.timestamp) {
       _v.status = VoteStatusConsumer.VoteStatus.Expired;
     }
@@ -56,7 +60,10 @@ library IsolatedGovernance {
   /**
    * @dev Returns the list of vote's addresses that voted for the hash `_hash`.
    */
-  function filterByHash(Vote storage _v, bytes32 _hash) internal view returns (address[] memory _voters) {
+  function filterByHash(
+    Vote storage _v,
+    bytes32 _hash
+  ) internal view returns (address[] memory _voters) {
     uint256 _count;
     _voters = new address[](_v.voters.length);
 
@@ -77,7 +84,10 @@ library IsolatedGovernance {
   /**
    * @dev Returns whether the voter casted for the proposal.
    */
-  function voted(Vote storage _v, address _voter) internal view returns (bool) {
+  function voted(
+    Vote storage _v,
+    address _voter
+  ) internal view returns (bool) {
     return _v.voteHashOf[_voter] != bytes32(0);
   }
 }

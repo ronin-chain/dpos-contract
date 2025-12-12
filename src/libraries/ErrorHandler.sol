@@ -9,7 +9,11 @@ library ErrorHandler {
   /// @param status Status of external call
   /// @param callSig function signature of the calldata
   /// @param returnOrRevertData bytes result from external call
-  function handleRevert(bool status, bytes4 callSig, bytes memory returnOrRevertData) internal pure {
+  function handleRevert(
+    bool status,
+    bytes4 callSig,
+    bytes memory returnOrRevertData
+  ) internal pure {
     // Get the function signature of current context
     bytes4 msgSig = msg.sig;
     assembly {

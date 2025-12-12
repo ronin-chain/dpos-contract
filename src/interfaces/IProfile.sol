@@ -80,7 +80,10 @@ interface IProfile {
     address validatorContract
   ) external;
 
-  function initializeV2(address stakingContract, address trustedOrgContract) external;
+  function initializeV2(
+    address stakingContract,
+    address trustedOrgContract
+  ) external;
 
   function initializeV3(
     uint256 cooldown
@@ -211,21 +214,30 @@ interface IProfile {
    *
    * Emit an {ProfileAddressChanged}.
    */
-  function changeAdminAddr(address id, address newAdminAddr) external;
+  function changeAdminAddr(
+    address id,
+    address newAdminAddr
+  ) external;
 
   /**
    * @dev Updated the treasury address of candidate id `id` immediately without waiting time.
    *
    * Emit an {ProfileAddressChanged}.
    */
-  function changeConsensusAddr(address id, TConsensus newConsensusAddr) external;
+  function changeConsensusAddr(
+    address id,
+    TConsensus newConsensusAddr
+  ) external;
 
   /**
    * @dev Updated the treasury address of candidate id `id` immediately without waiting time.
    *
    * Emit an {ProfileAddressChanged}.
    */
-  function changeTreasuryAddr(address id, address payable newTreasury) external;
+  function changeTreasuryAddr(
+    address id,
+    address payable newTreasury
+  ) external;
 
   /**
    * @notice The candidate admin changes the public key.
@@ -237,7 +249,11 @@ interface IProfile {
    * - The proof of public key possession must be verified successfully.
    * - The public key change cooldown must be ended.
    */
-  function changePubkey(address id, bytes memory pubkey, bytes memory proofOfPossession) external;
+  function changePubkey(
+    address id,
+    bytes memory pubkey,
+    bytes memory proofOfPossession
+  ) external;
 
   /**
    * @notice The candidate admin changes the VRF key hash.
@@ -248,7 +264,10 @@ interface IProfile {
    * - New VRF key hash must not be duplicated.
    * - The VRF key hash change cooldown must be ended.
    */
-  function changeVRFKeyHash(address id, bytes32 vrfKeyHash) external;
+  function changeVRFKeyHash(
+    address id,
+    bytes32 vrfKeyHash
+  ) external;
 
   /**
    * @dev Cross-contract function to for slash indicator to check the list of public

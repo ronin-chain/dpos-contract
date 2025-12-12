@@ -61,9 +61,8 @@ contract Migration__04_ProposeAndExecuteProposalPatch_ShadowMainnet_Release_V0_8
     assertTrue(prevLogic.code.length != 0, "Prev Logic is not a contract");
     assertTrue(IRoninValidatorSet(prevLogic).currentPeriod() == 0, "Cannot interact with prev logic");
 
-    roninValidatorSetREP10LogicMigrator = new RoninValidatorSetREP10MigratorLogicDeploy().overrideActivatedAtPeriod(
-      REP10_ACTIVATION_PERIOD
-    ).overridePrevImpl(prevLogic).run();
+    roninValidatorSetREP10LogicMigrator = new RoninValidatorSetREP10MigratorLogicDeploy()
+      .overrideActivatedAtPeriod(REP10_ACTIVATION_PERIOD).overridePrevImpl(prevLogic).run();
   }
 
   function _postCheck() internal virtual override {

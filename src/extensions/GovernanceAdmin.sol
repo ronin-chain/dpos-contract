@@ -24,7 +24,10 @@ abstract contract GovernanceAdmin is
   /// @dev Domain separator
   bytes32 public DOMAIN_SEPARATOR;
 
-  constructor(uint256 _roninChainId, address _roninTrustedOrganizationContract) {
+  constructor(
+    uint256 _roninChainId,
+    address _roninTrustedOrganizationContract
+  ) {
     roninChainId = _roninChainId;
 
     /*
@@ -114,7 +117,10 @@ abstract contract GovernanceAdmin is
   /**
    * @inheritdoc IGovernanceAdmin
    */
-  function changeProxyAdmin(address _proxy, address _newAdmin) external onlySelfCall {
+  function changeProxyAdmin(
+    address _proxy,
+    address _newAdmin
+  ) external onlySelfCall {
     // bytes4(keccak256("changeAdmin(address)"))
     bytes4 _selector = 0x8f283970;
     (bool _success, bytes memory _returndata) = _proxy.call(abi.encodeWithSelector(_selector, _newAdmin));
@@ -126,13 +132,14 @@ abstract contract GovernanceAdmin is
    */
   function _getMinimumVoteWeight() internal view virtual override returns (uint256) {
     bytes4 _selector = IQuorum.minimumVoteWeight.selector;
-    (bool _success, bytes memory _returndata) = getContract(ContractType.RONIN_TRUSTED_ORGANIZATION).staticcall(
-      abi.encodeWithSelector(
-        // TransparentUpgradeableProxyV2.functionDelegateCall.selector,
-        0x4bb5274a,
-        abi.encodeWithSelector(_selector)
-      )
-    );
+    (bool _success, bytes memory _returndata) = getContract(ContractType.RONIN_TRUSTED_ORGANIZATION)
+      .staticcall(
+        abi.encodeWithSelector(
+          // TransparentUpgradeableProxyV2.functionDelegateCall.selector,
+          0x4bb5274a,
+          abi.encodeWithSelector(_selector)
+        )
+      );
     _success.handleRevert(_selector, _returndata);
     return abi.decode(_returndata, (uint256));
   }
@@ -142,13 +149,14 @@ abstract contract GovernanceAdmin is
    */
   function _getTotalWeight() internal view virtual override returns (uint256) {
     bytes4 _selector = IRoninTrustedOrganization.totalWeight.selector;
-    (bool _success, bytes memory _returndata) = getContract(ContractType.RONIN_TRUSTED_ORGANIZATION).staticcall(
-      abi.encodeWithSelector(
-        // TransparentUpgradeableProxyV2.functionDelegateCall.selector,
-        0x4bb5274a,
-        abi.encodeWithSelector(_selector)
-      )
-    );
+    (bool _success, bytes memory _returndata) = getContract(ContractType.RONIN_TRUSTED_ORGANIZATION)
+      .staticcall(
+        abi.encodeWithSelector(
+          // TransparentUpgradeableProxyV2.functionDelegateCall.selector,
+          0x4bb5274a,
+          abi.encodeWithSelector(_selector)
+        )
+      );
     _success.handleRevert(_selector, _returndata);
     return abi.decode(_returndata, (uint256));
   }

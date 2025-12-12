@@ -211,7 +211,10 @@ library LibProposal {
     logProposal(address(governanceAdmin), proposal);
   }
 
-  function logProposal(address governanceAdmin, Proposal.ProposalDetail memory proposal) internal {
+  function logProposal(
+    address governanceAdmin,
+    Proposal.ProposalDetail memory proposal
+  ) internal {
     if (config.isPostChecking()) {
       console.log(StdStyle.italic(StdStyle.magenta("Proposal details omitted:")));
       printLogProposalSummary(governanceAdmin, proposal);
@@ -220,7 +223,10 @@ library LibProposal {
     }
   }
 
-  function printLogProposalSummary(address governanceAdmin, Proposal.ProposalDetail memory proposal) internal view {
+  function printLogProposalSummary(
+    address governanceAdmin,
+    Proposal.ProposalDetail memory proposal
+  ) internal view {
     console.log(
       string.concat(
         "\tGovernance Admin:          \t",
@@ -236,7 +242,10 @@ library LibProposal {
     );
   }
 
-  function printLogProposal(address governanceAdmin, Proposal.ProposalDetail memory proposal) internal {
+  function printLogProposal(
+    address governanceAdmin,
+    Proposal.ProposalDetail memory proposal
+  ) internal {
     console.log(
       // string.concat(
       StdStyle.magenta("\n================================= Proposal Detail =================================\n")

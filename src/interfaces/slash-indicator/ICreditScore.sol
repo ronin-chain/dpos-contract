@@ -49,7 +49,10 @@ interface ICreditScore {
    * Emits the event `CreditScoresUpdated`.
    *
    */
-  function execUpdateCreditScores(address[] calldata validatorIds, uint256 period) external;
+  function execUpdateCreditScores(
+    address[] calldata validatorIds,
+    uint256 period
+  ) external;
 
   /**
    * @dev Resets the credit score for the revoked validators.
@@ -136,5 +139,8 @@ interface ICreditScore {
   /**
    * @dev Returns the whether the `consensus` has been bailed out at the `period`.
    */
-  function checkBailedOutAtPeriod(TConsensus consensus, uint256 period) external view returns (bool);
+  function checkBailedOutAtPeriod(
+    TConsensus consensus,
+    uint256 period
+  ) external view returns (bool);
 }

@@ -27,7 +27,10 @@ library LibWrapUpEpoch {
     logs = wrapUpPeriods({ times: times, shouldSubmitBeacon: false });
   }
 
-  function wrapUpPeriods(uint256 times, bool shouldSubmitBeacon) internal returns (VmSafe.Log[][] memory logs) {
+  function wrapUpPeriods(
+    uint256 times,
+    bool shouldSubmitBeacon
+  ) internal returns (VmSafe.Log[][] memory logs) {
     LibVRFProof.VRFKey[] memory keys;
     bytes memory raw = vme.getUserDefinedConfig("vrf-keys");
 
@@ -50,7 +53,10 @@ library LibWrapUpEpoch {
     }
   }
 
-  function wrapUpEpochs(uint256 times, bool shouldSubmitBeacon) internal returns (VmSafe.Log[][] memory logs) {
+  function wrapUpEpochs(
+    uint256 times,
+    bool shouldSubmitBeacon
+  ) internal returns (VmSafe.Log[][] memory logs) {
     LibVRFProof.VRFKey[] memory keys;
     bytes memory raw = vme.getUserDefinedConfig("vrf-keys");
 

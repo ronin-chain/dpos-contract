@@ -22,7 +22,10 @@ interface IJailingInfo {
   /**
    * @dev Returns whether the validator are put in jail (cannot join the set of validators) at a specific block.
    */
-  function checkJailedAtBlock(TConsensus addr, uint256 blockNum) external view returns (bool);
+  function checkJailedAtBlock(
+    TConsensus addr,
+    uint256 blockNum
+  ) external view returns (bool);
 
   /**
    * @dev Returns whether the validator are put in jail at a specific block and the number of block and epoch that he still is in the jail.
@@ -53,5 +56,8 @@ interface IJailingInfo {
   /**
    * @dev Returns whether the incoming reward of the block producer is deprecated during a specific period.
    */
-  function checkMiningRewardDeprecatedAtPeriod(TConsensus addr, uint256 period) external view returns (bool);
+  function checkMiningRewardDeprecatedAtPeriod(
+    TConsensus addr,
+    uint256 period
+  ) external view returns (bool);
 }

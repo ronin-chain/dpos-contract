@@ -152,14 +152,21 @@ abstract contract SlashUnavailability is ISlashUnavailability, HasContracts, Has
     return _getUnavailabilityIndicatorById(__css2cid(consensus), period);
   }
 
-  function _getUnavailabilityIndicatorById(address validatorId, uint256 period) internal view virtual returns (uint256) {
+  function _getUnavailabilityIndicatorById(
+    address validatorId,
+    uint256 period
+  ) internal view virtual returns (uint256) {
     return _unavailabilityIndicator[validatorId][period];
   }
 
   /**
    * @dev Sets the unavailability indicator of the `_validator` at `_period`.
    */
-  function _setUnavailabilityIndicator(address _validator, uint256 _period, uint256 _indicator) internal virtual {
+  function _setUnavailabilityIndicator(
+    address _validator,
+    uint256 _period,
+    uint256 _indicator
+  ) internal virtual {
     _unavailabilityIndicator[_validator][_period] = _indicator;
   }
 
@@ -184,12 +191,18 @@ abstract contract SlashUnavailability is ISlashUnavailability, HasContracts, Has
   /**
    * @dev Returns whether the account `_addr` should be slashed or not.
    */
-  function _shouldSlash(TConsensus consensus, address validatorId) internal view virtual returns (bool);
+  function _shouldSlash(
+    TConsensus consensus,
+    address validatorId
+  ) internal view virtual returns (bool);
 
   /**
    * @dev See `ICreditScore-checkBailedOutAtPeriodById`
    */
-  function _checkBailedOutAtPeriodById(address validatorId, uint256 period) internal view virtual returns (bool);
+  function _checkBailedOutAtPeriodById(
+    address validatorId,
+    uint256 period
+  ) internal view virtual returns (bool);
 
   function __css2cid(
     TConsensus consensusAddr

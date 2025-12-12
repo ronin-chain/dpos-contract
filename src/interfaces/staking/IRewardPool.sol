@@ -45,17 +45,26 @@ interface IRewardPool is PeriodWrapperConsumer {
   /**
    * @dev Returns the reward amount that user claimable.
    */
-  function getReward(TConsensus consensusAddr, address user) external view returns (uint256);
+  function getReward(
+    TConsensus consensusAddr,
+    address user
+  ) external view returns (uint256);
 
   /**
    * @dev Returns the reward amount that user claimable.
    */
-  function getRewardById(address poolId, address user) external view returns (uint256);
+  function getRewardById(
+    address poolId,
+    address user
+  ) external view returns (uint256);
 
   /**
    * @dev Returns the staking amount of an user.
    */
-  function getStakingAmount(TConsensus consensusAddr, address user) external view returns (uint256);
+  function getStakingAmount(
+    TConsensus consensusAddr,
+    address user
+  ) external view returns (uint256);
 
   /**
    * @dev Returns the staking amounts of the users.

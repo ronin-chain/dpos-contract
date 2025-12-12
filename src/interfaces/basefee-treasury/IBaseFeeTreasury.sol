@@ -11,5 +11,8 @@ interface IBaseFeeTreasury {
    * @dev Withdraws the specified amount to the specified address.
    * Only `RoninGovernanceAdmin` can call this function.
    */
-  function withdrawTo(address to, uint256 amount) external;
+  function withdrawTo(
+    address to,
+    uint256 amount
+  ) external;
 }

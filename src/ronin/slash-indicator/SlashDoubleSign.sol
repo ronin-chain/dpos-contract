@@ -105,7 +105,10 @@ abstract contract SlashDoubleSign is ISlashDoubleSign, HasContracts, HasValidato
   /**
    * @dev Returns whether the id `cid` should be slashed or not.
    */
-  function _shouldSlash(TConsensus consensus, address validatorId) internal view virtual returns (bool);
+  function _shouldSlash(
+    TConsensus consensus,
+    address validatorId
+  ) internal view virtual returns (bool);
 
   function __tryCss2cid(
     TConsensus consensusAddr

@@ -147,12 +147,18 @@ interface ICandidateManager {
   /**
    * @dev Returns whether the address is the candidate admin.
    */
-  function isCandidateAdmin(TConsensus consensus, address admin) external view returns (bool);
+  function isCandidateAdmin(
+    TConsensus consensus,
+    address admin
+  ) external view returns (bool);
 
   /**
    * @dev Returns whether the address is the candidate admin.
    */
-  function isCandidateAdminById(address id, address admin) external view returns (bool);
+  function isCandidateAdminById(
+    address id,
+    address admin
+  ) external view returns (bool);
 
   /**
    * @dev Returns the schedule of changing commission rate of a candidate address.

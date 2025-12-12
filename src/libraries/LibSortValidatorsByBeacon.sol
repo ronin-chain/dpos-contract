@@ -126,7 +126,10 @@ library LibSortValidatorsByBeacon {
    *
    * - Save all cids as unsorted validators.
    */
-  function _saveAllCids(uint256 period, address[] memory cids) private {
+  function _saveAllCids(
+    uint256 period,
+    address[] memory cids
+  ) private {
     ValidatorStorage storage $ = getValidatorPerPeriodLocation(period);
     SortedValidatorStorage storage $sortedValidatorStorage = $._sorted;
 

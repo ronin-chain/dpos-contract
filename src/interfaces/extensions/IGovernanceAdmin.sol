@@ -14,7 +14,10 @@ interface IGovernanceAdmin is IGovernanceProposal, IHasContracts {
    * - This contract must be the current admin of `proxy`.
    *
    */
-  function changeProxyAdmin(address proxy, address newAdmin) external;
+  function changeProxyAdmin(
+    address proxy,
+    address newAdmin
+  ) external;
 
   /**
    * @dev Returns the proposal expiry duration.

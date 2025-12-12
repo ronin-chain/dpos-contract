@@ -103,7 +103,10 @@ abstract contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalC
   /**
    * @inheritdoc IRandomBeacon
    */
-  function fulfillRandomSeed(RandomRequest calldata req, Proof calldata proof) external {
+  function fulfillRandomSeed(
+    RandomRequest calldata req,
+    Proof calldata proof
+  ) external {
     unchecked {
       bytes32 reqHash = req.hash();
       bytes32 keyHash = proof.pk.calcKeyHash();
@@ -210,7 +213,10 @@ abstract contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalC
   /**
    * @inheritdoc IRandomBeacon
    */
-  function getSelectedValidatorSet(uint256 period, uint256 epoch) public view returns (address[] memory pickedCids) {
+  function getSelectedValidatorSet(
+    uint256 period,
+    uint256 epoch
+  ) public view returns (address[] memory pickedCids) {
     Beacon storage $beacon = _beaconPerPeriod[period];
     if (!$beacon.finalized) revert ErrNotFinalizedBeacon(period);
 
@@ -255,14 +261,20 @@ abstract contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalC
   /**
    * @inheritdoc IRandomBeacon
    */
-  function isSubmittedAt(uint256 period, TConsensus consensus) external view returns (bool submitted) {
+  function isSubmittedAt(
+    uint256 period,
+    TConsensus consensus
+  ) external view returns (bool submitted) {
     submitted = isSubmittedAtById({ period: period, cid: _convertToCid(consensus) });
   }
 
   /**
    * @inheritdoc IRandomBeacon
    */
-  function isSubmittedAtByKeyHash(uint256 period, bytes32 keyHash) external view returns (bool submitted) {
+  function isSubmittedAtByKeyHash(
+    uint256 period,
+    bytes32 keyHash
+  ) external view returns (bool submitted) {
     IProfile profile = IProfile(getContract(ContractType.PROFILE));
     address cid = profile.getVRFKeyHash2Id({ vrfKeyHash: keyHash });
     submitted = isSubmittedAtById(period, cid);
@@ -271,7 +283,10 @@ abstract contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalC
   /**
    * @inheritdoc IRandomBeacon
    */
-  function isSubmittedAtById(uint256 period, address cid) public view returns (bool submitted) {
+  function isSubmittedAtById(
+    uint256 period,
+    address cid
+  ) public view returns (bool submitted) {
     submitted = _beaconPerPeriod[period].submitted[cid];
   }
 
@@ -342,12 +357,12 @@ abstract contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalC
    * @param period The period for which the random seed is requested.
    * @param prevBeacon The previous beacon value.
    */
-  function _requestRandomSeed(uint256 period, uint256 prevBeacon) internal {
+  function _requestRandomSeed(
+    uint256 period,
+    uint256 prevBeacon
+  ) internal {
     RandomRequest memory req = RandomRequest({
-      period: period,
-      prevBeacon: prevBeacon,
-      chainId: block.chainid,
-      verifyingContract: address(this)
+      period: period, prevBeacon: prevBeacon, chainId: block.chainid, verifyingContract: address(this)
     });
     bytes32 reqHash = req.hash();
 
@@ -361,7 +376,10 @@ abstract contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalC
    * @param $beacon The beacon to be finalized.
    * @param period The period of the beacon.
    */
-  function _finalizeBeacon(Beacon storage $beacon, uint256 period) internal {
+  function _finalizeBeacon(
+    Beacon storage $beacon,
+    uint256 period
+  ) internal {
     $beacon.finalized = true;
     _lastFinalizedPeriod = period;
 
@@ -427,7 +445,10 @@ abstract contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalC
    * @dev Sets the thresholds for multiple validator types.
    * @notice Emits a `ValidatorThresholdUpdated` event .
    */
-  function _bulkSetValidatorThresholds(ValidatorType[] calldata validatorTypes, uint256[] calldata thresholds) internal {
+  function _bulkSetValidatorThresholds(
+    ValidatorType[] calldata validatorTypes,
+    uint256[] calldata thresholds
+  ) internal {
     uint256 length = validatorTypes.length;
     if (length != thresholds.length) revert ErrLengthMismatch(msg.sig);
 
@@ -445,7 +466,7 @@ abstract contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalC
 
     if (
       _validatorThreshold[ValidatorType.Governing] + _validatorThreshold[ValidatorType.Standard]
-        + _validatorThreshold[ValidatorType.Rotating] != _validatorThreshold[ValidatorType.All]
+          + _validatorThreshold[ValidatorType.Rotating] != _validatorThreshold[ValidatorType.All]
     ) {
       revert ErrInvalidThresholdConfig();
     }
@@ -505,7 +526,11 @@ abstract contract RoninRandomBeacon is Initializable, VRF, HasContracts, GlobalC
    * - Sender is governing validator.
    * - Sender's profile is not newly registered.
    */
-  function _requireAuthorized(address cid, uint256 profileRegisteredAt, uint256 currPeriod) internal view {
+  function _requireAuthorized(
+    address cid,
+    uint256 profileRegisteredAt,
+    uint256 currPeriod
+  ) internal view {
     address trustedOrg = getContract(ContractType.RONIN_TRUSTED_ORGANIZATION);
 
     // only allow to fulfill if the sender is a governing validator

@@ -25,7 +25,10 @@ abstract contract DelegatorStaking is BaseStaking, IDelegatorStaking {
   /**
    * @inheritdoc IDelegatorStaking
    */
-  function undelegate(TConsensus consensusAddr, uint256 amount) external nonReentrant {
+  function undelegate(
+    TConsensus consensusAddr,
+    uint256 amount
+  ) external nonReentrant {
     address payable delegator = payable(msg.sender);
     _undelegate(consensusAddr, _poolDetail[__css2cid(consensusAddr)], delegator, amount);
     if (!_sendRON(delegator, amount)) revert ErrCannotTransferRON();
@@ -34,7 +37,10 @@ abstract contract DelegatorStaking is BaseStaking, IDelegatorStaking {
   /**
    * @inheritdoc IDelegatorStaking
    */
-  function bulkUndelegate(TConsensus[] calldata consensusAddrs, uint256[] calldata amounts) external nonReentrant {
+  function bulkUndelegate(
+    TConsensus[] calldata consensusAddrs,
+    uint256[] calldata amounts
+  ) external nonReentrant {
     if (consensusAddrs.length == 0 || consensusAddrs.length != amounts.length) revert ErrInvalidArrays();
 
     address payable delegator = payable(msg.sender);
@@ -104,7 +110,10 @@ abstract contract DelegatorStaking is BaseStaking, IDelegatorStaking {
   /**
    * @inheritdoc IDelegatorStaking
    */
-  function getRewardsById(address user, address[] memory poolIds) public view returns (uint256[] memory rewards_) {
+  function getRewardsById(
+    address user,
+    address[] memory poolIds
+  ) public view returns (uint256[] memory rewards_) {
     uint256 length = poolIds.length;
     uint256 period = IRoninValidatorSet(getContract(ContractType.VALIDATOR)).currentPeriod();
     rewards_ = new uint256[](length);
@@ -173,7 +182,10 @@ abstract contract DelegatorStaking is BaseStaking, IDelegatorStaking {
    * @dev Claims rewards from the pools `_poolAddrList`.
    * Note: This function does not transfer reward to user.
    */
-  function _claimRewards(address user, address[] memory poolIds) internal returns (uint256 amount) {
+  function _claimRewards(
+    address user,
+    address[] memory poolIds
+  ) internal returns (uint256 amount) {
     uint256 period = _currentPeriod();
     for (uint256 i = 0; i < poolIds.length;) {
       amount += _claimReward(poolIds[i], user, period);

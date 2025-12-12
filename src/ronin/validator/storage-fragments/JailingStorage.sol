@@ -38,7 +38,10 @@ abstract contract JailingStorage is IJailingInfo {
   /**
    * @inheritdoc IJailingInfo
    */
-  function checkJailedAtBlock(TConsensus addr, uint256 blockNum) external view override returns (bool) {
+  function checkJailedAtBlock(
+    TConsensus addr,
+    uint256 blockNum
+  ) external view override returns (bool) {
     address candidateId = __css2cid(addr);
     return _isJailedAtBlockById(candidateId, blockNum);
   }
@@ -148,14 +151,20 @@ abstract contract JailingStorage is IJailingInfo {
   /**
    * @dev Returns whether the reward of the validator is put in jail (cannot join the set of validators) at a specific block.
    */
-  function _isJailedAtBlockById(address validatorId, uint256 blockNum) internal view returns (bool) {
+  function _isJailedAtBlockById(
+    address validatorId,
+    uint256 blockNum
+  ) internal view returns (bool) {
     return blockNum <= _blockProducerJailedBlock[validatorId];
   }
 
   /**
    * @dev Returns whether the block producer has no pending reward in that period.
    */
-  function _miningRewardDeprecatedById(address validatorId, uint256 period) internal view returns (bool) {
+  function _miningRewardDeprecatedById(
+    address validatorId,
+    uint256 period
+  ) internal view returns (bool) {
     return _miningRewardDeprecatedAtPeriod[validatorId][period];
   }
 

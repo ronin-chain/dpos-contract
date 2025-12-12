@@ -58,19 +58,18 @@ contract REP_10_FastFinalityTrackingTest is REP10_BaseTest {
     vThresholds[3] = 10;
 
     vm.prank(address(governanceAdmin));
-    TransparentUpgradeableProxyV2(payable(address(roninRandomBeacon))).functionDelegateCall(
-      abi.encodeCall(IRandomBeacon.bulkSetValidatorThresholds, (vTypes, vThresholds))
-    );
+    TransparentUpgradeableProxyV2(payable(address(roninRandomBeacon)))
+      .functionDelegateCall(abi.encodeCall(IRandomBeacon.bulkSetValidatorThresholds, (vTypes, vThresholds)));
   }
 
   function _overrideRewardConfig() private {
     vm.startPrank(address(governanceAdmin));
-    TransparentUpgradeableProxyV2(payable(address(stakingVesting))).functionDelegateCall(
-      abi.encodeCall(IStakingVesting.setBlockProducerBonusPerBlock, (blockBonus))
-    );
-    TransparentUpgradeableProxyV2(payable(address(stakingVesting))).functionDelegateCall(
-      abi.encodeCall(IStakingVesting.setFastFinalityRewardPercentage, (fastFinalityRewardPercentage))
-    );
+    TransparentUpgradeableProxyV2(payable(address(stakingVesting)))
+      .functionDelegateCall(abi.encodeCall(IStakingVesting.setBlockProducerBonusPerBlock, (blockBonus)));
+    TransparentUpgradeableProxyV2(payable(address(stakingVesting)))
+      .functionDelegateCall(
+        abi.encodeCall(IStakingVesting.setFastFinalityRewardPercentage, (fastFinalityRewardPercentage))
+      );
     vm.stopPrank();
   }
 
@@ -92,19 +91,45 @@ contract REP_10_FastFinalityTrackingTest is REP10_BaseTest {
     }
 
     Validator[13] memory mValidators = [
-      Validator({ adm: makeAddr("adm-00"), css: makeAddr("css-00"), amt: 6904 ether, gv: true, vRate: 100, cRate: 500 }),
-      Validator({ adm: makeAddr("adm-01"), css: makeAddr("css-01"), amt: 9014 ether, gv: true, vRate: 100, cRate: 1000 }),
-      Validator({ adm: makeAddr("adm-02"), css: makeAddr("css-02"), amt: 7812 ether, gv: true, vRate: 100, cRate: 500 }),
-      Validator({ adm: makeAddr("adm-03"), css: makeAddr("css-03"), amt: 9180 ether, gv: true, vRate: 100, cRate: 500 }),
-      Validator({ adm: makeAddr("adm-04"), css: makeAddr("css-04"), amt: 7362 ether, gv: true, vRate: 100, cRate: 2000 }),
-      Validator({ adm: makeAddr("adm-05"), css: makeAddr("css-05"), amt: 7210 ether, gv: false, vRate: 100, cRate: 2000 }),
-      Validator({ adm: makeAddr("adm-06"), css: makeAddr("css-06"), amt: 5611 ether, gv: false, vRate: 80, cRate: 500 }),
-      Validator({ adm: makeAddr("adm-07"), css: makeAddr("css-07"), amt: 7212 ether, gv: false, vRate: 100, cRate: 500 }),
-      Validator({ adm: makeAddr("adm-08"), css: makeAddr("css-08"), amt: 6277 ether, gv: false, vRate: 100, cRate: 500 }),
-      Validator({ adm: makeAddr("adm-09"), css: makeAddr("css-09"), amt: 6579 ether, gv: false, vRate: 90, cRate: 500 }),
-      Validator({ adm: makeAddr("adm-10"), css: makeAddr("css-10"), amt: 7380 ether, gv: false, vRate: 100, cRate: 500 }),
-      Validator({ adm: makeAddr("adm-11"), css: makeAddr("css-11"), amt: 6066 ether, gv: false, vRate: 100, cRate: 500 }),
-      Validator({ adm: makeAddr("adm-12"), css: makeAddr("css-12"), amt: 5218 ether, gv: false, vRate: 100, cRate: 500 })
+      Validator({
+        adm: makeAddr("adm-00"), css: makeAddr("css-00"), amt: 6904 ether, gv: true, vRate: 100, cRate: 500
+      }),
+      Validator({
+        adm: makeAddr("adm-01"), css: makeAddr("css-01"), amt: 9014 ether, gv: true, vRate: 100, cRate: 1000
+      }),
+      Validator({
+        adm: makeAddr("adm-02"), css: makeAddr("css-02"), amt: 7812 ether, gv: true, vRate: 100, cRate: 500
+      }),
+      Validator({
+        adm: makeAddr("adm-03"), css: makeAddr("css-03"), amt: 9180 ether, gv: true, vRate: 100, cRate: 500
+      }),
+      Validator({
+        adm: makeAddr("adm-04"), css: makeAddr("css-04"), amt: 7362 ether, gv: true, vRate: 100, cRate: 2000
+      }),
+      Validator({
+        adm: makeAddr("adm-05"), css: makeAddr("css-05"), amt: 7210 ether, gv: false, vRate: 100, cRate: 2000
+      }),
+      Validator({
+        adm: makeAddr("adm-06"), css: makeAddr("css-06"), amt: 5611 ether, gv: false, vRate: 80, cRate: 500
+      }),
+      Validator({
+        adm: makeAddr("adm-07"), css: makeAddr("css-07"), amt: 7212 ether, gv: false, vRate: 100, cRate: 500
+      }),
+      Validator({
+        adm: makeAddr("adm-08"), css: makeAddr("css-08"), amt: 6277 ether, gv: false, vRate: 100, cRate: 500
+      }),
+      Validator({
+        adm: makeAddr("adm-09"), css: makeAddr("css-09"), amt: 6579 ether, gv: false, vRate: 90, cRate: 500
+      }),
+      Validator({
+        adm: makeAddr("adm-10"), css: makeAddr("css-10"), amt: 7380 ether, gv: false, vRate: 100, cRate: 500
+      }),
+      Validator({
+        adm: makeAddr("adm-11"), css: makeAddr("css-11"), amt: 6066 ether, gv: false, vRate: 100, cRate: 500
+      }),
+      Validator({
+        adm: makeAddr("adm-12"), css: makeAddr("css-12"), amt: 5218 ether, gv: false, vRate: 100, cRate: 500
+      })
     ];
 
     for (uint256 i; i < mValidators.length; i++) {
@@ -145,12 +170,10 @@ contract REP_10_FastFinalityTrackingTest is REP10_BaseTest {
     }
 
     vm.startPrank(address(governanceAdmin));
-    TransparentUpgradeableProxyV2(payable(address(roninTrustedOrganization))).functionDelegateCall(
-      abi.encodeCall(IRoninTrustedOrganization.addTrustedOrganizations, (newGVs))
-    );
-    TransparentUpgradeableProxyV2(payable(address(roninTrustedOrganization))).functionDelegateCall(
-      abi.encodeCall(IRoninTrustedOrganization.removeTrustedOrganizations, (currCss))
-    );
+    TransparentUpgradeableProxyV2(payable(address(roninTrustedOrganization)))
+      .functionDelegateCall(abi.encodeCall(IRoninTrustedOrganization.addTrustedOrganizations, (newGVs)));
+    TransparentUpgradeableProxyV2(payable(address(roninTrustedOrganization)))
+      .functionDelegateCall(abi.encodeCall(IRoninTrustedOrganization.removeTrustedOrganizations, (currCss)));
     vm.stopPrank();
   }
 

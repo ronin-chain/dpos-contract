@@ -41,7 +41,11 @@ contract RoninTrustedOrganization is IRoninTrustedOrganization, HasProxyAdmin, H
   /**
    * @dev Initializes the contract storage.
    */
-  function initialize(TrustedOrganization[] calldata trustedOrgs, uint256 num, uint256 denom) external initializer {
+  function initialize(
+    TrustedOrganization[] calldata trustedOrgs,
+    uint256 num,
+    uint256 denom
+  ) external initializer {
     if (trustedOrgs.length > 0) {
       _addTrustedOrganizations(trustedOrgs);
     }

@@ -77,20 +77,12 @@ contract Profile_Concrete_Test is Test {
     vm.startPrank(_stakingContract);
     vm.expectRevert(abi.encodeWithSelector(IProfile.ErrInvalidProofOfPossession.selector, "0xcc", ""));
     _profile.execApplyValidatorCandidate({
-      admin: address(0x30000),
-      id: address(0x30001),
-      treasury: address(0x30000),
-      pubkey: "0xcc",
-      proofOfPossession: ""
+      admin: address(0x30000), id: address(0x30001), treasury: address(0x30000), pubkey: "0xcc", proofOfPossession: ""
     });
 
     _profile.setVerificationFailed(false);
     _profile.execApplyValidatorCandidate({
-      admin: address(0x30000),
-      id: address(0x30001),
-      treasury: address(0x30000),
-      pubkey: "0xcc",
-      proofOfPossession: ""
+      admin: address(0x30000), id: address(0x30001), treasury: address(0x30000), pubkey: "0xcc", proofOfPossession: ""
     });
 
     vm.stopPrank();
@@ -120,19 +112,11 @@ contract Profile_Concrete_Test is Test {
 
     _profile.setVerificationFailed(false);
     _profile.execApplyValidatorCandidate({
-      admin: address(0x30000),
-      id: address(0x30001),
-      treasury: address(0x30000),
-      pubkey: "0xbb",
-      proofOfPossession: ""
+      admin: address(0x30000), id: address(0x30001), treasury: address(0x30000), pubkey: "0xbb", proofOfPossession: ""
     });
 
     _profile.execApplyValidatorCandidate({
-      admin: address(0x40000),
-      id: address(0x40001),
-      treasury: address(0x40000),
-      pubkey: "0xcc",
-      proofOfPossession: ""
+      admin: address(0x40000), id: address(0x40001), treasury: address(0x40000), pubkey: "0xcc", proofOfPossession: ""
     });
 
     bytes[][2] memory listOfPublicKey;

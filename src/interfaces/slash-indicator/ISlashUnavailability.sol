@@ -50,7 +50,10 @@ interface ISlashUnavailability is IBaseSlash {
   /**
    * @dev Returns the unavailability indicator in the period `period` of a block producer.
    */
-  function getUnavailabilityIndicator(TConsensus consensusAddr, uint256 period) external view returns (uint256);
+  function getUnavailabilityIndicator(
+    TConsensus consensusAddr,
+    uint256 period
+  ) external view returns (uint256);
 
   /**
    * @dev Returns the configs related to block producer slashing.

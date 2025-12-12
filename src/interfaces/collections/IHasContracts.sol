@@ -28,5 +28,8 @@ interface IHasContracts {
    * @param contractType The role of the contract to set.
    * @param addr The address of the contract to set.
    */
-  function setContract(ContractType contractType, address addr) external;
+  function setContract(
+    ContractType contractType,
+    address addr
+  ) external;
 }

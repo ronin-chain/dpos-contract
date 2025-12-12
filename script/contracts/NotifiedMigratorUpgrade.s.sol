@@ -13,7 +13,10 @@ contract NotifiedMigratorUpgrade is RoninMigration {
 
   function _defaultArguments() internal virtual override returns (bytes memory) { }
 
-  function run(Contract contractType, bytes[] calldata callDatas) public virtual returns (address payable) {
+  function run(
+    Contract contractType,
+    bytes[] calldata callDatas
+  ) public virtual returns (address payable) {
     // address payable proxy = loadContract(contractType.key());
     // address proxyAdmin = proxy.getProxyAdmin();
     // address prevImpl = proxy.getProxyImplementation();

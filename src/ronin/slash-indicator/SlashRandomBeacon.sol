@@ -17,7 +17,10 @@ abstract contract SlashRandomBeacon is ISlashRandomBeacon, HasContracts {
   /**
    * @inheritdoc ISlashRandomBeacon
    */
-  function slashRandomBeacon(address validatorId, uint256 period) external onlyContract(ContractType.RANDOM_BEACON) {
+  function slashRandomBeacon(
+    address validatorId,
+    uint256 period
+  ) external onlyContract(ContractType.RANDOM_BEACON) {
     IRoninValidatorSet validatorContract = IRoninValidatorSet(getContract(ContractType.VALIDATOR));
     SlashRandomBeaconConfig memory config = _getSlashRandomBeaconConfig();
     uint256 currPeriod = ITimingInfo(address(validatorContract)).currentPeriod();
@@ -30,10 +33,7 @@ abstract contract SlashRandomBeacon is ISlashRandomBeacon, HasContracts {
     emit Slashed(validatorId, SlashType.RANDOM_BEACON, period);
 
     validatorContract.execSlash({
-      cid: validatorId,
-      newJailedUntil: 0,
-      slashAmount: config._slashAmount,
-      cannotBailout: false
+      cid: validatorId, newJailedUntil: 0, slashAmount: config._slashAmount, cannotBailout: false
     });
   }
 
@@ -47,14 +47,20 @@ abstract contract SlashRandomBeacon is ISlashRandomBeacon, HasContracts {
   /**
    * @inheritdoc ISlashRandomBeacon
    */
-  function setRandomBeaconSlashingConfigs(uint256 slashAmount, uint256 activatedAtPeriod) external onlyAdmin {
+  function setRandomBeaconSlashingConfigs(
+    uint256 slashAmount,
+    uint256 activatedAtPeriod
+  ) external onlyAdmin {
     _setRandomBeaconSlashingConfigs(slashAmount, activatedAtPeriod);
   }
 
   /**
    * @dev See `ISlashRandomBeacon-setRandomBeaconSlashingConfigs`.
    */
-  function _setRandomBeaconSlashingConfigs(uint256 slashAmount, uint256 activatedAtPeriod) internal {
+  function _setRandomBeaconSlashingConfigs(
+    uint256 slashAmount,
+    uint256 activatedAtPeriod
+  ) internal {
     SlashRandomBeaconConfig storage $ = _getSlashRandomBeaconConfig();
 
     $._slashAmount = slashAmount;

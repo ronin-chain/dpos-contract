@@ -33,14 +33,13 @@ library Proposal {
   /**
    * @dev Validates the proposal.
    */
-  function validate(ProposalDetail memory _proposal, uint256 _maxExpiryDuration) internal view {
-    if (
-      !(
-        _proposal.targets.length > 0 && _proposal.targets.length == _proposal.values.length
+  function validate(
+    ProposalDetail memory _proposal,
+    uint256 _maxExpiryDuration
+  ) internal view {
+    if (!(_proposal.targets.length > 0 && _proposal.targets.length == _proposal.values.length
           && _proposal.targets.length == _proposal.calldatas.length
-          && _proposal.targets.length == _proposal.gasAmounts.length
-      )
-    ) {
+          && _proposal.targets.length == _proposal.gasAmounts.length)) {
       revert ErrLengthMismatch(msg.sig);
     }
 
@@ -127,9 +126,10 @@ library Proposal {
       if (gasleft() <= _proposal.gasAmounts[_i]) revert ErrInsufficientGas(hash(_proposal));
 
       (_successCalls[_i], _returnDatas[_i]) = _proposal.targets[_i].call{
-        value: _proposal.values[_i],
-        gas: _proposal.gasAmounts[_i]
-      }(_proposal.calldatas[_i]);
+        value: _proposal.values[_i], gas: _proposal.gasAmounts[_i]
+      }(
+        _proposal.calldatas[_i]
+      );
 
       unchecked {
         ++_i;
