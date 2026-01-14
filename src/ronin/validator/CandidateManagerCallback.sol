@@ -57,9 +57,10 @@ abstract contract CandidateManagerCallback is ICandidateManagerCallback, Candida
    */
   function execRequestRenounceCandidate(
     address cid,
-    uint256 secsLeft
+    uint256 secsLeft,
+    bool allowTrustedOrg
   ) external override onlyContract(ContractType.STAKING) {
-    if (_isTrustedOrg(cid)) revert ErrTrustedOrgCannotRenounce();
+    if (_isTrustedOrg(cid) && !allowTrustedOrg) revert ErrTrustedOrgCannotRenounce();
 
     ValidatorCandidate storage _info = _candidateInfo[cid];
     if (_info.revokingTimestamp != 0) revert ErrAlreadyRequestedRevokingCandidate();

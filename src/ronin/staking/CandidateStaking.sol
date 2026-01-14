@@ -197,7 +197,11 @@ abstract contract CandidateStaking is BaseStaking, ICandidateStaking, GlobalConf
     onlyPoolAdmin(_poolDetail[__css2cid(consensusAddr)], msg.sender)
   {
     IRoninValidatorSet(getContract(ContractType.VALIDATOR))
-      .execRequestRenounceCandidate(__css2cid(consensusAddr), _waitingSecsToRevoke);
+      .execRequestRenounceCandidate(__css2cid(consensusAddr), _waitingSecsToRevoke, _shouldAllowTrustedOrg());
+  }
+
+  function _shouldAllowTrustedOrg() internal view virtual returns (bool) {
+    return false;
   }
 
   /**

@@ -35,6 +35,7 @@ interface ICandidateManagerCallback {
 
   /**
    * @dev Requests to revoke a validator candidate in next `secsLeft` seconds.
+   * If `allowTrustedOrg` is true, the trusted org can renounce the candidate.
    *
    * Requirements:
    * - The method caller is staking contract.
@@ -44,7 +45,8 @@ interface ICandidateManagerCallback {
    */
   function execRequestRenounceCandidate(
     address cid,
-    uint256 secsLeft
+    uint256 secsLeft,
+    bool allowTrustedOrg
   ) external;
 
   /**

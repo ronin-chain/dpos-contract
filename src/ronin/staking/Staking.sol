@@ -103,6 +103,12 @@ contract Staking is IStaking, StakingCallback, Initializable, AccessControlEnume
     return s_l2Migrated;
   }
 
+  /// @dev Returns whether trusted organizations should be allowed to renounce.
+  /// After L2 migration, trusted orgs need the ability to exit gracefully.
+  function _shouldAllowTrustedOrg() internal view virtual override returns (bool) {
+    return s_l2Migrated;
+  }
+
   function execRenounceAndDeprecatePool(
     address poolId
   ) external onlyPoolAdmin(_poolDetail[poolId], msg.sender) {
