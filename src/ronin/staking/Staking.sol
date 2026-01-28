@@ -12,6 +12,7 @@ import "@openzeppelin-v4/contracts/proxy/utils/Initializable.sol";
 
 contract Staking is IStaking, StakingCallback, Initializable, AccessControlEnumerable {
   bytes32 public constant MIGRATOR_ROLE = keccak256("MIGRATOR_ROLE");
+  bytes32 public constant L2_MIGRATOR_ROLE = keccak256("L2_MIGRATOR_ROLE");
 
   // keccak256(abi.encode(uint256(keccak256("ronin.storage.StakingRep4MigratedStorageLocation")) - 1)) & ~bytes32(uint256(0xff))
   bytes32 private constant $_StakingRep4MigratedStorageLocation =
@@ -22,6 +23,7 @@ contract Staking is IStaking, StakingCallback, Initializable, AccessControlEnume
 
   error ErrL2MigrationNotCompleted();
   error ErrPoolRevokingTimestampNotReach(address poolId, uint256 revokingTimestamp, uint256 blockTimestamp);
+  error ErrMigrateRewardFailed(address to, uint256 amount, uint256 balance);
 
   event L2MigrationStatusUpdated(address indexed by, bool status);
   event PoolDeprecated(address indexed poolId);
@@ -33,6 +35,11 @@ contract Staking is IStaking, StakingCallback, Initializable, AccessControlEnume
     }
 
     if (val > 0) revert ErrMigrateWasAdminAlreadyDone();
+    _;
+  }
+
+  modifier onlyL2Migrated() {
+    require(s_l2Migrated, ErrL2MigrationNotCompleted());
     _;
   }
 
@@ -89,12 +96,12 @@ contract Staking is IStaking, StakingCallback, Initializable, AccessControlEnume
   function initializeV5(
     address migrator
   ) external reinitializer(5) {
-    _grantRole(MIGRATOR_ROLE, migrator);
+    _grantRole(L2_MIGRATOR_ROLE, migrator);
   }
 
   function setL2Migrated(
     bool status
-  ) external onlyRole(MIGRATOR_ROLE) {
+  ) external onlyRole(L2_MIGRATOR_ROLE) {
     s_l2Migrated = status;
     emit L2MigrationStatusUpdated(msg.sender, status);
   }
@@ -109,14 +116,25 @@ contract Staking is IStaking, StakingCallback, Initializable, AccessControlEnume
     return s_l2Migrated;
   }
 
+  /**
+   * @dev Migrate reward to the address `to`.
+   */
+  function migrateReward(
+    address to,
+    uint256 amount
+  ) external onlyRole(L2_MIGRATOR_ROLE) onlyL2Migrated {
+    if (!_unsafeSendRON(payable(to), amount)) {
+      revert ErrMigrateRewardFailed(to, amount, address(this).balance);
+    }
+  }
+
   function execRenounceAndDeprecatePool(
     address poolId
-  ) external onlyPoolAdmin(_poolDetail[poolId], msg.sender) {
+  ) external onlyPoolAdmin(_poolDetail[poolId], msg.sender) onlyL2Migrated {
     IRoninValidatorSet validatorContract = IRoninValidatorSet(getContract(ContractType.VALIDATOR));
     uint256 revokingTimestamp = validatorContract.getCandidateInfoById(poolId).revokingTimestamp;
     uint256 currentPeriod = validatorContract.currentPeriod();
 
-    require(s_l2Migrated, ErrL2MigrationNotCompleted());
     require(
       revokingTimestamp != 0 && revokingTimestamp < block.timestamp,
       ErrPoolRevokingTimestampNotReach(poolId, revokingTimestamp, block.timestamp)
