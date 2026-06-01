@@ -239,8 +239,8 @@ abstract contract CandidateStaking is BaseStaking, ICandidateStaking, GlobalConf
 
     IRoninValidatorSet(getContract(ContractType.VALIDATOR))
       .execApplyValidatorCandidate({
-        candidateAdmin: candidateAdmin, cid: poolId, treasuryAddr: treasuryAddr, commissionRate: commissionRate
-      });
+      candidateAdmin: candidateAdmin, cid: poolId, treasuryAddr: treasuryAddr, commissionRate: commissionRate
+    });
 
     IProfile profileContract = IProfile(getContract(ContractType.PROFILE));
     profileContract.execApplyValidatorCandidate(candidateAdmin, poolId, treasuryAddr, pubkey, proofOfPossession);

@@ -30,15 +30,15 @@ contract RoninValidatorSetTimedMigratorUpgrade is RoninMigration {
       abi.encodeCall(IRoninValidatorSet.initializeV3, (loadContractOrDeploy(Contract.FastFinalityTracking.key())));
 
     UpgradeInfo({
-        proxy: proxy,
-        logic: switcher,
-        callValue: 0,
-        callData: abi.encodeCall(RoninValidatorSetTimedMigrator.initialize, (callDatas)),
-        shouldPrompt: true,
-        proxyInterface: ProxyInterface.Transparent,
-        upgradeCallback: _upgradeCallback,
-        shouldUseCallback: true
-      }).upgrade();
+      proxy: proxy,
+      logic: switcher,
+      callValue: 0,
+      callData: abi.encodeCall(RoninValidatorSetTimedMigrator.initialize, (callDatas)),
+      shouldPrompt: true,
+      proxyInterface: ProxyInterface.Transparent,
+      upgradeCallback: _upgradeCallback,
+      shouldUseCallback: true
+    }).upgrade();
 
     return IRoninValidatorSet(proxy);
   }

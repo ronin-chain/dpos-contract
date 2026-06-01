@@ -173,15 +173,15 @@ contract RoninMigration is BaseMigration {
     address logic = _deployLogic(contractType, argsLogicConstructor);
 
     UpgradeInfo({
-        proxy: proxy,
-        logic: logic,
-        callValue: 0,
-        callData: args,
-        proxyInterface: ProxyInterface.Transparent,
-        shouldPrompt: false,
-        upgradeCallback: _upgradeCallback,
-        shouldUseCallback: true
-      }).upgrade();
+      proxy: proxy,
+      logic: logic,
+      callValue: 0,
+      callData: args,
+      proxyInterface: ProxyInterface.Transparent,
+      shouldPrompt: false,
+      upgradeCallback: _upgradeCallback,
+      shouldUseCallback: true
+    }).upgrade();
   }
 
   function _upgradeCallback(
