@@ -16,3 +16,5 @@ ab835baa28d8dff8f096110e1515d0929c1de1d0
 5adaaf8539795c64ca7d90162482f22cf393b323
 # chore(automated): post-commit update .git-blame-ignore-revs
 d02019495ea99334176ba57266a8f019a66b631d
+# style(automated): post-commit forge fmt (*.sol)
+058fccd63bcc968d5221874d893a96ec2336996a
