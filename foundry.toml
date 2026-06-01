@@ -44,7 +44,7 @@ ronin-testnet-shadow = "${RONIN_TESTNET_SHADOW}"
 ronin-mainnet-shadow = "${RONIN_MAINNET_SHADOW}"
 
 [dependencies]
-"fdk" = { version = "0.3.5-beta", url = "https://github.com/axieinfinity/foundry-deployment-kit/archive/refs/tags/v0.3.5-beta.zip" }
+"fdk" = { version = "0.3.6", url = "https://github.com/axieinfinity/foundry-deployment-kit/archive/refs/tags/v0.3.6-gamma.4.zip" }
 "openzeppelin-v4" = { version = "4.7.3", url = "https://github.com/OpenZeppelin/openzeppelin-contracts/archive/refs/tags/v4.7.3.zip" }
 "openzeppelin-v5" = { version = "5.0.2", url = "https://github.com/OpenZeppelin/openzeppelin-contracts/archive/refs/tags/v5.0.2.zip" }
 "chainlink" = { version = "1.6.0", url = "https://github.com/smartcontractkit/chainlink/archive/refs/tags/v1.6.0.zip" }
