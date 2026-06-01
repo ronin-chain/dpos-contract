@@ -18,3 +18,5 @@ ab835baa28d8dff8f096110e1515d0929c1de1d0
 d02019495ea99334176ba57266a8f019a66b631d
 # style(automated): post-commit forge fmt (*.sol)
 058fccd63bcc968d5221874d893a96ec2336996a
+# style(automated): post-commit forge fmt (*.sol)
+ebb5d13358c62cc1caff9fc9cd47eb717ed51328
