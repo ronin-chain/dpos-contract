@@ -19,6 +19,7 @@ cache_path = 'cache_foundry'
 fs_permissions = [{ access = "read-write", path = "./" }]
 gas_limit = "18446744073709551615"
 allow_internal_expect_revert = true
+script_execution_protection = false
 
 [profile.fork]
 evm_version = 'cancun'
@@ -36,8 +37,8 @@ number_underscore = "thousands"
 [rpc_endpoints]
 ethereum = "https://eth.llamarpc.com"
 goerli = "https://goerli.infura.io/v3/${INFURA_API_KEY}"
-ronin-mainnet = "https://api-archived.roninchain.com/rpc"
-ronin-testnet = "https://saigon-archive.roninchain.com/rpc"
+ronin-mainnet = "https://api.roninchain.com/rpc"
+ronin-testnet = "https://rpc-saigon-testnet-cc58e966ql.t.conduit.xyz/ChMGzCr3oXbdRm1M7sP6Um51S6Wzf9T4r"
 localhost = "http://localhost:8545"
 ronin-testnet-shadow = "${RONIN_TESTNET_SHADOW}"
 ronin-mainnet-shadow = "${RONIN_MAINNET_SHADOW}"
