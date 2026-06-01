@@ -2,7 +2,6 @@
 
 pragma solidity ^0.8.9;
 
-import { IRewardMigration } from "../../interfaces/staking/IRewardMigration.sol";
 import "../../interfaces/staking/IStaking.sol";
 import "../../interfaces/validator/IRoninValidatorSet.sol";
 import "../../libraries/Math.sol";
@@ -26,7 +25,6 @@ contract Staking is IStaking, StakingCallback, Initializable, AccessControlEnume
   error ErrPoolRevokingTimestampNotReach(address poolId, uint256 revokingTimestamp, uint256 blockTimestamp);
 
   event L2MigrationStatusUpdated(address indexed by, bool status);
-  event RewardMigrated(address indexed to, uint256 amount);
   event PoolDeprecated(address indexed poolId);
 
   modifier onRep4Migration() {
@@ -115,18 +113,6 @@ contract Staking is IStaking, StakingCallback, Initializable, AccessControlEnume
   /// After L2 migration, trusted orgs need the ability to exit gracefully.
   function _shouldAllowTrustedOrg() internal view virtual override returns (bool) {
     return s_l2Migrated;
-  }
-
-  /**
-   * @dev Migrate reward from staking vesting to the address `to`.
-   */
-  function migrateRewardFromVesting(
-    address to,
-    uint256 amount
-  ) external onlyRole(L2_MIGRATOR_ROLE) onlyL2Migrated {
-    address stakingVesting = getContract(ContractType.STAKING_VESTING);
-    IRewardMigration(stakingVesting).migrateReward(to, amount);
-    emit RewardMigrated(to, amount);
   }
 
   function execRenounceAndDeprecatePool(

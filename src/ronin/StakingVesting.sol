@@ -7,7 +7,7 @@ import "../extensions/collections/HasContracts.sol";
 import "../extensions/consumers/PercentageConsumer.sol";
 import "../interfaces/IStakingVesting.sol";
 
-import { IRewardMigration } from "../interfaces/staking/IRewardMigration.sol";
+import { IStaking } from "../interfaces/staking/IStaking.sol";
 import { IRoninValidatorSet } from "../interfaces/validator/IRoninValidatorSet.sol";
 import "../utils/CommonErrors.sol";
 import { HasValidatorDeprecated } from "../utils/DeprecatedSlots.sol";
@@ -19,11 +19,8 @@ contract StakingVesting is
   HasValidatorDeprecated,
   HasContracts,
   Initializable,
-  RONTransferHelper,
-  IRewardMigration
+  RONTransferHelper
 {
-  error ErrMigrateRewardFailed(address to, uint256 amount, uint256 balance);
-
   /// @dev The block bonus for the block producer whenever a new block is mined.
   uint256 internal _blockProducerBonusPerBlock;
   /// @dev The block bonus for the bridge operator whenever a new block is mined.
@@ -38,6 +35,8 @@ contract StakingVesting is
   uint256 internal _rep10ActivationPeriod;
   /// @dev The boolean flag to check if REP-10 is activated.
   bool internal _isREP10Activated;
+  /// @dev The address of the migrator.
+  address internal _migratorAddress;
 
   constructor() {
     _disableInitializers();
@@ -76,14 +75,33 @@ contract StakingVesting is
     emit FastFinalityRewardPercentageUpdatedForREP10(fastFinalityRewardPercentREP10);
   }
 
-  /// @inheritdoc IRewardMigration
+  function initializeV5(
+    address migratorAddress,
+    address stakingContract
+  ) external reinitializer(5) {
+    _migratorAddress = migratorAddress;
+    _setContract(ContractType.STAKING, stakingContract);
+  }
+
+  /**
+   * @dev Migrate reward to the address `to`.
+   */
   function migrateReward(
     address to,
     uint256 amount
-  ) external onlyContract(ContractType.STAKING) {
+  ) external {
+    if (msg.sender != _migratorAddress) revert ErrNotMigrator();
+    if (!IStaking(getContract(ContractType.STAKING)).isL2Migrated()) revert ErrL2MigrationNotCompleted();
     if (!_unsafeSendRON(payable(to), amount)) {
       revert ErrMigrateRewardFailed(to, amount, address(this).balance);
     }
+  }
+
+  /**
+   * @dev Returns the address of the migrator.
+   */
+  function getMigratorAddress() external view returns (address) {
+    return _migratorAddress;
   }
 
   /**

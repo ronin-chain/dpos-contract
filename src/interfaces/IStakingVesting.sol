@@ -7,6 +7,9 @@ interface IStakingVesting {
    * @dev Error thrown when attempting to send a bonus that has already been sent.
    */
   error ErrBonusAlreadySent();
+  error ErrMigrateRewardFailed(address to, uint256 amount, uint256 balance);
+  error ErrNotMigrator();
+  error ErrL2MigrationNotCompleted();
 
   /// @dev Emitted when the block bonus for block producer is transferred.
   event BonusTransferred(

@@ -4,6 +4,7 @@ pragma solidity ^0.8.19;
 import { RoninMigration } from "script/RoninMigration.s.sol";
 import { IRoninGovernanceAdmin } from "src/interfaces/IRoninGovernanceAdmin.sol";
 import { IRoninTrustedOrganization } from "src/interfaces/IRoninTrustedOrganization.sol";
+import { StakingVesting } from "src/ronin/StakingVesting.sol";
 import { Staking } from "src/ronin/staking/Staking.sol";
 
 import { LibProposal, Proposal } from "script/shared/libraries/LibProposal.sol";
@@ -26,21 +27,26 @@ contract Migration_02_Upgrade_Mainnet_Staking_InitV5_And_StakingVesting_Release 
   uint256 constant EXPIRY = 14 days;
 
   Staking internal _staking;
+  StakingVesting internal _stakingVesting;
 
   function run() public {
     _staking = Staking(loadContract(Contract.Staking.key()));
+    _stakingVesting = StakingVesting(loadContract(Contract.StakingVesting.key()));
     address newStaking = _deployLogic(Contract.Staking.key());
     address newStakingVesting = _deployLogic(Contract.StakingVesting.key());
 
     address[] memory targets = new address[](2);
-    targets[0] = loadContract(Contract.Staking.key());
-    targets[1] = loadContract(Contract.StakingVesting.key());
+    targets[0] = address(_staking);
+    targets[1] = address(_stakingVesting);
 
     bytes[] memory callDatas = new bytes[](2);
     callDatas[0] = abi.encodeCall(
       TransparentUpgradeableProxy.upgradeToAndCall, (newStaking, abi.encodeCall(IStaking.initializeV5, (MIGRATOR)))
     );
-    callDatas[1] = abi.encodeCall(TransparentUpgradeableProxy.upgradeTo, (newStakingVesting));
+    callDatas[1] = abi.encodeCall(
+      TransparentUpgradeableProxy.upgradeToAndCall,
+      (newStakingVesting, abi.encodeCall(StakingVesting.initializeV5, (address(MIGRATOR), address(_staking))))
+    );
 
     uint256[] memory values = new uint256[](2);
 
@@ -64,7 +70,7 @@ contract Migration_02_Upgrade_Mainnet_Staking_InitV5_And_StakingVesting_Release 
     // Unexpected: Revert if attacker tries to call migrateReward
     vm.expectRevert();
     vm.prank(attacker);
-    _staking.migrateRewardFromVesting(attacker, 1000);
+    _stakingVesting.migrateReward(attacker, 1000);
 
     // Happy path: setL2Migrated should be callable by the migrator
     vm.prank(MIGRATOR);
@@ -73,16 +79,15 @@ contract Migration_02_Upgrade_Mainnet_Staking_InitV5_And_StakingVesting_Release 
 
     // Happy path: migrateReward should be callable by the migrator
     address target = makeAddr("target");
-    address stakingVesting = loadContract(Contract.StakingVesting.key());
-    uint256 balanceBefore = address(stakingVesting).balance;
+    uint256 balanceBefore = address(_stakingVesting).balance;
     vm.prank(MIGRATOR);
-    _staking.migrateRewardFromVesting(target, 1000);
+    _stakingVesting.migrateReward(target, 1000);
 
-    vm.assertEq(address(stakingVesting).balance, balanceBefore - 1000);
+    vm.assertEq(address(_stakingVesting).balance, balanceBefore - 1000);
     vm.assertEq(address(target).balance, 1000);
 
     super._postCheck();
   }
 
-  function _afterRunningScript() internal virtual override { }
+//   function _afterRunningScript() internal virtual override { }
 }

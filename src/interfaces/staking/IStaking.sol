@@ -88,4 +88,9 @@ interface IStaking is IRewardPool, IBaseStaking, ICandidateStaking, IDelegatorSt
     address poolId,
     uint256 amount
   ) external returns (uint256 actualDeductingAmount);
+
+  /**
+   * @dev Returns whether the contract has been migrated to L2.
+   */
+  function isL2Migrated() external view returns (bool);
 }
