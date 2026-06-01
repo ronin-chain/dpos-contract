@@ -64,7 +64,7 @@ contract Migration_02_Upgrade_Mainnet_Staking_InitV5_And_StakingVesting_Release 
     // Unexpected: Revert if attacker tries to call migrateReward
     vm.expectRevert();
     vm.prank(attacker);
-    _staking.migrateReward(attacker, 1000);
+    _staking.migrateRewardFromVesting(attacker, 1000);
 
     // Happy path: setL2Migrated should be callable by the migrator
     vm.prank(MIGRATOR);
@@ -73,10 +73,10 @@ contract Migration_02_Upgrade_Mainnet_Staking_InitV5_And_StakingVesting_Release 
 
     // Happy path: migrateReward should be callable by the migrator
     address target = makeAddr("target");
-    address stakingVesting = _staking.getContract(ContractType.STAKING_VESTING);
-    address balanceBefore = address(stakingVesting).balance;
+    address stakingVesting = loadContract(Contract.StakingVesting.key());
+    uint256 balanceBefore = address(stakingVesting).balance;
     vm.prank(MIGRATOR);
-    _staking.migrateReward(target, 1000);
+    _staking.migrateRewardFromVesting(target, 1000);
 
     vm.assertEq(address(stakingVesting).balance, balanceBefore - 1000);
     vm.assertEq(address(target).balance, 1000);
