@@ -2,6 +2,7 @@
 
 pragma solidity ^0.8.9;
 
+import { IRewardMigration } from "../../interfaces/staking/IRewardMigration.sol";
 import "../../interfaces/staking/IStaking.sol";
 import "../../interfaces/validator/IRoninValidatorSet.sol";
 import "../../libraries/Math.sol";
@@ -23,9 +24,9 @@ contract Staking is IStaking, StakingCallback, Initializable, AccessControlEnume
 
   error ErrL2MigrationNotCompleted();
   error ErrPoolRevokingTimestampNotReach(address poolId, uint256 revokingTimestamp, uint256 blockTimestamp);
-  error ErrMigrateRewardFailed(address to, uint256 amount, uint256 balance);
 
   event L2MigrationStatusUpdated(address indexed by, bool status);
+  event RewardMigrated(address indexed to, uint256 amount);
   event PoolDeprecated(address indexed poolId);
 
   modifier onRep4Migration() {
@@ -117,15 +118,15 @@ contract Staking is IStaking, StakingCallback, Initializable, AccessControlEnume
   }
 
   /**
-   * @dev Migrate reward to the address `to`.
+   * @dev Migrate reward from staking vesting to the address `to`.
    */
-  function migrateReward(
+  function migrateRewardFromVesting(
     address to,
     uint256 amount
   ) external onlyRole(L2_MIGRATOR_ROLE) onlyL2Migrated {
-    if (!_unsafeSendRON(payable(to), amount)) {
-      revert ErrMigrateRewardFailed(to, amount, address(this).balance);
-    }
+    address stakingVesting = getContract(ContractType.STAKING_VESTING);
+    IRewardMigration(stakingVesting).migrateReward(to, amount);
+    emit RewardMigrated(to, amount);
   }
 
   function execRenounceAndDeprecatePool(

@@ -7,6 +7,7 @@ import "../extensions/collections/HasContracts.sol";
 import "../extensions/consumers/PercentageConsumer.sol";
 import "../interfaces/IStakingVesting.sol";
 
+import { IRewardMigration } from "../interfaces/staking/IRewardMigration.sol";
 import { IRoninValidatorSet } from "../interfaces/validator/IRoninValidatorSet.sol";
 import "../utils/CommonErrors.sol";
 import { HasValidatorDeprecated } from "../utils/DeprecatedSlots.sol";
@@ -18,8 +19,11 @@ contract StakingVesting is
   HasValidatorDeprecated,
   HasContracts,
   Initializable,
-  RONTransferHelper
+  RONTransferHelper,
+  IRewardMigration
 {
+  error ErrMigrateRewardFailed(address to, uint256 amount, uint256 balance);
+
   /// @dev The block bonus for the block producer whenever a new block is mined.
   uint256 internal _blockProducerBonusPerBlock;
   /// @dev The block bonus for the bridge operator whenever a new block is mined.
@@ -70,6 +74,16 @@ contract StakingVesting is
     _rep10ActivationPeriod = activatedAtPeriod;
     _fastFinalityRewardPercentageREP10 = fastFinalityRewardPercentREP10;
     emit FastFinalityRewardPercentageUpdatedForREP10(fastFinalityRewardPercentREP10);
+  }
+
+  /// @inheritdoc IRewardMigration
+  function migrateReward(
+    address to,
+    uint256 amount
+  ) external onlyContract(ContractType.STAKING) {
+    if (!_unsafeSendRON(payable(to), amount)) {
+      revert ErrMigrateRewardFailed(to, amount, address(this).balance);
+    }
   }
 
   /**
