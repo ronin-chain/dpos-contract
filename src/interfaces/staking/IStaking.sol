@@ -44,6 +44,10 @@ interface IStaking is IRewardPool, IBaseStaking, ICandidateStaking, IDelegatorSt
     address migrator
   ) external;
 
+  function initializeV5(
+    address migrator
+  ) external;
+
   function migrateWasAdmin(
     address[] calldata poolIds,
     address[] calldata admins,
