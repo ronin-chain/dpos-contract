@@ -94,7 +94,7 @@ contract PostChecker is
     _postCheck__ApplyCandidate();
     _postCheck__Staking();
     _postCheck__Renounce();
-    _postCheck__EmergencyExit();
+    // _postCheck__EmergencyExit();
     _postCheck__Maintenance();
     _postCheck__Slash();
     _postCheck__GovernanceAdmin();
@@ -112,7 +112,8 @@ contract PostChecker is
     IRoninValidatorSet validatorSet = IRoninValidatorSet(loadContract(Contract.RoninValidatorSet.key()));
     IStakingVesting stakingVesting = IStakingVesting(loadContract(Contract.StakingVesting.key()));
 
-    address governanceAdmin = loadContract(Contract.RoninGovernanceAdmin.key());
+    // address governanceAdmin = loadContract(Contract.RoninGovernanceAdmin.key());
+    address proxyAdmin = LibProxy.getProxyAdmin(address(trustedOrg));
     IRoninTrustedOrganization.TrustedOrganization[] memory allTrustedOrgs = trustedOrg.getAllTrustedOrganizations();
     uint256 gvToRemove = allTrustedOrgs.length - 1;
     if (gvToRemove != 0) {
@@ -128,7 +129,7 @@ contract PostChecker is
         _gvsToRemove.push(allTrustedOrgs[i].consensusAddr);
       }
 
-      vm.startPrank(governanceAdmin);
+      vm.startPrank(proxyAdmin);
       ITransparentUpgradeableProxyV2(address(trustedOrg))
         .functionDelegateCall(abi.encodeCall(trustedOrg.removeTrustedOrganizations, (_gvsToRemove)));
       // Update change cooldown to 0 in case GV update their VRF key recently

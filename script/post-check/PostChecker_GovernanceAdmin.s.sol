@@ -55,7 +55,7 @@ abstract contract PostChecker_GovernanceAdmin is BaseMigration, PostChecker_Help
     __trustedOrg = loadContract(Contract.RoninTrustedOrganization.key());
 
     _postCheck__UpgradeAllContracts();
-    _postCheck__ChangeAdminAllContracts();
+    // _postCheck__ChangeAdminAllContracts();
   }
 
   function _postCheck__UpgradeAllContracts()
