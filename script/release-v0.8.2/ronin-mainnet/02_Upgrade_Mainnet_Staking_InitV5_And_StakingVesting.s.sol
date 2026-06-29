@@ -38,10 +38,9 @@ contract Migration_02_Upgrade_Mainnet_Staking_InitV5_And_StakingVesting_InitV5_A
     _staking = Staking(loadContract(Contract.Staking.key()));
     _stakingVesting = StakingVesting(loadContract(Contract.StakingVesting.key()));
     _roninValidatorSet = RoninValidatorSet(loadContract(Contract.RoninValidatorSet.key()));
-    address newStaking = _deployLogic(Contract.Staking.key());
-    address newStakingVesting = _deployLogic(Contract.StakingVesting.key());
-    address newRoninValidatorSet = _deployLogic(Contract.RoninValidatorSet.key());
-
+    address newStaking = 0x485204AeF4B250e1022fE0B8c7C229319800479A;
+    address newStakingVesting = 0x4A822fb763b078A2F0A3813A73fF4264D0983425;
+    address newRoninValidatorSet = 0xF10DECa02FD8D926f66De9879cFeFA51E344b117;
     address[] memory targets = new address[](13);
     targets[0] = address(_staking);
     targets[1] = address(_stakingVesting);
