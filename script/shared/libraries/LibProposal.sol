@@ -205,10 +205,31 @@ library LibProposal {
     vm.revertTo(snapshotId);
 
     proposal = Proposal.ProposalDetail(
-      governanceAdmin.round(block.chainid) + 1, block.chainid, expiry, targets, values, callDatas, gasAmounts
+      _getNextProposalNonce(governanceAdmin), block.chainid, expiry, targets, values, callDatas, gasAmounts
     );
 
     logProposal(address(governanceAdmin), proposal);
+  }
+
+  /**
+   * @dev Computes the nonce the next proposal will be stored under, mirroring
+   * `CoreGovernance._createVotingRound`. The round counter is only incremented when the latest
+   * round is still active; an expired pending round is overwritten (reused) rather than bumped,
+   * so the next nonce stays the same in that case.
+   */
+  function _getNextProposalNonce(
+    IRoninGovernanceAdmin governanceAdmin
+  ) internal view returns (uint256 nonce) {
+    uint256 currentRound = governanceAdmin.round(block.chainid);
+    if (currentRound == 0) {
+      // No voting round has ever been created for this chain.
+      return 1;
+    }
+
+    (VoteStatusConsumer.VoteStatus status,,,, uint256 expiryTimestamp) =
+      governanceAdmin.vote(block.chainid, currentRound);
+    bool isExpired = status == VoteStatusConsumer.VoteStatus.Pending && expiryTimestamp <= block.timestamp;
+    nonce = isExpired ? currentRound : currentRound + 1;
   }
 
   function logProposal(
