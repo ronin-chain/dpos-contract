@@ -1,7 +1,7 @@
-forge-std/=dependencies/fdk-0.3.5-beta/dependencies/forge-std-1.9.3/src/
+forge-std/=dependencies/fdk-0.3.6/dependencies/forge-std-1.9.5/src/
 @openzeppelin-v4/contracts/=dependencies/openzeppelin-v4-4.7.3/contracts/
 @openzeppelin-v5/contracts/=dependencies/openzeppelin-v5-5.0.2/contracts/
-@solady/=dependencies/fdk-0.3.5-beta/dependencies/solady-0.0.228/src/
-@fdk/=dependencies/fdk-0.3.5-beta/script/
+@solady/=dependencies/fdk-0.3.6/dependencies/solady-0.0.228/src/
+@fdk/=dependencies/fdk-0.3.6/script/
 @chainlink/contracts/=dependencies/chainlink-1.6.0/contracts/
 @safe/contracts/=dependencies/safe-1.4.1/contracts/

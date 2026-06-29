@@ -11,7 +11,8 @@ import { IRoninTrustedOrganization, Proposal, RoninMigration } from "script/Roni
 import { LibProposal } from "script/shared/libraries/LibProposal.sol";
 import { Contract } from "script/utils/Contract.sol";
 import {
-  TransparentUpgradeableProxy, TransparentUpgradeableProxyV2
+  TransparentUpgradeableProxy,
+  TransparentUpgradeableProxyV2
 } from "src/extensions/TransparentUpgradeableProxyV2.sol";
 import { IMaintenance } from "src/interfaces/IMaintenance.sol";
 import { IRoninGovernanceAdmin } from "src/interfaces/IRoninGovernanceAdmin.sol";
@@ -113,7 +114,11 @@ contract Migration__20242103_UpgradeReleaseV0_7_7_Mainnet is RoninMigration {
     super._postCheck();
   }
 
-  function _buildMigrateProfileProposal(address[] memory targets, bytes[] memory callDatas, uint256 at) internal view {
+  function _buildMigrateProfileProposal(
+    address[] memory targets,
+    bytes[] memory callDatas,
+    uint256 at
+  ) internal view {
     Profile_Mainnet profile = Profile_Mainnet(loadContract(Contract.Profile.key()));
     targets[at] = address(profile);
     callDatas[at] = abi.encodeCall(
@@ -130,8 +135,7 @@ contract Migration__20242103_UpgradeReleaseV0_7_7_Mainnet is RoninMigration {
     targets[at] = address(maintenance);
     callDatas[at] = abi.encodeCall(
       TransparentUpgradeableProxyV2.functionDelegateCall,
-      (
-        abi.encodeCall(
+      (abi.encodeCall(
           IMaintenance.setMaintenanceConfig,
           (
             maintenance.minMaintenanceDurationInBlock(),
@@ -141,8 +145,7 @@ contract Migration__20242103_UpgradeReleaseV0_7_7_Mainnet is RoninMigration {
             maintenance.maxSchedule(),
             maintenance.cooldownSecsToMaintain()
           )
-        )
-      )
+        ))
     );
   }
 

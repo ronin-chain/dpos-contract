@@ -27,7 +27,10 @@ abstract contract EmergencyExit is IEmergencyExit, RONTransferHelper, CandidateM
   /**
    * @inheritdoc IEmergencyExit
    */
-  function execRequestEmergencyExit(address cid, uint256 secLeftToRevoke) external onlyContract(ContractType.STAKING) {
+  function execRequestEmergencyExit(
+    address cid,
+    uint256 secLeftToRevoke
+  ) external onlyContract(ContractType.STAKING) {
     EmergencyExitInfo storage _info = _exitInfo[cid];
     if (_info.recyclingAt != 0) revert ErrAlreadyRequestedEmergencyExit();
 
@@ -41,9 +44,8 @@ abstract contract EmergencyExit is IEmergencyExit, RONTransferHelper, CandidateM
       _lockedConsensusList.push(cid);
       _info.lockedAmount = deductedAmount;
       _info.recyclingAt = recyclingAt;
-      IRoninGovernanceAdmin(_getAdmin()).createEmergencyExitPoll(
-        cid, _candidateInfo[cid].__shadowedTreasury, block.timestamp, recyclingAt
-      );
+      IRoninGovernanceAdmin(_getAdmin())
+        .createEmergencyExitPoll(cid, _candidateInfo[cid].__shadowedTreasury, block.timestamp, recyclingAt);
     }
     emit EmergencyExitRequested(cid, deductedAmount);
   }
@@ -69,7 +71,10 @@ abstract contract EmergencyExit is IEmergencyExit, RONTransferHelper, CandidateM
   /**
    * @inheritdoc IEmergencyExit
    */
-  function execReleaseLockedFundForEmergencyExitRequest(address cid, address payable recipient) external onlyAdmin {
+  function execReleaseLockedFundForEmergencyExitRequest(
+    address cid,
+    address payable recipient
+  ) external onlyAdmin {
     if (_exitInfo[cid].recyclingAt == 0) {
       revert ErrLockedFundReleaseInfoNotFound(cid);
     }

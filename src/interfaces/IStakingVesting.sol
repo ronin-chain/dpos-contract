@@ -7,6 +7,9 @@ interface IStakingVesting {
    * @dev Error thrown when attempting to send a bonus that has already been sent.
    */
   error ErrBonusAlreadySent();
+  error ErrMigrateRewardFailed(address to, uint256 amount, uint256 balance);
+  error ErrNotMigrator();
+  error ErrL2MigrationNotCompleted();
 
   /// @dev Emitted when the block bonus for block producer is transferred.
   event BonusTransferred(
@@ -43,7 +46,10 @@ interface IStakingVesting {
     uint256 fastFinalityRewardPercent
   ) external;
 
-  function initializeV4(uint256 activatedAtPeriod, uint256 fastFinalityRewardPercentREP10) external;
+  function initializeV4(
+    uint256 activatedAtPeriod,
+    uint256 fastFinalityRewardPercentREP10
+  ) external;
 
   /**
    * @dev Returns the destined period that REP10 is activated.

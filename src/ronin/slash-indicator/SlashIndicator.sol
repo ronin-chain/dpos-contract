@@ -143,10 +143,10 @@ contract SlashIndicator is
     return
     // The slasher must not be identical with the slashee
     (msg.sender != TConsensus.unwrap(consensus)) && (msg.sender != validatorId)
-    // The slashee must still be block producer at the time of being slashed
-    && IRoninValidatorSet(getContract(ContractType.VALIDATOR)).isBlockProducerById(validatorId)
-    // The slashee must not on maintenance
-    && !IMaintenance(getContract(ContractType.MAINTENANCE)).checkMaintainedById(validatorId, block.number);
+      // The slashee must still be block producer at the time of being slashed
+      && IRoninValidatorSet(getContract(ContractType.VALIDATOR)).isBlockProducerById(validatorId)
+      // The slashee must not on maintenance
+      && !IMaintenance(getContract(ContractType.MAINTENANCE)).checkMaintainedById(validatorId, block.number);
   }
 
   function __css2cid(

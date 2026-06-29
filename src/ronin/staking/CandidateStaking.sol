@@ -52,7 +52,10 @@ abstract contract CandidateStaking is BaseStaking, ICandidateStaking, GlobalConf
   /**
    * @inheritdoc ICandidateStaking
    */
-  function setCommissionRateRange(uint256 minRate, uint256 maxRate) external override onlyAdmin {
+  function setCommissionRateRange(
+    uint256 minRate,
+    uint256 maxRate
+  ) external override onlyAdmin {
     _setCommissionRateRange(minRate, maxRate);
   }
 
@@ -109,9 +112,8 @@ abstract contract CandidateStaking is BaseStaking, ICandidateStaking, GlobalConf
     onlyPoolAdmin(_poolDetail[__css2cid(consensusAddr)], msg.sender)
   {
     if (commissionRate > _maxCommissionRate || commissionRate < _minCommissionRate) revert ErrInvalidCommissionRate();
-    IRoninValidatorSet(getContract(ContractType.VALIDATOR)).execRequestUpdateCommissionRate(
-      __css2cid(consensusAddr), effectiveDaysOnwards, commissionRate
-    );
+    IRoninValidatorSet(getContract(ContractType.VALIDATOR))
+      .execRequestUpdateCommissionRate(__css2cid(consensusAddr), effectiveDaysOnwards, commissionRate);
   }
 
   /**
@@ -121,37 +123,38 @@ abstract contract CandidateStaking is BaseStaking, ICandidateStaking, GlobalConf
     address[] calldata poolIds,
     uint256 newPeriod
   ) external override onlyContract(ContractType.VALIDATOR) {
-    if (poolIds.length == 0) {
-      return;
-    }
+    uint256 length = poolIds.length;
+    if (length == 0) return;
 
-    for (uint256 i = 0; i < poolIds.length;) {
-      address poolId = poolIds[i];
-      PoolDetail storage _pool = _poolDetail[poolId];
-      // Deactivate the pool admin in the active mapping.
-      delete _adminOfActivePoolMapping[_pool.__shadowedPoolAdmin];
-
-      // Deduct and transfer the self staking amount to the pool admin.
-      uint256 deductingAmount = _pool.stakingAmount;
-      if (deductingAmount > 0) {
-        _deductStakingAmount(_pool, deductingAmount);
-        if (!_unsafeSendRONLimitGas(payable(_pool.__shadowedPoolAdmin), deductingAmount, DEFAULT_ADDITION_GAS)) {
-          emit StakingAmountTransferFailed(_pool.pid, _pool.__shadowedPoolAdmin, deductingAmount, address(this).balance);
-        }
-      }
-
-      // Settle the unclaimed reward and transfer to the pool admin.
-      uint256 lastRewardAmount = _claimReward(poolId, _pool.__shadowedPoolAdmin, newPeriod);
-      if (lastRewardAmount > 0) {
-        _unsafeSendRONLimitGas(payable(_pool.__shadowedPoolAdmin), lastRewardAmount, DEFAULT_ADDITION_GAS);
-      }
-
-      unchecked {
-        ++i;
-      }
+    for (uint256 i = 0; i < length; ++i) {
+      _deprecatePool(poolIds[i], newPeriod);
     }
 
     emit PoolsDeprecated(poolIds);
+  }
+
+  function _deprecatePool(
+    address poolId,
+    uint256 newPeriod
+  ) internal {
+    PoolDetail storage _pool = _poolDetail[poolId];
+    // Deactivate the pool admin in the active mapping.
+    delete _adminOfActivePoolMapping[_pool.__shadowedPoolAdmin];
+
+    // Deduct and transfer the self staking amount to the pool admin.
+    uint256 deductingAmount = _pool.stakingAmount;
+    if (deductingAmount > 0) {
+      _deductStakingAmount(_pool, deductingAmount);
+      if (!_unsafeSendRONLimitGas(payable(_pool.__shadowedPoolAdmin), deductingAmount, DEFAULT_ADDITION_GAS)) {
+        emit StakingAmountTransferFailed(_pool.pid, _pool.__shadowedPoolAdmin, deductingAmount, address(this).balance);
+      }
+    }
+
+    // Settle the unclaimed reward and transfer to the pool admin.
+    uint256 lastRewardAmount = _claimReward(poolId, _pool.__shadowedPoolAdmin, newPeriod);
+    if (lastRewardAmount > 0) {
+      _unsafeSendRONLimitGas(payable(_pool.__shadowedPoolAdmin), lastRewardAmount, DEFAULT_ADDITION_GAS);
+    }
   }
 
   /**
@@ -193,9 +196,12 @@ abstract contract CandidateStaking is BaseStaking, ICandidateStaking, GlobalConf
     poolOfConsensusIsActive(consensusAddr)
     onlyPoolAdmin(_poolDetail[__css2cid(consensusAddr)], msg.sender)
   {
-    IRoninValidatorSet(getContract(ContractType.VALIDATOR)).execRequestRenounceCandidate(
-      __css2cid(consensusAddr), _waitingSecsToRevoke
-    );
+    IRoninValidatorSet(getContract(ContractType.VALIDATOR))
+      .execRequestRenounceCandidate(__css2cid(consensusAddr), _waitingSecsToRevoke, _shouldAllowTrustedOrg());
+  }
+
+  function _shouldAllowTrustedOrg() internal view virtual returns (bool) {
+    return false;
   }
 
   /**
@@ -209,9 +215,8 @@ abstract contract CandidateStaking is BaseStaking, ICandidateStaking, GlobalConf
     poolOfConsensusIsActive(consensusAddr)
     onlyPoolAdmin(_poolDetail[__css2cid(consensusAddr)], msg.sender)
   {
-    IRoninValidatorSet(getContract(ContractType.VALIDATOR)).execRequestEmergencyExit(
-      __css2cid(consensusAddr), _waitingSecsToRevoke
-    );
+    IRoninValidatorSet(getContract(ContractType.VALIDATOR))
+      .execRequestEmergencyExit(__css2cid(consensusAddr), _waitingSecsToRevoke);
   }
 
   /**
@@ -232,11 +237,9 @@ abstract contract CandidateStaking is BaseStaking, ICandidateStaking, GlobalConf
 
     if (poolAdmin == poolId) revert LibArray.ErrDuplicated(msg.sig);
 
-    IRoninValidatorSet(getContract(ContractType.VALIDATOR)).execApplyValidatorCandidate({
-      candidateAdmin: candidateAdmin,
-      cid: poolId,
-      treasuryAddr: treasuryAddr,
-      commissionRate: commissionRate
+    IRoninValidatorSet(getContract(ContractType.VALIDATOR))
+      .execApplyValidatorCandidate({
+      candidateAdmin: candidateAdmin, cid: poolId, treasuryAddr: treasuryAddr, commissionRate: commissionRate
     });
 
     IProfile profileContract = IProfile(getContract(ContractType.PROFILE));
@@ -246,7 +249,11 @@ abstract contract CandidateStaking is BaseStaking, ICandidateStaking, GlobalConf
   /**
    * @dev See `ICandidateStaking-stake`
    */
-  function _stake(PoolDetail storage _pool, address requester, uint256 amount) internal onlyPoolAdmin(_pool, requester) {
+  function _stake(
+    PoolDetail storage _pool,
+    address requester,
+    uint256 amount
+  ) internal onlyPoolAdmin(_pool, requester) {
     _pool.stakingAmount += amount;
     _changeDelegatingAmount(_pool, requester, _pool.stakingAmount, _pool.stakingTotal + amount);
     _pool.lastDelegatingTimestamp[requester] = block.timestamp;
@@ -300,7 +307,10 @@ abstract contract CandidateStaking is BaseStaking, ICandidateStaking, GlobalConf
    *
    * @return The actual deducted amount
    */
-  function _deductStakingAmount(PoolDetail storage _pool, uint256 amount) internal virtual returns (uint256);
+  function _deductStakingAmount(
+    PoolDetail storage _pool,
+    uint256 amount
+  ) internal virtual returns (uint256);
 
   /**
    * @dev Sets the minimum threshold for being a validator candidate.
@@ -321,7 +331,10 @@ abstract contract CandidateStaking is BaseStaking, ICandidateStaking, GlobalConf
    * Emits the `MaxCommissionRateUpdated` event.
    *
    */
-  function _setCommissionRateRange(uint256 minRate, uint256 maxRate) internal {
+  function _setCommissionRateRange(
+    uint256 minRate,
+    uint256 maxRate
+  ) internal {
     if (maxRate > _MAX_PERCENTAGE || minRate > maxRate) revert ErrInvalidCommissionRate();
     _maxCommissionRate = maxRate;
     _minCommissionRate = minRate;

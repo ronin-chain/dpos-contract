@@ -24,7 +24,11 @@ library Sorting {
     return _quickSort(data, int256(0), int256(data.length - 1));
   }
 
-  function _quickSort(uint256[] memory arr, int256 left, int256 right) private pure returns (uint256[] memory) {
+  function _quickSort(
+    uint256[] memory arr,
+    int256 left,
+    int256 right
+  ) private pure returns (uint256[] memory) {
     int256 i = left;
     int256 j = right;
     if (i == j) return arr;
@@ -48,7 +52,10 @@ library Sorting {
   //                                   NODE SORTING                                    //
   ///////////////////////////////////////////////////////////////////////////////////////
 
-  function sort(address[] memory _keys, uint256[] memory _values) internal pure returns (address[] memory) {
+  function sort(
+    address[] memory _keys,
+    uint256[] memory _values
+  ) internal pure returns (address[] memory) {
     require(_values.length == _keys.length, "Sorting: invalid array length");
     if (_keys.length == 0) {
       return _keys;
@@ -67,7 +74,10 @@ library Sorting {
     return _keys;
   }
 
-  function sort(uint256[] memory keys, uint256[] memory values) internal pure returns (uint256[] memory) {
+  function sort(
+    uint256[] memory keys,
+    uint256[] memory values
+  ) internal pure returns (uint256[] memory) {
     require(values.length == keys.length, "Sorting: invalid array length");
     if (keys.length == 0) {
       return keys;
@@ -92,7 +102,11 @@ library Sorting {
     return _quickSortNodes(nodes, int256(0), int256(nodes.length - 1));
   }
 
-  function _quickSortNodes(Node[] memory nodes, int256 left, int256 right) private pure returns (Node[] memory) {
+  function _quickSortNodes(
+    Node[] memory nodes,
+    int256 left,
+    int256 right
+  ) private pure returns (Node[] memory) {
     int256 i = left;
     int256 j = right;
     if (i == j) return nodes;
@@ -126,7 +140,10 @@ library Sorting {
     return nodes;
   }
 
-  function __swapNodes(Node memory x, Node memory y) private pure returns (Node memory, Node memory) {
+  function __swapNodes(
+    Node memory x,
+    Node memory y
+  ) private pure returns (Node memory, Node memory) {
     Node memory tmp = x;
     (x, y) = (y, tmp);
     return (x, y);
@@ -165,7 +182,11 @@ library Sorting {
     return _quickSortNode3s(nodes, int256(0), int256(nodes.length - 1));
   }
 
-  function _quickSortNode3s(Node3[] memory nodes, int256 left, int256 right) private pure returns (Node3[] memory) {
+  function _quickSortNode3s(
+    Node3[] memory nodes,
+    int256 left,
+    int256 right
+  ) private pure returns (Node3[] memory) {
     int256 i = left;
     int256 j = right;
     if (i == j) return nodes;
@@ -199,7 +220,10 @@ library Sorting {
     return nodes;
   }
 
-  function __swapNode3s(Node3 memory x, Node3 memory y) private pure returns (Node3 memory, Node3 memory) {
+  function __swapNode3s(
+    Node3 memory x,
+    Node3 memory y
+  ) private pure returns (Node3 memory, Node3 memory) {
     Node3 memory tmp = x;
     (x, y) = (y, tmp);
     return (x, y);

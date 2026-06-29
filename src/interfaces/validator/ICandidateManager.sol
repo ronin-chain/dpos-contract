@@ -8,17 +8,17 @@ interface ICandidateManager {
   struct ValidatorCandidate {
     /**
      * @dev The address of the candidate admin.
-     * @custom shadowed-storage This storage slot is always kept in sync with {Profile-CandidateProfile}.admin.
+     * @custom:shadowed-storage This storage slot is always kept in sync with {Profile-CandidateProfile}.admin.
      */
     address __shadowedAdmin;
     /**
      * @dev Address of the validator that produces block, e.g. block.coinbase. This is so-called validator address.
-     * @custom shadowed-storage This storage slot is always kept in sync with {Profile-CandidateProfile}.consensus.
+     * @custom:shadowed-storage This storage slot is always kept in sync with {Profile-CandidateProfile}.consensus.
      */
     TConsensus __shadowedConsensus;
     /**
      * @dev Address that receives mining reward of the validator
-     * @custom shadowed-storage This storage slot is always kept in sync with {Profile-CandidateProfile}.treasury.
+     * @custom:shadowed-storage This storage slot is always kept in sync with {Profile-CandidateProfile}.treasury.
      */
     address payable __shadowedTreasury;
     /// @dev Address of the bridge operator corresponding to the candidate
@@ -147,12 +147,18 @@ interface ICandidateManager {
   /**
    * @dev Returns whether the address is the candidate admin.
    */
-  function isCandidateAdmin(TConsensus consensus, address admin) external view returns (bool);
+  function isCandidateAdmin(
+    TConsensus consensus,
+    address admin
+  ) external view returns (bool);
 
   /**
    * @dev Returns whether the address is the candidate admin.
    */
-  function isCandidateAdminById(address id, address admin) external view returns (bool);
+  function isCandidateAdminById(
+    address id,
+    address admin
+  ) external view returns (bool);
 
   /**
    * @dev Returns the schedule of changing commission rate of a candidate address.

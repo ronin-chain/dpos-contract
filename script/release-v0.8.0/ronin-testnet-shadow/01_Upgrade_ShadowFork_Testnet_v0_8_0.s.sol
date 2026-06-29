@@ -14,7 +14,8 @@ import { LibProposal } from "script/shared/libraries/LibProposal.sol";
 import { Contract } from "script/utils/Contract.sol";
 import { Network } from "script/utils/Network.sol";
 import {
-  TransparentUpgradeableProxy, TransparentUpgradeableProxyV2
+  TransparentUpgradeableProxy,
+  TransparentUpgradeableProxyV2
 } from "src/extensions/TransparentUpgradeableProxyV2.sol";
 import { IRoninGovernanceAdmin } from "src/interfaces/IRoninGovernanceAdmin.sol";
 
@@ -138,7 +139,10 @@ contract Migration_01_Upgrade_ShadowForkTestnet_Release_V0_8_0 is RoninMigration
     }
   }
 
-  function _recordContractToUpgrade(address gov, address payable[] memory allContracts) internal {
+  function _recordContractToUpgrade(
+    address gov,
+    address payable[] memory allContracts
+  ) internal {
     for (uint256 i; i < allContracts.length; i++) {
       address proxyAdmin = allContracts[i].getProxyAdmin(false);
       if (proxyAdmin != gov) {

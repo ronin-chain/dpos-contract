@@ -51,9 +51,8 @@ abstract contract CreditScore is
     uint256 periodStartAtBlock = validatorContract.currentPeriodStartAtBlock();
 
     bool[] memory jaileds = validatorContract.checkManyJailedById(validatorIds);
-    bool[] memory maintaineds = IMaintenance(getContract(ContractType.MAINTENANCE)).checkManyMaintainedInBlockRangeById(
-      validatorIds, periodStartAtBlock, block.number
-    );
+    bool[] memory maintaineds = IMaintenance(getContract(ContractType.MAINTENANCE))
+      .checkManyMaintainedInBlockRangeById(validatorIds, periodStartAtBlock, block.number);
     uint256[] memory updatedCreditScores = new uint256[](validatorIds.length);
 
     for (uint256 i = 0; i < validatorIds.length;) {
@@ -141,7 +140,10 @@ abstract contract CreditScore is
   /**
    * @dev See `ISlashUnavailability`
    */
-  function _getUnavailabilityIndicatorById(address validator, uint256 period) internal view virtual returns (uint256);
+  function _getUnavailabilityIndicatorById(
+    address validator,
+    uint256 period
+  ) internal view virtual returns (uint256);
 
   /**
    * @inheritdoc ICreditScore
@@ -190,18 +192,28 @@ abstract contract CreditScore is
   /**
    * @inheritdoc ICreditScore
    */
-  function checkBailedOutAtPeriod(TConsensus consensus, uint256 period) external view override returns (bool) {
+  function checkBailedOutAtPeriod(
+    TConsensus consensus,
+    uint256 period
+  ) external view override returns (bool) {
     return _checkBailedOutAtPeriodById(__css2cid(consensus), period);
   }
 
-  function _checkBailedOutAtPeriodById(address validatorId, uint256 period) internal view virtual returns (bool) {
+  function _checkBailedOutAtPeriodById(
+    address validatorId,
+    uint256 period
+  ) internal view virtual returns (bool) {
     return _checkBailedOutAtPeriod[validatorId][period];
   }
 
   /**
    * @dev See `SlashUnavailability`.
    */
-  function _setUnavailabilityIndicator(address _validator, uint256 period, uint256 _indicator) internal virtual;
+  function _setUnavailabilityIndicator(
+    address _validator,
+    uint256 period,
+    uint256 _indicator
+  ) internal virtual;
 
   function __css2cid(
     TConsensus consensusAddr

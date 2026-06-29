@@ -110,7 +110,10 @@ library LibSortValidatorsByBeaconOld {
    * @param period The period for which the IDs are being saved.
    * @param ids An array of addresses representing the unsorted IDs.
    */
-  function _saveAll(uint256 period, address[] memory ids) private {
+  function _saveAll(
+    uint256 period,
+    address[] memory ids
+  ) private {
     ValidatorStorage storage $ = _getValidatorPerPeriodLocation()[period];
     $._pickedAll = true;
     $._unsorted._ids = ids;
@@ -169,7 +172,10 @@ library LibSortValidatorsByBeaconOld {
   /**
    * @dev Returns the set of validators for a given period and epoch.
    */
-  function pickValidatorSet(uint256 period, uint256 epoch) internal view returns (address[] memory pickedValidatorIds) {
+  function pickValidatorSet(
+    uint256 period,
+    uint256 epoch
+  ) internal view returns (address[] memory pickedValidatorIds) {
     ValidatorStorage storage $ = _getValidatorPerPeriodLocation()[period];
     if ($._pickedAll) return $._unsorted._ids;
     return $._sorted._nonRotatingValidators.concat($._sorted._rotatingValidators[epoch]);
@@ -183,7 +189,12 @@ library LibSortValidatorsByBeaconOld {
    * @param beacon The beacon value.
    * @return weight The calculated weight.
    */
-  function _calcWeight(address id, uint256 staked, uint256 epoch, uint256 beacon) private pure returns (uint256 weight) {
+  function _calcWeight(
+    address id,
+    uint256 staked,
+    uint256 epoch,
+    uint256 beacon
+  ) private pure returns (uint256 weight) {
     assembly ("memory-safe") {
       // load the free memory pointer
       let ptr := mload(0x40)

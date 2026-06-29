@@ -37,7 +37,7 @@ contract RoninValidatorSetREP10MigratorLogicDeploy is RoninMigration {
 
   function _logicArgs() internal returns (bytes memory args) {
     ISharedArgument.RoninValidatorSetREP10MigratorParam memory param =
-      config.sharedArguments().roninValidatorSetREP10Migrator;
+    config.sharedArguments().roninValidatorSetREP10Migrator;
 
     address payable currProxy = loadContractOrDeploy(Contract.RoninValidatorSet.key());
     address prevImpl = _prevImpl == address(0x0) ? currProxy.getProxyImplementation() : _prevImpl;

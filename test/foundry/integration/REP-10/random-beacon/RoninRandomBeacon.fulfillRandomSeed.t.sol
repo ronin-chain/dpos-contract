@@ -23,9 +23,8 @@ contract RoninRandomBeacon_FulfillRandomSeed_Test is REP10_BaseTest {
     IRoninTrustedOrganization.TrustedOrganization[] memory gvs = new IRoninTrustedOrganization.TrustedOrganization[](1);
     gvs[0] = gov;
     vm.prank(address(governanceAdmin));
-    TransparentUpgradeableProxyV2(payable(address(roninTrustedOrganization))).functionDelegateCall(
-      abi.encodeCall(IRoninTrustedOrganization.addTrustedOrganizations, (gvs))
-    );
+    TransparentUpgradeableProxyV2(payable(address(roninTrustedOrganization)))
+      .functionDelegateCall(abi.encodeCall(IRoninTrustedOrganization.addTrustedOrganizations, (gvs)));
 
     LibWrapUpEpoch.wrapUpPeriods({ times: 1, shouldSubmitBeacon: false });
     wrapUpEpochCount = bound(wrapUpEpochCount, 1, 10);
@@ -117,7 +116,10 @@ contract RoninRandomBeacon_FulfillRandomSeed_Test is REP10_BaseTest {
     this.wrapUpPeriods({ times: 1, shouldSubmitBeacon: true });
   }
 
-  function wrapUpPeriods(uint256 times, bool shouldSubmitBeacon) external returns (VmSafe.Log[][] memory logs) {
+  function wrapUpPeriods(
+    uint256 times,
+    bool shouldSubmitBeacon
+  ) external returns (VmSafe.Log[][] memory logs) {
     LibWrapUpEpoch.wrapUpPeriods({ times: times, shouldSubmitBeacon: shouldSubmitBeacon });
   }
 
@@ -139,9 +141,8 @@ contract RoninRandomBeacon_FulfillRandomSeed_Test is REP10_BaseTest {
     IRoninTrustedOrganization.TrustedOrganization[] memory gvs = new IRoninTrustedOrganization.TrustedOrganization[](1);
     gvs[0] = gov;
     vm.prank(address(governanceAdmin));
-    TransparentUpgradeableProxyV2(payable(address(roninTrustedOrganization))).functionDelegateCall(
-      abi.encodeCall(IRoninTrustedOrganization.addTrustedOrganizations, (gvs))
-    );
+    TransparentUpgradeableProxyV2(payable(address(roninTrustedOrganization)))
+      .functionDelegateCall(abi.encodeCall(IRoninTrustedOrganization.addTrustedOrganizations, (gvs)));
 
     LibVRFProof.VRFKey[] memory keys = abi.decode(vme.getUserDefinedConfig("vrf-keys"), (LibVRFProof.VRFKey[]));
     LibVRFProof.VRFKey[] memory newKeys = new LibVRFProof.VRFKey[](keys.length + 1);

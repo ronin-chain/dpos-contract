@@ -11,7 +11,8 @@ import { RoninMigration } from "script/RoninMigration.s.sol";
 import { LibProposal } from "script/shared/libraries/LibProposal.sol";
 import { Contract } from "script/utils/Contract.sol";
 import {
-  TransparentUpgradeableProxy, TransparentUpgradeableProxyV2
+  TransparentUpgradeableProxy,
+  TransparentUpgradeableProxyV2
 } from "src/extensions/TransparentUpgradeableProxyV2.sol";
 import { IRoninGovernanceAdmin } from "src/interfaces/IRoninGovernanceAdmin.sol";
 import { IRoninTrustedOrganization } from "src/interfaces/IRoninTrustedOrganization.sol";

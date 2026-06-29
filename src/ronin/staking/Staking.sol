@@ -12,10 +12,20 @@ import "@openzeppelin-v4/contracts/proxy/utils/Initializable.sol";
 
 contract Staking is IStaking, StakingCallback, Initializable, AccessControlEnumerable {
   bytes32 public constant MIGRATOR_ROLE = keccak256("MIGRATOR_ROLE");
+  bytes32 public constant L2_MIGRATOR_ROLE = keccak256("L2_MIGRATOR_ROLE");
 
   // keccak256(abi.encode(uint256(keccak256("ronin.storage.StakingRep4MigratedStorageLocation")) - 1)) & ~bytes32(uint256(0xff))
   bytes32 private constant $_StakingRep4MigratedStorageLocation =
     0x02b7258856b9f6bdff23dae2002215e15e9b3a0101a83005baf0725f1e37df00;
+
+  /// @notice Flag indicating whether the contract has been migrated to L2.
+  bool internal s_l2Migrated;
+
+  error ErrL2MigrationNotCompleted();
+  error ErrPoolRevokingTimestampNotReach(address poolId, uint256 revokingTimestamp, uint256 blockTimestamp);
+
+  event L2MigrationStatusUpdated(address indexed by, bool status);
+  event PoolDeprecated(address indexed poolId);
 
   modifier onRep4Migration() {
     uint256 val;
@@ -24,6 +34,11 @@ contract Staking is IStaking, StakingCallback, Initializable, AccessControlEnume
     }
 
     if (val > 0) revert ErrMigrateWasAdminAlreadyDone();
+    _;
+  }
+
+  modifier onlyL2Migrated() {
+    require(s_l2Migrated, ErrL2MigrationNotCompleted());
     _;
   }
 
@@ -69,9 +84,52 @@ contract Staking is IStaking, StakingCallback, Initializable, AccessControlEnume
     _setContract(ContractType.PROFILE, __profileContract);
   }
 
-  function initializeV4(address admin, address migrator) external reinitializer(4) {
+  function initializeV4(
+    address admin,
+    address migrator
+  ) external reinitializer(4) {
     _grantRole(DEFAULT_ADMIN_ROLE, admin);
     _grantRole(MIGRATOR_ROLE, migrator);
+  }
+
+  function initializeV5(
+    address migrator
+  ) external reinitializer(5) {
+    _grantRole(L2_MIGRATOR_ROLE, migrator);
+  }
+
+  function setL2Migrated(
+    bool status
+  ) external onlyRole(L2_MIGRATOR_ROLE) {
+    s_l2Migrated = status;
+    emit L2MigrationStatusUpdated(msg.sender, status);
+  }
+
+  function isL2Migrated() external view returns (bool) {
+    return s_l2Migrated;
+  }
+
+  /// @dev Returns whether trusted organizations should be allowed to renounce.
+  /// After L2 migration, trusted orgs need the ability to exit gracefully.
+  function _shouldAllowTrustedOrg() internal view virtual override returns (bool) {
+    return s_l2Migrated;
+  }
+
+  function execRenounceAndDeprecatePool(
+    address poolId
+  ) external onlyPoolAdmin(_poolDetail[poolId], msg.sender) onlyL2Migrated {
+    IRoninValidatorSet validatorContract = IRoninValidatorSet(getContract(ContractType.VALIDATOR));
+    uint256 revokingTimestamp = validatorContract.getCandidateInfoById(poolId).revokingTimestamp;
+    uint256 currentPeriod = validatorContract.currentPeriod();
+
+    require(
+      revokingTimestamp != 0 && revokingTimestamp < block.timestamp,
+      ErrPoolRevokingTimestampNotReach(poolId, revokingTimestamp, block.timestamp)
+    );
+
+    _deprecatePool(poolId, currentPeriod);
+
+    emit PoolDeprecated(poolId);
   }
 
   /**

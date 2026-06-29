@@ -51,7 +51,11 @@ contract Maintenance_Base_Test is Test {
     _applyValidatorCandidate();
   }
 
-  function _applyValidatorCandidate(address candidateAdmin, TConsensus consensusAddr, uint256 value) internal {
+  function _applyValidatorCandidate(
+    address candidateAdmin,
+    TConsensus consensusAddr,
+    uint256 value
+  ) internal {
     vm.deal(candidateAdmin, value);
     vm.startPrank(candidateAdmin);
 

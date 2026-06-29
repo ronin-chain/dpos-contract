@@ -47,7 +47,10 @@ library LibArray {
    * @param arr2 The second array of uint256 values.
    * @return res The sum of the two arrays.
    */
-  function add(uint256[] memory arr1, uint256[] memory arr2) internal pure returns (uint256[] memory res) {
+  function add(
+    uint256[] memory arr1,
+    uint256[] memory arr2
+  ) internal pure returns (uint256[] memory res) {
     uint256 length = arr1.length;
     if (length != arr2.length) revert ErrLengthMismatch();
 
@@ -220,7 +223,10 @@ library LibArray {
   /**
    * @dev Returns whether two arrays of addresses are equal or not.
    */
-  function isEqual(address[] memory self, address[] memory other) internal pure returns (bool yes) {
+  function isEqual(
+    address[] memory self,
+    address[] memory other
+  ) internal pure returns (bool yes) {
     return hash(self) == hash(other);
   }
 
@@ -258,7 +264,10 @@ library LibArray {
   /**
    * @dev Return the concatenated array (uint256) from a and b.
    */
-  function concat(uint256[] memory a, uint256[] memory b) internal pure returns (uint256[] memory c) {
+  function concat(
+    uint256[] memory a,
+    uint256[] memory b
+  ) internal pure returns (uint256[] memory c) {
     unchecked {
       uint256 lengthA = a.length;
       uint256 lengthB = b.length;
@@ -285,7 +294,10 @@ library LibArray {
   /**
    * @dev Return the concatenated array (address) from a and b.
    */
-  function concat(address[] memory a, address[] memory b) internal pure returns (address[] memory c) {
+  function concat(
+    address[] memory a,
+    address[] memory b
+  ) internal pure returns (address[] memory c) {
     return unsafeToAddresses(concat(toUint256s(a), toUint256s(b)));
   }
 
@@ -365,7 +377,10 @@ library LibArray {
    *
    * Inspiration from: https://numpy.org/doc/stable/reference/generated/numpy.take.html
    */
-  function take(uint256[] memory self, uint256[] memory ids) internal pure returns (uint256[] memory result) {
+  function take(
+    uint256[] memory self,
+    uint256[] memory ids
+  ) internal pure returns (uint256[] memory result) {
     uint256 length = ids.length;
     result = new uint256[](length);
     for (uint256 i; i < length; ++i) {
@@ -376,7 +391,10 @@ library LibArray {
   /**
    * @dev Take elements from an array (address) given an array of indices.
    */
-  function take(address[] memory self, uint256[] memory indices) internal pure returns (address[] memory result) {
+  function take(
+    address[] memory self,
+    uint256[] memory indices
+  ) internal pure returns (address[] memory result) {
     return unsafeToAddresses(take(toUint256s(self), indices));
   }
 
@@ -488,7 +506,11 @@ library LibArray {
    *
    * WARNING This function modify `values`
    */
-  function _inplaceDescQuickSort(uint256[] memory values, int256 left, int256 right) private pure {
+  function _inplaceDescQuickSort(
+    uint256[] memory values,
+    int256 left,
+    int256 right
+  ) private pure {
     unchecked {
       if (left < right) {
         if (left == right) return;
@@ -532,7 +554,10 @@ library LibArray {
    *
    * WARNING: The new length of the array should not be greater than the current length to avoid collision with other already allocated memory.
    */
-  function unsafeResize(uint256[] memory self, uint256 length) internal pure returns (uint256[] memory resized) {
+  function unsafeResize(
+    uint256[] memory self,
+    uint256 length
+  ) internal pure returns (uint256[] memory resized) {
     assembly ("memory-safe") {
       resized := self
       mstore(resized, length)
@@ -544,7 +569,10 @@ library LibArray {
    *
    * WARNING: The new length of the array should not be greater than the current length to avoid collision with other already allocated memory.
    */
-  function unsafeResize(address[] memory self, uint256 length) internal pure returns (address[] memory resized) {
+  function unsafeResize(
+    address[] memory self,
+    uint256 length
+  ) internal pure returns (address[] memory resized) {
     return unsafeToAddresses(unsafeResize(toUint256s(self), length));
   }
 

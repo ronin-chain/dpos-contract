@@ -56,11 +56,9 @@ abstract contract SlashFastFinality is ISlashFastFinality, HasContracts, PCUVali
       revert ErrUnregisteredPublicKey();
     }
 
-    if (
-      _pcValidateFastFinalityEvidence(
+    if (_pcValidateFastFinalityEvidence(
         voterPublicKey, targetBlockNumber, targetBlockHash, listOfPublicKey, aggregatedSignature
-      )
-    ) {
+      )) {
       _processedEvidence[evidenceHash] = true;
 
       IRoninValidatorSet validatorContract = IRoninValidatorSet(getContract(ContractType.VALIDATOR));
@@ -90,14 +88,20 @@ abstract contract SlashFastFinality is ISlashFastFinality, HasContracts, PCUVali
   /**
    * @inheritdoc ISlashFastFinality
    */
-  function setFastFinalitySlashingConfigs(uint256 slashAmount, uint256 jailUntilBlock) external override onlyAdmin {
+  function setFastFinalitySlashingConfigs(
+    uint256 slashAmount,
+    uint256 jailUntilBlock
+  ) external override onlyAdmin {
     _setFastFinalitySlashingConfigs(slashAmount, jailUntilBlock);
   }
 
   /**
    * @dev See `ISlashFastFinality-setFastFinalitySlashingConfigs`.
    */
-  function _setFastFinalitySlashingConfigs(uint256 slashAmount, uint256 jailUntilBlock) internal {
+  function _setFastFinalitySlashingConfigs(
+    uint256 slashAmount,
+    uint256 jailUntilBlock
+  ) internal {
     _slashFastFinalityAmount = slashAmount;
     _fastFinalityJailUntilBlock = jailUntilBlock;
     emit FastFinalitySlashingConfigsUpdated(slashAmount, jailUntilBlock);

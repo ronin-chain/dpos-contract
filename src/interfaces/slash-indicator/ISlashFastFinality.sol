@@ -53,5 +53,8 @@ interface ISlashFastFinality is IBaseSlash {
    * @param jailUntilBlock The block number that the punished validator will be jailed until, due to fast finality.
    *
    */
-  function setFastFinalitySlashingConfigs(uint256 slashAmount, uint256 jailUntilBlock) external;
+  function setFastFinalitySlashingConfigs(
+    uint256 slashAmount,
+    uint256 jailUntilBlock
+  ) external;
 }

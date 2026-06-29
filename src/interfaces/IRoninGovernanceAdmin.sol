@@ -49,9 +49,15 @@ interface IRoninGovernanceAdmin is IGovernanceAdmin {
     Ballot.VoteType _support
   ) external;
 
-  function deleteExpired(uint256 chainId, uint256 _round) external;
+  function deleteExpired(
+    uint256 chainId,
+    uint256 _round
+  ) external;
 
-  function emergencyPollVoted(bytes32 _voteHash, address _voter) external view returns (bool);
+  function emergencyPollVoted(
+    bytes32 _voteHash,
+    address _voter
+  ) external view returns (bool);
 
   function propose(
     uint256 chainId,

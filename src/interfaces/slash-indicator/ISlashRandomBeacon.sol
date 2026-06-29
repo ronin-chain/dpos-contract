@@ -32,7 +32,10 @@ interface ISlashRandomBeacon is IBaseSlash {
    * @param validatorId The id of the validator.
    * @param period The current period.
    */
-  function slashRandomBeacon(address validatorId, uint256 period) external;
+  function slashRandomBeacon(
+    address validatorId,
+    uint256 period
+  ) external;
 
   /**
    * @dev Returns the configs related to block producer slashing.
@@ -53,5 +56,8 @@ interface ISlashRandomBeacon is IBaseSlash {
    * @param slashAmount The amount of RON to slash random beacon.
    * @param activatedAtPeriod The period to activate the slashing.
    */
-  function setRandomBeaconSlashingConfigs(uint256 slashAmount, uint256 activatedAtPeriod) external;
+  function setRandomBeaconSlashingConfigs(
+    uint256 slashAmount,
+    uint256 activatedAtPeriod
+  ) external;
 }

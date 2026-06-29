@@ -4,11 +4,17 @@ pragma solidity ^0.8.19;
 import { LibProxy } from "@fdk/libraries/LibProxy.sol";
 import { TContract } from "@fdk/types/Types.sol";
 import { DefaultNetwork } from "@fdk/utils/DefaultNetwork.sol";
-import { TransparentUpgradeableProxy } from
-  "@openzeppelin-v4/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
+import {
+  TransparentUpgradeableProxy
+} from "@openzeppelin-v4/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 import { StdStyle } from "forge-std/StdStyle.sol";
 import { console } from "forge-std/console.sol";
-import { IRoninGovernanceAdmin, IRoninTrustedOrganization, Proposal, RoninMigration } from "script/RoninMigration.s.sol";
+import {
+  IRoninGovernanceAdmin,
+  IRoninTrustedOrganization,
+  Proposal,
+  RoninMigration
+} from "script/RoninMigration.s.sol";
 
 import { LibProposal } from "script/shared/libraries/LibProposal.sol";
 import { Contract } from "script/utils/Contract.sol";

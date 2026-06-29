@@ -7,6 +7,7 @@ import "../extensions/collections/HasContracts.sol";
 import "../extensions/consumers/PercentageConsumer.sol";
 import "../interfaces/IStakingVesting.sol";
 
+import { IStaking } from "../interfaces/staking/IStaking.sol";
 import { IRoninValidatorSet } from "../interfaces/validator/IRoninValidatorSet.sol";
 import "../utils/CommonErrors.sol";
 import { HasValidatorDeprecated } from "../utils/DeprecatedSlots.sol";
@@ -34,6 +35,8 @@ contract StakingVesting is
   uint256 internal _rep10ActivationPeriod;
   /// @dev The boolean flag to check if REP-10 is activated.
   bool internal _isREP10Activated;
+  /// @dev The address of the migrator.
+  address internal _migratorAddress;
 
   constructor() {
     _disableInitializers();
@@ -63,10 +66,42 @@ contract StakingVesting is
     _setFastFinalityRewardPercentage(fastFinalityRewardPercent);
   }
 
-  function initializeV4(uint256 activatedAtPeriod, uint256 fastFinalityRewardPercentREP10) external reinitializer(4) {
+  function initializeV4(
+    uint256 activatedAtPeriod,
+    uint256 fastFinalityRewardPercentREP10
+  ) external reinitializer(4) {
     _rep10ActivationPeriod = activatedAtPeriod;
     _fastFinalityRewardPercentageREP10 = fastFinalityRewardPercentREP10;
     emit FastFinalityRewardPercentageUpdatedForREP10(fastFinalityRewardPercentREP10);
+  }
+
+  function initializeV5(
+    address migratorAddress,
+    address stakingContract
+  ) external reinitializer(5) {
+    _migratorAddress = migratorAddress;
+    _setContract(ContractType.STAKING, stakingContract);
+  }
+
+  /**
+   * @dev Migrate reward to the address `to`.
+   */
+  function migrateReward(
+    address to,
+    uint256 amount
+  ) external {
+    if (msg.sender != _migratorAddress) revert ErrNotMigrator();
+    if (!IStaking(getContract(ContractType.STAKING)).isL2Migrated()) revert ErrL2MigrationNotCompleted();
+    if (!_unsafeSendRON(payable(to), amount)) {
+      revert ErrMigrateRewardFailed(to, amount, address(this).balance);
+    }
+  }
+
+  /**
+   * @dev Returns the address of the migrator.
+   */
+  function getMigratorAddress() external view returns (address) {
+    return _migratorAddress;
   }
 
   /**

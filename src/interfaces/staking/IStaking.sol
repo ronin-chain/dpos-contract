@@ -39,9 +39,20 @@ interface IStaking is IRewardPool, IBaseStaking, ICandidateStaking, IDelegatorSt
     address __profileContract
   ) external;
 
-  function initializeV4(address admin, address migrator) external;
+  function initializeV4(
+    address admin,
+    address migrator
+  ) external;
 
-  function migrateWasAdmin(address[] calldata poolIds, address[] calldata admins, bool[] calldata flags) external;
+  function initializeV5(
+    address migrator
+  ) external;
+
+  function migrateWasAdmin(
+    address[] calldata poolIds,
+    address[] calldata admins,
+    bool[] calldata flags
+  ) external;
 
   function disableMigrateWasAdmin() external;
 
@@ -58,7 +69,11 @@ interface IStaking is IRewardPool, IBaseStaking, ICandidateStaking, IDelegatorSt
    * Note: This method should be called once at the period ending.
    *
    */
-  function execRecordRewards(address[] calldata poolIds, uint256[] calldata rewards, uint256 period) external payable;
+  function execRecordRewards(
+    address[] calldata poolIds,
+    uint256[] calldata rewards,
+    uint256 period
+  ) external payable;
 
   /**
    * @dev Deducts from staking amount of the validator `_consensusAddr` for `_amount`.
@@ -69,5 +84,13 @@ interface IStaking is IRewardPool, IBaseStaking, ICandidateStaking, IDelegatorSt
    * Emits the event `Unstaked`.
    *
    */
-  function execDeductStakingAmount(address poolId, uint256 amount) external returns (uint256 actualDeductingAmount);
+  function execDeductStakingAmount(
+    address poolId,
+    uint256 amount
+  ) external returns (uint256 actualDeductingAmount);
+
+  /**
+   * @dev Returns whether the contract has been migrated to L2.
+   */
+  function isL2Migrated() external view returns (bool);
 }

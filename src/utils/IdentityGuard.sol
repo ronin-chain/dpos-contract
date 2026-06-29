@@ -104,7 +104,10 @@ abstract contract IdentityGuard {
    * @param contractAddr The address of the contract to check for interface support.
    * @param interfaceId The interface ID to check for support.
    */
-  function _requireSupportsInterface(address contractAddr, bytes4 interfaceId) internal view {
+  function _requireSupportsInterface(
+    address contractAddr,
+    bytes4 interfaceId
+  ) internal view {
     bytes memory supportsInterfaceParams = abi.encodeCall(IERC165.supportsInterface, (interfaceId));
     (bool success, bytes memory returnOrRevertData) = contractAddr.staticcall(supportsInterfaceParams);
     if (!success) {

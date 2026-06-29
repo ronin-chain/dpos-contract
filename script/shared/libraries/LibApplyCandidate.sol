@@ -12,7 +12,11 @@ library LibApplyCandidate {
 
   Vm internal constant vm = Vm(LibSharedAddress.VM);
 
-  function applyValidatorCandidate(address staking, address candidateAdmin, address consensusAddr) internal {
+  function applyValidatorCandidate(
+    address staking,
+    address candidateAdmin,
+    address consensusAddr
+  ) internal {
     uint256 value = ICandidateStaking(staking).minValidatorStakingAmount();
     applyValidatorCandidate(staking, candidateAdmin, consensusAddr, value);
   }

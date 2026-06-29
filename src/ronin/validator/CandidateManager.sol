@@ -231,15 +231,24 @@ abstract contract CandidateManager is
   /**
    * @inheritdoc ICandidateManager
    */
-  function isCandidateAdmin(TConsensus consensusAddr, address admin) external view override returns (bool) {
+  function isCandidateAdmin(
+    TConsensus consensusAddr,
+    address admin
+  ) external view override returns (bool) {
     return _isCandidateAdminById(__css2cid(consensusAddr), admin);
   }
 
-  function isCandidateAdminById(address candidateId, address admin) external view returns (bool) {
+  function isCandidateAdminById(
+    address candidateId,
+    address admin
+  ) external view returns (bool) {
     return _isCandidateAdminById(candidateId, admin);
   }
 
-  function _isCandidateAdminById(address candidateId, address admin) internal view returns (bool) {
+  function _isCandidateAdminById(
+    address candidateId,
+    address admin
+  ) internal view returns (bool) {
     return _candidateInfo[candidateId].__shadowedAdmin == admin;
   }
 
@@ -297,7 +306,10 @@ abstract contract CandidateManager is
   /**
    * @dev Sets timestamp to revoke a candidate.
    */
-  function _setRevokingTimestamp(ValidatorCandidate storage _candidate, uint256 timestamp) internal {
+  function _setRevokingTimestamp(
+    ValidatorCandidate storage _candidate,
+    uint256 timestamp
+  ) internal {
     address cid = __css2cid(_candidate.__shadowedConsensus);
     if (!_isValidatorCandidateById(cid)) revert ErrNonExistentCandidate();
     _candidate.revokingTimestamp = timestamp;

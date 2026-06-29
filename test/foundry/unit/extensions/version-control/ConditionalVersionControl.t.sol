@@ -76,7 +76,10 @@ contract ConditionalImplementControlTest is Test {
   /**
    * @notice Tests invalid inputs with duplicated addresses.
    */
-  function testFuzz_RevertIf_DuplicatedAddress(uint8 instruction, address dupAddr) external virtual {
+  function testFuzz_RevertIf_DuplicatedAddress(
+    uint8 instruction,
+    address dupAddr
+  ) external virtual {
     vm.skip(true);
     instruction = instruction % 7; // 0b111
     vm.assume(instruction != 1 && instruction != 2 && instruction != 4); // 0b001, 0b010, 0b100
@@ -107,7 +110,10 @@ contract ConditionalImplementControlTest is Test {
   /**
    * @notice Tests invalid inputs with non-contract addresses.
    */
-  function testFuzz_RevertIf_NonContract(uint8 idx, address nonContract) external virtual {
+  function testFuzz_RevertIf_NonContract(
+    uint8 idx,
+    address nonContract
+  ) external virtual {
     vm.assume(nonContract.code.length == 0);
     idx %= 3;
     address[3] memory inputs = _getTestAddresses();

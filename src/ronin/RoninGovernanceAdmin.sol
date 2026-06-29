@@ -59,7 +59,10 @@ contract RoninGovernanceAdmin is
   /**
    * @dev Returns whether the voter casted vote for emergency exit poll.
    */
-  function emergencyPollVoted(bytes32 _voteHash, address _voter) external view returns (bool) {
+  function emergencyPollVoted(
+    bytes32 _voteHash,
+    address _voter
+  ) external view returns (bool) {
     return _emergencyExitPoll[_voteHash].voted(_voter);
   }
 
@@ -151,7 +154,10 @@ contract RoninGovernanceAdmin is
    * - The proposal is already created.
    *
    */
-  function deleteExpired(uint256 _chainId, uint256 _round) external {
+  function deleteExpired(
+    uint256 _chainId,
+    uint256 _round
+  ) external {
     ProposalVote storage _vote = vote[_chainId][_round];
     if (_vote.hash == 0) revert ErrQueryForEmptyVote();
 
@@ -219,13 +225,14 @@ contract RoninGovernanceAdmin is
     address _governor
   ) internal view virtual override returns (uint256) {
     bytes4 _selector = IRoninTrustedOrganization.getGovernorWeight.selector;
-    (bool _success, bytes memory _returndata) = getContract(ContractType.RONIN_TRUSTED_ORGANIZATION).staticcall(
-      abi.encodeWithSelector(
-        // TransparentUpgradeableProxyV2.functionDelegateCall.selector,
-        0x4bb5274a,
-        abi.encodeWithSelector(_selector, _governor)
-      )
-    );
+    (bool _success, bytes memory _returndata) = getContract(ContractType.RONIN_TRUSTED_ORGANIZATION)
+      .staticcall(
+        abi.encodeWithSelector(
+          // TransparentUpgradeableProxyV2.functionDelegateCall.selector,
+          0x4bb5274a,
+          abi.encodeWithSelector(_selector, _governor)
+        )
+      );
     _success.handleRevert(_selector, _returndata);
     return abi.decode(_returndata, (uint256));
   }
@@ -237,13 +244,14 @@ contract RoninGovernanceAdmin is
     address[] memory governors
   ) internal view virtual returns (uint256) {
     bytes4 _selector = IRoninTrustedOrganization.sumGovernorWeight.selector;
-    (bool _success, bytes memory _returndata) = getContract(ContractType.RONIN_TRUSTED_ORGANIZATION).staticcall(
-      abi.encodeWithSelector(
-        // TransparentUpgradeableProxyV2.functionDelegateCall.selector,
-        0x4bb5274a,
-        abi.encodeWithSelector(_selector, governors)
-      )
-    );
+    (bool _success, bytes memory _returndata) = getContract(ContractType.RONIN_TRUSTED_ORGANIZATION)
+      .staticcall(
+        abi.encodeWithSelector(
+          // TransparentUpgradeableProxyV2.functionDelegateCall.selector,
+          0x4bb5274a,
+          abi.encodeWithSelector(_selector, governors)
+        )
+      );
 
     _success.handleRevert(_selector, _returndata);
     return abi.decode(_returndata, (uint256));
@@ -257,13 +265,14 @@ contract RoninGovernanceAdmin is
     address recipientAfterUnlockedFund
   ) internal virtual {
     bytes4 _selector = IEmergencyExit.execReleaseLockedFundForEmergencyExitRequest.selector;
-    (bool _success, bytes memory _returndata) = getContract(ContractType.VALIDATOR).call(
-      abi.encodeWithSelector(
-        // TransparentUpgradeableProxyV2.functionDelegateCall.selector,
-        0x4bb5274a,
-        abi.encodeWithSelector(_selector, validatorId, recipientAfterUnlockedFund)
-      )
-    );
+    (bool _success, bytes memory _returndata) = getContract(ContractType.VALIDATOR)
+      .call(
+        abi.encodeWithSelector(
+          // TransparentUpgradeableProxyV2.functionDelegateCall.selector,
+          0x4bb5274a,
+          abi.encodeWithSelector(_selector, validatorId, recipientAfterUnlockedFund)
+        )
+      );
     _success.handleRevert(_selector, _returndata);
   }
 

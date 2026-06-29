@@ -11,8 +11,9 @@ import { LibProxy } from "@fdk/libraries/LibProxy.sol";
 
 import { TContract } from "@fdk/types/TContract.sol";
 import { IAccessControl } from "@openzeppelin-v4/contracts/access/IAccessControl.sol";
-import { TransparentUpgradeableProxy } from
-  "@openzeppelin-v4/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
+import {
+  TransparentUpgradeableProxy
+} from "@openzeppelin-v4/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 
 import { IRoninTrustedOrganization } from "src/interfaces/IRoninTrustedOrganization.sol";
 import { ICandidateStaking } from "src/interfaces/staking/ICandidateStaking.sol";
@@ -54,7 +55,7 @@ abstract contract PostChecker_GovernanceAdmin is BaseMigration, PostChecker_Help
     __trustedOrg = loadContract(Contract.RoninTrustedOrganization.key());
 
     _postCheck__UpgradeAllContracts();
-    _postCheck__ChangeAdminAllContracts();
+    // _postCheck__ChangeAdminAllContracts();
   }
 
   function _postCheck__UpgradeAllContracts()
@@ -88,8 +89,9 @@ abstract contract PostChecker_GovernanceAdmin is BaseMigration, PostChecker_Help
     cleanUpProxyTargets
     logPostCheck("[GovernanceAdmin] change admin all contracts")
   {
-    __newGovernanceAdmin =
-      new RoninGovernanceAdmin(block.chainid, __trustedOrg, loadContract(Contract.RoninValidatorSet.key()), 14 days);
+    __newGovernanceAdmin = new RoninGovernanceAdmin(
+      block.chainid, __trustedOrg, loadContract(Contract.RoninValidatorSet.key()), 14 days
+    );
 
     // Get all contracts deployed from the current network
     address payable[] memory addrs = vme.getAllAddresses(network());

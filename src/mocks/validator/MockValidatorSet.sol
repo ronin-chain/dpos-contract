@@ -88,7 +88,10 @@ contract MockValidatorSet is
     TConsensus
   ) external view override returns (bool) { }
 
-  function checkMiningRewardDeprecatedAtPeriod(TConsensus, uint256 period) external view override returns (bool) { }
+  function checkMiningRewardDeprecatedAtPeriod(
+    TConsensus,
+    uint256 period
+  ) external view override returns (bool) { }
 
   function checkBridgeRewardDeprecatedAtPeriod(
     TConsensus _consensusAddr,
@@ -107,13 +110,26 @@ contract MockValidatorSet is
     uint256 _block
   ) external view override returns (bool) { }
 
-  function execSlash(address cid, uint256 newJailedUntil, uint256 slashAmount, bool cannotBailout) external override { }
+  function execSlash(
+    address cid,
+    uint256 newJailedUntil,
+    uint256 slashAmount,
+    bool cannotBailout
+  ) external override { }
 
-  function execBailOut(address, uint256) external override { }
+  function execBailOut(
+    address,
+    uint256
+  ) external override { }
 
   function maxValidatorNumber() external view override returns (uint256 _maximumValidatorNumber) { }
 
-  function maxPrioritizedValidatorNumber() external view override returns (uint256 _maximumPrioritizedValidatorNumber) { }
+  function maxPrioritizedValidatorNumber()
+    external
+    view
+    override
+    returns (uint256 _maximumPrioritizedValidatorNumber)
+  { }
 
   function numberOfBlocksInEpoch() public view override returns (uint256) {
     return _numberOfBlocksInEpoch;
@@ -159,7 +175,10 @@ contract MockValidatorSet is
 
   function currentPeriodStartAtBlock() external view override returns (uint256) { }
 
-  function checkJailedAtBlock(TConsensus _addr, uint256 _blockNum) external view override returns (bool) { }
+  function checkJailedAtBlock(
+    TConsensus _addr,
+    uint256 _blockNum
+  ) external view override returns (bool) { }
 
   function getJailedTimeLeftAtBlock(
     TConsensus _addr,
@@ -207,7 +226,10 @@ contract MockValidatorSet is
     TConsensus consensus
   ) external view override returns (EmergencyExitInfo memory) { }
 
-  function execRequestEmergencyExit(address, uint256) external { }
+  function execRequestEmergencyExit(
+    address,
+    uint256
+  ) external { }
 
   function isOperatingBridge(
     TConsensus

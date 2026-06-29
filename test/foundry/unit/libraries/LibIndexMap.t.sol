@@ -12,7 +12,10 @@ contract LibIndexMapTest is Test {
     assertTrue(map._inner.length != 0, "map.length == 0");
   }
 
-  function testFuzz_ShouldNotRecordUnsetIndex_contains(uint16 length, uint16 indexToRecord) external pure {
+  function testFuzz_ShouldNotRecordUnsetIndex_contains(
+    uint16 length,
+    uint16 indexToRecord
+  ) external pure {
     IndexMap memory map = LibIndexMap.create(length);
 
     vm.assume(indexToRecord < length);
@@ -43,7 +46,10 @@ contract LibIndexMapTest is Test {
     map.set(1000);
   }
 
-  function testFuzz_shouldStoreIndexCorrectly_contains(uint256[] calldata values, uint256 indexToRecord) external pure {
+  function testFuzz_shouldStoreIndexCorrectly_contains(
+    uint256[] calldata values,
+    uint256 indexToRecord
+  ) external pure {
     IndexMap memory map = LibIndexMap.create(uint16(values.length));
 
     vm.assume(indexToRecord < values.length);

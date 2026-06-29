@@ -130,9 +130,9 @@ abstract contract ValidatorInfoStorageV2 is IValidatorInfoV2, HasContracts, HasT
    * @inheritdoc IValidatorInfoV2
    */
   function maxPrioritizedValidatorNumber() external view override returns (uint256 _maximumPrioritizedValidatorNumber) {
-    return IRandomBeacon(getContract(ContractType.RANDOM_BEACON)).getValidatorThreshold(
-      IRandomBeacon.ValidatorType.Governing
-    );
+    return
+      IRandomBeacon(getContract(ContractType.RANDOM_BEACON))
+        .getValidatorThreshold(IRandomBeacon.ValidatorType.Governing);
   }
 
   /// @dev See {RoninValidatorSet-__css2cid}

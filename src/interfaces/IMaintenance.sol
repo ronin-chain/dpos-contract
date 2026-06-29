@@ -111,12 +111,18 @@ interface IMaintenance {
   /**
    * @dev Returns whether the validator `consensusAddr` maintained at the block number `_block`.
    */
-  function checkMaintained(TConsensus consensusAddr, uint256 _block) external view returns (bool);
+  function checkMaintained(
+    TConsensus consensusAddr,
+    uint256 _block
+  ) external view returns (bool);
 
   /**
    * @dev Returns whether the validator whose id `validatorId` maintained at the block number `_block`.
    */
-  function checkMaintainedById(address validatorId, uint256 _block) external view returns (bool);
+  function checkMaintainedById(
+    address validatorId,
+    uint256 _block
+  ) external view returns (bool);
 
   /**
    * @dev Returns whether the validator `consensusAddr` maintained in the inclusive range [`_fromBlock`, `_toBlock`] of blocks.
@@ -253,7 +259,11 @@ interface IMaintenance {
    * Emits the event `MaintenanceScheduled`.
    *
    */
-  function schedule(TConsensus consensusAddr, uint256 startedAtBlock, uint256 endedAtBlock) external;
+  function schedule(
+    TConsensus consensusAddr,
+    uint256 startedAtBlock,
+    uint256 endedAtBlock
+  ) external;
 
   /**
    * @dev Cancel the schedule of maintenance for the `consensusAddr`.
